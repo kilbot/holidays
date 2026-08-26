@@ -1,0 +1,876 @@
+[
+  {
+    "name": "Parkes Elvis Festival",
+    "region": "NSW — Central West / Parkes",
+    "tags": ["festival", "quirky", "small-town", "music", "date-locked", "kitsch", "free-fringe"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "500-900",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 6–10 January 2027 (Wed–Sun), theme 'Elvis on Tour', 200+ events over five days. Parkes is 365km west of Sydney and inland-hot in January (35-40°C common). Accommodation in Parkes sells out roughly a year ahead and prices triple — the standard workaround is staying in Forbes (35km) or Orange (1.5hr) and driving in. Much of the street programme is free.",
+    "why_rated": "The single most-cited 'only in Australia' event on r/australia quirky-festival threads and a staple of every Australian-oddities YouTube list: an entire wheat-belt town of 11,000 goes full 1950s Memphis, with a chartered Elvis Express train from Sydney Central where the passengers are all in jumpsuits. Regional-listicle sweeps miss it because it is nobody's 'destination' — it's an event that happens to a town.",
+    "nearest_airport": "PKE (Parkes, limited) / SYD",
+    "sources": [
+      "https://www.parkeselvisfestival.com.au/",
+      "https://visitparkes.com.au/events/parkes-elvis-festival-2027/",
+      "https://en.wikipedia.org/wiki/Parkes_Elvis_Festival"
+    ]
+  },
+  {
+    "name": "Illawarra Folk Festival, Bulli",
+    "region": "NSW — Illawarra / Bulli",
+    "tags": ["festival", "music", "folk", "hippie", "camping", "date-locked", "budget"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "350-650",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 15–17 January 2027, its 40th anniversary edition, at Bulli Showground on the Illawarra escarpment — 80km south of Sydney, reachable by train from Central. On-site camping available. 100+ acts across folk, roots, bluegrass, Balkan, Celtic and world music.",
+    "why_rated": "The festival regulars name when asked for 'Woodford but small and near Sydney' — barefoot, family-run, escarpment-and-ocean setting, and cheap enough to be a whim rather than a plan. Missed by NSW regional sweeps because Bulli reads as a Wollongong suburb, not a destination.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nsw.gov.au/visiting-and-exploring-nsw/nsw-events/illawarra-folk-festival",
+      "https://www.abc.net.au/news/2026-01-02/great-regional-festivals-in-australia/105752036"
+    ]
+  },
+  {
+    "name": "Tunarama Festival, Port Lincoln",
+    "region": "SA — Eyre Peninsula / Port Lincoln",
+    "tags": ["festival", "quirky", "small-town", "seafood", "date-locked", "free-fringe"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 15–17 January 2027 (Bendigo Bank Tunarama). Genuinely back from the dead — the festival was axed after 2023, returned in January 2026 to strong crowds, and 2027 is confirmed as an expanded programme. Frozen-tuna throwing was retired from the original format on welfare grounds and reworked; check the current event list before selling anyone on the classic Tuna Toss.",
+    "why_rated": "Australia's most famous absurd small-town festival — the tuna-toss town — and the one thing that turns Port Lincoln from a shark-cage staging post into a destination for a weekend. Recurring answer in 'weirdest Australian festival' threads; regional SA sweeps catch Port Lincoln the place but not this date.",
+    "nearest_airport": "PLO",
+    "sources": [
+      "https://www.tunaramafestival.com.au/",
+      "https://portlincoln.com.au/tunarama/",
+      "https://www.abc.net.au/news/2026-01-18/return-of-port-lincoln-tunarama-festival-sees-big-fish-seafood/106238468"
+    ]
+  },
+  {
+    "name": "National Multicultural Festival, Canberra",
+    "region": "ACT — Canberra city centre",
+    "tags": ["festival", "food", "free", "multicultural", "date-locked", "budget"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 5–7 February 2027, confirmed by ACT Government in June 2026. Free entry; you pay only for food and drink. ~350,000 attendees over the weekend and around 300 food stalls take over the Civic streets. Canberra accommodation spikes hard that weekend — book early or day-trip from Sydney (3hr drive).",
+    "why_rated": "The cheapest big day out in the country and the standard r/canberra answer to 'is Canberra worth it' — the one weekend a year the city is unambiguously fun. Regional sweeps treat Canberra as museums-and-Parliament; this is the opposite of that.",
+    "nearest_airport": "CBR",
+    "sources": [
+      "https://www.act.gov.au/our-canberra/latest-news/2026/june/2027-national-multicultural-festival-dates-announced",
+      "https://multiculturalfestival.com.au/",
+      "https://en.wikipedia.org/wiki/National_Multicultural_Festival"
+    ]
+  },
+  {
+    "name": "Lunar New Year 2027 — Sydney, Melbourne, Bendigo, Brisbane",
+    "region": "Cross-state — major cities (Sydney lead)",
+    "tags": ["festival", "free", "food", "multicultural", "date-locked", "city", "budget"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED to the lunar calendar: Lunar New Year day is Saturday 6 February 2027 (Year of the Fire Goat). City festivals typically run roughly two weeks bracketing that date; Sydney's programme (lion dances, lantern installations, Dragon Boat races in Darling Harbour, Haymarket night markets) is the largest outside Asia. Exact 2027 city programmes are not published this far ahead — recheck from November 2026. Only reachable if the trip's tail extends past ~4 Feb.",
+    "why_rated": "Consistently named in 'what's actually on in February' threads as the free thing that beats every paid attraction that week, and the reason Chinatown food crawls are worth doing that fortnight specifically. Regional sweeps miss it because it is a date, not a place.",
+    "nearest_airport": "SYD / MEL / BNE",
+    "sources": [
+      "https://www.sydney.com/events/lunar-new-year",
+      "https://publicholidays.com.au/lunar-new-year/"
+    ]
+  },
+  {
+    "name": "Laneway Festival 2027 — Sydney & Brisbane legs",
+    "region": "Cross-state — Sydney (Centennial Park) / Brisbane (Showgrounds)",
+    "tags": ["festival", "music", "indie", "date-locked", "event-spend", "city"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "450-750",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: Sydney at Centennial Park on Friday 12 February 2027 (Laneway's first-ever Sydney opening date), Brisbane Showgrounds Saturday 13 February 2027, Melbourne Flemington Friday 19 February. Adelaide and Perth are dropped from the 2027 route. Lineup was unannounced as of late August 2026 — first artist drop expected late September 2026. Single-day city festival, no camping, so it slots into an existing city block rather than needing its own.",
+    "why_rated": "The one big touring festival that survived the Australian festival cull and still has genuine taste-making credibility; the recurring r/australia answer to 'is there anything left after Splendour and Falls died'. A one-day, no-camping festival in a city they may already be in is unusually cheap to bolt on.",
+    "nearest_airport": "SYD / BNE",
+    "sources": [
+      "https://au.rollingstone.com/music/music-news/laneway-festival-reveals-2027-dates-100209/",
+      "https://www.billboard.com/music/concerts/laneway-festival-2027-dates-1236323649/",
+      "https://www.noise11.com/news/laneway-festival-2027-sydney-brisbane-melbourne-auckland-20260825"
+    ]
+  },
+  {
+    "name": "Wildlands Festival — Brisbane NYE & Perth, and the touring-lineup trick",
+    "region": "Cross-state — Brisbane Showgrounds / Arena Joondalup (Perth)",
+    "tags": ["festival", "music", "electronic", "doof-adjacent", "date-locked", "event-spend", "planning-lever"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "400-700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: Brisbane Showgrounds Thursday 31 December 2026, Arena Joondalup (Perth) Saturday 2 January 2027. IMPORTANT PLANNING NOTE: Wildlands, Lost Paradise (Glenworth Valley, 28 Dec–1 Jan) and Beyond The Valley share the same touring headliners — John Summit, Skepta, KI/KI, Overmono, Nia Archives, Disco Lines, WORSHIP. So the 'which NYE festival' question is really a question about location and format (camping vs single-day), not lineup. Both Wildlands dates conflict with the Sydney NYE hard anchor; the Perth date on 2 Jan is only reachable if they had not yet left Perth, which the Sydney NYE anchor rules out.",
+    "why_rated": "Captured mostly as negative information with a lever attached: the fan-forum insight that Australia's summer electronic festivals are one touring package split across cities means you cannot 'miss the lineup' by picking the wrong city — you can only miss the format. Worth knowing before anyone reshuffles the itinerary chasing a poster.",
+    "nearest_airport": "BNE / PER",
+    "sources": [
+      "https://www.abc.net.au/triplej/news/wildlands-festival-2026-lineup-dates/106975584",
+      "https://au.rollingstone.com/music/music-news/wildlands-announces-2026-27-lineup-99101/",
+      "https://ra.co/events/2498640"
+    ]
+  },
+  {
+    "name": "Perth Festival 2027",
+    "region": "WA — Perth (city-wide)",
+    "tags": ["festival", "arts", "music", "city", "date-locked", "wrong-end-of-trip"],
+    "days_min": 1,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "200-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "DATES CONFIRMED: 5–28 February 2027; programme launches 29 October 2026. WRONG END OF THE TRIP — the couple are in Perth in December for the Christmas anchor and on the east coast by February, so this needs a deliberate return leg to work. Distinct from FRINGE WORLD (20 Jan – 14 Feb 2027, already captured in the WA sweep): Perth Festival is the curated flagship, Fringe is the open-access sprawl, and they overlap for ten days.",
+    "why_rated": "Logged as negative information because WA-sweep readers will see 'Perth summer arts festival' and assume Fringe covers it. It doesn't — and the free Chevron Gardens/Boorloo opening events are the part locals rate. Recorded so nobody rediscovers the date clash.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.perthfestival.com.au/frequently-asked-questions",
+      "https://en.wikipedia.org/wiki/Perth_Festival"
+    ]
+  },
+  {
+    "name": "Meredith Music Festival",
+    "region": "VIC — Meredith Supernatural Amphitheatre (near Geelong)",
+    "tags": ["festival", "music", "camping", "alternative-culture", "date-locked", "probably-too-early"],
+    "days_min": 3,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "800-1200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "DATE-LOCKED: 8am Friday 11 December to 4.30pm Sunday 13 December 2026. Almost certainly BEFORE arrival — the couple leave Valencia in December and the Christmas-in-Perth anchor is the first fixed point. Also ballot-ticketed and reliably sells out, so it cannot be decided late. Logged so the gap is a known gap.",
+    "why_rated": "The most-loved festival in the country among people who go to festivals: no commercial sponsorship, no VIP area, one stage, the 'no dickheads' policy, BYO alcohol, and the Meredith Gift nude footrace. Every Australian music forum treats it as the gold standard. Missed by the VIC sweep entirely, and worth knowing exists in case the departure date is still movable.",
+    "nearest_airport": "MEL / AVV",
+    "sources": [
+      "https://www.jambase.com/festival/meredith-music-festival-2026",
+      "https://en.wikipedia.org/wiki/Meredith_Music_Festival",
+      "https://au.rollingstone.com/music/music-news/meredith-music-festival-2026-lineup-revealed-tickets-99776/"
+    ]
+  },
+  {
+    "name": "Cockroach Races, Story Bridge Hotel — Australia Day",
+    "region": "QLD — Brisbane / Kangaroo Point",
+    "tags": ["quirky", "australia-day", "pub", "free-ish", "date-locked", "cheap"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-160",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED to Australia Day, 26 January 2027 (the 2026 edition, the 43rd, was actually run on Sunday 25 January — confirm the exact day with the pub in December). Under the Story Bridge at Kangaroo Point: 14 races on a 5m circular track including a steeplechase, plus live music, costume contests and food trucks. Small entry/charity donation; proceeds go to charity. Extremely hot and extremely crowded.",
+    "why_rated": "Running since 1982 out of a pub argument about whose cockroach was faster, and the answer everyone gives to 'what should we actually do on Australia Day' that isn't a beach or a barbecue. Directly serves the soft Australia Day anchor for the price of a few beers.",
+    "nearest_airport": "BNE",
+    "sources": [
+      "https://storybridgehotel.com.au/annual-cockroach-races/",
+      "https://www.cockroachraces.com.au/",
+      "https://en.wikipedia.org/wiki/Cockroach_racing"
+    ]
+  },
+  {
+    "name": "Sydney Gay and Lesbian Mardi Gras — misses the window",
+    "region": "NSW — Sydney / Oxford Street",
+    "tags": ["festival", "alternative-culture", "date-locked", "negative-information", "just-misses"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "0-400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "MISSES THE TRIP: the 2027 festival runs 20 February – 7 March 2027 with the parade on Saturday 6 March 2027 (8pm, Oxford Street). The trip's outer bound is mid-February, so the parade is out by about three weeks and even the festival opening is marginal. Watching the parade itself is free; the accommodation market in Darlinghurst/Surry Hills is not.",
+    "why_rated": "Captured deliberately as negative information: it is the biggest her-taste event in the Sydney calendar and 'February in Sydney' lore points straight at it, so someone will suggest it. The dates say no unless the return flight moves into March.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.mardigras.org.au/event/parade/",
+      "https://www.neonmarketplace.nsw.gov.au/opportunity/nd/mardi-gras-parade-2027-applications-open",
+      "https://en.wikipedia.org/wiki/Sydney_Gay_and_Lesbian_Mardi_Gras"
+    ]
+  },
+  {
+    "name": "Mona Foma is permanently dead — do not plan a January Tasmania trip around it",
+    "region": "TAS — Hobart / Launceston",
+    "tags": ["negative-information", "festival", "stale-lore"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "no",
+    "season_note": "CANCELLED FOREVER, not on hiatus. David Walsh killed Mona Foma after the February/March 2024 edition, saying the 'spell has worn off' and citing poor attendance; MONA confirmed it will not return. Dark Mofo (June, wrong season) is the surviving sibling. Aggregator sites, older travel guides and 'best summer festivals' listicles still list Mona Foma for January — those listings are stale.",
+    "why_rated": "Pure negative information. Mona Foma was for fifteen years THE reason to be in Tasmania in January and it is the single most likely stale recommendation to reach this trip. Recorded with a primary-source date so the merge pass can kill it on sight.",
+    "nearest_airport": "HBA / LST",
+    "sources": [
+      "https://www.abc.net.au/news/2024-04-05/tas-mona-foma-calls-it-quits-david-walsh/103675398",
+      "https://www.broadsheet.com.au/national/entertainment/article/mona-foma-no-more-david-walsh-has-canned-summer-festival-good",
+      "https://en.wikipedia.org/wiki/Mona_Foma"
+    ]
+  },
+  {
+    "name": "Sydney to Hobart start, Boxing Day",
+    "region": "NSW — Sydney Harbour",
+    "tags": ["sport", "free", "spectacle", "date-locked", "anchor-conflict"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-120",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "no",
+    "season_note": "DATE-LOCKED: 1pm on Boxing Day, 26 December 2026 — which the couple spend in Perth under the Christmas anchor. Unreachable without breaking the anchor. Free from any eastern-harbour headland (Nielsen Park, Watsons Bay, Bradleys Head); the paid harbour-cruise version is A$150-250pp and rated as not worth it versus a headland picnic.",
+    "why_rated": "Logged so the conflict is explicit rather than discovered: the most-photographed free spectacle in Sydney happens five days before their NYE anchor puts them in exactly the right city. Tagged sport, and down-weighted accordingly — it's a one-sided pick and it doesn't fit anyway.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.sydney.com/events/rolex-sydney-hobart-yacht-race"
+    ]
+  },
+  {
+    "name": "Whitsundays overnight backpacker sailing (2 nights aboard)",
+    "region": "QLD — Whitsundays / Airlie Beach",
+    "tags": ["sailing", "islands", "backpacker", "reef", "event-spend", "experience-type"],
+    "days_min": 3,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "1100-1500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Runs year-round. January is stinger season — every swim and snorkel is in a supplied full-body lycra stinger suit, and that includes Whitehaven. It is also cyclone season; boats cancel and reschedule. On the plus side January is the low-demand half of the year, so this is when the A$549-per-person deals appear against a A$749 list price. Sleeping is in shared cabins or on deck; there is no couples-privacy version at this price.",
+    "why_rated": "The definitive east-coast backpacker rite and the trip people say they remember twenty years later — you sleep on the boat, wake up anchored off an island, and the sailing rather than the destination is the point. The QLD sweep captured Whitehaven as a day trip from Airlie; the overnight is a different experience and roughly the same money per day.",
+    "nearest_airport": "PPP (Whitsunday Coast/Proserpine)",
+    "sources": [
+      "https://sailing-whitsundays.com/whitsundays/solway-voyager-3-day-2-night",
+      "https://sailing-whitsundays.com/tours/backpackers-18-35",
+      "https://www.backpackerdeals.com/australia/airlie-beach/3-day-2-night-whitsundays-sailing-tour"
+    ]
+  },
+  {
+    "name": "Learn to scuba dive — PADI Open Water liveaboard, Cairns",
+    "region": "QLD — Cairns / Outer Great Barrier Reef",
+    "tags": ["diving", "reef", "skill", "liveaboard", "event-spend", "experience-type"],
+    "days_min": 5,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "2900-3100",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Pro Dive Cairns 5-day/2-night liveaboard Open Water course is A$1,440pp for 1 Apr 2026 – 31 Mar 2027 (2 days pool and theory ashore, then 3 days and 2 nights on the outer reef, 9 dives). Divers Den is A$1,510pp double cabin. Summer means warm water (~29°C) and no stingers on the outer reef, but also the wet-season chance of a blown-out week; visibility is generally better May–October. A medical questionnaire gate applies and can require a doctor's sign-off.",
+    "why_rated": "The single biggest-ticket item in backpacker lore and the one people who did it never regret — you come out certified for life, having done it on the Great Barrier Reef rather than a quarry. Regional QLD sweeps catch day-boats and Port Douglas trips but not the course, which is a different product at a different price point and worth an explicit yes/no.",
+    "nearest_airport": "CNS",
+    "sources": [
+      "https://prodivecairns.com/",
+      "https://cairnsdiveadventures.com.au/dive-course-cairns/open-water/",
+      "https://www.diversden.com.au/dive-courses/padi-open-water-diver-courses/"
+    ]
+  },
+  {
+    "name": "Blue Mountains canyoning — Empress Canyon abseil",
+    "region": "NSW — Blue Mountains / Wentworth Falls",
+    "tags": ["adventure", "canyoning", "abseil", "swimming", "summer-only", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "400-450",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "SEASON-LOCKED IN THEIR FAVOUR: canyoning runs roughly September to April only — Dec–Feb is peak. Empress Canyon half-day is ~A$200-223pp with wetsuit, harness, helmet and ropes supplied; the finale is a 30m abseil down a waterfall. It is a wet, swimming-and-jumping trip, which makes it one of the few Blue Mountains activities that improves on a 38°C day. Flash-flood risk means operators cancel on rain — that is a feature, not a red flag.",
+    "why_rated": "The recurring 'best thing I did in Australia' answer on backpacker and adventure threads that never appears on a Blue Mountains listicle, because listicles stop at the Three Sisters lookout. The Blue Mountains have arguably the best canyoning in the world and almost every visitor leaves without knowing it.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/guided-tours/empress-canyon-abseiling-and-canyoning-tour",
+      "https://www.adrenaline.com.au/en/blue-mountains/half-day-canyoning-tour-empress-canyon",
+      "https://highandwild.rezdy.com/230586/empress-canyon-abseiling-and-canyoning-adventure-blue-mountains"
+    ]
+  },
+  {
+    "name": "YHA Pittwater Eco — boat-access hostel inside a national park",
+    "region": "NSW — Ku-ring-gai Chase NP / Morning Bay",
+    "tags": ["hostel-as-destination", "budget", "national-park", "boat-access", "experience-type", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "90-220",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Ferry-only access from Church Point wharf (last ferry ~6.30pm weekdays, ~7pm weekends — miss it and you are paying for a water taxi). Bring ALL food: there are no shops in the national park and no catering. Linen hire ~A$4pp if you don't carry your own. 8 bedrooms total, so it books out for summer weekends well ahead. 30km from central Sydney and it feels like 300.",
+    "why_rated": "The perennial 'Sydney's best-kept secret' answer — a hostel you reach by boat, with wallabies on the lawn and no road, at hostel prices inside a national park an hour from the CBD. The NSW sweep captured Ku-ring-gai Chase as a day trip; the point of this entry is that you can sleep in it cheaply.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.yha.com.au/hostels/nsw/sydney-surrounds/pittwater/",
+      "https://www.hostelworld.com/hostels/p/29313/yha-pittwater-eco/",
+      "https://www.sydney.com/destinations/sydney/sydney-north/northern-beaches/accommodation/yha-pittwater-eco"
+    ]
+  },
+  {
+    "name": "Arts Factory Lodge, Byron Bay — the hostel as the destination",
+    "region": "NSW — Northern Rivers / Byron Bay",
+    "tags": ["hostel-as-destination", "hippie", "alternative-culture", "budget", "experience-type"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "80-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Confirmed operating in 2026 as 'Arts Factory by Nomads', still with the teepees, on 5 acres of subtropical forest a 10-minute walk from Byron town. January is Byron's most expensive and most crowded month and the hostel is no exception — budget the top of the range and book early. Rooms range from dorms through teepees to private cabins; the teepees are the reason to come and they are basic (no linen, shared amenities).",
+    "why_rated": "The original Byron hippie commune-hostel, running since the 1970s and the place every 'Byron before it got expensive' thread is nostalgic about — didgeridoo lessons, drum circles, a saltwater pool, yoga, and the teepees. Regional sweeps catalogue Byron the town; this is the one piece of Byron lodging that is itself a first-class her-taste experience rather than a bed.",
+    "nearest_airport": "BNK (Ballina) / OOL (Gold Coast)",
+    "sources": [
+      "https://nomadsworld.com/australia/arts-factory-lodge/",
+      "https://www.hostelworld.com/hostels/p/364/arts-factory-by-nomads/",
+      "https://byronbay.com/stay/arts-factory-backpackers-lodge/"
+    ]
+  },
+  {
+    "name": "Lighthouse keeper's cottage stays",
+    "region": "Cross-state — NSW/VIC/SA/TAS coastal lightstations",
+    "tags": ["accommodation-as-destination", "coastal", "heritage", "national-park", "experience-type", "splurge-lite"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "700-1500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Summer is peak and minimum-stay rules bite: Smoky Cape (Hat Head NP, NSW) is A$550-750/night for a 3-bedroom cottage with a 3-night minimum, rising to 4 nights in NSW school holidays — which covers most of January. Montague Island (Narooma) is from A$350/night, 2-night minimum, with the boat transfer and a 2.5hr guided island tour included, and is the best value of the set. Green Cape (near Eden), Cape Otway (VIC) and Cape Byron round out the circuit. All sleep 6-16, so they only make budget sense split with friends — as a couple you are paying for a whole cottage.",
+    "why_rated": "The recurring 'most memorable place I've ever stayed in Australia' answer on accommodation threads: you get an entire clifftop lightstation compound to yourself after the day visitors leave, with whales or seals below and no light pollution above. Falls between the cracks of regional sweeps because each lightstation is a footnote in its own region but the category is the idea.",
+    "nearest_airport": "varies (Sydney/Melbourne + drive)",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/camping-and-accommodation/accommodation/smoky-cape-lighthouse-keepers-cottages/learnmore",
+      "https://www.nationalparks.nsw.gov.au/camping-and-accommodation/accommodation/green-cape-lightstation-keepers-cottage",
+      "https://weareexplorers.co/lighthouse-stays-nsw/"
+    ]
+  },
+  {
+    "name": "Farm stay / station stay",
+    "region": "Cross-state — rural NSW, VIC, SA, QLD",
+    "tags": ["accommodation-as-destination", "rural", "budget", "experience-type", "slow-travel"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "110-350",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "400+ farm and station stays nationally; NSW average around A$56/night off-peak on Booking.com, more like A$150-250 for a self-contained cottage in summer. Coastal-hinterland and highland farms (Barrington Tops, Southern Highlands, Yarra Valley, Adelaide Hills) are the summer-viable ones — inland and outback stations are 40°C+ in January and largely shut to guests. Some are working farms where you can join a muster or a milking; most are simply a cottage on a paddock.",
+    "why_rated": "The consistent forum answer to 'how do we see the actual country without an outback road trip', and the cheapest way to get a whole house to yourselves with no neighbours. Regional sweeps catalogue towns and parks; farm stays are a lodging category that quietly beats a motel for the same money.",
+    "nearest_airport": "varies",
+    "sources": [
+      "https://www.visitnsw.com/accommodation/accommodation-farm-stays",
+      "https://www.farmerstays.com/",
+      "https://www.campsaustraliawide.com/top-farm-stay-and-station-stays-australia/"
+    ]
+  },
+  {
+    "name": "WWOOF / HelpX / Workaway — work-for-board stays",
+    "region": "Cross-state — rural and alternative communities",
+    "tags": ["budget", "hippie", "alternative-culture", "volunteering", "experience-type", "slow-travel"],
+    "days_min": 4,
+    "days_ideal": 10,
+    "rough_cost_couple_aud": "120-200",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "WWOOF Australia membership is A$70 for one person or A$120 for a couple travelling together, valid one year — after that, food and accommodation are free in exchange for roughly 4-6 hours of work a day. Practical caveats for this trip: hosts want a minimum commitment (usually a week, often two), and summer is the hard-work end of the year on Australian farms — 35°C+ days of weeding and harvesting. Best used as a deliberate 5-10 day slow block, not as a way to save money on a fast itinerary.",
+    "why_rated": "The classic answer in every 'how did you travel Australia on nothing' thread, and it doubles as the most direct route into the alternative-communities layer — a large share of WWOOF hosts are permaculture farms, intentional communities and off-grid properties in exactly the Northern Rivers / Sunshine Coast hinterland / Daylesford belts. Two travellers, one A$120 membership, and the daily cap effectively goes to zero.",
+    "nearest_airport": "varies",
+    "sources": [
+      "https://wwoof.com.au/join-wwoof/",
+      "https://help.wwoof.net/hc/en-us/articles/16654242038941-What-does-a-WWOOFer-membership-cost",
+      "https://www.organicgardener.com.au/what-is-wwoof/"
+    ]
+  },
+  {
+    "name": "House sitting for free accommodation",
+    "region": "Cross-state — cities and coastal towns",
+    "tags": ["budget", "accommodation-hack", "experience-type", "slow-travel", "planning-lever"],
+    "days_min": 3,
+    "days_ideal": 10,
+    "rough_cost_couple_aud": "60-170",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "SEASON WORKS AGAINST YOU: the annual peak of house-sit listings is exactly Dec–Feb because Australians go away, but it is also the peak of applicant competition, and good sits are filled months ahead by sitters with local references. A couple arriving with no platform history is a weak applicant. Aussie House Sitters charges sitters an annual fee (~A$85-100); TrustedHousesitters is ~A$109/yr and up. Realistically worth one speculative membership and a batch of applications from October 2026, treated as upside rather than plan.",
+    "why_rated": "The highest-leverage budget hack in Australian travel forums — a free furnished house with a car sometimes included, in return for feeding a dog. Included honestly: the payoff is enormous and the hit rate for first-time sitters in peak season is low, so it belongs in the catalog as an option to try early, not a line to budget against.",
+    "nearest_airport": "varies",
+    "sources": [
+      "https://www.aussiehousesitters.com.au/how-it-works",
+      "https://www.trustedhousesitters.com/house-and-pet-sitting-assignments/australia/",
+      "https://www.comparehousesitting.com.au/best-house-sitting-websites-australia/"
+    ]
+  },
+  {
+    "name": "Free camping and the WikiCamps method",
+    "region": "Cross-state — rural roadside, showgrounds and NP campgrounds",
+    "tags": ["budget", "camping", "accommodation-hack", "experience-type", "planning-lever"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "0-40",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "WikiCamps Australia is a one-off ~A$8 app purchase and works offline; CamperMate is free. 5,500+ free and budget sites nationally. Dec–Feb caveats: total fire bans mean no campfires and sometimes no gas cooking; many councils actively enforce no-overnight-sleeping rules in beach car parks and urban streets; and the good free camps are 30-60 minutes inland from the coast, not on it. Coastal NSW/VIC national park campgrounds in January run on BALLOTS or sell out months ahead — free camping is the inland fallback, not a beachfront strategy.",
+    "why_rated": "The single most repeated piece of practical advice in Australian van-life and budget-travel channels, and the mechanism behind every 'we did Australia for $40 a day' video. Recorded as a modality because it changes the arithmetic of the daily cap on any driving day, in a way no individual destination entry captures.",
+    "nearest_airport": "n/a",
+    "sources": [
+      "https://www.camplify.com.au/blog/free-camping-in-australia",
+      "https://www.dutchbloggeronthemove.com/free-camping-east-coast-australia-guide/",
+      "https://www.anaimlesswalk.com/vanlife-australia/"
+    ]
+  },
+  {
+    "name": "Greyhound East Coast Whimit pass",
+    "region": "Cross-state — Melbourne to Cairns corridor",
+    "tags": ["transport", "budget", "backpacker", "experience-type", "planning-lever"],
+    "days_min": 7,
+    "days_ideal": 21,
+    "rough_cost_couple_aud": "640-980",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Unlimited travel in any direction on the Melbourne–Cairns network for a set number of consecutive days: 7 days A$319, 15 days A$405, 21 days A$444, 30 days A$489, 45 days A$538, 60 days A$561 (per person; up to 10% off through backpacker agents). Twelve months to start travelling from purchase. The economics only work if you actually move every few days — for a couple doing three long hops, individual tickets or a cheap flight usually win. Overnight legs save a night's accommodation but cost you a night's sleep.",
+    "why_rated": "The default east-coast backpacker answer for two decades and the reason the Byron/Noosa/Airlie/Cairns chain exists as a route at all. Included as a transport modality rather than a route: it is a lever on the trip's cost structure, and worth pricing against flights before anyone assumes buses are cheaper. Note this is a bus pass, not a road-trip plan — the driving itinerary is a separate sweep's territory.",
+    "nearest_airport": "n/a",
+    "sources": [
+      "https://www.greyhound.com.au/east-coast-whimit",
+      "https://www.greyhound.com.au/travel-passes",
+      "https://www.backpackerdeals.com/australia/sydney/greyhound-australia-whimit-travel-pass"
+    ]
+  },
+  {
+    "name": "Vipassana 10-day silent meditation retreat",
+    "region": "Cross-state — Blackheath NSW, Pomona QLD, Woori Yallock VIC, Perth WA",
+    "tags": ["hippie", "alternative-culture", "wellness", "retreat", "free", "experience-type", "slow-travel"],
+    "days_min": 10,
+    "days_ideal": 12,
+    "rough_cost_couple_aud": "0-200",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "There is NO CHARGE — not for the course, the food or the accommodation. Centres run on donations from past students, and you may only donate after completing a course. Centres include Dhamma Bhūmi (Blackheath, Blue Mountains), Dhamma Padipa (Pomona, QLD), Dhamma Aloka (Woori Yallock, VIC) and Perth. Two hard constraints: courses fill 2-3 months ahead so this needs booking by roughly October 2026, and it is TEN DAYS of total silence with no phones, no reading and men and women segregated — so it is a solo experience taken in parallel, not a couple's activity, and it eats a fifth of the whole trip.",
+    "why_rated": "The most polarising recurring recommendation in Australian travel and wellness forums — people either call it the most valuable thing they've ever done or the hardest ten days of their lives, and it costs nothing. First-class on the hippie/alternative axis, brutal on the itinerary axis. In the catalog so it is an explicit reject rather than an unknown.",
+    "nearest_airport": "SYD / BNE / MEL / PER",
+    "sources": [
+      "https://www.au.dhamma.org/",
+      "https://bhumi.dhamma.org/",
+      "https://www.vridhamma.org/Australia-and-New-Zealand"
+    ]
+  },
+  {
+    "name": "Victorian hot springs beyond Peninsula — Metung and Deep Blue Warrnambool",
+    "region": "VIC — East Gippsland / Great Ocean Road",
+    "tags": ["hot-springs", "wellness", "hippie", "experience-type", "heat-beater"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "70-260",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Metung Hot Springs (Gippsland Lakes, opened 2023) day bathing from ~A$47pp with hilltop pools over Bancroft Bay and safari-tent glamping alongside; a 2-visit deal runs around A$100. Deep Blue Hot Springs, Warrnambool, is A$33-68pp for day entry depending on session and day. Honest caveat: soaking in 38°C water on a 38°C day is a hard sell — both are best booked for an evening session, or for the one cool change that always lands mid-summer.",
+    "why_rated": "The two additions that break the Peninsula Hot Springs monopoly, and the ones regulars now rate higher on crowds-per-dollar. Metung in particular keeps appearing in 'Victoria's best new thing' coverage and sits in East Gippsland, a region otherwise thin on paid attractions. Captured as a circuit entry because the VIC sweep took Peninsula and Hepburn but not these.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitgippsland.com.au/products/hot-springs-metung",
+      "https://www.broadsheet.com.au/gippsland/metung/accommodations/metung-hot-springs",
+      "https://www.visitmelbourne.com/regions/great-ocean-road/see-and-do/spa-and-wellbeing/deep-blue-hot-springs-warrnambool"
+    ]
+  },
+  {
+    "name": "Moree artesian bore baths",
+    "region": "NSW — North West Slopes / Moree",
+    "tags": ["hot-springs", "cheap", "quirky", "heat-beater", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "16-60",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "A$8 per adult (A$25 family) at the Moree Artesian Aquatic Centre — the cheapest thermal soak in the country. Water comes out of the Great Artesian Basin at ~41°C from a bore sunk in 1895; 300,000 visits a year, mostly grey nomads. SEASON PROBLEM: Moree is inland northern NSW and routinely 38-42°C in January, which turns a hot soak into an endurance event. The centre has cool pools alongside. Best as a two-hour stop on a Brisbane–Sydney inland run, not a destination.",
+    "why_rated": "The Australian bore-bath tradition in its cheapest and least glamorous form — the anti-Peninsula-Hot-Springs, at A$8 a head. Recurring answer in 'cheapest good thing in Australia' threads and completely absent from the NSW regional sweep, which caught Lightning Ridge's bore baths but not Moree's.",
+    "nearest_airport": "MRZ (Moree) / limited",
+    "sources": [
+      "https://www.moreeartesianaquaticcentre.com.au/",
+      "https://www.visitnsw.com/destinations/country-nsw/moree-and-narrabri-area/moree/attractions/moree-artesian-aquatic-centre-maac",
+      "https://visitmoreeplains.com.au/things-to-do/moree-plains-artesian-pools.html"
+    ]
+  },
+  {
+    "name": "Bioluminescence (sea sparkle) hunting",
+    "region": "Cross-state — Jervis Bay NSW, Hobart & Tasman Peninsula TAS",
+    "tags": ["natural-phenomenon", "free", "night", "unpredictable", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-60",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Free, but a lottery. Noctiluca scintillans blooms cannot be booked or forecast more than a day or two out. Jervis Bay's sheltered shores — Callala Bay, Barfleur Beach, Scottish Rocks, Blenheim, Hyams — are the reliable NSW hunting grounds and there it skews to the WARMER months, which favours this trip. In Tasmania the brightest displays have come on calm SUMMER nights around Hobart and the Tasman Peninsula. Method: a moonless night, a dark sheltered beach, and Facebook groups ('Bioluminescence Australia', 'Jervis Bay Bioluminescence') for same-day sightings. Rain beforehand helps.",
+    "why_rated": "The classic 'if you get lucky' item — glowing blue surf you kick into light with your feet, at zero cost. It never makes a regional guide because it cannot be scheduled, but it is a standing answer in Australian photography and coastal-town forums, and both of the couple's likely coastal blocks (South Coast NSW, Tasmania) are the right places to chase it.",
+    "nearest_airport": "SYD / HBA",
+    "sources": [
+      "https://www.jervisbay.org/blog/jervis-bay-bioluminescence/",
+      "https://tasmaniangeographic.com/the-definitive-guide-how-to-find-and-photograph-sea-sparkle-bioluminescence/",
+      "https://www.australiantraveller.com/australia/bioluminescence/"
+    ]
+  },
+  {
+    "name": "Glow Worm Tunnel, Wollemi NP (and Melba Gully, Otways)",
+    "region": "NSW — Wollemi NP / Lithgow; VIC — Great Otway NP",
+    "tags": ["free", "walk", "natural-phenomenon", "heat-beater", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-40",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free. The Glow Worm Tunnel walking track near Newnes/Lithgow is 6km return, 2-3 hours, along the old Newnes shale railway to a 400m curved tunnel where the darkness is total and the roof is full of glow worms — bring a torch and expect wet feet. The access road is unsealed and rough; check NSW NPNS alerts as upgrade works have periodically closed the precinct. Melba Gully in the Otways is the Victorian equivalent, a short boardwalk loop, best after rain. Both are cool, shaded and dark — genuinely good 40°C-day activities.",
+    "why_rated": "Recurring 'do this instead of paying for a glow-worm tour' answer: Queensland's Springbrook and Tamborine glow-worm caves are ticketed attractions, these two are free walks into the same phenomenon. The NSW tunnel in particular is a favourite of Australian hiking channels and almost never appears on a Blue Mountains itinerary.",
+    "nearest_airport": "SYD / MEL",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/walking-tracks/glow-worm-tunnel-walking-track",
+      "https://www.visitnsw.com/destinations/blue-mountains/lithgow-area/lithgow/attractions/glow-worm-tunnel",
+      "https://www.tamborineglowworms.com.au/top-10-places-to-find-glow-worms-around-australia.html"
+    ]
+  },
+  {
+    "name": "River Murray International Dark Sky Reserve",
+    "region": "SA — Murraylands / Swan Reach",
+    "tags": ["dark-sky", "stargazing", "free", "night", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "40-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "90 minutes north-east of Adelaide, 3,200km² and Australia's first International Dark Sky Reserve (the 16th in the world). Swan Reach Conservation Park is the dark heart; the Swan Reach Observatory opened 13 November 2025 with a CDK700 research telescope and runs paid public nights. Summer caveats: 38-42°C days and warm nights, plus summer is the least spectacular half of the year for the Milky Way core (best May–September) — but Jupiter, Saturn and the Magellanic Clouds are still there, and it is dark enough to see your own shadow by starlight. Free if you just camp and look up.",
+    "why_rated": "The SA answer to Warrumbungle, and newer — it was gazetted in 2019 and the observatory only opened in late 2025, so it is absent from almost every published guide and from the WA+SA sweep. Astro-tourism forums rate it as the best accessible dark sky within two hours of any Australian capital.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://darksky.org/news/south-australias-river-murray-designated-first-international-dark-sky-reserve-in-australia/",
+      "https://www.themurrayriver.com/dark-sky/",
+      "https://swanreachobservatory.com.au/"
+    ]
+  },
+  {
+    "name": "Aurora australis chasing, Tasmania",
+    "region": "TAS — southern and south-east coast",
+    "tags": ["natural-phenomenon", "free", "night", "unpredictable", "long-shot", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-60",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Free, and a genuine long shot in this window. Aurora activity depends on solar storms, not season, but Tasmanian summer works against you three ways: short nights, long twilight, and the best displays historically cluster around the equinoxes (March and September). South-facing dark shores — South Arm, Cremorne, Carlton Beach, Cockle Creek — are the standard vantage points. The mechanism is the 'Aurora Australis Tasmania' Facebook group plus a Kp-index alert app; you go when it fires, not when you planned to.",
+    "why_rated": "The single most-hyped Tasmanian experience in social feeds and the one most likely to be sold to a summer visitor who cannot realistically get it. Captured as honest negative information with the method attached, so that if a big geomagnetic storm does land during a Tasmania block they know what to do rather than reading about it afterwards.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/nature-and-wildlife/aurora-australis/"
+    ]
+  },
+  {
+    "name": "Cabramatta Vietnamese food crawl",
+    "region": "NSW — Sydney South West / Cabramatta",
+    "tags": ["food-pilgrimage", "cheap", "multicultural", "city", "day-trip", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-90",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Under an hour by train from Central on the T2/T5 lines, 45 minutes by car. Best on a weekend morning when the John Street strip and the produce shops are at full noise; most places are cash-friendly, tiny and specialised in one dish. Bánh mì around A$5-8, a bowl of phở A$14-18 — a full crawl for two lands well under A$100 including a Vietnamese iced coffee each.",
+    "why_rated": "The universal r/sydney answer to 'best food in Sydney' and to 'what should we do that isn't the harbour' — Sydney's Little Saigon, where the standard advice is to eat one dish per shop: bánh mì at Viet Hoa, phở at Phở Tàu Bay, crispy-skin chicken noodles at Tân Việt, DIY rice-paper rolls at Phú Quốc. Tourist guides send visitors to Darling Harbour; locals send them here.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.qantas.com/travelinsider/en/explore/australia/new-south-wales/sydney/vietnamese-restaurants-food-in-cabramatta.html",
+      "https://www.sbs.com.au/food/article/vietnamese-food-crawl-luke-nguyens-tips-for-a-viet-fix-in-cabramatta/yme9javhd",
+      "https://www.sydney.com/destinations/sydney/sydney-west/cabramatta"
+    ]
+  },
+  {
+    "name": "Melbourne migrant food crawl — Footscray, Springvale, Box Hill",
+    "region": "VIC — Melbourne western and south-eastern suburbs",
+    "tags": ["food-pilgrimage", "cheap", "multicultural", "city", "day-trip", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "40-100",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "All three are on suburban train lines from Flinders Street (Footscray ~10 min, Box Hill ~25 min, Springvale ~40 min). Footscray is Vietnamese and East African around the market; Springvale is Vietnamese and Cambodian; Box Hill is Chinese with a heavy Sichuan and Shanghainese bent. Markets are liveliest weekend mornings; many Box Hill food-court operators are cash-only. Costs are the same order as Cabramatta.",
+    "why_rated": "The standing r/melbourne rebuttal to laneway-and-coffee tourism: the city's best eating is 20 minutes out on a suburban train and a third of the price. Regional VIC sweeps catalogue the Yarra Valley and the Mornington Peninsula; this is the cheap, high-rated city day that never makes a listicle.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/melbourne/see-and-do/shopping/markets/footscray-market",
+      "https://www.broadsheet.com.au/melbourne/food-and-drink/article/best-restaurants-footscray"
+    ]
+  },
+  {
+    "name": "The new Sydney Fish Market, Blackwattle Bay",
+    "region": "NSW — Sydney / Blackwattle Bay",
+    "tags": ["food-pilgrimage", "city", "new-2026", "architecture", "day-trip", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-160",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "OPENED 19 JANUARY 2026 — brand new and absent from every guidebook printed before then. A$836m building by Danish architects 3XN/GXN with BVN and Aspect Studios, a 200m wave-shaped solar roof clad to look like fish scales, 40+ retailers, and it is the largest market of its kind in the southern hemisphere. Free to walk through; you pay for what you eat. Forecast six million visitors a year, so weekday mornings beat weekend lunchtimes. Christmas Eve here is a famous 36-hour seafood marathon — but the couple are in Perth for that.",
+    "why_rated": "Genuinely new information rather than a hidden gem: the old fish market was a well-known mediocre tourist experience and the new one drew 230,000 people in its opening week. Every 'what's changed in Sydney' thread from 2026 leads with it, and no regional sweep working from older sources will have it.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.sydneyfishmarket.com.au/Corporate/The-New-Sydney-Fish-Market/Project",
+      "https://www.abc.net.au/news/2026-01-19/what-to-know-about-new-sydney-fish-market/106225622",
+      "https://www.infrastructure.nsw.gov.au/projects-nsw/completed/new-sydney-fish-market/"
+    ]
+  },
+  {
+    "name": "Country pub counter meal and pub stay",
+    "region": "Cross-state — rural NSW, VIC, QLD, SA",
+    "tags": ["food-pilgrimage", "accommodation-as-destination", "cheap", "rural", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "80-180",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "The format: a two-storey verandah pub in a country town, A$70-130 for a basic upstairs room with a shared bathroom, and a A$20-30 chicken parmigiana downstairs. No booking system beyond a phone call at many of them. Summer caveat: the older pubs' upstairs rooms are tin-roofed and often have only a ceiling fan — ask about air conditioning before committing on a 40°C night. Meals typically stop at 8pm sharp in small towns.",
+    "why_rated": "The most Australian cheap night out there is, and a recurring 'the best meal of our trip was a $24 parmi in a pub in a town we can't remember' story in road-trip threads. Included as a lodging-and-food modality because it beats a motel on both price and character on any night the itinerary passes through a country town — and it is invisible to region-by-region sweeps, which catalogue towns rather than the pubs in them.",
+    "nearest_airport": "n/a",
+    "sources": [
+      "https://www.australiantraveller.com/australia/best-country-pubs-australia/"
+    ]
+  },
+  {
+    "name": "The bakery and pie pilgrimage",
+    "region": "Cross-state — country towns and city bakeries",
+    "tags": ["food-pilgrimage", "cheap", "quirky", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "15-50",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Year-round, all hours, A$6-9 a pie. Recurring names in the forums: Beechworth Bakery (VIC high country), Yatala Pies (Gold Coast–Brisbane road), Vili's and a proper pie floater in Adelaide, Bourke Street Bakery and Black Star Pastry in Sydney, Lune Croissanterie in Melbourne (queue, and a booking system for the 'Lune Lab'), Ross Village Bakery in Tasmania (the vanilla slice), Kytons in SA. Bakeries in small towns often sell out of the good things by 11am.",
+    "why_rated": "The genuinely national food obsession that no destination guide treats as an activity — 'best pie in Australia' and 'best vanilla slice' threads are perennial in every state subreddit and reliably produce a route rather than a single answer. It costs almost nothing, works on any driving day, and is exactly the sort of cross-cutting thread a region-by-region sweep cannot see.",
+    "nearest_airport": "n/a",
+    "sources": [
+      "https://www.beechworthbakery.com.au/",
+      "https://lune.com.au/"
+    ]
+  },
+  {
+    "name": "The Kiva Spa, Mullumbimby",
+    "region": "NSW — Northern Rivers / Mullumbimby",
+    "tags": ["hippie", "alternative-culture", "wellness", "bathhouse", "hers", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "90-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Open year-round in a bamboo grove off a lane in Mullumbimby, 20 minutes from Byron. Bathhouse entry plus optional treatments: wood-fired octagonal sauna, hammam-style steam room, warm magnesium pools, cold plunge, garden relaxation areas. Clothing-optional in parts of the bathhouse. Book ahead in January. Pairs naturally with the Friday Mullumbimby Farmers Market already captured in the NSW sweep.",
+    "why_rated": "The recurring answer whenever anyone asks the Northern Rivers hippie question — not the polished Byron day spas but the communal, garden, wood-fired one in Mullum that the locals actually use, voted one of the world's most social bathhouses. First-class on her taste axis and captured by no regional sweep, which caught Mullumbimby the market town but not this.",
+    "nearest_airport": "BNK (Ballina) / OOL",
+    "sources": [
+      "https://thekivaspa.com/",
+      "https://www.visitbyronbay.com/products/kiva-spa/",
+      "https://www.bestwellness.com.au/nsw/north-coast/mullumbimby/venue/the-kiva-spa"
+    ]
+  },
+  {
+    "name": "The underground doof circuit — how to actually find one",
+    "region": "Cross-state — bush sites, announced late",
+    "tags": ["doof", "psytrance", "hippie", "alternative-culture", "hers", "method", "planning-lever"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "150-500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "METHOD, NOT A DATE. The big named summer doofs are already captured across the regional sweeps (Rainbow Spirit, Esoteric, Pitch, Earth Frequency, Subsonic, Lost Paradise) — but the scene's mid-sized and small parties are deliberately not marketed: no vendors, no sponsorship, locations released days out, tickets through Facebook groups and word of mouth. Working channels: the Bush.Doofs page and its Linktree (state-by-state listings, including 2027), Psymedia's Australian event calendar, Resident Advisor's regional listings, and state-based Facebook groups. Two Dec–Feb realities: total fire bans cancel bush parties at short notice in an El Niño summer, and the scene has been drifting away from the January window for exactly that reason — March and October are now the fatter months.",
+    "why_rated": "Recorded because the taste profile makes this first-class and because no listicle-based sweep can produce it: the good small doofs are structurally invisible to search. Also carries the honest warning that a strong El Niño summer is the worst possible season for bush parties, which reframes the big ticketed festivals as the reliable option rather than the fallback.",
+    "nearest_airport": "varies",
+    "sources": [
+      "https://www.facebook.com/AussieBushDoofs/",
+      "https://psymedia.co.za/event_country/australia/",
+      "https://www.adventuresnsunsets.com/transformational-festivals-in-australia-music-bush-doofs/"
+    ]
+  },
+  {
+    "name": "Learn to surf — the budget lesson circuit",
+    "region": "Cross-state — Byron, Noosa, Torquay, Manly, Gold Coast",
+    "tags": ["skill", "beach", "cheap", "backpacker", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "140-400",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Group lessons run A$70-99pp for 2 hours including board and wetsuit, with multi-lesson packages around A$180-250pp; board hire alone is A$25-40 a day once you can stand up. Summer is the right season — small, forgiving beach-break swell and warm water everywhere from Torquay to Noosa. The beginner beaches the schools use (Byron's Main Beach, Noosa's First Point, Torquay's Cosy Corner, Manly's south end) are crowded in January, which is a safety consideration more than a fun one.",
+    "why_rated": "The single most-recommended 'thing to actually do' in every east-coast backpacker thread and every Australia travel channel, and the one activity where the cheap version is the good version — a A$90 group lesson from a local school beats any packaged experience. Cross-cutting by nature, so no regional sweep claims it.",
+    "nearest_airport": "varies",
+    "sources": [
+      "https://www.letsgosurfing.com.au/",
+      "https://www.gosurfschool.com.au/"
+    ]
+  },
+  {
+    "name": "Sea kayaking with dolphins and turtles, Byron Bay",
+    "region": "NSW — Northern Rivers / Byron Bay",
+    "tags": ["wildlife", "kayak", "beach", "cheap", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "150-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Roughly A$75-99pp for a 3-hour morning paddle from Clarkes Beach around Cape Byron, most operators offering a free repeat trip if you don't see dolphins. Resident bottlenose pods are present year-round; summer adds turtles and rays in the bay. Morning departures only, weather-dependent. Note this is a different animal from the WA/SA seal-and-sea-lion swims (Jurien Bay, Baird Bay, Port Lincoln) already captured — those are in-water swims, this is a paddle.",
+    "why_rated": "Consistently the highest-rated paid activity in Byron on both the review sites and the forums, and the thing people say they'd do again instead of a second night out. Rounds out a marine-encounter category that the regional sweeps covered thoroughly on the west coast (sea lions, dolphins, cuttlefish) and barely at all on the east.",
+    "nearest_airport": "BNK (Ballina) / OOL",
+    "sources": [
+      "https://www.goseakayakbyronbay.com.au/",
+      "https://www.visitbyronbay.com/things-to-do/kayaking/"
+    ]
+  },
+  {
+    "name": "Swim with wild dolphins, Rockingham",
+    "region": "WA — Perth / Rockingham",
+    "tags": ["wildlife", "swim", "day-trip", "home-base", "experience-type", "event-spend"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "600-700",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "SEASON-LOCKED IN THEIR FAVOUR and sits on the Perth home base. Perth Wildlife Encounters runs September to early June only — Dec–Feb is mid-season. A$299-349pp for swimmers (spectators ~A$150), roughly 5-6 hours, meeting the boat at Rockingham 8am with an optional ~A$50pp transfer from Perth. Wild pods of bottlenose dolphins in Shoalwater; you are towed on a line and the dolphins choose whether to come. No guarantee, but the operator claims very high encounter rates and offers a repeat trip.",
+    "why_rated": "The Perth-side wildlife swim that the WA sweep missed while capturing Penguin Island and the Bunbury dolphins from shore — this is the in-water version, 45 minutes from a home base where lodging costs nothing, which is exactly the kind of day the budget structure rewards. Recurring 'best day we had in Perth' answer in WA travel threads.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.dolphins.com.au/",
+      "https://australianwildlifejourneys.com/wildlife-operator/perth-wildlife-encounters/tour/swim-with-wild-dolphins",
+      "https://www.tripadvisor.com/AttractionProductReview-g488365-d11451037-Swim_with_Wild_Dolphins_Day_Tour-Rockingham_Greater_Perth_Western_Australia.html"
+    ]
+  },
+  {
+    "name": "Dangar Island, Hawkesbury River",
+    "region": "NSW — Hawkesbury / Brooklyn",
+    "tags": ["day-trip", "island", "cheap", "car-free", "hidden-gem", "experience-type"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-110",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Train from Sydney Central to Hawkesbury River station (about an hour), then a 30-minute ferry from Brooklyn wharf next to the station — no car needed at either end, and the island itself has no cars at all. 30 hectares, about 300 residents, wheelbarrows parked at the wharf for hauling shopping. A 4km loop walk, a waterfront café, a bowling club, a swimming beach. Allow 3 hours plus, and check the ferry timetable both ways — it is not frequent.",
+    "why_rated": "The most-cited Sydney hidden gem in recent 'underrated places' rankings and a standing r/sydney answer: a car-free island an hour from the city that almost no Sydneysider has been to. The NSW sweep caught Brooklyn and the Riverboat Postman but not the island itself, and the island is the better half of that day.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.sydney.com/destinations/sydney/sydney-north/hawkesbury/attractions/dangar-island",
+      "https://www.dangarislandleague.com/visiting-the-island",
+      "https://timeout.com/australia/news/revealed-the-10-most-popular-hidden-gems-in-australia-091724"
+    ]
+  },
+  {
+    "name": "The NSW ocean pool pilgrimage",
+    "region": "NSW — coast from Illawarra to the Mid North Coast",
+    "tags": ["free", "beach", "swimming", "heat-beater", "experience-type", "cheap"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "0-30",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free, everywhere, all summer. NSW has around 100 ocean pools — more than the rest of the world combined — almost all of them free and council-maintained. Beyond the Sydney ones already captured: the Illawarra chain (Austinmer, Bulli, Wombarra, Coledale, Thirroul, Bellambi) is walkable between several by train; north there's Forster, Nambucca's V-Wall, Yamba's Turners Beach pool; south, Bermagui's Blue Pool set in the cliff face. Cleaning schedules drain individual pools for a day or two — signposted locally, not centrally listed.",
+    "why_rated": "A genuinely national-treasure category that Australians take for granted and visitors never hear about: the recurring 'the thing I miss most about Australia' answer among expats, and free. Regional sweeps pick up the famous individual pools (Bondi Icebergs, the Bogey Hole) but not the chain, which is the point — you can plan a coastal day around swimming five of them.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.visitnsw.com/things-to-do/beach-holidays/best-ocean-pools-nsw",
+      "https://allintothepool.com.au/"
+    ]
+  },
+  {
+    "name": "Bondi Beach is the most overrated thing in Sydney",
+    "region": "NSW — Sydney Eastern Beaches",
+    "tags": ["negative-information", "overrated", "beach", "city"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Not a season problem — a crowding and value problem, and January is its worst month. The standing local verdict: Bondi in summer is a packed, expensive strip with mediocre swimming and a permanent rip at the south end, and every other Sydney beach is better on the same day. Named alternatives that recur: Bronte and Clovelly for swimming (Clovelly's concrete-sided channel is the calmest snorkel in Sydney), Gordons Bay, Shelly Beach at Manly, Wattamolla and Garie in the Royal, Store Beach by kayak. The Bondi-to-Coogee walk itself is genuinely rated — the beach at the start of it is not.",
+    "why_rated": "The most consistent 'overrated' verdict in every Australian forum, and it directly contradicts the tourist lore that puts Bondi at the top of every Sydney list. Captured so the couple reject it on the facts rather than spend a hot January day discovering them. The walk stays; the beach day goes.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.timeout.com/australia/news/three-aussie-tourist-attractions-were-ranked-among-the-worlds-most-underrated-and-overrated-spots-040824"
+    ]
+  },
+  {
+    "name": "Surfers Paradise and the Gold Coast strip — skip the strip, keep the hinterland",
+    "region": "QLD — Gold Coast",
+    "tags": ["negative-information", "overrated", "city", "beach"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Schoolies aside, January is the strip at its worst: high-rise shadow over the beach from mid-afternoon, chain restaurants, aggressive touting, and the highest accommodation prices of the year. The verdict is specifically about Surfers Paradise, not the region — Burleigh Heads, Currumbin, the hinterland (Springbrook, Lamington, Currumbin Valley) and the night markets are all separately well rated and already captured by the QLD sweep.",
+    "why_rated": "The other perennial 'overrated' answer alongside Bondi, and the one where tourist lore and local consensus diverge most sharply — international itineraries still route through Surfers by default. Recorded as negative information with the specific carve-out, so the Gold Coast isn't rejected wholesale by mistake.",
+    "nearest_airport": "OOL",
+    "sources": [
+      "https://www.timeout.com/australia/news/three-aussie-tourist-attractions-were-ranked-among-the-worlds-most-underrated-and-overrated-spots-040824"
+    ]
+  },
+  {
+    "name": "Darling Harbour and the Sydney Tower Eye — the paid-attraction trap",
+    "region": "NSW — Sydney CBD",
+    "tags": ["negative-information", "overrated", "city", "budget-protection"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "poor",
+    "season_note": "The bundled CBD attractions — Sydney Tower Eye, SEA LIFE Aquarium, WILD LIFE Zoo, Madame Tussauds, plus the Darling Harbour dining strip — are the single biggest avoidable spend in Sydney, roughly A$45-75pp each or A$90-140pp for a combo pass. The recurring counter-advice: the A$8-ish Manly ferry gives better harbour views than the Tower, Taronga Zoo has actual animals in an actual setting, and the free Royal Botanic Garden / Mrs Macquarie's Chair walk beats the lot. Darling Harbour restaurants are priced for people who will not come back.",
+    "why_rated": "The clearest example of tourist lore and local consensus pointing in opposite directions, and directly relevant to a budget-conscious trip: avoiding this cluster is worth A$200-300 to a couple and costs nothing in experience. Never appears in a regional sweep because it is advice about what not to do.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.sydney.com/things-to-do/attractions/free-things-to-do-in-sydney"
+    ]
+  },
+  {
+    "name": "Koala cuddling — legal only in QLD, SA and WA, and increasingly withdrawn",
+    "region": "Cross-state — wildlife parks",
+    "tags": ["negative-information", "wildlife", "welfare", "overrated", "legal-constraint"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "poor",
+    "season_note": "HOLDING A KOALA IS ILLEGAL in NSW (since 1997), Victoria, Tasmania and the NT. It remains legal in Queensland, South Australia and Western Australia, where an individual koala may be handled no more than 30 minutes a day and 180 minutes a week. Even in those states, venues have been dropping the product — World Animal Protection's 2025 review tracked Queensland parks ending cuddles, and at least one major park has banned them outright. Typical price where offered: A$30-50 for a photo on top of A$45-60 park entry. Free wild alternatives already in the catalog: the Port Macquarie koala hospital, Magnetic Island's Forts Walk, Kennett River on the Great Ocean Road, Raymond Island (VIC, free ferry).",
+    "why_rated": "A high-frequency tourist request built on a false premise — most visitors assume it's available Australia-wide, and it is banned in the two states they will spend the most time in. Captured as negative information with the legal detail and the free wild-koala alternatives attached.",
+    "nearest_airport": "n/a",
+    "sources": [
+      "https://www.worldanimalprotection.org.au/news/koala-cuddles-queensland-new-report-reveals-venues-stopped-havent/",
+      "https://greatoceanroadwildlifepark.com.au/can-you-hold-a-koala-in-australia-laws-safety-and-where-to-go/",
+      "https://www.experienceoz.com.au/en/where-to-cuddle-a-koala-in-australia"
+    ]
+  },
+  {
+    "name": "Sovereign Hill and the paid heritage-village category",
+    "region": "VIC — Ballarat",
+    "tags": ["negative-information", "overrated", "heritage", "budget-protection"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "A TripAdvisor-review analysis by Wingie that scored attractions for 'overrated' keywords (overpriced, disappointing, let down) put Sovereign Hill among the world's most overrated spots. Entry is around A$50-60pp, it is a costumed reconstruction rather than a preserved site, and January means walking a treeless replica goldfields town in 35°C+. The recurring counter-recommendation is the free, actual Eureka Stockade site and the Art Gallery of Ballarat, or Walhalla and Hill End as real, un-reconstructed gold towns you can walk through for nothing.",
+    "why_rated": "Included because the VIC sweep captured Sovereign Hill on reputation and the review data says the reputation is soft — and because 'is Sovereign Hill worth it' is a perennial thread whose answer is usually 'with kids yes, without kids no'. This couple has no kids.",
+    "nearest_airport": "MEL / AVV",
+    "sources": [
+      "https://www.timeout.com/australia/news/three-aussie-tourist-attractions-were-ranked-among-the-worlds-most-underrated-and-overrated-spots-040824"
+    ]
+  },
+  {
+    "name": "Kuranda Skyrail and Scenic Railway versus driving the Tablelands",
+    "region": "QLD — Cairns / Atherton Tablelands",
+    "tags": ["negative-information", "overrated", "budget-protection", "day-trip"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "The Skyrail + Scenic Railway combo runs roughly A$150-190pp, and the recurring verdict is that you pay it to arrive at a village of souvenir shops. The stated alternative — already in the QLD sweep as separate entries but not as a comparison — is a hire car up the range for the waterfall circuit, the Crater Lakes, Yungaburra and Millaa Millaa, which is cooler than Cairns, free at every stop, and rated far higher. The rainforest gondola itself is genuinely scenic; the question is whether it is A$300 a couple scenic when the same rainforest is beside the road.",
+    "why_rated": "The most common 'we wasted our Cairns day' story on Far North Queensland threads, and one of the few places where a direct like-for-like substitution saves a couple A$250+ and produces a better day. Region sweeps list both options without ranking them; this entry is the ranking.",
+    "nearest_airport": "CNS",
+    "sources": [
+      "https://www.tripadvisor.com/Attraction_Review-g255070-d257379-Reviews-Skyrail_Rainforest_Cableway-Cairns_Cairns_Region_Queensland.html"
+    ]
+  },
+  {
+    "name": "The Big Things — a road-trip game, not a destination",
+    "region": "Cross-state — highway towns nationwide",
+    "tags": ["negative-information", "quirky", "kitsch", "free", "overrated"],
+    "days_min": 0,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-20",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free to photograph, universally disappointing to visit deliberately. There are 150+ Big Things; the ones on likely routes include the Big Banana (Coffs Harbour), the Big Prawn (Ballina), the Big Pineapple (Woombye), the Big Merino (Goulburn), the Big Lobster (Kingston SE) and the Golden Guitar (Tamworth). Several have paid attractions bolted on — those are the part people regret. The correct dose is a five-minute photo stop on a drive you were already making.",
+    "why_rated": "Captured with its dose deliberately specified. Every 'quirky Australia' YouTube list oversells the Big Things into a road trip of their own, and every Australian forum answer says the same thing: they are excellent as punctuation and terrible as a plan. Cheap, funny, and worth exactly one stop each.",
+    "nearest_airport": "n/a",
+    "sources": [
+      "https://en.wikipedia.org/wiki/Australia%27s_big_things"
+    ]
+  }
+]
