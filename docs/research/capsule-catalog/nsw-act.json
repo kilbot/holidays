@@ -1,0 +1,1226 @@
+[
+  {
+    "name": "Lost Paradise festival — Glenworth Valley",
+    "region": "NSW — Central Coast / Glenworth Valley",
+    "tags": ["festival", "doof", "electronic", "camping", "hippie", "date-locked", "event-spend"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "1400-1900",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 28 Dec 2026 – 1 Jan 2027, confirmed. Four-day GA A$639.99 + A$28.50 fee pp (three-day A$569.99 + A$27.57); GA camping included in every ticket. Direct collision with the Sydney NYE anchor — you get one or the other, not both. 90 min north of Sydney, so a car or the shuttle is needed. Bush venue in a strong El Niño summer: total fire ban days can restrict campfires and cooking.",
+    "why_rated": "The one first-class doof that lands exactly on this trip's dates. Bush-set electronic festival on Darkinjung Country with art, wellness (Shambhala Fields), a river beach club, horse riding and abseiling built into the site — the 2026/27 bill is John Summit, Skepta, KI/KI, Overmono, Armand Van Helden, Nia Archives, Partiboi69. Widely described as the closest thing Australia has to a Boom/Fusion-flavoured NYE.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.lostparadise.com.au/",
+      "https://au.rollingstone.com/music/music-news/lost-paradise-returning-2026-tickets-dates-98519/",
+      "https://www.billboard.com/music/concerts/john-summit-2026-lost-paradise-lineup-1236305022/",
+      "https://ra.co/events/2491206"
+    ]
+  },
+  {
+    "name": "Field Day — New Year's Day, The Domain",
+    "region": "NSW — Sydney CBD",
+    "tags": ["festival", "electronic", "city", "date-locked", "event-spend"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "350-450",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 1 January 2027, The Domain, 18+. Slots perfectly after the NYE anchor with zero relocation — you are already in Sydney. 2027 lineup/prices not out yet (usually announced Sep–Oct); budget ~A$160–200pp. Brutal in a heatwave — it's an open parkland site with limited shade, and NSW is forecast a strong El Niño summer.",
+    "why_rated": "Sydney's institutional New Year's Day party, running at The Domain since 2002 — the standard local answer to 'what do you do on 1 Jan'. Walkable from the CBD, no camping, no car.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://fieldday.com.au/",
+      "https://en.wikipedia.org/wiki/Field_Day_(Sydney_festival)",
+      "https://www.musicfestivalwizard.com/festivals/field-day-sydney-2027/"
+    ]
+  },
+  {
+    "name": "Sydney Festival",
+    "region": "NSW — Sydney (city-wide)",
+    "tags": ["festival", "culture", "arts", "city", "free", "date-locked"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "0-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 7–25 January 2027. Note the miss — the Sydney base runs to ~4 Jan, so the festival opens two or three days after they leave town. Only worth planning around if the Sydney block stretches, or as a reason to swing back through. Many headline Domain outdoor concerts and installations are free.",
+    "why_rated": "100+ events across the Opera House, Carriageworks, The Domain, Riverside Parramatta and 30+ small venues — contemporary theatre, circus, dance, big free outdoor installations. The one time of year Sydney's arts scene is genuinely dense.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://en.wikipedia.org/wiki/Sydney_Festival",
+      "https://www.sydneyfestival.org.au/"
+    ]
+  },
+  {
+    "name": "Blue Mountains day trip by train — Katoomba, Three Sisters, Scenic World",
+    "region": "NSW — Blue Mountains",
+    "tags": ["day-trip", "hiking", "national-park", "scenic", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "150-200",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Doable entirely on Opal — Central to Katoomba is ~2 hr on the Blue Mountains line, inside the Opal daily cap (~A$19 weekday, ~A$9.35 Sat/Sun/public holiday per person). Scenic World unlimited day pass from A$64pp. FIRE RISK: the Blue Mountains are named in the 2026–27 El Niño outlook as elevated-danger bushland; NPWS closes tracks on catastrophic days and smoke can erase the view entirely. Mountains run ~7°C cooler than Sydney, which is a plus in a heatwave. Peak-week crowds at Echo Point are heavy.",
+    "why_rated": "The default Sydney day trip and it earns it — Three Sisters, the Giant Stairway, and Scenic World's railway (the world's steepest passenger railway, 52°) into the Jamison Valley rainforest. The rare marquee attraction reachable without renting a car.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.scenicworld.com.au/tickets/day-passes",
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/blue-mountains-national-park",
+      "https://www.theurbanlist.com/sydney/a-list/sydney-weather-this-summer"
+    ]
+  },
+  {
+    "name": "Blue Mountains overnight — Blackheath, Grose Valley & the Grand Canyon Track",
+    "region": "NSW — Blue Mountains / Blackheath",
+    "tags": ["hiking", "national-park", "waterfall", "rainforest", "overnight"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "350-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Overnight beats the day trip if you want the actual walks — the Grand Canyon Track (6 km loop, cool ferny slot canyon) and Govetts Leap/Pulpit Rock are all at Blackheath, one stop past Katoomba. Same El Niño fire caveat: check NPWS alerts and RFS the morning of. Blackheath midweek lodging is far cheaper than Katoomba in the Christmas fortnight; camping at Perrys Lookdown is nearly free but exposed.",
+    "why_rated": "Forum consensus is that Katoomba is the postcard and Blackheath is the hike — the Grand Canyon Track is repeatedly voted the best short walk in NSW, and the Grose Valley view from Govetts Leap outclasses the Three Sisters. Quieter, cheaper, better food (Blackheath has a stronger cafe scene than Katoomba).",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/walking-tracks/grand-canyon-track",
+      "https://www.visitnsw.com/destinations/blue-mountains/blackheath"
+    ]
+  },
+  {
+    "name": "Jenolan Caves",
+    "region": "NSW — Blue Mountains / Oberon",
+    "tags": ["cave", "geology", "closed-risk"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "120-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "ALMOST CERTAINLY SHUT. Jenolan has been closed since the April 2024 extreme-rainfall landslips; NPWS lists the Karst Conservation Reserve as closed into late 2026, with road repairs on the Two Mile section of Jenolan Caves Road targeting a public reopening in early 2027. Do not plan around it — re-check a fortnight before travel, and treat any opening as a bonus. Caves sit at a constant ~15°C, which would make it the perfect 40°C-day activity if it were open.",
+    "why_rated": "One of the world's oldest open cave systems (340 million years) and the classic Blue Mountains add-on before the closures. Included here as an honest 'don't bother trying to book it' entry.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.jenolancaves.org.au/",
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/jenolan-karst-conservation-reserve"
+    ]
+  },
+  {
+    "name": "Figure Eight Pools — Royal National Park",
+    "region": "NSW — Royal NP / Burning Palms",
+    "tags": ["hiking", "coastal-walk", "swimming", "national-park", "tide-locked", "free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "30-80",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "TIDE-LOCKED, and hard-locked: reachable only within roughly two hours either side of low tide, with tide under ~1 m AND swell under 1 m. NSW NPWS runs a public risk-forecast tool with a real-time rating plus a three-day forecast — go only on LOW (blue) or VERY LOW (green). People are seriously injured here every summer by waves washing the rock platform. The walk in from Garrawarra Farm car park is ~6 km return with a punishing hot climb back up; carry far more water than feels necessary. Only realistic with a car (Otford station is the train alternative but adds distance).",
+    "why_rated": "Instagram's favourite Sydney rock pools — natural figure-eight-shaped potholes carved into a wave-cut platform under the Burning Palms cliffs. The forum lore is unanimous: half the people who go see nothing because they ignored the tide, so the win is entirely in scheduling it right.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/lookouts/figure-eight-pools",
+      "https://www.digital.nsw.gov.au/article/be-safe-on-your-next-trip-to-figure-eight-pools"
+    ]
+  },
+  {
+    "name": "Royal NP — Bundeena ferry, Wedding Cake Rock & the Coast Track",
+    "region": "NSW — Royal NP / Bundeena",
+    "tags": ["coastal-walk", "hiking", "national-park", "ferry", "beach", "car-free"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "50-120",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Reachable car-free: train to Cronulla, then the little Bundeena ferry (~A$8pp each way, roughly hourly). Park entry A$12/vehicle only if driving. Wedding Cake Rock is fenced off — it's undercut and structurally unstable, and NPWS fines people who climb it, so treat it as a viewpoint. The full 26 km Coast Track is a two-day walk and is genuinely dangerous in January heat; do the Bundeena–Marley Beach section (~9 km return) early morning instead. Wattamolla and Garie are the swim stops.",
+    "why_rated": "The world's second-oldest national park, 45 minutes from the CBD, with a coastline of sea cliffs, hidden beaches and lagoons that beats anything in the city. The ferry approach is the underrated bit — locals rate the Cronulla–Bundeena crossing as one of Sydney's best cheap boat rides.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/royal-national-park",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/walking-tracks/coast-track"
+    ]
+  },
+  {
+    "name": "Bondi to Coogee coastal walk + the ocean-pool circuit",
+    "region": "NSW — Sydney Eastern Beaches",
+    "tags": ["coastal-walk", "beach", "swimming", "free", "day-trip", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "10-40",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "6 km clifftop path, free, bus or train the whole way on Opal. Do it at dawn — by 10am in January it's a sunburnt conga line, and the path has almost no shade. String the ocean pools together for the swim version: Bondi Icebergs (A$10pp), then the free Bronte Baths, Clovelly, Wylie's Baths at Coogee (A$8pp) and Mahon Pool at Maroubra. Sydney beaches are the one thing January genuinely improves.",
+    "why_rated": "The single most-recommended free thing to do in Sydney across every forum thread ever written, and the ocean-pool variant is what locals actually do. Gordons Bay along the way is a legitimate snorkel site with an underwater nature trail.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.sydney.com/destinations/sydney/sydney-east/bondi/attractions/bondi-to-coogee-walk",
+      "https://www.timeout.com/sydney/news/we-asked-you-to-share-sydneys-best-kept-secrets-here-are-your-favourite-hidden-gems-072324"
+    ]
+  },
+  {
+    "name": "Manly by ferry — North Head, Shelly Beach snorkel, Q Station",
+    "region": "NSW — Sydney North Harbour",
+    "tags": ["ferry", "beach", "snorkel", "coastal-walk", "heritage", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-120",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Circular Quay to Manly on the F1 ferry is on Opal and doubles as the cheapest harbour cruise in the world (~A$8pp, less on weekends under the daily cap). Shelly Beach is a no-take aquatic reserve — bring or hire a mask; blue gropers and cuttlefish are near-guaranteed. Q Station ghost tours are extra and book out. Very crowded in the Christmas fortnight but the water is at its warmest.",
+    "why_rated": "Perennial 'if you do one thing in Sydney' answer. The Manly ferry past the Opera House and Heads costs the price of a bus ticket; Shelly Beach is Sydney's best shore snorkel; the North Head Fairfax lookout has the harbour view most tourists never see.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.sydney.com/destinations/sydney/sydney-north/manly",
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/sydney-harbour-national-park"
+    ]
+  },
+  {
+    "name": "Palm Beach & the Northern Beaches — Barrenjoey Lighthouse",
+    "region": "NSW — Sydney Northern Beaches",
+    "tags": ["beach", "hiking", "coastal-walk", "day-trip", "scenic-drive"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-150",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Bus B1 + 199 from the city takes ~1h45 each way on Opal — slow but car-free; a car makes the whole peninsula (Bilgola, Avalon, Whale Beach) work as one loop. The Barrenjoey climb is short (~1 km) but steep and fully exposed — morning or late afternoon only. Northern Beaches bushland is on the El Niño elevated-fire list; check RFS before a Ku-ring-gai/West Head extension. Palm Beach parking on a January weekend is a bloodsport.",
+    "why_rated": "'Summer Bay' from Home and Away, and the headland view over Pittwater and the Hawkesbury mouth from Barrenjoey is the best free lookout in greater Sydney. The Palm Beach–Ettalong ferry hop is the cult move — it turns a day trip into a Central Coast crossing.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/lookouts/barrenjoey-lighthouse",
+      "https://www.sydney.com/destinations/sydney/sydney-north/palm-beach"
+    ]
+  },
+  {
+    "name": "Ku-ring-gai Chase NP — West Head, Aboriginal engravings & the Basin",
+    "region": "NSW — Sydney North / Pittwater",
+    "tags": ["national-park", "indigenous", "hiking", "camping", "ferry", "free"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "40-140",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Park entry A$12/vehicle. The Basin is NSW's only mainland walk-in/ferry-in campground of its kind — Palm Beach ferry across Pittwater, camp by the water, wild wallabies at dusk (book ahead, it fills in January). ELEVATED FIRE AREA in the 2026–27 outlook; roads and tracks close on catastrophic days. Ticks and leeches after any rain.",
+    "why_rated": "The Aboriginal engraving sites on the Basin and Red Hands tracks are among the most accessible rock-art in Australia — thousand-year-old whale, kangaroo and ancestral figures cut into open sandstone platforms, free and unfenced. West Head lookout over Pittwater and Barrenjoey is the payoff view.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/ku-ring-gai-chase-national-park",
+      "https://www.nationalparks.nsw.gov.au/camping-and-accommodation/campgrounds/the-basin-campground"
+    ]
+  },
+  {
+    "name": "Hawkesbury River — the Riverboat Postman mail run from Brooklyn",
+    "region": "NSW — Hawkesbury / Brooklyn",
+    "tags": ["boat", "day-trip", "quirky", "scenic", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "130-190",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "WEEKDAY-LOCKED: the mail run operates weekdays only (typically Mon–Fri, departing Brooklyn late morning); there are separate weekend coffee cruises but they're not the real thing. ~A$60–70pp, ~3 hours, lunch usually extra. Train from Central to Hawkesbury River station on Opal, the wharf is beside the platform — genuinely car-free. Book ahead; it's a small boat.",
+    "why_rated": "A working Australia Post mail delivery to riverside communities with no road access — Dangar Island, Bar Point, Marlow. Repeat forum 'hidden gem' pick: you're on a postie's rounds through drowned-valley scenery an hour from Sydney, and it's the kind of thing almost no visitor knows exists.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://riverboatpostman.com.au/",
+      "https://www.visitnsw.com/destinations/sydney/sydney-north/brooklyn"
+    ]
+  },
+  {
+    "name": "Wisemans Ferry & the convict Great North Road",
+    "region": "NSW — Hawkesbury / Wisemans Ferry",
+    "tags": ["heritage", "scenic-drive", "hiking", "free", "river"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-250",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Needs a car; the two free 24-hour cable ferries across the Hawkesbury are part of the fun. Devines Hill and the Old Great North Road climb are exposed sandstone — do them before 9am in January, and check RFS (Hawkesbury is on the El Niño elevated-fire list). Del Rio Riverside Resort here is the Return to Rio festival site, though that event has moved to a Halloween weekender rather than its old February slot.",
+    "why_rated": "A UNESCO-listed Australian Convict Site hiding in plain sight — hand-cut buttresses and retaining walls built by chain gangs in the 1830s, walkable and free. Wisemans Ferry itself is the classic 'nothing happens here' river town an hour and a half from the CBD, and the drive up the Macdonald Valley to St Albans (Settlers Arms, 1836) is a cult NSW backroad.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/historic-buildings-places/old-great-north-road",
+      "https://whc.unesco.org/en/list/1306/"
+    ]
+  },
+  {
+    "name": "Inner West alternative-culture crawl — Newtown, Enmore, Marrickville",
+    "region": "NSW — Sydney Inner West",
+    "tags": ["city", "alternative", "hippie", "food", "music", "cheap", "car-free"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-180",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Year-round, no lock, all on Opal. This is also the cheapest place to base in Sydney — Newtown/Marrickville rooms run well under Bondi or CBD rates, with the trade-off of a 15-min train to the harbour. Live music at the Enmore Theatre, Lansdowne and Marrickville Bowlo; the Marrickville brewery district (Batch, Wildflower, Grifter) is walkable.",
+    "why_rated": "Sydney's counterculture spine — King Street's vintage shops, crystal and record stores, vegan kitchens, op shops and street art (the 'I Have a Dream' mural), plus Sydney's densest live-music strip. The obvious her-first counterweight to a harbour-and-beaches itinerary, and it costs almost nothing.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.timeout.com/sydney/things-to-do/best-things-to-do-in-newtown",
+      "https://www.sydney.com/destinations/sydney/sydney-west/newtown"
+    ]
+  },
+  {
+    "name": "Sydney weekend markets — Glebe, Paddington, Rocks, Carriageworks",
+    "region": "NSW — Sydney (various)",
+    "tags": ["market", "hippie", "food", "cheap", "weekday-locked", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "20-100",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "WEEKDAY-LOCKED, each to its own day: Glebe Markets Saturdays (the vintage/incense/second-hand one, closest to the hippie register), Paddington Markets Saturdays (designers and jewellery), Carriageworks Farmers Market Saturdays (chef-grade produce), The Rocks Markets Saturdays and Sundays (touristy but harbourside). Several close or run reduced hours over the Christmas–New Year fortnight — check before committing a day. Within the trip's Sydney block the eligible days are Sat 26 Dec, Sun 27 Dec, Sat 2 Jan and Sun 3 Jan.",
+    "why_rated": "Glebe Markets on the primary-school field is the closest Sydney gets to a Northern Rivers market — records, tie-dye, sage, cheap vintage, live buskers, a food-truck lawn — and it's free to wander.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://glebemarkets.com.au/",
+      "https://carriageworks.com.au/events/carriageworks-farmers-market/",
+      "https://www.therocks.com/things-to-do/the-rocks-markets"
+    ]
+  },
+  {
+    "name": "Wendy's Secret Garden & Lavender Bay foreshore",
+    "region": "NSW — Sydney North Shore",
+    "tags": ["free", "hidden-gem", "garden", "day-trip", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-20",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free, open always, no lock. Train or ferry to Milsons Point, then a few minutes' walk past Luna Park. Shaded — a genuinely good option on a 38°C day when the coast walks are unbearable.",
+    "why_rated": "Repeatedly the top answer in 'Sydney's best-kept secret' threads: a garden Wendy Whiteley planted by hand into abandoned railway land after her husband's death, now a jungly terraced maze of figs and ferns hanging over the harbour with a Harbour Bridge view and no entry gate. Pair it with the free Brett Whiteley Studio in Surry Hills.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.wendyssecretgarden.org.au/",
+      "https://www.timeout.com/sydney/news/we-asked-you-to-share-sydneys-best-kept-secrets-here-are-your-favourite-hidden-gems-072324"
+    ]
+  },
+  {
+    "name": "Cockatoo Island (Wareamah) — camping on Sydney Harbour",
+    "region": "NSW — Sydney Harbour",
+    "tags": ["camping", "heritage", "ferry", "quirky", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Ferry-access only (F3/F8 on Opal), day visits free. Camping is roughly A$50–90 per site per night with pre-pitched options higher; it books out for New Year and the island typically runs a separate ticketed NYE event at premium prices. Zero shade on the campground plateau — hot and exposed in January, and there is nowhere to escape to after the last ferry.",
+    "why_rated": "A UNESCO-listed convict site and derelict shipyard in the middle of the harbour where you can legally pitch a tent with the city skyline in view. Nothing else in a major world city is quite like it, and it's one of the cheapest 'wow' nights in Sydney.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.cockatooisland.gov.au/",
+      "https://whc.unesco.org/en/list/1306/"
+    ]
+  },
+  {
+    "name": "SCG cricket — Big Bash and the New Year's Test",
+    "region": "NSW — Sydney / Moore Park",
+    "tags": ["sport", "city", "date-locked", "minor-interest"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "DATE-LOCKED to the fixture list. BBL runs mid-December to a late-January final, so Sydney Sixers or Thunder home games fall inside the Sydney block; BBL general admission is typically A$25–40pp. The SCG New Year's Test traditionally starts in the first week of January — check the 2026–27 international schedule, as the touring side and exact dates weren't confirmed at time of writing, and Test tickets run much higher. Bring sunscreen; the SCG in January is a furnace.",
+    "why_rated": "TAGGED SPORT — minor interest, his side only. Down-weight it: this is a cheap, low-commitment single afternoon that happens to be walkable from the CBD, not a reason to shape the itinerary. A BBL night game is the better-value version; the Test is the higher-cost, higher-heat one.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.sydneycricketground.com.au/",
+      "https://www.bigbash.com.au/"
+    ]
+  },
+  {
+    "name": "Glenworth Valley — horse riding, kayaking & quad bikes",
+    "region": "NSW — Central Coast / Glenworth Valley",
+    "tags": ["adventure", "horse-riding", "camping", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Runs year-round independently of the festival — two-hour horse rides around A$100–120pp, kayaking and quads cheaper, and there's cheap bush camping on the creek. Note the site is occupied by Lost Paradise 28 Dec–1 Jan, so it's an either/or with those dates. Hot and dusty in January; morning rides.",
+    "why_rated": "Australia's largest privately-owned horse-riding operation (3,000 acres, 200+ horses) and — for anyone not going to the festival — the cheap way to see the valley people rave about. 90 minutes from Sydney, easy add-on to a Central Coast run.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.glenworth.com.au/",
+      "https://www.visitnsw.com/destinations/central-coast"
+    ]
+  },
+  {
+    "name": "Bouddi National Park & the Central Coast beaches",
+    "region": "NSW — Central Coast / Killcare",
+    "tags": ["coastal-walk", "beach", "national-park", "camping", "hidden-gem"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Reachable from Palm Beach via the Ettalong ferry (car-free) or ~1.5 hr drive from Sydney. The 8 km Bouddi Coastal Walk (Putty Beach to MacMasters) has proper shade sections, unlike most Sydney coast walks. Walk-in camping at Little Beach and Putty Beach is cheap but books out over Christmas. Peak-season crowds are real but nothing like Bondi.",
+    "why_rated": "The Central Coast is what Sydneysiders use when Sydney beaches are full — Pearl Beach, Killcare, Maitland Bay, Putty. Maitland Bay in particular gets called the best beach within two hours of the city, and it takes a 30-minute walk-in to reach, which keeps the crowds down.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/bouddi-national-park",
+      "https://www.visitnsw.com/destinations/central-coast"
+    ]
+  },
+  {
+    "name": "Newcastle — Bathers Way, Bogey Hole & Merewether Baths",
+    "region": "NSW — Hunter / Newcastle",
+    "tags": ["city", "beach", "swimming", "coastal-walk", "heritage", "cheap", "free"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "2.5 hr by train from Central on Opal, or 2 hr drive. No lock. Everything on the Bathers Way — Merewether Ocean Baths (one of the southern hemisphere's largest), the convict-cut Bogey Hole, Nobbys Beach, Fort Scratchley — is free. A genuinely cheap coastal city, unlike everywhere else on this list in January.",
+    "why_rated": "The forum darling of the last decade: an ex-steel city that turned into a beach town with a serious food and bar scene, huge free ocean baths and no Sydney price tag. Consistently named one of Australia's most underrated cities.",
+    "nearest_airport": "NTL",
+    "sources": [
+      "https://www.visitnewcastle.com.au/",
+      "https://www.timeout.com/australia/travel/most-underrated-cities-in-australia"
+    ]
+  },
+  {
+    "name": "Hunter Valley wine country — Pokolbin & Lovedale",
+    "region": "NSW — Hunter Valley",
+    "tags": ["wine", "food", "day-trip", "scenic-drive"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "250-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "HONEST TAKE: January is the Hunter's worst month. It's the hottest and most humid time of year (mid-to-high 30s inland, no sea breeze), it's harvest run-up so vineyard staff are stretched, and peak-season cellar-door fees plus accommodation rates are at their annual high. Tasting fees now A$15–30pp at most cellar doors (often waived on purchase). A designated driver or a day tour from Sydney (~A$150–200pp) is required — this is a drinking region with police attention. Compare against Orange, which is 600 m higher and much cooler.",
+    "why_rated": "Australia's oldest wine region and the default Sydney weekender — Semillon that exists nowhere else, plus a dense cluster of cellar doors you can do without long drives. Rated for convenience more than for January conditions.",
+    "nearest_airport": "NTL",
+    "sources": [
+      "https://www.winecountry.com.au/",
+      "https://www.mynrma.com.au/open-road/destinations/hunter-valley"
+    ]
+  },
+  {
+    "name": "Wollombi Valley — the Wollombi Tavern & Yellow Rock",
+    "region": "NSW — Hunter / Wollombi",
+    "tags": ["hidden-gem", "alternative", "heritage", "scenic-drive", "cheap"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Car needed; it's on the Convict Trail between Sydney and the Hunter, so it works as a detour rather than a destination. Hot and dry in January, and the valley is fire-exposed. The Wollombi Tavern's Dr Jurd's Jungle Juice is the local institution — designated driver, obviously.",
+    "why_rated": "A tiny sandstone village with a long-running alternative/artist streak, Aboriginal rock art in the surrounding valleys, and one of the great Australian country pubs. The kind of place that turns up in 'the Hunter without the wine buses' threads.",
+    "nearest_airport": "NTL",
+    "sources": [
+      "https://www.visitnsw.com/destinations/hunter/cessnock-area/wollombi",
+      "https://www.wollombitavern.com.au/"
+    ]
+  },
+  {
+    "name": "Port Stephens — Stockton dunes sandboarding & dolphin cruise",
+    "region": "NSW — Port Stephens / Nelson Bay",
+    "tags": ["adventure", "wildlife", "beach", "day-trip", "sandboarding"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Year-round; the resident bottlenose population means dolphin sightings don't depend on the season (the humpback migration is May–Nov, so no whales in this window). Real prices: Birubi Beach 4WD + sandboarding ~A$41pp for 75 min, Nelson Bay dolphin cruise from ~A$32pp for 90 min, combined 12-hour day tours ex-Sydney from ~A$142pp. Stockton Bight dunes reach 40m and radiate heat — go early. Peak-season Nelson Bay accommodation is expensive; day-tripping from Newcastle is cheaper.",
+    "why_rated": "The largest moving coastal sand dune system in Australia (32 km of it) on Worimi land, with sandboarding that consistently rates as the best-value adrenaline hour on the NSW coast. Combine with Tomaree Head summit walk (short, steep, huge view) and the koalas at Tilligerry.",
+    "nearest_airport": "NTL",
+    "sources": [
+      "https://www.getyourguide.com/stockton-beach-l168868/",
+      "https://www.portstephens.org.au/",
+      "https://www.viator.com/tours/Port-Stephens/Port-Stephens-Dolphin-Watching/d23018-8746P4"
+    ]
+  },
+  {
+    "name": "Subsonic Music Festival — Riverwood Downs, Barrington Tops",
+    "region": "NSW — Barrington Tops / Dungog",
+    "tags": ["festival", "doof", "psytrance", "camping", "hippie", "wrong-season"],
+    "days_min": 3,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "700-1000",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG SEASON — Subsonic 2026 runs 13–15 November 2026, roughly a month before they land. Captured deliberately so it can be rejected on facts: this is the NSW doof that would otherwise be the perfect fit (riverside camping, 120+ artists, four stages of psytrance/techno/bass/downtempo). If the trip's start ever slides earlier, this is the first thing to re-check.",
+    "why_rated": "NSW's most-loved mid-size bush doof — river swimming between sets at Riverwood Downs, world/funk/roots stages alongside the electronic ones, back since 2023 after a four-year hiatus. 3.5 hr north of Sydney, 1 hr from Newcastle.",
+    "nearest_airport": "NTL",
+    "sources": [
+      "https://www.subsonicmusic.com.au/",
+      "https://beat.com.au/subsonic-music-festival-2026/",
+      "https://www.visitnsw.com/destinations/hunter/barrington-tops/dungog/events/subsonic-music-festival"
+    ]
+  },
+  {
+    "name": "Barrington Tops National Park — rainforest and cool-country escape",
+    "region": "NSW — Barrington Tops",
+    "tags": ["national-park", "rainforest", "hiking", "camping", "swimming-hole"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "One of the few NSW inland options that gets BETTER in a heatwave — the plateau sits above 1,500 m and can be 10–15°C cooler than the Hunter floor, with snow gums and Antarctic beech. Gondwana Rainforests World Heritage listing. Roads on top are gravel and some need decent clearance; camping is cheap. Still check RFS — Barrington burned badly in 2019–20.",
+    "why_rated": "Cool temperate rainforest, waterfall swimming holes (Ladies Well, Jerusalem Creek) and near-empty campgrounds three hours from Sydney. The standard local answer to 'where do I go when it's 40 degrees'.",
+    "nearest_airport": "NTL",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/barrington-tops-national-park",
+      "https://barringtoncoast.com.au/"
+    ]
+  },
+  {
+    "name": "Myall Lakes & Seal Rocks",
+    "region": "NSW — Mid North Coast / Myall Lakes",
+    "tags": ["beach", "national-park", "camping", "hidden-gem", "surf", "cheap"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "120-350",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Perfect summer fit — freshwater lakes plus surf beaches, and the campgrounds (Mungo Brush, Seal Rocks/Treachery) are among the cheapest coastal nights in NSW. They do book out over the Christmas fortnight, so aim mid-January. No shops to speak of at Seal Rocks; provision in Bulahdelah or Forster. Car essential.",
+    "why_rated": "Seal Rocks is the perennial 'don't tell anyone' answer in NSW coast threads — a handful of houses, Sugarloaf Point Lighthouse, and Number One Beach, with no development at all. Mungo Brush's paperbark forest and the lake system behind it make it a two-ecosystem stop.",
+    "nearest_airport": "NTL",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/myall-lakes-national-park",
+      "https://www.barringtoncoast.com.au/destinations/seal-rocks"
+    ]
+  },
+  {
+    "name": "Kiama — Blowhole, Cathedral Rocks & Minnamurra Rainforest",
+    "region": "NSW — Illawarra / Kiama",
+    "tags": ["day-trip", "coastal-walk", "rainforest", "free", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-150",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Train from Central to Kiama (~2.5 hr) is on Opal and the South Coast line hugs the cliffs — the ride is part of the attraction. The Blowhole needs a decent south-easterly swell to perform; it's a dud on a flat day, so check the swell forecast. Minnamurra Rainforest (Budderoo NP) has a A$12 vehicle fee and shaded boardwalks — a good hot-day option. Cathedral Rocks needs a car and low tide.",
+    "why_rated": "One of the world's largest blowholes plus Cathedral Rocks' basalt columns and the Kiama Coast Walk, all within a car-free day of Sydney. Add the Sea Cliff Bridge and Stanwell Tops on the drive down if you have wheels.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.kiama.com.au/",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/attractions/minnamurra-rainforest-centre"
+    ]
+  },
+  {
+    "name": "Berry & Kangaroo Valley — Fitzroy Falls and Hampden Bridge",
+    "region": "NSW — Southern Highlands / Shoalhaven",
+    "tags": ["day-trip", "waterfall", "village", "food", "scenic-drive", "kayak"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Car needed. Fitzroy Falls runs thin in a dry El Niño summer — in a drought year it can be a trickle, so manage expectations; the Kangaroo Valley canoe/kayak paddle on the Kangaroo River (hire ~A$50–70 for a double for a half day) is the more reliable draw. Berry gets slammed on summer weekends. Kangaroo Valley Village burned close in 2019–20 — fire-aware area.",
+    "why_rated": "Kangaroo Valley is a repeat 'most beautiful place two hours from Sydney' pick — the 1898 Hampden Bridge, escarpment walls on three sides, wombats at dusk. Berry is the food-and-vintage stop on the way (Berry Donut Van is the ritual).",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.shoalhaven.com/destinations/kangaroo-valley/",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/lookouts/fitzroy-falls-lookouts"
+    ]
+  },
+  {
+    "name": "Jervis Bay & Hyams Beach",
+    "region": "NSW — South Coast / Jervis Bay",
+    "tags": ["beach", "wildlife", "national-park", "snorkel", "expensive"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "500-1200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "SEASON HONESTY: Jervis Bay in January is the definition of the crowded-coast problem. Hyams Beach parking fills before 9–10am and cars are actively turned away; Booderee NP campsites go by ballot months ahead; peak-season houses impose 7-night minimums at brutal rates (one Hyams Beach house quotes A$2,090 a weekday night in January). Booderee has its own A$13/vehicle 48-hour pass, separate from the NSW parks pass. Go in the shoulder or go elsewhere — it's rated 'poor' on cost and crowding, not on beauty. Water is cold-ish year round (it's open to the Southern Ocean).",
+    "why_rated": "Some of the whitest sand in the world and the clearest water in NSW, with dolphins in the bay most days and Booderee's Aboriginal-owned park (Murrays Beach, Green Patch, Cave Beach) doing the heavy lifting. Beautiful, and priced accordingly in this exact window.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.jervisbaytourism.com.au/",
+      "https://parksaustralia.gov.au/booderee/",
+      "https://www.whitesandshyamsbeach.com/pricing"
+    ]
+  },
+  {
+    "name": "Mollymook, Milton & Ulladulla",
+    "region": "NSW — South Coast / Shoalhaven",
+    "tags": ["beach", "food", "village", "surf", "day-trip"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Peak January prices and a busy stretch, but noticeably less contested than Jervis Bay 40 minutes north. Rick Stein at Bannisters is the marquee (expensive) meal; Milton's main street is the cheap version. Book anything early — the whole South Coast fills between Boxing Day and Australia Day.",
+    "why_rated": "The South Coast's food capital paired with a long, uncrowded surf beach and Narrawallee Inlet for flat-water swimming. Milton is the antiques-and-bakery village inland; Ulladulla has the working harbour and Warden Head walk.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.shoalhaven.com/destinations/mollymook-milton-ulladulla/",
+      "https://timeout.com/sydney/travel/the-most-underrated-holiday-destinations-that-you-should-be-visiting-in-nsw"
+    ]
+  },
+  {
+    "name": "Murramarang NP — Pebbly Beach kangaroos",
+    "region": "NSW — South Coast / Batemans Bay",
+    "tags": ["wildlife", "beach", "national-park", "camping", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "A$12/vehicle day fee; campsites at Pebbly and Depot Beach are cheap but ballot/book out for the Christmas fortnight. Kangaroos are wild and resident year-round — dawn and dusk are when they're on the sand. The area was hit hard in the 2019–20 fires and has regrown; still an elevated-risk zone in an El Niño summer.",
+    "why_rated": "The 'kangaroos on the beach' photo everyone has seen is taken here. Backed by spotted-gum forest running right to the sand, with the Murramarang South Coast Walk now linking the beaches — one of the few places where an iconic Australian image is genuinely reliable and free.",
+    "nearest_airport": "MYA",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/murramarang-national-park",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/beaches/pebbly-beach"
+    ]
+  },
+  {
+    "name": "Central Tilba & Bermagui Blue Pool",
+    "region": "NSW — Sapphire Coast / Bermagui",
+    "tags": ["village", "heritage", "swimming", "hidden-gem", "alternative", "free"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Car needed; it's 5 hr from Sydney so this belongs to a South Coast run rather than a day trip. Blue Pool is free, tide-affected (best around low tide, unswimmable in big swell) and has a long staircase down the cliff. Tilba is tiny — a single National Trust-classified street.",
+    "why_rated": "Central Tilba is a preserved 1890s dairy village under Gulaga (Mount Dromedary) with a cheese factory, a woodfired bakery and a persistent alternative/craft population — the South Coast's answer to a hill-country hippie town. Bermagui's Blue Pool is a rock pool cut into an ocean cliff face and regularly voted Australia's best.",
+    "nearest_airport": "MYA",
+    "sources": [
+      "https://www.eurobodalla.com.au/destinations/central-tilba",
+      "https://timeout.com/sydney/travel/the-most-underrated-holiday-destinations-that-you-should-be-visiting-in-nsw"
+    ]
+  },
+  {
+    "name": "Montague Island (Barunguba) — seals, penguins & snorkelling",
+    "region": "NSW — Sapphire Coast / Narooma",
+    "tags": ["wildlife", "snorkel", "boat", "indigenous", "event-spend"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "300-500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "NPWS-guided tours only (~A$100–130pp for the nature tour; snorkel-with-seals trips ~A$140–180pp). Summer is right: little penguins are ashore at dusk and the fur seal colony is resident, water is warm enough for a wetsuit snorkel. Weather-dependent — swell cancels trips, so leave a spare day. Book ahead in January.",
+    "why_rated": "Swimming with hundreds of Australian and NZ fur seals in clear water off a granite island, plus a heritage lighthouse and one of the largest little penguin colonies in NSW. The reliable 'wildlife splurge' of the South Coast, and Aboriginal-guided options exist.",
+    "nearest_airport": "MYA",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/montague-island-nature-reserve",
+      "https://www.narooma.org.au/"
+    ]
+  },
+  {
+    "name": "Beowa NP & the Light to Light Walk — Eden",
+    "region": "NSW — Far South Coast / Eden",
+    "tags": ["hiking", "coastal-walk", "national-park", "remote", "camping"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "150-500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "31 km, 3-day coastal walk between Boyd's Tower and Green Cape Lighthouse; NPWS now runs it with upgraded camps and there's a guided option. January is warm but the far south coast is the mildest part of NSW — this is one inland-adjacent walk heat doesn't kill. However: this coast was devastated in the 2019–20 Black Summer fires and is squarely in an elevated-risk zone again under a strong El Niño; multi-day walks can be closed at short notice. Whale season is Sep–Nov, so no whales in this window.",
+    "why_rated": "Red rock, white sand, no crowds — repeatedly called the best multi-day coastal walk in NSW and still barely known outside the state. Eden's Killer Whale Museum (the Old Tom skeleton and the story of orcas cooperating with Yuin whalers) is one of the strangest and best small museums in Australia.",
+    "nearest_airport": "MIM",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/walking-tracks/light-to-light-walk",
+      "https://www.sapphirecoast.com.au/"
+    ]
+  },
+  {
+    "name": "Wollongong & the Sea Cliff Bridge — Grand Pacific Drive",
+    "region": "NSW — Illawarra / Wollongong",
+    "tags": ["scenic-drive", "day-trip", "beach", "temple", "free", "car-free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-180",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Train to Wollongong on Opal (~1.5 hr) works, but the Sea Cliff Bridge really wants a car or a bike. Nan Tien Temple (largest Buddhist temple in the southern hemisphere) is free to enter and air-conditioned — a strong 40°C-day option, and her-adjacent. Tandem hang gliding from Bald Hill at Stanwell Tops is ~A$300pp, which is Event-spend territory.",
+    "why_rated": "The bridge cantilevered out over the sea below the Illawarra escarpment is one of Australia's great short drives, and Bald Hill lookout above it is where every 'best view in NSW' listicle stops. Wollongong itself has cheap food, ocean pools and no tourist pricing.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.visitwollongong.com.au/",
+      "https://www.nantien.org.au/"
+    ]
+  },
+  {
+    "name": "Mount Kosciuszko summit walk from Thredbo",
+    "region": "NSW — Snowy Mountains / Thredbo",
+    "tags": ["hiking", "alpine", "national-park", "summit", "scenic"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-450",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "SUMMER IS THE ONLY SEASON FOR IT — the walk is under snow the rest of the year. Kosciuszko Express chairlift is the shortcut (recent summer pricing around A$55–70pp for a day pass; check current rates), leaving a 13 km return raised-walkway stroll to the 2,228 m summit. Alpine weather is volatile even in January: it can snow, and the exposure is total, so carry layers regardless of the Sydney forecast. Kosciuszko NP is a fire-risk park in an El Niño year and the 2019–20 and 2003 fires both closed sections — check NPWS alerts. Park entry A$29/vehicle/day in the alpine area (higher than the standard A$8–12).",
+    "why_rated": "Continental Australia's highest point, and one of the very few high summits anywhere reachable by an easy walk on a boardwalk — Main Range wildflowers, glacial lakes (Blue Lake), and a genuine alpine landscape most visitors don't believe Australia has. The extended Main Range Track loop (22 km) is the walker's version.",
+    "nearest_airport": "OOM",
+    "sources": [
+      "https://www.thredbo.com.au/activities/gondola-and-chairlift/",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/walking-tracks/mount-kosciuszko-summit-walk",
+      "https://wildwalks.com/bushwalking-and-hiking-in-nsw/kosciuszko-np-south/kosciuszko-walk-thredbo-to-mount-kosciuszko.html"
+    ]
+  },
+  {
+    "name": "Yarrangobilly Caves & the thermal pool",
+    "region": "NSW — Snowy Mountains / Kosciuszko NP north",
+    "tags": ["cave", "swimming", "hidden-gem", "national-park", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Self-guided Glory Hole cave ~A$22pp, guided caves ~A$35pp; the thermal pool is included with park entry. The pool holds a constant 27°C year-round — a brilliant hot-day swim, and the caves sit at a steady cool temperature. Access is via a steep gravel loop off the Snowy Mountains Highway; a long way from anywhere (about 1.5 hr from Tumut). Fire-risk park — check alerts.",
+    "why_rated": "A near-secret: limestone caves you can walk through unguided at your own pace, and a natural thermal swimming pool in a river gorge, both inside Kosciuszko NP for the price of a park pass. Turns up constantly in 'best thing in NSW nobody knows about' threads.",
+    "nearest_airport": "CBR",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/attractions/yarrangobilly-caves",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/swimming/yarrangobilly-caves-thermal-pool"
+    ]
+  },
+  {
+    "name": "Canberra — the free national institutions",
+    "region": "ACT — Canberra",
+    "tags": ["city", "museum", "culture", "free", "indoor"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "120-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "HONEST TAKE: Canberra in January is hot (mid-30s), dry, and half-empty — public servants are on leave and the city can feel abandoned. That cuts both ways: no queues, cheap accommodation (the only Australian capital where January is low season), and the marquee attractions are indoors and air-conditioned. Free entry at the National Gallery, National Portrait Gallery, Australian War Memorial, National Museum, Questacon (paid, ~A$25pp), Canberra Museum and Gallery, Old Parliament House/MoAD. 3 hr drive or bus from Sydney. Sunset Cinema at the Botanic Gardens runs Nov–Feb.",
+    "why_rated": "The concentration of free world-class museums is unmatched in Australia — the NGA's Aboriginal Memorial and Blue Poles, the War Memorial's Last Post ceremony every closing time, and the Museum of Australian Democracy in the old parliament. Best used as an air-conditioned two days when the coast is at 40°C.",
+    "nearest_airport": "CBR",
+    "sources": [
+      "https://visitcanberra.com.au/articles/100-things-to-do-in-canberra",
+      "https://region.com.au/things-to-do-in-canberra-over-summer-2/930177/"
+    ]
+  },
+  {
+    "name": "Summernats 39 — Canberra street machine festival",
+    "region": "ACT — Canberra / EPIC",
+    "tags": ["sport", "cars", "festival", "date-locked", "minor-interest"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "200-450",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE-LOCKED: 7–10 January 2027 at Exhibition Park in Canberra. Fits neatly after the Sydney block ends (~4 Jan). Single-day passes are the cheap entry; four-day passes and camping cost considerably more, and Canberra accommodation spikes for the one week of the year it's busy. Extremely hot, loud, dusty, and heavily male — pack accordingly and know what you're buying.",
+    "why_rated": "TAGGED SPORT/CARS — minor interest, his side only, and down-weight it hard: this is a 100,000-person burnout festival, not a shared-taste pick. Included because the dates land perfectly and it is a genuinely singular slice of Australian culture (burnout masters, 2,000+ entrant cars, the Grand Champion cruise). One day, cheap ticket, no relocation built around it.",
+    "nearest_airport": "CBR",
+    "sources": [
+      "https://summernats.com.au/tickets/",
+      "https://exhibitionparkincanberra.com.au/event/summernats-39/",
+      "https://visitcanberra.com.au/events/6018843413d25fcf0c9cbc3b/summernats-39"
+    ]
+  },
+  {
+    "name": "Tidbinbilla, Namadgi & Mount Ainslie — the Bush Capital",
+    "region": "ACT — Canberra outskirts",
+    "tags": ["wildlife", "hiking", "indigenous", "national-park", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "40-150",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "FIRE-EXPOSED: Namadgi and Tidbinbilla are dry-forest ACT ranges that burned in 2003 and again in the 2019–20 Orroral Valley fire, which took 80% of Namadgi. In a strong El Niño summer expect total fire ban closures and long, unshaded, 35°C walks. Do it at dawn or not at all. Tidbinbilla entry ~A$13/vehicle; wildlife (koalas, platypus in the sanctuary, mobs of eastern greys) is best at dusk. The Mount Ainslie summit walk from the War Memorial is free and gives the Griffin-plan view of the whole city.",
+    "why_rated": "Tidbinbilla is the reliable Australian-wildlife hit near a capital city without paying zoo prices, and Namadgi's Yankee Hat rock-art shelter is a short, worthwhile walk to genuine Ngunnawal art. Rated poor for the season, not the place.",
+    "nearest_airport": "CBR",
+    "sources": [
+      "https://www.environment.act.gov.au/parks-conservation/parks-and-reserves/find-a-park/tidbinbilla",
+      "https://www.environment.act.gov.au/parks-conservation/parks-and-reserves/find-a-park/namadgi-national-park"
+    ]
+  },
+  {
+    "name": "Tamworth Country Music Festival",
+    "region": "NSW — New England / Tamworth",
+    "tags": ["festival", "music", "date-locked", "culture", "free"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "400-900",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "DATE-LOCKED: 15–24 January 2027 (55th edition), and it falls in the gap between the Sydney block and Byron — Tamworth is roughly on a Sydney→Byron inland route. Most of it is free: 2,800+ events, 700+ artists, with buskers along Peel Street all day and paid concerts optional. The catch is accommodation — the town's beds sell out a year ahead and prices multiply, so realistically it's camping, a caravan park, or a day visit. Inland January heat (mid-to-high 30s) and dust.",
+    "why_rated": "The southern hemisphere's biggest country music festival and one of the world's top few — but the reason forums rate it is the free street-busking layer, which turns the whole CBD into a ten-day open-air stage. A completely different Australia to the coast.",
+    "nearest_airport": "TMW",
+    "sources": [
+      "https://www.visitnsw.com/events/tamworth-country-music-festival",
+      "https://www.nsw.gov.au/visiting-and-exploring-nsw/nsw-events/toyota-country-music-festival-tamworth",
+      "https://www.musicfestivalwizard.com/festivals/tamworth-country-music-festival-2027/"
+    ]
+  },
+  {
+    "name": "Mudgee — wine, The Drip & Dunns Swamp",
+    "region": "NSW — Central West / Mudgee",
+    "tags": ["wine", "swimming-hole", "food", "market", "weekday-locked"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "HEAT WARNING: Mudgee is inland and regularly hits the very high 30s Dec–Feb; locals openly recommend October instead. Also NOTE THE MARKET GAP — the Mudgee Farmers' Market (3rd Saturday) does not run in January or February, which removes the main her-friendly draw. Wineries stay open with tastings around A$10–15pp, often waived on purchase. The heat-beaters are the two water spots: The Drip (Great Dripping Wall in Goulburn River SCA, a mossy sandstone overhang seeping water, ~40 min from town) and Dunns Swamp/Ganguddy in Wollemi NP for kayaking and swimming among pagoda rock formations. Fire-prone country.",
+    "why_rated": "The Drip is a top-10 'most-searched hidden gem in Australia' entry and is free. Mudgee's cellar doors are smaller and friendlier than the Hunter's with a fraction of the bus traffic. But the January version of this capsule is a much weaker one than the brochure implies.",
+    "nearest_airport": "DGE",
+    "sources": [
+      "https://www.visitmudgeeregion.com.au/things-to-do/markets",
+      "https://www.australiantraveller.com/nsw/central-west/mudgee/",
+      "https://timeout.com/sydney/news/these-dreamy-nsw-spots-have-ranked-among-the-top-10-hidden-gems-in-australia-091824"
+    ]
+  },
+  {
+    "name": "Orange — cool-climate wine & Mount Canobolas",
+    "region": "NSW — Central West / Orange",
+    "tags": ["wine", "food", "market", "hiking", "weekday-locked"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "The cooler inland alternative to Mudgee and the Hunter — Orange sits at ~860 m with vineyards up to 1,100 m on Mount Canobolas, so summer days run several degrees below the surrounding plains. WEEKDAY-LOCKED market: Orange Farmers Market is the 2nd Saturday, 8:30am–noon, ~60 stalls (13 Jan 2027 falls on a Wednesday — the relevant Saturdays are 9 Jan and 13 Feb 2027). F.O.O.D Week, the big regional festival, is April — wrong season. 3.5–4 hr from Sydney.",
+    "why_rated": "Australia's serious cool-climate region (Chardonnay, Pinot, Shiraz that tastes nothing like the Hunter's) with a food scene punching well above a town of 40,000, plus the Mount Canobolas summit and Federal Falls for a walk. The pick if a wine capsule survives the sift but the Hunter's January heat doesn't.",
+    "nearest_airport": "OAG",
+    "sources": [
+      "https://visitorange.com.au/",
+      "https://www.mynrma.com.au/open-road/destinations/orange-and-mudgee"
+    ]
+  },
+  {
+    "name": "Warrumbungle National Park — Australia's only Dark Sky Park",
+    "region": "NSW — Central West / Coonabarabran",
+    "tags": ["stargazing", "hiking", "national-park", "camping", "hidden-gem"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Two problems in January. First: heat — the Breadknife and Grand High Tops walk (14.5 km) is the reason to come and NPWS advises against it in extreme heat; it's fully exposed volcanic rock. Second: FIRE — Warrumbungle was almost entirely burnt in the 2013 fire and is squarely in the El Niño elevated-risk inland zone. The astronomy is season-neutral and summer nights are warm, so a stars-only visit (Siding Spring Observatory visitor centre plus a private observatory night, ~A$30–50pp) is the salvageable version. Camping is cheap; Coonabarabran is 6 hr from Sydney.",
+    "why_rated": "Australia's first and only International Dark Sky Park, sharing a mountain with Siding Spring, the country's largest optical observatory — the Milky Way from the Warrumbungles is the reference-standard Australian night sky. The Breadknife itself, a 90 m-high, 4 m-thick volcanic dyke, has no analogue in the country.",
+    "nearest_airport": "COJ",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/warrumbungle-national-park",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/stargazing/warrumbungle-dark-sky-park"
+    ]
+  },
+  {
+    "name": "Broken Hill & Silverton — outback NSW",
+    "region": "NSW — Far West / Broken Hill",
+    "tags": ["outback", "art", "remote", "heritage", "road-trip", "quirky"],
+    "days_min": 3,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "400-900",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG SEASON, plainly. Broken Hill in January averages 34–36°C with regular runs above 45°C, and there is no shade, no coast and no relief; the Living Desert sculptures and Silverton are outdoor, midday-hostile attractions. Locals and every travel guide say April–October. It's also 13 hr from Sydney by road (or the overnight Outback Xplorer train). Captured so it can be rejected on facts rather than rediscovered.",
+    "why_rated": "Australia's first Heritage-listed city, the Pro Hart and Broken Hill Regional galleries, the Living Desert sculpture symposium at sunset, and Silverton — the Mad Max 2 town with a legendary pub, an opal mine and desert horse treks. Silverton also carries the free artesian bore-bath curiosity. Genuinely great; genuinely the wrong three months.",
+    "nearest_airport": "BHQ",
+    "sources": [
+      "https://www.visitbrokenhill.com.au/",
+      "https://timeout.com/sydney/news/these-dreamy-nsw-spots-have-ranked-among-the-top-10-hidden-gems-in-australia-091824"
+    ]
+  },
+  {
+    "name": "Mungo National Park — the Walls of China",
+    "region": "NSW — Far West / Mungo",
+    "tags": ["indigenous", "outback", "remote", "heritage", "stargazing"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "250-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG SEASON. Mungo is a dry lakebed in far-western NSW; summer regularly exceeds 40°C, the lunette walks have zero shade, and the access roads are unsealed and impassable after rain. NPWS and every operator point at April–October. Discovery-ranger tours (the only way onto the Walls of China) run reduced schedules in summer.",
+    "why_rated": "World Heritage-listed and one of the most significant archaeological sites on earth — Mungo Man and Mungo Lady, 42,000 years of continuous human presence, and 20,000-year-old footprints. The eroded lunette at sunset is the image. Included honestly as a 'right country, wrong months' entry.",
+    "nearest_airport": "MQL",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/mungo-national-park",
+      "https://whc.unesco.org/en/list/167/"
+    ]
+  },
+  {
+    "name": "Lightning Ridge — opals and the artesian bore baths",
+    "region": "NSW — North West / Lightning Ridge",
+    "tags": ["outback", "quirky", "swimming", "cheap", "remote"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-350",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG SEASON. Summer averages 36–38°C with 45°C+ spells; the town's own tourism advice is winter. The free 24-hour artesian bore baths run at 41.5°C, which is a delight at 5am in July and a joke in January. The Car Door Tours (self-drive routes marked by painted car doors) are all outdoors.",
+    "why_rated": "The world's main source of black opal, and one of the strangest towns in Australia — underground homes, the Chambers of the Black Hand carvings, Amigo's Castle, a population of dropouts and diggers. A cult stop on any inland NSW road trip, but not this one.",
+    "nearest_airport": "LHG",
+    "sources": [
+      "https://www.visitnsw.com/destinations/country-nsw/lightning-ridge-area/lightning-ridge",
+      "https://www.lightningridgeinfo.com.au/"
+    ]
+  },
+  {
+    "name": "Port Macquarie — koala hospital & coastal walk",
+    "region": "NSW — Mid North Coast / Port Macquarie",
+    "tags": ["wildlife", "beach", "coastal-walk", "day-trip", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "A natural overnight break on the Sydney→Byron drive (about halfway). The Koala Hospital rebuild reopened as the Koala Conservation Australia facility — entry by donation/low fee, feeding times mid-morning. The 9 km Coastal Walk and Tacking Point Lighthouse are free. Busy but not Byron-busy in January. Sea Acres rainforest boardwalk is shaded — good hot-day option.",
+    "why_rated": "The world's first koala hospital, and the reliable place to actually see koalas after the fires devastated wild populations. Also the surprise 'break the drive' consensus pick — nine beaches, a river, and half the price of Byron.",
+    "nearest_airport": "PQQ",
+    "sources": [
+      "https://www.koalaconservationaustralia.org.au/",
+      "https://www.portmacquarieinfo.com.au/"
+    ]
+  },
+  {
+    "name": "South West Rocks, Trial Bay Gaol & Hat Head",
+    "region": "NSW — Mid North Coast / South West Rocks",
+    "tags": ["beach", "heritage", "dive", "hidden-gem", "national-park", "camping"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "200-450",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the right time — Fish Rock Cave is one of Australia's best temperate dives (grey nurse sharks year-round, ~A$180–220pp for a double dive) and the water is warm. Trial Bay Gaol campground is right on the beach and books out for January; camping is cheap otherwise. Car essential. Kangaroos graze the gaol lawns at dusk.",
+    "why_rated": "A ruined 1880s sandstone gaol on a headland above a swimming beach, with the Smoky Cape Lighthouse and Hat Head NP next door — this is the stretch of the mid-north coast that hasn't been discovered yet. Fish Rock is genuinely world-class and almost nobody outside diving circles has heard of it.",
+    "nearest_airport": "PQQ",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/things-to-do/historic-buildings-places/trial-bay-gaol",
+      "https://www.macleayvalleycoast.com.au/"
+    ]
+  },
+  {
+    "name": "Bellingen — the hippie town on the Never Never",
+    "region": "NSW — Coffs Coast / Bellingen",
+    "tags": ["hippie", "alternative", "market", "village", "swimming-hole", "weekday-locked"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "250-500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "WEEKDAY-LOCKED market: Bellingen Community Markets are the 3rd Saturday of the month at Bellingen Park — 16 January and 20 February 2027 in this window. There's also a growers market on the 2nd and 4th Saturdays. Otherwise no lock; the town runs year-round. Summer is humid but the swimming holes are the point. About 3 hr south of Byron, so it slots naturally on the Sydney→Byron drive or as a Byron-week side trip.",
+    "why_rated": "The strongest hippie-layer find on this list after Nimbin, and a nicer town than Nimbin — an alternative/artist community since the 1970s in a river valley, with a heritage main street, the Bellingen Brewery, vintage and second-hand shops, and a flying-fox colony in Bellingen Island. Repeatedly described as 'Australia's hippy soul'. The Bellingen Global Carnival is October (wrong season), but the town's register is year-round.",
+    "nearest_airport": "CFS",
+    "sources": [
+      "https://theworldonmynecklace.com/where-to-go-to-discover-australias-hippy-soul-bellingen-and-dorrigo/",
+      "https://www.visitnsw.com/destinations/north-coast/coffs-harbour-area/bellingen",
+      "https://www.echo.net.au/market-guide/"
+    ]
+  },
+  {
+    "name": "The Promised Land & Never Never Creek swimming holes",
+    "region": "NSW — Coffs Coast / Bellingen hinterland",
+    "tags": ["swimming-hole", "free", "hidden-gem", "hippie", "scenic-drive"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-40",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free. Peak summer is exactly when you want it, though a strong El Niño dry spell can drop the water level — check recent rain. Gleniffer Reserve and the Never Never Creek crossings are 15 minutes from Bellingen on a sealed road. Popular with locals on hot weekends; midweek it's empty. Watch for jumping-in injuries — depth changes.",
+    "why_rated": "An actual place called the Promised Land: clear granite-bottomed creek pools in a valley of dairy country and rainforest, free and unsigned. Peter Carey wrote Bliss here; Oscar and Lucinda's Gleniffer church is nearby. The purest cheap-day version of the Northern Rivers hippie summer.",
+    "nearest_airport": "CFS",
+    "sources": [
+      "https://www.visitnsw.com/destinations/north-coast/coffs-harbour-area/bellingen",
+      "https://theworldonmynecklace.com/where-to-go-to-discover-australias-hippy-soul-bellingen-and-dorrigo/"
+    ]
+  },
+  {
+    "name": "Dorrigo National Park & the Waterfall Way",
+    "region": "NSW — Coffs Coast / Dorrigo",
+    "tags": ["rainforest", "waterfall", "national-park", "scenic-drive", "free", "world-heritage"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "50-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "The Skywalk and Rainforest Centre are free (parking donation); the Wonga Walk to Crystal Shower Falls is 6.6 km of shaded boardwalk — one of the best 35°C-day walks in NSW because the rainforest canopy holds the temperature down. The Waterfall Way climbs from Bellingen to Armidale past Dangar, Ebor and Wollomombi Falls (the latter one of Australia's highest at 220 m); a dry El Niño summer will reduce flow on all of them. Note the Dorrigo Arc Rainforest Centre has been undergoing a major redevelopment — check it's open. Car essential.",
+    "why_rated": "Gondwana Rainforests World Heritage area, and the Skywalk over the canopy with the valley dropping away to the coast is the signature image. The drive itself is one of the great Australian scenic roads and links the hippie belt (Bellingen) to the New England tablelands.",
+    "nearest_airport": "CFS",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/dorrigo-national-park",
+      "https://whc.unesco.org/en/list/368/"
+    ]
+  },
+  {
+    "name": "Coffs Harbour — Muttonbird Island, Solitary Islands & the Big Banana",
+    "region": "NSW — Coffs Coast / Coffs Harbour",
+    "tags": ["beach", "snorkel", "wildlife", "quirky", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "120-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer works: the Solitary Islands Marine Park is where tropical and temperate species overlap, and snorkelling off Mullaway/Sapphire or a dive trip (~A$180pp) is at its best in warm water. Muttonbird Island (free walk out along the breakwall) has 20,000+ nesting wedge-tailed shearwaters from roughly August to April — so the colony IS active in this window, chicks in Jan/Feb. The Big Banana is free to walk up to. Busy in January but not expensive.",
+    "why_rated": "The half-way point that people underrate — a proper marine park with turtles and grey nurse sharks, an active seabird colony you can walk into, and Australia's first Big Thing. The forum line is 'don't stay in Coffs, but do stop in Coffs'.",
+    "nearest_airport": "CFS",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/muttonbird-island-nature-reserve",
+      "https://www.coffscoast.com.au/"
+    ]
+  },
+  {
+    "name": "Yamba & Angourie — the 'new Byron'",
+    "region": "NSW — Northern Rivers / Clarence Valley",
+    "tags": ["beach", "surf", "village", "hidden-gem", "food", "swimming"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "250-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak January — it's busy and rates rise, but it is materially cheaper and calmer than Byron 90 minutes north, which is the entire argument for it. Pippi Beach, Turners Beach, the Yamba ocean pool and the free Angourie Blue and Green Pools (flooded quarries) are all walkable/short drive. Car needed. Angourie is a National Surfing Reserve — the point break is for competent surfers only.",
+    "why_rated": "The forum darling of the last five years: the town people move to when Byron gets too much. Low-rise, no chain fast food, a real fishing fleet, a good pub with a view, and a dining scene that has quietly got serious — described as 'the same Northern Rivers ease, without the performance layer'. Ideal Byron-week side trip or a Sydney→Byron overnight.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.sixt.com.au/magazine/travel/yamba-is-the-new-byron-bay/",
+      "https://www.ytravelblog.com/yamba-nsw-australias-best-kept-secret/",
+      "https://www.tripadvisor.com/ShowTopic-g529051-i17260-k12940848-Yamba_compared_to_Byron-Yamba_New_South_Wales.html"
+    ]
+  },
+  {
+    "name": "Bundjalung NP, Iluka rainforest & Woody Head",
+    "region": "NSW — Northern Rivers / Iluka",
+    "tags": ["national-park", "camping", "beach", "world-heritage", "cheap", "hidden-gem"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "100-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "A$12/vehicle. Woody Head campground is one of the best-value coastal camps in NSW and books out for January — get in early or come midweek. Iluka is reached by ferry from Yamba across the Clarence (foot passengers) or a long road loop. Ticks and mosquitoes in the littoral rainforest; take repellent.",
+    "why_rated": "The Iluka Nature Reserve holds the largest remaining stand of littoral rainforest in NSW and is World Heritage-listed as part of the Gondwana Rainforests — a 2.5 km walk from the beach into it. Bundjalung's 38 km of undeveloped coast north of Iluka is about as empty as the NSW coast gets this far north.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/bundjalung-national-park",
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/iluka-nature-reserve"
+    ]
+  },
+  {
+    "name": "Grafton & the Clarence River",
+    "region": "NSW — Northern Rivers / Grafton",
+    "tags": ["heritage", "river", "cheap", "wrong-season"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "80-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "SEASON MISS: Grafton's whole identity is the jacarandas — 6,500 trees and the Jacaranda Festival, Australia's longest-running floral festival, which is late October to early November. In January the trees are green and the town is a hot river town with heritage streets and not much else. Included as an honest 'you're three months late' entry; it's a fuel-and-lunch stop on the Pacific Highway rather than a capsule.",
+    "why_rated": "In season it's spectacular — purple-canopied streets and the Bridge to Bridge. Out of season, the Clarence River, Grafton Regional Gallery and Susan Island are pleasant and free, and it's the gateway to Nymboida and the Gorge country.",
+    "nearest_airport": "CFS",
+    "sources": [
+      "https://www.myclarencevalley.com/",
+      "https://jacarandafestival.com/"
+    ]
+  },
+  {
+    "name": "The Channon Craft Market",
+    "region": "NSW — Northern Rivers / The Channon",
+    "tags": ["market", "hippie", "alternative", "cheap", "weekday-locked"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "30-120",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "WEEKDAY-LOCKED: 2nd Sunday of every month, 9am–3pm. In this trip's window that is 10 January and 14 February 2027 — and NEITHER falls inside the Byron block (27 Jan–2 Feb). This one only works if the Byron dates shift, or as a reason to shift them. Free entry, gold-coin parking, ~45 min inland from Byron. Note: the market has at times relocated to Lismore's CBD after flood damage — confirm the venue before driving out.",
+    "why_rated": "The original and still the most authentic Northern Rivers hippie market — running since 1976, born out of the Aquarius/Terania Creek era, all handmade-or-homegrown with no resellers, chai tent, drum circle, the lot. Rated well above the Byron Bay markets by anyone chasing the real alternative culture rather than the tourist version.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.echo.net.au/market-guide/",
+      "https://www.byronbay.com.au/sights-activities/markets/channon-craft-markets",
+      "https://www.lismore.nsw.gov.au/Council/News/Latest-news/The-Channon-Market-brings-the-hills-to-Lismores-CBD"
+    ]
+  },
+  {
+    "name": "Bangalow Market & Bangalow village",
+    "region": "NSW — Northern Rivers / Bangalow",
+    "tags": ["market", "hippie", "village", "food", "weekday-locked"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-150",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "WEEKDAY-LOCKED: 4th Sunday of every month, 9am–3pm. In the window that's Sunday 24 January 2027 (three days before the Byron block opens) and Sunday 28 February. A short 15-minute drive from Byron. If arriving in Byron a couple of days earlier is possible, this is the low-cost way to hit a proper Northern Rivers market inside the trip. There's also a weekly Bangalow Farmers Market on Saturday mornings, which IS inside the Byron block (Sat 30 Jan 2027).",
+    "why_rated": "The most-loved of the Byron-adjacent markets — 250+ stalls of local designers, plants, vintage and food in a heritage village that has kept its character. Bangalow itself (Station Street, the Bangalow Hotel, Woods) is the standard 'Byron without Byron' evening.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.echo.net.au/market-guide/",
+      "https://byronbay.com/byron-bay-regional-markets/"
+    ]
+  },
+  {
+    "name": "Mullumbimby — Community Market & Farmers Market",
+    "region": "NSW — Northern Rivers / Mullumbimby",
+    "tags": ["market", "hippie", "alternative", "food", "weekday-locked", "cheap"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "40-180",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "TWO LOCKS, and one of them lands. The Mullumbimby Community Market is the 3rd Saturday, 8am–2pm (16 Jan and 20 Feb 2027 — both OUTSIDE the Byron block). But the Mullumbimby Farmers Market runs EVERY FRIDAY 7–11am, which puts Friday 29 January 2027 squarely inside the Byron week. That Friday market is the practical answer. 20 minutes inland from Byron.",
+    "why_rated": "'The biggest little town in Australia' and the actual centre of Northern Rivers alternative life — this is where the people who can no longer afford Byron live. Crystal shops, herbalists, an anti-establishment streak, the Mullum Music Festival (November, wrong season) and a Friday farmers market that locals rate as the region's best.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.echo.net.au/market-guide/",
+      "https://mybyronbay.com.au/things-to-do/markets/"
+    ]
+  },
+  {
+    "name": "Uki, Wollumbin/Mount Warning & the Tweed caldera",
+    "region": "NSW — Northern Rivers / Tweed Valley",
+    "tags": ["hippie", "market", "scenic-drive", "national-park", "indigenous", "weekday-locked"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "50-250",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "IMPORTANT: the Wollumbin (Mount Warning) summit track is CLOSED — permanently, at the request of the Wollumbin Consultative Group, as the summit is a men's-business sacred site. Do not plan a sunrise climb; people still turn up and are turned back. The views are had instead from the Tweed Range/Border Ranges Pinnacle lookout or the Blackbutts/Lyrebird tracks. WEEKDAY-LOCKED: the Uki Buttery Bazaar runs the 3rd Sunday of the month (17 Jan, 21 Feb 2027 — both outside the Byron block). Roughly 50 min from Byron.",
+    "why_rated": "Uki is a tiny village of about 300 at the foot of the caldera that is almost pure alternative-culture — the Mount Warning Hotel, a vegan cafe, artists, a legendary bazaar. The Tweed caldera itself is the eroded remnant of a 23-million-year-old shield volcano and the largest erosion caldera in the southern hemisphere; the drive around its rim is extraordinary and free.",
+    "nearest_airport": "OOL",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/wollumbin-national-park",
+      "https://www.echo.net.au/market-guide/",
+      "https://www.visitnsw.com/destinations/north-coast/tweed-area/uki"
+    ]
+  },
+  {
+    "name": "Nightcap NP — Minyon Falls, Protesters Falls & Terania Creek",
+    "region": "NSW — Northern Rivers / Nightcap",
+    "tags": ["waterfall", "rainforest", "national-park", "world-heritage", "hippie", "free"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "20-120",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free, no lock, ~1 hr from Byron. Summer is when the leeches are out and when a wet week makes the falls roar — but a strong El Niño dry spell can reduce Minyon to a thin ribbon; check recent rainfall. Access roads to Minyon and Terania Creek are partly gravel and can close after storms. Swimming at the base of Protesters Falls is not permitted (it's habitat for the endangered Fleay's barred frog); Rummery Park and the Minyon Falls pool are the swim options.",
+    "why_rated": "Gondwana Rainforests World Heritage, a 100 m waterfall dropping off the caldera rim, and — for the hippie layer — the single most historically loaded site in the region: Terania Creek was the 1979 blockade that stopped rainforest logging and effectively founded the Australian environmental movement, which is why the falls are called Protesters Falls. Directly connected to the Nimbin/Aquarius story.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/nightcap-national-park",
+      "https://www.nationalparks.nsw.gov.au/things-to-do/lookouts/minyon-falls-lookout"
+    ]
+  },
+  {
+    "name": "Crystal Castle & Shambhala Gardens",
+    "region": "NSW — Northern Rivers / Montecollum",
+    "tags": ["hippie", "alternative", "garden", "wellness", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "80-140",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Open daily, no lock; roughly A$40–50pp entry, 20 min from Byron toward Mullumbimby. Summer means shade-seeking — the rainforest walks and the bamboo tunnel help. Hot midday; go early. Commercial and a bit polished for some tastes, but it's the region's flagship crystal/wellness attraction.",
+    "why_rated": "Giant amethyst geodes (some over 3 m), the world's largest crystal from Uruguay, a Kalachakra World Peace Stupa blessed by the Dalai Lama, blue lotus ponds, a labyrinth and rainforest gardens with caldera views. The single most explicitly her-tastes attraction in the Northern Rivers outside Nimbin.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.crystalcastle.com.au/",
+      "https://mybyronbay.com.au/things-to-do/"
+    ]
+  },
+  {
+    "name": "Byron hinterland loop — Federal, Newrybar, Bangalow, Clunes",
+    "region": "NSW — Northern Rivers / Byron hinterland",
+    "tags": ["scenic-drive", "food", "village", "hippie", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "No lock, car needed, works any day of the Byron block. This is the standard escape when Byron town itself is at January saturation — the hinterland roads are quiet even in peak week. Doon Doon, Federal (Doma Cafe), Newrybar (Harvest), Clunes and Eltham are 20–40 min from the beach.",
+    "why_rated": "Rolling macadamia and banana country, tiny general stores, a serious food scene (Harvest at Newrybar is the anchor) and the region's artisan/craft population. The forum consensus for the last few years is that the hinterland is now better than Byron itself.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.visitbyronbay.com/hinterland/",
+      "https://ripeintown.com/national/seven-alternatives-to-byron-bay-that-are-just-as-beautiful/"
+    ]
+  },
+  {
+    "name": "Lennox Head, Seven Mile Beach & Killen Falls",
+    "region": "NSW — Northern Rivers / Ballina",
+    "tags": ["beach", "surf", "waterfall", "swimming-hole", "cheap", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-250",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "20 minutes south of Byron, free, no lock — the cheap and much less crowded alternative to Byron's beaches during peak week. Lake Ainsworth is a tea-tree-stained freshwater lake right behind the dunes (warm, tannin-brown, safe swimming). Killen Falls is a short walk to a waterfall you can swim behind; the access track gets slippery. Lennox Head Point is a world-class right-hand point break and a National Surfing Reserve.",
+    "why_rated": "The 'stay in Lennox instead' advice is now near-universal in Byron threads — same coast, half the price, none of the parking wars. Seven Mile Beach runs unbroken toward Broken Head. Killen Falls is the cult free swim of the Byron hinterland.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.discoverballina.com.au/lennox-head",
+      "https://mybyronbay.com.au/things-to-do/"
+    ]
+  },
+  {
+    "name": "Tweed Regional Gallery & Margaret Olley Art Centre, Murwillumbah",
+    "region": "NSW — Northern Rivers / Murwillumbah",
+    "tags": ["art", "culture", "free", "indoor", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-60",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "FREE entry, closed Mondays and Tuesdays — a mild weekday lock. Air-conditioned, which makes it a genuine wet-day or 38°C-day fallback for the Byron week. About 50 min from Byron, and it pairs naturally with the Tweed caldera drive or Uki.",
+    "why_rated": "A regional gallery that is better than most capital-city ones — the Margaret Olley Art Centre is a full reconstruction of the artist's Paddington house and studio, moved piece by piece, cluttered exactly as she left it. Sits above the Tweed River with the caldera behind it. Repeatedly cited as the best free thing in the Northern Rivers.",
+    "nearest_airport": "OOL",
+    "sources": [
+      "https://artgallery.tweed.nsw.gov.au/",
+      "https://www.visitthetweed.com.au/"
+    ]
+  },
+  {
+    "name": "The Northern Rivers festival gap — Bluesfest, Splendour, Falls",
+    "region": "NSW — Northern Rivers / Byron",
+    "tags": ["festival", "wrong-season", "planning-note"],
+    "days_min": 0,
+    "days_ideal": 0,
+    "rough_cost_couple_aud": "0",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "no",
+    "season_note": "PLANNING NOTE, not a capsule — captured so nobody spends a day searching. The three festivals people associate with Byron are all unavailable in this window: Bluesfest is an Easter event and its 2026 edition (2–5 April) was cancelled outright on 13 March for poor ticket sales with its future unclear; Splendour in the Grass has not run since 2023; Falls Festival's Byron leg is gone. Rabbits Eat Lettuce and Bohemian Beatfreaks use the Byron-area valley site but run at Easter and in November respectively. The Byron week (27 Jan–2 Feb 2027) therefore has NO major festival — the festival energy has to come from Lost Paradise in late December, or from the monthly markets.",
+    "why_rated": "Included as negative information with a positive use: it redirects the hippie-festival budget to Lost Paradise (28 Dec–1 Jan) and the market calendar rather than leaving it hunting for a Byron event that no longer exists.",
+    "nearest_airport": "BNK",
+    "sources": [
+      "https://www.abc.net.au/news/2026-03-13/byron-bay-bluesfest-cancelled/106450384",
+      "https://musicfeeds.com.au/news/report-bluesfest-byron-bay-2026-cancelled/",
+      "https://www.adventuresnsunsets.com/transformational-festivals-in-australia-music-bush-doofs/"
+    ]
+  },
+  {
+    "name": "Lord Howe Island",
+    "region": "NSW — Lord Howe Island",
+    "tags": ["island", "world-heritage", "snorkel", "hiking", "remote", "expensive", "event-spend"],
+    "days_min": 4,
+    "days_ideal": 7,
+    "rough_cost_couple_aud": "3500-6000",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Season is right — December to February is peak, with warm water on the world's southernmost coral reef. Everything else is against it: only 400 visitors are permitted on the island at any time, so accommodation and the QantasLink Dash 8 from Sydney (~2 hr) must be booked many months to a year ahead and are priced accordingly — return airfares commonly A$800–1,200pp in peak, with no budget lodging on the island. Almost certainly unbookable at this notice for the January window, and it blows a hole in the daily cap.",
+    "why_rated": "Ranked Australia's second-most-searched hidden gem: World Heritage-listed, no crowds by law, snorkelling straight off the beach at Ned's, Mount Gower's 875 m day climb rated among the best day walks in the world, and no mobile signal. Captured so the couple can make the cost call explicitly rather than not knowing it exists.",
+    "nearest_airport": "LDH",
+    "sources": [
+      "https://www.lordhoweisland.info/",
+      "https://timeout.com/sydney/news/these-dreamy-nsw-spots-have-ranked-among-the-top-10-hidden-gems-in-australia-091824"
+    ]
+  },
+  {
+    "name": "Sydney to Byron coastal drive — the Pacific Highway run",
+    "region": "NSW — Sydney to Northern Rivers",
+    "tags": ["road-trip", "scenic-drive", "coast", "multi-stop"],
+    "days_min": 2,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "500-1200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "The Pacific Highway is now fully dual-carriageway Sydney–Brisbane, so the drive is ~9 hr non-stop — but done in one hit it's a wasted day. The obvious 3–5 day version: Port Stephens or Myall Lakes, Port Macquarie or South West Rocks, Bellingen/Dorrigo, Yamba, then Byron. Peak-season accommodation on every one of those stops needs booking ahead. One-way car hire Sydney→Ballina/Gold Coast carries a relocation fee — check it, it can be A$150–300. Fuel Sydney→Byron is roughly A$120–160 in a small car.",
+    "why_rated": "The connective tissue between the two anchors, and the piece that turns a Sydney block and a Byron block into a trip. Given the road-trip nostalgia in this couple's profile, the drive itself is worth budgeting days for rather than flying over — the hippie belt (Bellingen, Yamba, Mullumbimby) sits entirely along this line.",
+    "nearest_airport": "SYD",
+    "sources": [
+      "https://www.visitnsw.com/things-to-do/drives-and-road-trips/legendary-pacific-coast-drive",
+      "https://www.ytravelblog.com/yamba-nsw-australias-best-kept-secret/"
+    ]
+  },
+  {
+    "name": "Sydney to Melbourne inland via Canberra & the Snowies",
+    "region": "NSW/ACT — Hume & Alpine Way corridor",
+    "tags": ["road-trip", "scenic-drive", "alpine", "multi-stop"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "600-1200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Summer is the only time the alpine version is open — the Alpine Way and Snowy Mountains Highway are the good roads and they're clear of snow Dec–Mar. Fire-season caveat is real: Kosciuszko and the Monaro burned catastrophically in Jan 2020 and the Alpine Way was closed for weeks; carry a plan B via the Hume. Stops that make it worth the extra days: Canberra's museums, Yarrangobilly thermal pool, Thredbo/Kosciuszko, Khancoban, then Bright or Beechworth over the Victorian border.",
+    "why_rated": "The inland alternative to the coastal Princes Highway — higher, cooler, emptier, and it strings together the ACT capsules and the alpine ones into a single line instead of two out-and-backs. Only relevant if a Victorian leg is on the table, but it's the best way to get there.",
+    "nearest_airport": "CBR",
+    "sources": [
+      "https://www.visitnsw.com/things-to-do/drives-and-road-trips/snowy-mountains-highway",
+      "https://www.nationalparks.nsw.gov.au/visit-a-park/parks/kosciuszko-national-park"
+    ]
+  }
+]
