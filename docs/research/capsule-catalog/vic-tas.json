@@ -1,0 +1,1309 @@
+[
+  {
+    "name": "Great Ocean Road — 2-day self-drive (Torquay to Port Campbell)",
+    "region": "VIC — Surf Coast / Shipwreck Coast",
+    "tags": ["road-trip", "scenic-drive", "coast", "bucket-list", "national-park"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "450-750",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak summer is the road's busiest window — Jan is bumper-to-bumper at the Apostles carparks midday and Lorne/Apollo Bay beds spike. Drive it Mon-Thu if possible and book Apollo Bay or Port Campbell ahead. Weather is genuinely changeable year-round; pack a windproof.",
+    "why_rated": "The near-universal forum verdict is that the day-trip version is a mistake and two days is the minimum honest treatment — 10+ hours in a bus vs. sleeping at Apollo Bay and hitting Port Campbell at first light. The road itself (Memorial Arch, Teddy's Lookout, the cliff run past Wye River) is the attraction, not just the endpoint.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/great-ocean-road",
+      "https://www.greatoceanroadaustralia.org/guide-to-visiting-the-twelve-apostles-australia/",
+      "https://www.thecommonwanderer.com/blog/12-apostles-australia"
+    ]
+  },
+  {
+    "name": "Twelve Apostles & Loch Ard Gorge at dawn",
+    "region": "VIC — Port Campbell NP",
+    "tags": ["coast", "photography", "bucket-list", "free", "national-park"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-60",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free, open 24h, no lock. The only real constraint is time of day: locals say arrive at sunrise or after 6pm, since Melbourne day-buses own the site from mid-morning to mid-afternoon. Summer sunrise is ~06:00, so this means sleeping in Port Campbell or Princetown the night before.",
+    "why_rated": "The dawn version is a completely different experience from the day-tour version — the same stacks with fifty people instead of a thousand, gold light instead of flat glare. Loch Ard Gorge, The Grotto, London Bridge and Gibson Steps are all within 10 minutes and several forum posters rate them above the Apostles themselves.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/port-campbell-national-park",
+      "https://www.greatoceanroadaustralia.org/guide-to-visiting-the-twelve-apostles-australia/"
+    ]
+  },
+  {
+    "name": "Great Ocean Road day-tour from Melbourne (budget version)",
+    "region": "VIC — ex-Melbourne",
+    "tags": ["day-trip", "road-trip", "coast", "budget", "guided"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "200-320",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Runs daily year-round. The catch is structural, not seasonal: 12-13 hours door to door, roughly 9 of them on a bus, and you arrive at the Apostles at exactly the hour they are most crowded.",
+    "why_rated": "Captured as the honest cheap fallback if the Melbourne block is short and no car is available — around A$100-160pp with hostel-style operators, includes Kennett River koalas and Apollo Bay. Reddit consensus is that it beats not going, and loses badly to two days with a car.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/great-ocean-road",
+      "https://www.getyourguide.com/melbourne-l184/"
+    ]
+  },
+  {
+    "name": "Otways rainforest — Triplet Falls, Hopetoun Falls, Maits Rest",
+    "region": "VIC — Great Otway NP",
+    "tags": ["rainforest", "waterfall", "hiking", "national-park", "free", "forest"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "0-80",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Cool-temperate rainforest holds up in a hot summer — it is 8-10C cooler under the canopy than on the coast, which makes it the natural escape valve on a 38C day. Waterfall flow is at its annual low Dec-Feb but the walks are still worth it. Free entry, no lock.",
+    "why_rated": "The half of the Great Ocean Road region most day-trippers never turn inland to see: myrtle beech and tree-fern gullies, boardwalks through moss, and Triplet Falls consistently named the best short walk in the Otways. Kennett River's roadside koala colony and the Cape Otway lighthouse road are on the same loop.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/great-otway-national-park",
+      "https://www.visitmelbourne.com/regions/great-ocean-road/see-and-do/nature-and-wildlife"
+    ]
+  },
+  {
+    "name": "Great Ocean Walk (multi-day coastal hike, Apollo Bay to the Apostles)",
+    "region": "VIC — Great Otway NP / Shipwreck Coast",
+    "tags": ["hiking", "multi-day", "coast", "national-park", "camping"],
+    "days_min": 3,
+    "days_ideal": 8,
+    "rough_cost_couple_aud": "300-1400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "104km, walkable year-round, but summer means carrying water through exposed clifftop sections in 30C+ and a real total-fire-ban risk this El Nino summer. Hike-in campsites must be booked through Parks Victoria (a Lock — sites sell out for Jan). Day-walk sections (Blanket Bay, Wreck Beach, the Gables) need no booking.",
+    "why_rated": "Routinely rated Australia's best coastal multi-day walk after the Three Capes — you arrive at the Twelve Apostles on foot from the west, which walkers describe as the only way the sight still lands. Day sections are a cheap way to get 80% of it.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/great-otway-national-park/things-to-do/great-ocean-walk"
+    ]
+  },
+  {
+    "name": "Lorne & Erskine Falls",
+    "region": "VIC — Surf Coast",
+    "tags": ["beach", "waterfall", "town", "coast", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Lorne in January is Melbourne-on-holiday: packed, expensive beds, and the Pier to Pub swim (early Jan) fills the town completely. Erskine Falls is free and 10 minutes inland. Consider it a stop rather than a base — Apollo Bay is cheaper and calmer.",
+    "why_rated": "The prettiest of the Surf Coast towns and the classic first-night stop on the two-day drive; Erskine Falls is a 10-minute descent to a 30m fall in fern gully, and the Lorne foreshore is the one place on the road with a real summer buzz.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/great-ocean-road/destinations/lorne"
+    ]
+  },
+  {
+    "name": "Torquay, Bells Beach & the Surf Coast Walk",
+    "region": "VIC — Surf Coast",
+    "tags": ["beach", "surf", "sport", "coast", "day-trip", "free"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "20-120",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the swimmable, learn-to-surf season; Bells' famous waves are a winter/autumn phenomenon and the Rip Curl Pro is Easter, so Dec-Feb gives you the beach, not the spectacle. No lock.",
+    "why_rated": "The birthplace of Rip Curl and Quiksilver and the start of the Great Ocean Road; the Surf Coast Walk from Torquay to Bells to Point Addis is free and scenic. TAG NOTE: leans sport (his side) — down-weight, but it costs almost nothing and sits directly on the GOR route, so it is a stop rather than a detour.",
+    "nearest_airport": "AVV",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/great-ocean-road/destinations/torquay"
+    ]
+  },
+  {
+    "name": "Wilsons Promontory NP — Squeaky Beach, Mt Oberon, Tidal River",
+    "region": "VIC — South Gippsland",
+    "tags": ["national-park", "beach", "hiking", "wildlife", "camping", "bucket-list"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "150-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "HARD LOCK: Tidal River peak-summer camping runs on a ballot — applications close mid-year for the 26 Dec-late Jan period, so summer camping is effectively unbookable on short notice. Day entry is free and unrestricted; roofed accommodation and the Foster/Yanakie towns outside the park are the workaround. Also a genuine El Nino fire-risk park — the Prom has been evacuated and closed in past bad summers, so keep it swappable.",
+    "why_rated": "Melbourne's consensus best national park and the one most Victorians name when asked for the state's single best place: granite headlands, Squeaky Beach's quartz sand that actually squeaks underfoot, wombats and emus wandering the campground, and the 1.5h Mt Oberon summit for the view over the lot.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/wilsons-promontory-national-park",
+      "https://www.parks.vic.gov.au/stay/wilsons-promontory-tidal-river"
+    ]
+  },
+  {
+    "name": "Sealers Cove overnight hike (Wilsons Prom)",
+    "region": "VIC — South Gippsland",
+    "tags": ["hiking", "multi-day", "camping", "beach", "national-park"],
+    "days_min": 2,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Overnight hike permits are booked through Parks Victoria and summer dates go early (Lock). Fire risk applies as for the wider Prom. Sealers Creek crossing is tide-dependent — check tides before committing.",
+    "why_rated": "The most-recommended short overnight in Victoria: 10km through tree-fern forest and boardwalk to a perfect crescent beach with a hike-in campsite and nothing else. People describe waking to wallabies on the sand.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/wilsons-promontory-national-park"
+    ]
+  },
+  {
+    "name": "Phillip Island Penguin Parade",
+    "region": "VIC — Phillip Island",
+    "tags": ["wildlife", "penguins", "day-trip", "evening", "bucket-list"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "64-200",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the peak of the little penguin season — the biggest nightly numbers of the year and chicks in burrows. LOCK: start time is sunset, which in Jan is ~21:00, so the drive back to Melbourne lands near midnight — most people stay on the island. Booking essential; general viewing sells out in January.",
+    "why_rated": "A$32pp for general viewing in the tiered amphitheatre — hundreds of little penguins crossing the sand at dusk. Forum verdict is consistent: the cheapest ticket is the right ticket, the upgrades mostly buy proximity, and the boardwalks afterwards (where the birds walk past your feet to their burrows) are where the magic actually happens.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.penguins.org.au/attractions/penguin-parade/",
+      "https://www.getyourguide.com/gippsland-l117010/penguin-parade-general-viewing-ticket-t433692/"
+    ]
+  },
+  {
+    "name": "Phillip Island beyond the penguins — Cape Woolamai, the Nobbies, seal cruise",
+    "region": "VIC — Phillip Island",
+    "tags": ["coast", "wildlife", "hiking", "beach", "boat"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the seal-cruise season (Seal Rocks holds Australia's largest fur seal colony, ~25,000 animals, biggest numbers around the Nov-Jan breeding period). Cape Woolamai walk is free. Island beds are at their peak price in January.",
+    "why_rated": "The island is treated as a one-attraction stop and locals push back hard: the Cape Woolamai pink-granite circuit is one of the best coastal day walks near Melbourne, the Nobbies boardwalk is free at sunset, and the Seal Rocks cruise gets you within metres of the colony.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitphillipisland.com.au/",
+      "https://www.penguins.org.au/attractions/nobbies-centre/"
+    ]
+  },
+  {
+    "name": "Peninsula Hot Springs, Fingal",
+    "region": "VIC — Mornington Peninsula",
+    "tags": ["spa", "wellness", "hot-springs", "alternative", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-260",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Open year-round including late evening sessions, which are the summer move — soaking in 38C water at 10pm under stars beats doing it at midday in 33C heat. LOCK-ish: entry is by timed session and weekend slots book out; midweek is cheaper and quieter. Towel/robe hire is extra and adds up.",
+    "why_rated": "More than 50 geothermal pools terraced up a hillside, including the hilltop pool with a 360-degree view over the peninsula. Entry from about A$30pp for a 60-minute Bath House session, ~A$65pp unrestricted. Strongly her-side: wellness, ritual bathing, clay rooms, no need to drink anything to enjoy it.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.peninsulahotsprings.com/",
+      "https://australiatravelquestions.com/attractions/peninsula-hot-springs/"
+    ]
+  },
+  {
+    "name": "Mornington Peninsula loop — Cape Schanck, Bushrangers Bay, cellar doors",
+    "region": "VIC — Mornington Peninsula",
+    "tags": ["coast", "hiking", "wine", "food", "day-trip", "scenic-drive"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak summer; Portsea/Sorrento are at their most expensive and crowded, the back-beach surf is dangerous (rips — swim only at patrolled Front Beach or the bay side). Cape Schanck lighthouse boardwalk and Bushrangers Bay walk are free. Cool-climate pinot cellar doors are open daily.",
+    "why_rated": "An hour from Melbourne and it stacks a lot into one loop: basalt cliffs at Cape Schanck, the Bushrangers Bay clifftop walk, Arthurs Seat chairlift, calm bay swimming at Sorrento, and some of Australia's best cool-climate pinot noir and chardonnay at low-key cellar doors.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmorningtonpeninsula.org/",
+      "https://www.parks.vic.gov.au/places-to-see/parks/mornington-peninsula-national-park"
+    ]
+  },
+  {
+    "name": "Sorrento–Queenscliff ferry & Point Nepean",
+    "region": "VIC — Port Phillip Heads",
+    "tags": ["ferry", "history", "coast", "cycling", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-160",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Runs hourly year-round, roughly A$16pp foot passenger each way, more with a car. Dolphins and seals are commonly seen on the crossing. No seasonal issue; summer sailings are busy so book a car spot.",
+    "why_rated": "The clever routing trick, not just a jaunt: the 40-minute ferry links the Mornington Peninsula to the Bellarine and Great Ocean Road without backtracking through Melbourne, and Point Nepean's abandoned quarantine station and gun emplacements at the Heads are a genuinely eerie free walk.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.searoad.com.au/",
+      "https://www.parks.vic.gov.au/places-to-see/parks/point-nepean-national-park"
+    ]
+  },
+  {
+    "name": "Yarra Valley wineries & Healesville Sanctuary",
+    "region": "VIC — Yarra Valley",
+    "tags": ["wine", "food", "wildlife", "day-trip", "scenic-drive"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-400",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is warm and dry in the valley — good for long lunches, less good for the drive if there is a fire in the ranges (the valley abuts the Kinglake/Yarra Ranges country that burned in 2009, and this is a strong El Nino summer). Vintage is Feb-Mar so late Feb has harvest energy. Cellar doors open daily; tasting fees ~A$10-25pp, usually waived on purchase.",
+    "why_rated": "Australia's most accessible serious wine region — an hour from the city, sparkling at Domaine Chandon, pinot at Yering and Giant Steps, plus the region's oddball extras: TarraWarra art museum, the Yarra Valley Chocolaterie (free tastings), and Healesville Sanctuary, which people consistently rate above Melbourne Zoo for native wildlife.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/yarra-valley-and-dandenong-ranges",
+      "https://www.zoo.org.au/healesville/"
+    ]
+  },
+  {
+    "name": "Yarra Valley dawn hot air balloon",
+    "region": "VIC — Yarra Valley",
+    "tags": ["scenic", "splurge", "dawn", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "600-900",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Flies year-round at dawn (roughly 04:30 pickup in January — brutal start). Summer has more cancellations for wind and, in a hot El Nino summer, occasional smoke haze; operators rebook rather than refund, so it needs a flexible day either side. About A$350-450pp with champagne breakfast.",
+    "why_rated": "The classic Melbourne splurge — an hour over vineyards and mist at sunrise. Captured as an Event-spend candidate rather than a daily cost; the Melbourne CBD balloon flight is the alternative (flying over the skyline at dawn is rarer and gets the better reviews of the two).",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/yarra-valley-and-dandenong-ranges/see-and-do"
+    ]
+  },
+  {
+    "name": "Dandenong Ranges — Puffing Billy, Sherbrooke Forest, Sassafras",
+    "region": "VIC — Dandenong Ranges",
+    "tags": ["train", "forest", "day-trip", "heritage", "village"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "80-220",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Runs daily year-round; ~A$50-80pp for the Belgrave-Lakeside return. LOCK: sit-on-the-windowsill riding (the iconic image) is weather- and policy-dependent and has been restricted at times — check on booking. Mountain-ash forest is 5-8C cooler than the city, a genuine hot-day refuge. On declared Total Fire Ban days the steam locomotive is replaced by diesel — the fire risk affects the experience, not the safety.",
+    "why_rated": "A 125-year-old narrow-gauge steam railway through tree-fern gullies and over the Monbulk trestle bridge, an hour from the CBD by train to Belgrave. Pair with the Sherbrooke Forest walk to the giant mountain ash, the 1000 Steps Kokoda Track, and the tea-shop villages of Sassafras and Olinda.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://puffingbilly.com.au/",
+      "https://www.parks.vic.gov.au/places-to-see/parks/dandenong-ranges-national-park"
+    ]
+  },
+  {
+    "name": "Daylesford & Hepburn Springs — spa country",
+    "region": "VIC — Central Highlands",
+    "tags": ["spa", "wellness", "alternative", "hippie", "food", "market", "town"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "250-700",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Year-round, and summer is when the lake, the forest walks and the mineral-spring pumps are pleasant to walk between. LOCK: Daylesford Sunday Market at the old railway station is Sunday-only, and the Daylesford Farmers Market is the first Saturday of the month. Hepburn Bathhouse sanctuary bathing runs about A$58-80pp; private mineral baths ~A$210 per couple.",
+    "why_rated": "Australia's mineral-spring capital and, more to the point, its longest-running alternative-lifestyle town — bathhouses since 1895, a strong queer and hippie community, crystal and apothecary shops, vegetarian cafes, wellness retreats, and free public spring pumps at Hepburn Reserve where you fill your own bottles. This is the single most on-taste small town in Victoria for her.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://hepburnbathhouse.com/",
+      "https://www.visitmelbourne.com/regions/daylesford-and-the-macedon-ranges",
+      "https://discoverdaylesford.com/hepburn-bathhouse/"
+    ]
+  },
+  {
+    "name": "Lavandula Swiss-Italian lavender farm, Shepherds Flat",
+    "region": "VIC — Central Highlands (near Daylesford)",
+    "tags": ["garden", "flowers", "food", "day-trip", "photography", "hippie"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "20-90",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "WINDOW LOCK, and the window is theirs: lavender peaks in January. Entry is a few dollars per person; the stone farmhouse cafe does long lunches. Ten minutes from Daylesford so it folds into that block at almost no extra cost.",
+    "why_rated": "Purple fields and a restored 1850s Swiss-Italian stone farm — one of the few Victorian attractions that is objectively best in exactly the month they will be there, and photogenic enough that it carries a whole afternoon.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.lavandula.com.au/",
+      "https://www.visitmelbourne.com/regions/daylesford-and-the-macedon-ranges"
+    ]
+  },
+  {
+    "name": "Castlemaine & The Mill artisan precinct",
+    "region": "VIC — Goldfields",
+    "tags": ["arts", "alternative", "market", "food", "town", "heritage"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "LOCKS worth knowing: Castlemaine Artists' Market and Farmers Market both run the FIRST SUNDAY of the month, 9am-2pm, free entry, 60+ local makers; Wesley Hill Market is Saturday mornings. The Castlemaine State Festival is a March, odd-year event — 2027 would fall in it, but late March, after they leave.",
+    "why_rated": "The Melbourne creative diaspora's landing spot — gold-rush architecture filled with artists priced out of the city. The Mill is a converted woollen mill full of makers, vintage traders, a taproom and small-batch coffee; the live music scene at the Theatre Royal and Bridge Hotel punches far above a town of 7,000.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/goldfields/destinations/castlemaine",
+      "https://castlemaineaccom.com.au/news/castlemaine-artists-market/",
+      "https://www.timeout.com/melbourne/things-to-do/around-castlemaine"
+    ]
+  },
+  {
+    "name": "Macedon Ranges — Hanging Rock, Kyneton, Trentham",
+    "region": "VIC — Macedon Ranges",
+    "tags": ["day-trip", "scenic", "food", "wine", "village", "waterfall"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-280",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Hanging Rock reserve entry is about A$12 per car. Summer is dry and golden — atmospheric for the Picnic at Hanging Rock association, though the rock itself is a scramble in the heat, best done early. Trentham Falls flows thinly in February. Kyneton's Piper Street is open daily.",
+    "why_rated": "An hour from Melbourne on the Bendigo train line and the least-touristed of the near-Melbourne day trips. Hanging Rock is a genuinely strange volcanic outcrop with the novel/film mythology attached; Kyneton's Piper Street is a compact strip of good food and antiques; Trentham and the Garden of St Erth are the quiet extras.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmacedonranges.com/village/kyneton/",
+      "https://www.visitmelbourne.com/regions/daylesford-and-the-macedon-ranges"
+    ]
+  },
+  {
+    "name": "Bendigo — Art Gallery, Golden Dragon Museum, vintage trams",
+    "region": "VIC — Goldfields",
+    "tags": ["city", "arts", "heritage", "museum", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-280",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Inland and genuinely hot — 35-40C days are normal in January and the town has no coastal relief. Which is the argument for it as a gallery-and-museum day rather than a walking day. Two hours by train from Southern Cross, ~A$25pp return off-peak.",
+    "why_rated": "Bendigo Art Gallery is one of Australia's oldest and best regional galleries and reliably lands a blockbuster exhibition over summer. The Golden Dragon Museum holds Loong, the world's oldest imperial dragon, from the Chinese goldfields community — an under-told layer of Australian history. The gold mine tour and the heritage tram loop fill the rest.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.bendigoregion.com.au/",
+      "https://www.bendigoartgallery.com.au/"
+    ]
+  },
+  {
+    "name": "Ballarat — Sovereign Hill & the Eureka story",
+    "region": "VIC — Goldfields",
+    "tags": ["heritage", "history", "museum", "day-trip", "family"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "100-260",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Open daily; ~A$45-55pp. Ballarat is high and cold in winter but hot and exposed in January, and Sovereign Hill is an outdoor open-air museum — go early. The evening Aura sound-and-light show runs after dark, which is late in summer.",
+    "why_rated": "A full-scale reconstructed 1850s gold-rush town with working foundry, costumed staff, real gold panning and a Chinese quarter — regularly called the best living-history museum in Australia. The Eureka Stockade (the closest thing Australia has to an armed rebellion) happened here and is treated properly.",
+    "nearest_airport": "AVV",
+    "sources": [
+      "https://sovereignhill.com.au/",
+      "https://www.visitballarat.com.au/"
+    ]
+  },
+  {
+    "name": "Grampians (Gariwerd) — The Pinnacle, MacKenzie Falls, rock art",
+    "region": "VIC — Western Victoria",
+    "tags": ["national-park", "hiking", "waterfall", "rock-art", "indigenous", "mountain"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "180-500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "FIRE FLAG, but with good news attached. The Dec-2024 dry-lightning fire burned 135,000+ hectares; recovery has been substantial and by March 2026 the entire 164km Grampians Peaks Trail plus the rebuilt hike-in campgrounds had reopened, with The Pinnacle, Grand Canyon, Venus Baths and Chataqua Peak all open. That said, this is the single highest-risk park on this list for a strong El Nino summer — it has burned twice in a decade, closures come with no notice, and 38C on exposed sandstone is unpleasant regardless. Treat it as swappable and check Parks Victoria the week before.",
+    "why_rated": "Victoria's best sandstone country: The Pinnacle lookout over Halls Gap, MacKenzie Falls as the state's biggest reliable waterfall, and the highest concentration of Aboriginal rock art in southern Australia at Bunjil's Shelter and the Ngamadjidj and Billimina shelters. Kangaroos on the Halls Gap oval at dusk are a standing joke and completely real.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/grampians-national-park/things-to-do/what-is-open-in-the-grampians",
+      "https://www.parks.vic.gov.au/news/2026/03/03/23/37/entire-grampians-peaks-trail-hike-now-open-following-fires",
+      "https://emergency.vic.gov.au/news-and-media/grampians-gariwerd-national-park-fire-contained-after-21-days"
+    ]
+  },
+  {
+    "name": "Beechworth — gold-rush high country town",
+    "region": "VIC — High Country / Ovens Valley",
+    "tags": ["heritage", "town", "food", "beer", "history"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "120-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Inland, hot (mid-30s common) and in fire country — the Ovens Valley is a real El Nino risk area and smoke haze from alpine fires is the historical pattern. Beechworth Gorge swimming holes are the local answer to the heat. No date locks.",
+    "why_rated": "The best-preserved gold-rush town in Australia by common consent, and free of the theme-park feel — honey-coloured granite streetscape, the courthouse where Ned Kelly was committed for trial, Bridge Road Brewers, and the Beechworth Bakery. A natural pairing with Bright and the alpine valleys.",
+    "nearest_airport": "ABX",
+    "sources": [
+      "https://www.explorebeechworth.com.au/",
+      "https://www.visitmelbourne.com/regions/high-country"
+    ]
+  },
+  {
+    "name": "Bright & the Alpine Valleys — swimming holes and Mt Buffalo",
+    "region": "VIC — High Country",
+    "tags": ["mountain", "swimming", "cycling", "national-park", "town", "scenic-drive"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "180-500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "FIRE FLAG: the alpine valleys are the most fire-affected corridor in Victoria (2003, 2006-07, 2019-20 all hit here) and a strong El Nino summer makes both fires and multi-week smoke haze a live risk. Bright itself is also a peak-summer holiday town — beds are scarce and dear in January. The upside is real: the Ovens River swimming holes and the Murray to Mountains rail trail are exactly what people come for in summer.",
+    "why_rated": "Victoria's summer-in-the-mountains town — swim in the Ovens River at the Bright pool or Eurobin Falls, ride the flat sealed Murray to Mountains rail trail to Myrtleford or Beechworth, and drive up Mt Buffalo for granite tors, the Gorge lookout and Lake Catani. Cool nights after hot days.",
+    "nearest_airport": "ABX",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/high-country/destinations/bright",
+      "https://www.parks.vic.gov.au/places-to-see/parks/mount-buffalo-national-park"
+    ]
+  },
+  {
+    "name": "Alpine summer at Falls Creek / Mt Hotham — MTB and Bogong High Plains",
+    "region": "VIC — Alpine NP",
+    "tags": ["mountain", "cycling", "sport", "hiking", "national-park"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "200-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "FIRE FLAG: the Alpine NP is high-consequence country in an El Nino summer and access roads close fast. Summer lift/shuttle operation at the resorts is limited and season-dependent — verify before routing. Wildflowers on the Bogong High Plains peak Dec-Jan.",
+    "why_rated": "The under-known Australian alpine summer: snow resorts turn into mountain-bike parks and wildflower plateaus at a fraction of winter prices, with the Bogong High Plains walk and Mt Feathertop as the serious hikes. TAG NOTE: the MTB half is sport (his side) — down-weight; the wildflower walking half stands on its own.",
+    "nearest_airport": "ABX",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/alpine-national-park",
+      "https://www.visitmelbourne.com/regions/high-country"
+    ]
+  },
+  {
+    "name": "King Valley prosecco road & Milawa gourmet region",
+    "region": "VIC — King Valley / Milawa",
+    "tags": ["wine", "food", "scenic-drive", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Cellar doors open daily year-round; prosecco is a summer-drinking wine and this is its Australian home. Hot inland days, so plan long lunches not walks. Three hours from Melbourne — best combined with Beechworth/Bright rather than as a day trip.",
+    "why_rated": "Named repeatedly in 'underrated Victoria' threads: Italian migrant families (Pizzini, Chrismont, Dal Zotto) made this Australia's prosecco country, and Milawa Cheese, Brown Brothers and the Milawa mustard shop are on the same loop. Cheap tastings, no crowds, and a distinctly un-Australian Alpine-Italian character.",
+    "nearest_airport": "ABX",
+    "sources": [
+      "https://www.timeout.com/melbourne/travel/underrated-holiday-destinations-to-visit-in-victoria",
+      "https://www.winesofthekingvalley.com.au/"
+    ]
+  },
+  {
+    "name": "Rutherglen fortified wine trail",
+    "region": "VIC — Murray / Rutherglen",
+    "tags": ["wine", "food", "day-trip", "heritage"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-280",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Very hot (high 30s to 40C) and the wines are rich fortifieds, which is a slightly perverse combination in January. Cellar doors open daily, tastings usually free. No locks.",
+    "why_rated": "Home of Australia's genuinely world-class wine style — Rutherglen Muscat and Topaque, aged in solera systems for decades at Chambers, Morris and All Saints. Wine people rate it as one of the few uniquely Australian fine-wine categories; casual visitors rate the free tastings of century-old barrels.",
+    "nearest_airport": "ABX",
+    "sources": [
+      "https://www.visitrutherglen.com.au/"
+    ]
+  },
+  {
+    "name": "Gippsland Lakes, Lakes Entrance & Ninety Mile Beach",
+    "region": "VIC — East Gippsland",
+    "tags": ["beach", "boat", "coast", "fishing", "town"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "200-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "This is exactly its season — the lakes are an Australian summer-holiday institution and January is when they come alive (and when beds cost the most; book early). Ninety Mile Beach has no patrolled swimming for most of its length. A skipper's-licence-free boat hire on the lakes is the standard way to do it.",
+    "why_rated": "Australia's largest inland waterway system — 400km of interconnected lakes behind a dune barrier, with Ninety Mile Beach on the ocean side. Cheap boat hire, dolphins in the lakes, and Raymond Island's koala colony reached by a two-minute free ferry from Paynesville, where you walk a suburban street and count koalas overhead.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.visitmelbourne.com/regions/gippsland/destinations/lakes-entrance",
+      "https://www.parks.vic.gov.au/places-to-see/parks/gippsland-lakes-coastal-park"
+    ]
+  },
+  {
+    "name": "Mallacoota & Croajingolong NP",
+    "region": "VIC — Far East Gippsland",
+    "tags": ["remote", "coast", "national-park", "wildlife", "camping", "beach"],
+    "days_min": 3,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "250-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "FIRE FLAG, and this town is the reason the flag exists: Mallacoota was the site of the 31 Dec 2019 beach evacuation, when thousands sheltered on the foreshore under a red sky. It is a single-road-in town in a UNESCO biosphere of dense coastal forest, and in a strong El Nino summer the isolation is the risk. The community actively wants visitors back and summer is peak season. Go informed, keep an exit plan, and check VicEmergency daily.",
+    "why_rated": "The most-loved remote corner of Victoria on forums: a lake-and-ocean town six hours from Melbourne with almost no through traffic, Croajingolong's wilderness coast, Gabo Island's little penguin colony (larger than Phillip Island's, and almost unvisited), and camping right on the inlet.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/croajingolong-national-park",
+      "https://www.visitmelbourne.com/regions/gippsland/destinations/mallacoota"
+    ]
+  },
+  {
+    "name": "Cape Conran & Marlo — quiet East Gippsland coast",
+    "region": "VIC — East Gippsland",
+    "tags": ["beach", "camping", "coast", "remote", "budget"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "120-400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak season; the Parks Victoria foreshore camping at Banksia Bluff is ballot-allocated for the Christmas-January period (LOCK). Fire risk as for East Gippsland generally. Otherwise: warm water, empty white beaches.",
+    "why_rated": "Named constantly in 'where do Victorians actually go' threads as the antidote to the Great Ocean Road — granite-and-white-sand coast, camping metres from the beach, the Snowy River meeting the sea at Marlo, and effectively no tourism infrastructure.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/cape-conran-coastal-park"
+    ]
+  },
+  {
+    "name": "South Gippsland back roads — Loch, Koonwarra, Fish Creek",
+    "region": "VIC — South Gippsland",
+    "tags": ["village", "food", "arts", "scenic-drive", "day-trip", "budget"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-150",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Green rolling dairy country that stays greener than most of Victoria in a dry summer. No locks; most galleries and provedores open Thu-Sun, so a weekend run works better than a Tuesday.",
+    "why_rated": "The 'most Melburnians haven't been' region — Loch, Koonwarra and Fish Creek are tiny towns with disproportionate cafes, provedores and artist studios, and it is the natural approach route to Wilsons Prom rather than a detour from it.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.timeout.com/melbourne/travel/underrated-holiday-destinations-to-visit-in-victoria",
+      "https://www.visitpromcountry.com.au/"
+    ]
+  },
+  {
+    "name": "Echuca-Moama paddlesteamers on the Murray",
+    "region": "VIC — Murray River",
+    "tags": ["heritage", "river", "boat", "day-trip", "history"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Very hot inland summer (35-42C), but the river is the point and river swimming and red-gum shade are the local coping mechanism. One-hour paddlesteamer cruises run daily, ~A$35-45pp. No locks.",
+    "why_rated": "The largest fleet of working paddlesteamers in the world, on the old red-gum wharf that was Australia's busiest inland port. The Barmah red gum forest, the murals, and river swimming make it more than a novelty cruise — though at a 3h drive from Melbourne it needs the Bendigo/Goldfields loop to justify itself.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.echucamoama.com/"
+    ]
+  },
+  {
+    "name": "Murray-Sunset NP pink lakes & Mildura",
+    "region": "VIC — Mallee / North-West",
+    "tags": ["desert", "remote", "photography", "scenic-drive", "national-park"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "200-500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "HEAT FLAG, close to a no. The Mallee routinely hits 42-45C in January, the park is semi-arid with no water and long unsealed sections, and Parks Victoria advises against summer visits to the remote tracks. The pink lakes are also at their pinkest in late summer/autumn morning light, so the timing is nearly right and the temperature is entirely wrong. Captured so the couple can reject it on facts.",
+    "why_rated": "Salt lakes that go genuinely bubblegum pink from beta-carotene in the algae, with almost nobody there — the least-visited big national park in Victoria. Mildura anchors it with an unexpectedly good food scene (Stefano's) and Murray River houseboats.",
+    "nearest_airport": "MQL",
+    "sources": [
+      "https://www.parks.vic.gov.au/places-to-see/parks/murray-sunset-national-park"
+    ]
+  },
+  {
+    "name": "Wimmera-Mallee Silo Art Trail",
+    "region": "VIC — Wimmera",
+    "tags": ["road-trip", "art", "scenic-drive", "free", "photography"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "0-150",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Free and always open — a drive-through attraction, so the 40C Wimmera summer matters less than it would for a walking trip. Best in early morning or late afternoon light. Combines naturally with the Grampians approach from the north.",
+    "why_rated": "Australia's original silo art trail: 200km linking six giant grain silos painted with portraits of local farmers, footballers and Barengi Gadjin elders. Credited with keeping several dying Wimmera towns alive, which is most of why people rate it — the art plus the reason it exists.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.siloarttrail.com/",
+      "https://www.visitmelbourne.com/regions/grampians"
+    ]
+  },
+  {
+    "name": "Rainbow Spirit Festival (formerly Rainbow Serpent), Lexton",
+    "region": "VIC — Central Victoria / Lexton",
+    "tags": ["festival", "psytrance", "doof", "alternative", "hippie", "camping", "arts", "event-spend"],
+    "days_min": 4,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "700-1200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE LOCK: 22-26 January 2027, Australia Day long weekend, Lexton (160km west of Melbourne). Note the anchor interaction — Australia Day (26 Jan) is a soft anchor and this festival IS the Australia Day weekend, so it resolves that anchor rather than competing with it. Fire caveat: the 2020 edition was cancelled due to bushfire damage to the site, so an El Nino summer carries non-zero cancellation risk. Ticket ~A$300-450pp plus camping/vehicle passes; verify current pricing on the official site.",
+    "why_rated": "THE headline entry for her taste in this whole slice. Australia's biggest and most storied psytrance/doof festival — four days, ~12,000 people, multiple stages of psytrance, minimal techno and chill-out, plus art installations, healing arts, workshops and markets. Running since 1997 (renamed Rainbow Spirit in July 2023 over cultural-appropriation concerns). If any single Victorian item deserves Event-spend treatment, it is this one, and it happens to land squarely inside the trip window.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://en.wikipedia.org/wiki/Rainbow_Serpent_Festival",
+      "https://www.viberate.com/festival/rainbow-serpent/",
+      "https://concreteplayground.com/melbourne/event/rainbow-serpent-festival/amp"
+    ]
+  },
+  {
+    "name": "Beyond The Valley, Barunah Plains (NYE camping festival)",
+    "region": "VIC — Barunah Plains, near Geelong",
+    "tags": ["festival", "electronic", "camping", "nye", "event-spend"],
+    "days_min": 4,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "800-1400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "DATE LOCK AND ANCHOR CONFLICT: 28 December 2026 - 1 January 2027, which collides head-on with the New Year's Eve in Sydney hard anchor. Captured for completeness and in case the NYE anchor ever moves. The 2026/27 lineup is led by John Summit, Black Eyed Peas, KI/KI and Skepta, with John Summit on the NYE countdown.",
+    "why_rated": "Victoria's biggest camping NYE festival, 11th edition, on a farm property an hour from Geelong. Big electronic and hip-hop billing rather than a doof, so it is a different flavour to Rainbow Spirit — but it is the marquee VIC festival of the window and would be a genuine alternative NYE if Sydney were ever unpicked.",
+    "nearest_airport": "AVV",
+    "sources": [
+      "https://www.abc.net.au/triplej/news/beyond-the-valley-2026-lineup-dates/106963276",
+      "https://en.wikipedia.org/wiki/Beyond_the_Valley"
+    ]
+  },
+  {
+    "name": "Let Them Eat Cake, Werribee Park (New Year's Day)",
+    "region": "VIC — Werribee",
+    "tags": ["festival", "electronic", "techno", "day-festival", "event-spend"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "300-500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "DATE LOCK: New Year's Day, 1 January 2027, Werribee Park — conflicts with the Sydney NYE anchor (you cannot be in Sydney at midnight and at Werribee the next afternoon in any pleasant way). 2027 dates were not formally posted at time of research; it has run NYD annually. Captured for the record.",
+    "why_rated": "Melbourne's NYD institution — house and techno in the gardens of a 19th-century mansion, daytime-only, and widely described as the civilised way to spend the first day of the year. Named here mainly to document the conflict.",
+    "nearest_airport": "AVV",
+    "sources": [
+      "https://www.musicfestivalwizard.com/festivals/let-them-eat-cake-nyd-2027/",
+      "https://musicfestivalsaustralia.com/events-calendar/let-them-eat-cake-2"
+    ]
+  },
+  {
+    "name": "Esoteric Festival, Moyston (bush doof)",
+    "region": "VIC — Moyston, near the Grampians",
+    "tags": ["festival", "psytrance", "doof", "alternative", "hippie", "camping"],
+    "days_min": 4,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "700-1200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG WINDOW: Esoteric runs the March Labour Day long weekend (2026 was 6-10 March, Moyston). The couple leave in mid-February, so a 2027 edition would fall weeks after they go. Captured because it is the closest thing to Earthcore's successor and would be a top pick if the trip ever stretched into March.",
+    "why_rated": "The most-loved bush doof in Victoria on the doof forums — five days on a property near the Grampians, extremely open community culture, and it partly inherits the Earthcore mythology (the historic psytrance festival that collapsed in 2017). Pitch Music & Arts runs the same weekend as its techno counterpart.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://beat.com.au/the-best-electronic-festivals-and-bush-doofs-in-melbourne-and-regional-victoria/",
+      "https://www.adventuresnsunsets.com/best-music-festivals-in-victoria-australia/"
+    ]
+  },
+  {
+    "name": "Pitch Music & Arts, Moyston (techno)",
+    "region": "VIC — Moyston, near the Grampians",
+    "tags": ["festival", "techno", "electronic", "camping", "arts"],
+    "days_min": 4,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "700-1200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG WINDOW: March Labour Day long weekend, same weekend as Esoteric. Documented alongside it so the couple can see the whole late-summer Victorian doof calendar and confirm it sits just past their departure.",
+    "why_rated": "The late-summer techno haven of the Melbourne bush-festival scene — big international electronic bills and large-scale installations on a Grampians-edge property, drawing a younger crowd than Esoteric.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://beat.com.au/the-best-electronic-festivals-and-bush-doofs-in-melbourne-and-regional-victoria/"
+    ]
+  },
+  {
+    "name": "Midsumma Festival & Victoria's Pride, Melbourne",
+    "region": "VIC — Melbourne",
+    "tags": ["festival", "queer", "arts", "alternative", "free", "city"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "0-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "WINDOW LOCK, and a generous one: 17 January - 7 February 2027, three weeks of programming. Midsumma Carnival (the free opening day party in Alexandra Gardens) is Sunday 17 January 2027; Pride March is the following weekend; Victoria's Pride street party in the Gertrude/Smith Street precinct is in February. Most street events are free.",
+    "why_rated": "Australia's second-largest queer arts and culture festival and a three-week free-and-cheap layer over any Melbourne days that fall in the window — carnival, street parties, fringe theatre and the Smith Street block party. Fits the alternative-culture taste without being a nightlife capsule.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://midsumma.org.au/",
+      "https://australianpridenetwork.com.au/lgbtiq-festivals/victoria/"
+    ]
+  },
+  {
+    "name": "St Kilda Festival (free beachfront music day)",
+    "region": "VIC — Melbourne",
+    "tags": ["festival", "free", "music", "beach", "city"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-80",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE LOCK: a February Sunday (2027 date TBC at time of research — historically mid-February, which is right on the tail of the trip). Free entry, huge crowds, public transport only. Note this is the festival, not the St Kilda basics already covered elsewhere.",
+    "why_rated": "Australia's biggest free music festival — a full day of Australian acts across multiple stages along the foreshore, and famously free. If it lands on one of their last Melbourne days it is a zero-cost headline.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://stkildafestival.com.au/",
+      "https://whatson.melbourne.vic.gov.au/things-to-do/major-events"
+    ]
+  },
+  {
+    "name": "Australian Open, Melbourne Park",
+    "region": "VIC — Melbourne",
+    "tags": ["sport", "event-spend", "city"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "100-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE LOCK: mid-to-late January (2027 dates TBC; the Open traditionally starts the second or third Monday of January and runs two weeks). Ground passes for the first week are the cheap option (~A$50-60pp) and get you outside courts plus the free festival atmosphere in Garden Square. First-week night sessions are the value pick.",
+    "why_rated": "TAG NOTE: sport, so his side only — down-weight per the taste profile, and do not build a Melbourne date around it. That said, a first-week ground pass is cheap, the precinct is free to wander, and the whole city visibly changes character for a fortnight, which has some appeal beyond the tennis.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://ausopen.com/",
+      "https://whatson.melbourne.vic.gov.au/things-to-do/major-events"
+    ]
+  },
+  {
+    "name": "Boxing Day Test, MCG",
+    "region": "VIC — Melbourne",
+    "tags": ["sport", "event-spend", "city", "heritage"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "100-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "DATE LOCK AND ANCHOR CONFLICT: 26 December, which is Christmas-in-Perth territory — they will be on the wrong side of the continent. Captured only so the conflict is on record. Day-one general admission is typically A$50-60pp.",
+    "why_rated": "TAG NOTE: sport, his side, and doubly discounted by the anchor conflict. The MCG on Boxing Day with 80-90,000 people is a genuine Australian cultural set-piece, but this trip cannot have it. The MCG stadium tour (~A$32pp, runs daily) is the consolation version that works any day.",
+    "nearest_airport": "MEL",
+    "sources": [
+      "https://www.mcg.org.au/"
+    ]
+  },
+  {
+    "name": "Queenscliff & the Bellarine Peninsula",
+    "region": "VIC — Bellarine",
+    "tags": ["coast", "town", "heritage", "wine", "food", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak summer, busy but far less so than the Mornington side. LOCK worth knowing: the Portarlington Mussel Festival is a January one-day event on the Bellarine, and the Queenscliff Music Festival is late November (outside the window). Ferry to Sorrento runs hourly.",
+    "why_rated": "The quieter half of the Heads — Victorian-era Queenscliff with its grand hotels and fort, the Bellarine Taste Trail's cellar doors and mussel farms, calm bay swimming, and a heritage steam railway. Cheaper and less pretentious than the Mornington Peninsula and it links to the Great Ocean Road without going back through Melbourne.",
+    "nearest_airport": "AVV",
+    "sources": [
+      "https://www.visitgeelongbellarine.com.au/",
+      "https://www.visitmelbourne.com/regions/geelong-and-the-bellarine"
+    ]
+  },
+  {
+    "name": "Werribee Open Range Zoo & Werribee Mansion",
+    "region": "VIC — Werribee",
+    "tags": ["wildlife", "day-trip", "garden", "heritage"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "90-180",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Open daily; the safari bus tour is included in entry (~A$45pp). Very hot and exposed in January — animals and visitors are both flattest at midday, so an early session is the move. 35 minutes from the CBD by train plus shuttle.",
+    "why_rated": "A savannah-style open range zoo on the Werribee River where you ride through rhino, giraffe and zebra herds, next door to a grand 1870s mansion with formal gardens and the Victoria State Rose Garden. The cheapest wildlife-safari feeling anywhere near Melbourne.",
+    "nearest_airport": "AVV",
+    "sources": [
+      "https://www.zoo.org.au/werribee/"
+    ]
+  },
+  {
+    "name": "Spirit of Tasmania — Geelong to Devonport overnight ferry",
+    "region": "VIC/TAS — Bass Strait crossing",
+    "tags": ["ferry", "leg", "road-trip", "overnight"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "250-800",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "LOCK: summer sailings and vehicle spaces book out months ahead for the Dec-Jan holiday period, and peak-season fares are the year's highest. Bass Strait is genuinely rough — the crossing has a reputation. The terminal moved from Port Melbourne to Geelong. Roughly 10-11 hours overnight, or a day sailing.",
+    "why_rated": "The alternative to flying into Tasmania: take a vehicle across and skip car hire on the island entirely, which changes the whole cost structure of a Tasmania block. Captured mainly as a Leg option — note it conflicts with the researched HBA-in/LST-out arc, so it is an either/or, not an addition.",
+    "nearest_airport": "AVV",
+    "sources": [
+      "https://www.spiritoftasmania.com.au/"
+    ]
+  },
+  {
+    "name": "Maria Island day trip — the wombat island",
+    "region": "TAS — East Coast / Triabunna",
+    "tags": ["island", "wildlife", "national-park", "hiking", "day-trip", "history"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-250",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "LOCK: ferry from Triabunna (75 min drive from Hobart), five sailings daily, ~A$54pp return, bookings essential and summer sailings fill. A Parks pass is required on top. No shops, no bins, no fuel, no cars on the island — carry everything in and out. A day trip gives you only 4-5 hours ashore, which is the main argument for camping a night at Darlington.",
+    "why_rated": "Called the wombat capital of the world and the descriptions are not exaggerated — hundreds of wombats grazing the convict-settlement paddocks, plus Forester kangaroos, Cape Barren geese and a disease-free Tasmanian devil population. Add the Painted Cliffs, the Fossil Cliffs, and a completely car-free World Heritage convict site. Consistently the highest-satisfaction cheap day in Tasmania on forums.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://parks.tas.gov.au/explore-our-parks/maria-island-national-park",
+      "https://www.mariaisland.tours/maria-island-ferry/",
+      "https://www.timeout.com/australia/news/i-walked-with-wild-wombats-on-this-stunning-car-free-australian-island-070226"
+    ]
+  },
+  {
+    "name": "takayna / Tarkine — Corinna, the Pieman River and the Western Explorer",
+    "region": "TAS — North-West / Tarkine",
+    "tags": ["rainforest", "remote", "wilderness", "scenic-drive", "river", "indigenous"],
+    "days_min": 3,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "400-900",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the only sane season for the Western Explorer — the unsealed sections and the Fatman barge crossing at Corinna are much easier dry. It is also the highest-consequence remote drive in Tasmania: no fuel between Zeehan and Arthur River, no reliable phone signal. Tasmania's 2016 and 2019 fires burned parts of the western wilderness, so El Nino smoke and closures are a real if lower-probability risk than mainland alpine areas.",
+    "why_rated": "The largest tract of cool-temperate rainforest in Australia and the loudest environmental cause in Tasmania — Gondwanan myrtle forest, the tannin-black Pieman River, and Corinna, a restored gold-mining hamlet with no phone reception at the end of a dirt road. The Arthur River 'Edge of the World' lookout faces the longest uninterrupted stretch of ocean on the planet. The single biggest wilderness gap in the already-researched Tasmania arc.",
+    "nearest_airport": "BWT",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/nature-and-wildlife/tarkine/",
+      "https://www.corinna.com.au/",
+      "https://www.parks.tas.gov.au/"
+    ]
+  },
+  {
+    "name": "Stanley & The Nut",
+    "region": "TAS — North-West",
+    "tags": ["town", "coast", "hiking", "heritage", "wildlife", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Year-round; the chairlift up The Nut runs daily in summer (~A$20pp return) or you walk the steep 15-minute path for free. Notoriously windy — the north-west coast catches the Roaring Forties. Little penguins come ashore at dusk at the Godfreys Beach viewing platform, free, best in summer.",
+    "why_rated": "A fishing village of 19th-century cottages huddled under a 143m flat-topped volcanic plug that rises straight out of the sea. Repeatedly named Tasmania's most underrated town: the summit circuit walk, free penguin viewing at dusk, cheap crayfish off the wharf, and it is the gateway to the Tarkine.",
+    "nearest_airport": "BWT",
+    "sources": [
+      "https://www.worldatlas.com/cities/6-most-underrated-towns-in-tasmania-50104.html",
+      "https://www.discovertasmania.com.au/things-to-do/destinations/stanley/"
+    ]
+  },
+  {
+    "name": "Flinders Island — Strzelecki Peaks and Killiecrankie",
+    "region": "TAS — Bass Strait / Furneaux Group",
+    "tags": ["island", "remote", "hiking", "beach", "wildlife", "budget-hostile"],
+    "days_min": 3,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "900-1800",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the right season and the only practical one. COST WARNING: the flights are the problem — Sharp Airlines from Launceston or Melbourne, limited frequency, and you effectively must hire a car on-island. This is a genuine Event-spend decision, not a cheap detour.",
+    "why_rated": "The most-romanticised place in Tasmania that almost nobody goes to: granite peaks streaked with orange lichen dropping into empty white beaches, Strzelecki Peaks as a serious day climb, and Killiecrankie 'diamonds' (topaz) that you fossick out of the sand yourself. Wombats, wallabies and Cape Barren geese outnumber the ~900 residents.",
+    "nearest_airport": "FLS",
+    "sources": [
+      "https://sharpairlines.com/",
+      "https://www.discovertasmania.com.au/things-to-do/destinations/flinders-island/",
+      "https://australianairsafaris.com.au/news/how-to-get-to-flinders-island-king-island/"
+    ]
+  },
+  {
+    "name": "King Island — beef, cheese, crayfish and shipwreck coast",
+    "region": "TAS — Bass Strait / King Island",
+    "tags": ["island", "food", "remote", "beach", "sport"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "800-1600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "December to February is explicitly the best window — mild temperatures and the island's small event calendar clusters there. Flights via Rex, Sharp or King Island Airlines from Melbourne (Moorabbin/Essendon) or Burnie; costly and infrequent. Note it is closer to Victoria than to Tasmania, so it fits a Melbourne block better than a Hobart-Launceston arc.",
+    "why_rated": "Australia's dairy and beef shorthand — King Island cheese and grass-fed beef come from here, and the crayfish is bought off the boat. Add a wild shipwreck coast with more wrecks than anywhere in Australia, and Cape Wickham and Ocean Dunes, two links golf courses that rank absurdly high globally. TAG NOTE: the golf is sport (his side) — down-weight; the food and coast carry it on their own.",
+    "nearest_airport": "KNS",
+    "sources": [
+      "https://www.expedia.com/Cheap-Flights-To-King-Island.d1876.Travel-Guide-Flights",
+      "https://www.discovertasmania.com.au/things-to-do/destinations/king-island/"
+    ]
+  },
+  {
+    "name": "Tasman Peninsula sea kayaking (Fortescue Bay / Tasman Island)",
+    "region": "TAS — Tasman Peninsula",
+    "tags": ["kayak", "coast", "adventure", "wildlife", "national-park", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "300-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the operating season; trips are still weather-cancelled often because these are the exposed Southern Ocean cliffs. Book with a day of slack either side. Roughly A$150-280pp for a half or full day. Distinct from the already-researched Port Arthur capsule — same peninsula, different activity.",
+    "why_rated": "Paddling under the tallest sea cliffs in the southern hemisphere (300m dolerite columns at Cape Pillar and Cape Hauy) with seals, dolphins and sea eagles. The motorised Tasman Island Cruise is the cheaper, faster, more reliably-running alternative to the same coastline and is one of the highest-rated boat trips in Australia.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://parks.tas.gov.au/explore-our-parks/tasman-national-park",
+      "https://www.discovertasmania.com.au/things-to-do/adventure/"
+    ]
+  },
+  {
+    "name": "Three Capes Track (multi-day, Tasman Peninsula)",
+    "region": "TAS — Tasman Peninsula",
+    "tags": ["hiking", "multi-day", "coast", "national-park", "bucket-list", "event-spend"],
+    "days_min": 3,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "1000-1600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "HARD LOCK: fixed-departure booked walk with a capped daily start number, run by Tasmania Parks — summer dates book out many months ahead, sometimes a year. Around A$500pp for the four-day version including boat transfer, huts and the Port Arthur entry. If it is not already booked, it is very likely unavailable for a Feb 2027 walk.",
+    "why_rated": "Australia's most in-demand hut-based walk: three days along the highest sea cliffs in the country with architect-designed huts, mattresses and no tent required. Rated at or near the top of every Australian multi-day-walk list. Captured with an honest availability warning rather than as a live option.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.threecapestrack.com.au/",
+      "https://parks.tas.gov.au/explore-our-parks/tasman-national-park"
+    ]
+  },
+  {
+    "name": "Huon Valley — Cygnet, Huonville, cider and orchards",
+    "region": "TAS — Huon Valley",
+    "tags": ["food", "alternative", "hippie", "village", "arts", "scenic-drive", "cider"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "180-500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is stone-fruit and berry season with roadside honesty boxes running; cherries peak late Dec-Jan. Willie Smith's Apple Shed is open daily. Cygnet's galleries and cafes lean Thu-Sun. 45 minutes south of Hobart, so it works as day trips from a Hobart base rather than needing its own beds.",
+    "why_rated": "Tasmania's alternative-lifestyle heartland and a strong her-side pick: Cygnet is a small town of organic farmers, artists, musicians and blow-ins with a disproportionate arts scene; the valley is orchards, roadside produce stalls on the honour system, and craft cider at Willie Smith's. Consistently cited in 'hidden gems' threads as the part of southern Tasmania visitors drive past.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.worldatlas.com/cities/6-most-underrated-towns-in-tasmania-50104.html",
+      "https://www.huonvalley.tas.gov.au/",
+      "https://www.williesmiths.com.au/"
+    ]
+  },
+  {
+    "name": "Cygnet Folk Festival",
+    "region": "TAS — Huon Valley / Cygnet",
+    "tags": ["festival", "folk", "music", "alternative", "hippie", "market", "event-spend"],
+    "days_min": 3,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE LOCK: 8-10 January 2027, Cygnet. Beds in Cygnet and the Huon Valley vanish for that weekend — camping or a Hobart base with a 45-minute drive are the fallbacks. Weekend passes are typically A$150-220pp with cheaper single-day tickets.",
+    "why_rated": "One of Australia's most-loved folk festivals and the sort of event this couple would build a weekend around: an entire small town given over to music, dance, poetry, circus, masterclasses, handicrafts and street performance for three days. Much more her-taste than the food-and-wine festivals that dominate the Tasmanian summer calendar — but check it against the trip shape, since early January is likely still east-coast mainland time.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.cygnetfolkfestival.org/",
+      "https://events.humanitix.com/cygnet-folk-festival-2027",
+      "https://www.discovertasmania.com.au/things-to-do/festivals-and-events/cygnet-folk-festival2/"
+    ]
+  },
+  {
+    "name": "Far South — Tahune, Hastings Caves & Thermal Springs, Cockle Creek",
+    "region": "TAS — Far South",
+    "tags": ["cave", "hot-springs", "remote", "forest", "hiking", "scenic-drive"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the season for the far south — the road to Cockle Creek is partly unsealed and much better dry. Hastings Caves tour ~A$25pp and includes the thermal pool (a constant 28C outdoor pool in dolomite country). Tahune Airwalk was badly fire-damaged in 2019 and has since reopened — worth verifying operating status close to the date.",
+    "why_rated": "The end of the road: Cockle Creek is Australia's southernmost drivable point, with a 4-hour return walk to South Cape Bay where the next stop south is Antarctica. Hastings Caves is the largest tourist dolomite cave in Australia and pairs with a thermal swimming pool. Almost no international visitors get past the Huon.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://parks.tas.gov.au/explore-our-parks/hastings-caves-and-thermal-springs",
+      "https://parks.tas.gov.au/explore-our-parks/southwest-national-park",
+      "https://www.tahuneadventures.com.au/"
+    ]
+  },
+  {
+    "name": "Mt Field NP — Russell Falls and the Tarn Shelf",
+    "region": "TAS — Derwent Valley",
+    "tags": ["national-park", "waterfall", "hiking", "forest", "day-trip", "budget"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "50-200",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "An hour from Hobart, open year-round, parks pass only. Russell Falls flows all year but is at its lowest in late summer. The high-country Tarn Shelf circuit needs a clear day and is snow-affected outside summer — Dec-Feb is the window for it. No booking, no lock.",
+    "why_rated": "Tasmania's first national park and the best value day out from Hobart: a 15-minute flat walk through tree ferns to Russell Falls (probably the most photographed waterfall in Australia), giant swamp gums on the Tall Trees walk, and then a completely different alpine world of glacial tarns and pandani up on the Tarn Shelf. Also one of the better spots near Hobart for spotting platypus and wombats at dusk.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://parks.tas.gov.au/explore-our-parks/mount-field-national-park"
+    ]
+  },
+  {
+    "name": "Derby & Blue Derby mountain biking",
+    "region": "TAS — North-East",
+    "tags": ["cycling", "sport", "forest", "town", "adventure"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "200-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is prime riding season and the trails are open year-round. Bike hire ~A$80-120/day each plus shuttles; beds in Derby are limited and book out. Sits neatly between Launceston and the Bay of Fires on the north-east loop.",
+    "why_rated": "TAG NOTE: sport, his side — down-weight, and do not relocate the trip for it. That said, Blue Derby is genuinely world-famous (an ex-tin-mining town of 200 people rebuilt entirely around 125km of trail, an Enduro World Series host), and the non-riding half of the town — the Floating Sauna on Lake Derby, a wood-fired sauna on a pontoon you plunge from into the lake — is a strong her-side item in its own right and can be booked without touching a bike.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://www.ridebluederby.com.au/",
+      "https://www.discovertasmania.com.au/things-to-do/destinations/derby/"
+    ]
+  },
+  {
+    "name": "Launceston & Cataract Gorge",
+    "region": "TAS — North",
+    "tags": ["city", "gorge", "free", "food", "heritage", "swimming"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Cataract Gorge is free and 15 minutes' walk from the CBD; the chairlift (world's longest single span) is about A$20pp return and the free outdoor swimming pool in the First Basin is open in summer. Launceston is the arc's exit airport, so this costs almost nothing to include.",
+    "why_rated": "A city with a genuine river gorge inside its suburbs — swimming, peacocks, a Victorian garden and a chairlift over the water, all a short walk from a compact heritage centre. Add the Design Tasmania collection, the Harvest Market on Saturdays, and Josef Chromy and Tamar Valley cellar doors on the doorstep. Since LST is already the departure airport, this is nearly free to bolt on.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://www.launcestoncataractgorge.com.au/",
+      "https://www.discovertasmania.com.au/things-to-do/destinations/launceston/"
+    ]
+  },
+  {
+    "name": "Tamar Valley wine route & Cataract-to-Pipers River loop",
+    "region": "TAS — Tamar Valley",
+    "tags": ["wine", "food", "scenic-drive", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Cellar doors open daily; tastings usually A$10-15pp, often waived on purchase. Late February is the start of vintage. Note the drink-driving constraint on a self-drive wine day — the standard answer is a small-group tour at ~A$150-190pp.",
+    "why_rated": "Tasmania makes Australia's best sparkling wine and this is where — Jansz, Clover Hill and Pipers Brook at the northern end, Josef Chromy and Tamar Ridge closer to Launceston. Add the Batman Bridge, the Beauty Point platypus and seahorse centres, and Low Head's little penguin tour at dusk.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://www.tamarvalleywinetrail.com.au/",
+      "https://www.discovertasmania.com.au/things-to-do/food-and-drink/"
+    ]
+  },
+  {
+    "name": "Evandale Sunday Market & National Penny Farthing Championships",
+    "region": "TAS — Northern Midlands / Evandale",
+    "tags": ["market", "festival", "heritage", "village", "quirky", "sport"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "20-100",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "TWO LOCKS. (1) The Evandale Market runs every SUNDAY morning, year-round — a weekday visit gets you a pretty empty Georgian village and nothing else. (2) The Evandale Village Fair and National Penny Farthing Championships is one Saturday in late February (2026 was Sat 21 Feb; the 2027 date was not published at time of research). Late Feb is probably just past their departure — verify before counting on it. Evandale is 10 minutes from Launceston Airport, so the Sunday market is an easy last-morning item.",
+    "why_rated": "The Sunday market is the north's best — antiques, produce, bric-a-brac in a fully intact Georgian village. The Penny Farthing Championships is a genuinely absurd spectacle: grown adults racing 19th-century high-wheel bicycles through the streets, the only national championship of its kind in the world, drawing international riders. TAG NOTE: nominally sport, but it reads as folk-quirk rather than sport, so do not down-weight it the way you would a tennis ticket.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://evandalevillagefair.com/",
+      "https://www.evandaletasmania.com/national-penny-farthing-championship.html",
+      "https://northernmidlands.tas.gov.au/events/penny-farthing-championships-evandale"
+    ]
+  },
+  {
+    "name": "Party In The Paddock, Carrick",
+    "region": "TAS — Northern Midlands / Carrick",
+    "tags": ["festival", "music", "camping", "alternative", "event-spend"],
+    "days_min": 3,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "500-900",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE LOCK: 4-7 February 2027, on a farm at Carrick, 20 minutes from Launceston. This is the single best festival-to-itinerary fit in Tasmania — it lands squarely in the likely early-February Tasmania block and is right beside the LST exit airport. Camping on site; tickets typically A$200-280pp plus camping.",
+    "why_rated": "Tasmania's flagship camping music festival — a working farm turned into multiple stages for four days, with a fiercely local, unpretentious reputation. Its position on the calendar and the map means it could be the anchor the Tasmanian block is built around rather than an add-on.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://en.wikipedia.org/wiki/Party_in_the_Paddock",
+      "https://www.discovertasmania.com.au/things-to-do/festivals-and-events/"
+    ]
+  },
+  {
+    "name": "Festivale, Launceston",
+    "region": "TAS — Launceston",
+    "tags": ["festival", "food", "wine", "music", "city"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE LOCK: 29-31 January 2027, City Park, Launceston. Ticketed entry (typically A$30-45pp per session) plus food and drink inside. Sits about a week before Party In The Paddock, so both could plausibly bracket a northern-Tasmania stretch.",
+    "why_rated": "A three-day showcase of Tasmanian food, wine, beer, cider and whisky with live music, held under the oaks in Launceston's City Park. Less of a destination than Party In The Paddock, but if the Tasmania block starts in late January it is a cheap, high-density way to eat and drink the whole island in one park.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/festivals-and-events/",
+      "https://www.festivale.com.au/"
+    ]
+  },
+  {
+    "name": "Australian Wooden Boat Festival, Hobart",
+    "region": "TAS — Hobart",
+    "tags": ["festival", "free", "maritime", "heritage", "city", "waterfront"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "0-150",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "DATE LOCK: 5-8 February 2027, Hobart waterfront — biennial (odd years), so 2027 is an on-year. Largely free to wander the docks; Hobart accommodation spikes hard that weekend, and it overlaps with Party In The Paddock (4-7 Feb) in the north, so the two compete directly for the same days.",
+    "why_rated": "The largest wooden boat festival in the southern hemisphere and one of the biggest in the world — several hundred vessels filling Sullivans Cove, free to walk among, with boatbuilding demonstrations, shanty singing and the whole waterfront given over to it. It only happens every second year and 2027 is one of them.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/festivals-and-events/",
+      "https://australianwoodenboatfestival.com.au/"
+    ]
+  },
+  {
+    "name": "Taste of Summer, Hobart waterfront",
+    "region": "TAS — Hobart",
+    "tags": ["festival", "food", "wine", "city", "waterfront"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "DATE LOCK AND ANCHOR CONFLICT: 27 December 2026 - 3 January 2027 at Princes Wharf No.1, which sits entirely inside the Perth-Christmas-to-Sydney-NYE stretch. It overlaps the Sydney Hobart finish, which is the reason Hobart is at its liveliest all year. Captured to document the clash — if the Tasmania block is early February, this is simply unavailable.",
+    "why_rated": "Formerly the Taste of Tasmania: 75+ stalls of Tasmanian producers, distillers, brewers and winemakers on the waterfront for a week, with the Sydney Hobart fleet arriving alongside. The biggest week of the Hobart year, and the trip's anchors make it unreachable.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.tasteofsummer.com.au/",
+      "https://tickets.oztix.com.au/outlet/event/0ed4a63e-f39a-4342-a016-c2db4b8d8416"
+    ]
+  },
+  {
+    "name": "Farm Gate Market, Hobart (Sunday)",
+    "region": "TAS — Hobart",
+    "tags": ["market", "food", "free", "city", "alternative"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "20-80",
+    "cost_confidence": "high",
+    "season_fit_dec_feb": "good",
+    "season_note": "WEEKDAY LOCK: Sundays only, Bathurst Street, Hobart CBD, roughly 8:30am-1pm, year-round, free entry. Notable as the counterpart to the Saturday Salamanca lock — with both, a Hobart weekend covers Saturday and Sunday mornings without overlap.",
+    "why_rated": "The producers-only market that locals push over Salamanca: strictly grower-and-maker, no imported souvenirs, and the closest thing Hobart has to a weekly food-community gathering. Cheap breakfast, and a useful piece of scheduling geometry alongside the Saturday Salamanca lock.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.farmgatemarket.com.au/",
+      "https://www.discovertasmania.com.au/things-to-do/shopping-and-markets/"
+    ]
+  },
+  {
+    "name": "kunanyi / Mt Wellington summit and descent",
+    "region": "TAS — Hobart",
+    "tags": ["mountain", "free", "scenic", "hiking", "cycling", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-160",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free by car or on foot; the summit road closes in ice and snow, which can happen even in summer (it is 1,271m and Hobart's weather turns fast — take a jacket in January, seriously). The gravity-assisted mountain-bike descent operators run ~A$100-130pp. The free Mt Wellington Explorer-style shuttle buses charge similar.",
+    "why_rated": "A 1,271m mountain 30 minutes from a capital city's CBD, with an alpine plateau, dolerite Organ Pipes and a view over the whole Derwent estuary. Free if you drive. The 21km downhill bike run from summit to waterfront is the fun version. Listed separately from the researched Hobart items because it is often skipped and costs nothing.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://wellingtonpark.org.au/",
+      "https://www.discovertasmania.com.au/things-to-do/destinations/hobart/"
+    ]
+  },
+  {
+    "name": "Strahan, Gordon River cruise & West Coast Wilderness Railway",
+    "region": "TAS — West Coast",
+    "tags": ["wilderness", "boat", "river", "train", "heritage", "remote"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "500-1000",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the reliable-weather window on a coast that is otherwise relentlessly wet — Strahan gets around 2m of rain a year. Gordon River cruises run daily, roughly A$150-230pp; the railway roughly A$130-170pp. Both should be booked ahead in January. Long drive from anywhere (4.5h from Hobart, 3.5h from Launceston) — it needs its own days.",
+    "why_rated": "The Gordon River cruise into Tasmanian Wilderness World Heritage rainforest, with the engine cut for silence at Heritage Landing, plus Sarah Island — the convict settlement so brutal it makes Port Arthur look mild. The West Coast Wilderness Railway is a rack-and-pinion steam line through rainforest gorges built by hand in the 1890s. Ocean Beach at sunset is 40km of empty sand with nothing between it and Argentina.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/destinations/strahan/",
+      "https://www.wcwr.com.au/",
+      "https://www.gordonrivercruises.com.au/"
+    ]
+  },
+  {
+    "name": "Queenstown & the Western Wilds drive",
+    "region": "TAS — West Coast",
+    "tags": ["scenic-drive", "history", "remote", "quirky", "arts"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "The Lyell Highway and the 99 Bends descent into Queenstown are sealed and open year-round; summer just makes the mountain weather less hostile. No locks. Fits naturally between Hobart/Lake St Clair and Strahan.",
+    "why_rated": "One of the strangest landscapes in Australia — a century of copper smelting stripped the hills bare, leaving pink, orange and grey moonscape around a town with a gravel football oval. It has since grown an unlikely arts scene, and the drive through Nelson Falls and the Franklin River crossings is a highlight in its own right. Reliably named the most surprising place in Tasmania by people who expected nothing.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/destinations/queenstown/",
+      "https://www.parks.tas.gov.au/"
+    ]
+  },
+  {
+    "name": "Lake St Clair — Australia's deepest lake",
+    "region": "TAS — Central Highlands",
+    "tags": ["national-park", "lake", "hiking", "wilderness", "budget"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Parks pass only for day use; the ferry across the lake is ~A$45pp one way. Two and a half hours from Hobart on the Lyell Highway. Note this is the SOUTHERN end of the Cradle Mountain-Lake St Clair park — a completely different access point from the already-researched Cradle end, four hours' drive apart, and vastly quieter.",
+    "why_rated": "The Overland Track's finish line and Australia's deepest natural freshwater lake, in a glacial valley of ancient pencil pines. Because everyone drives to the Cradle end, the St Clair end gets a fraction of the visitors for a comparable landscape — the Larmairremener tabelti and Shadow Lake walks start from the door, and the ferry lets you walk one-way back along the lakeshore.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://parks.tas.gov.au/explore-our-parks/cradle-mountain-lake-st-clair-national-park",
+      "https://lakestclairlodge.com.au/"
+    ]
+  },
+  {
+    "name": "Mole Creek Karst caves & the Great Western Tiers",
+    "region": "TAS — North / Deloraine",
+    "tags": ["cave", "national-park", "glow-worms", "day-trip", "waterfall"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Marakoopa and King Solomons caves run guided tours daily, ~A$22-25pp each or a combined ticket; a constant ~9C inside, so this is also the answer to a rare hot Tasmanian day. Liffey Falls is free. Deloraine's market is the first Saturday of the month (LOCK). Sits directly on the Launceston-to-Cradle road.",
+    "why_rated": "Marakoopa Cave has the largest display of glow-worms in any public-access cave in Australia — a whole underground chamber ceiling of them. Add Liffey Falls, the Great Western Tiers escarpment, and Deloraine, a riverside crafts-and-arts town. Cheap, indoors-when-needed, and almost nobody schedules it.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://parks.tas.gov.au/explore-our-parks/mole-creek-karst-national-park",
+      "https://www.discovertasmania.com.au/things-to-do/destinations/deloraine/"
+    ]
+  },
+  {
+    "name": "Ross, Oatlands & the Heritage Highway",
+    "region": "TAS — Midlands",
+    "tags": ["heritage", "history", "village", "scenic-drive", "free", "budget"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "20-120",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Free to wander; no locks. The Midlands is the dry, golden interior of Tasmania and is genuinely hot in January by island standards (high 20s to low 30s). This sits directly on the Hobart-Launceston drive, so it costs almost nothing in time.",
+    "why_rated": "The Hobart-Launceston drive is otherwise a dull two hours, and these towns are the reason to make it four: Ross Bridge (1836) with its carved convict masonry, the Ross Female Factory site, and Oatlands' Callington Mill, a restored 1837 Lincolnshire-style windmill that actually grinds flour. Woolmers and Brickendon Estates near Longford are UNESCO-listed convict farm sites.",
+    "nearest_airport": "LST",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/history-and-heritage/",
+      "https://www.woolmers.com.au/"
+    ]
+  },
+  {
+    "name": "Bicheno — blowhole, penguins and the Gulch",
+    "region": "TAS — East Coast",
+    "tags": ["coast", "wildlife", "penguins", "town", "budget", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the peak of the little penguin season; the guided evening penguin tour runs nightly, ~A$40pp, booking essential in January. The blowhole and the orange-lichen Gulch rocks are free and always open. Bicheno beds spike in January.",
+    "why_rated": "Named separately from the researched Freycinet capsule because it is 30 minutes north and often skipped: a fishing town with a natural blowhole that fires spray over the road, the same orange-lichen granite as the Bay of Fires without the drive, and a small guided little penguin colony that people rate above Phillip Island for intimacy. The Waubs Bay walk is free and takes 40 minutes.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/destinations/bicheno/",
+      "https://bichenopenguintours.com.au/"
+    ]
+  },
+  {
+    "name": "Tasmanian Wine Festival & Clarence Jazz Festival, Hobart",
+    "region": "TAS — Hobart / Clarence",
+    "tags": ["festival", "wine", "music", "free", "city"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "30-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Both are February events on the Hobart side of the Derwent; 2027 dates were not published at time of research (WINDOW LOCK, verify closer to the date). Clarence Jazz is substantially free across multiple outdoor venues; the Wine Festival is a ticketed tasting event.",
+    "why_rated": "Captured as the cheap February filler layer for any Hobart days that do not line up with the Wooden Boat Festival — outdoor jazz in parks and on the Bellerive waterfront, largely free, and a single-venue tasting of the entire Tasmanian wine industry.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/festivals-and-events/",
+      "https://www.ccc.tas.gov.au/clarence-jazz-festival/"
+    ]
+  },
+  {
+    "name": "Spoke Motorcycle Festival, east coast",
+    "region": "TAS — East Coast",
+    "tags": ["festival", "music", "camping", "quirky", "sport"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "DATE LOCK, OUTSIDE THE WINDOW: 26-28 February 2027, an east-coast beach. The couple are due to leave by mid-February, so this falls after the trip. Recorded so the calendar is complete rather than as a live option.",
+    "why_rated": "A beach-side motorcycle festival with live music, glamping, food and beach races — an unusual mix of doof-adjacent camping culture and motorsport. TAG NOTE: sport-leaning, his side, and out of window on top of that.",
+    "nearest_airport": "HBA",
+    "sources": [
+      "https://www.discovertasmania.com.au/things-to-do/festivals-and-events/"
+    ]
+  }
+]
