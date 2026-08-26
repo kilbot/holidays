@@ -1,0 +1,1069 @@
+{
+  "schema_version": "1.0",
+  "generated": "2026-08-27",
+  "generated_by": "docs/research/climate-outlook.md research pass (issue #21)",
+  "purpose": "Layer 1 of the site's three-layer weather model: static Dec/Jan/Feb normals per base. Layer 2 is the ENSO tilt below (re-check monthly). Layer 3 is a live forecast, only meaningful inside ~10 days.",
+  "units": {
+    "temperature": "degrees Celsius",
+    "rainfall": "millimetres",
+    "rain_days": "mean count of days in the month",
+    "humidity": "percent relative humidity",
+    "wind": "km/h",
+    "sea_surface_temp": "degrees Celsius (approximate)"
+  },
+  "field_notes": {
+    "avg_high_c": "BOM 'Mean maximum temperature'",
+    "avg_low_c": "BOM 'Mean minimum temperature'",
+    "mean_rain_mm": "BOM 'Mean rainfall' - inflated by rare extreme months in the tropics; prefer median_rain_mm for a typical month",
+    "median_rain_mm": "BOM 'Decile 5 (median) rainfall' - what a typical month actually delivers",
+    "rain_days_ge_1mm": "days with >=1 mm; divide by days-in-month for a wet-day probability",
+    "rain_days_ge_10mm": "days with >=10 mm; the 'plans actually ruined' threshold",
+    "humidity": "derived band from 3 pm relative humidity: dry <45, moderate 45-57, humid 58-67, very humid 68-75, oppressive >=76",
+    "sea_surface_temp_c": "APPROXIMATE. Not from BOM station data. See per-location sources."
+  },
+  "flag_definitions": {
+    "stinger_season": "Marine stinger (box jellyfish / Irukandji) season, tropical Queensland, 1 Nov - 31 May, peak Dec-Mar. Stinger nets at Port Douglas, Palm Cove, Trinity Beach, Yorkeys Knob, Kewarra. Reef operators supply stinger suits. Source: Surf Life Saving Queensland, https://lifesaving.com.au/safety-info/marine-stingers",
+    "cyclone_window": "Australian tropical cyclone season, 1 Nov - 30 Apr. Australia-wide average 10 TCs/season since 1980-81 (8-9 since 2000), 3-4 crossing the coast. Source: http://www.bom.gov.au/climate/cyclones/australia/",
+    "bushfire_months": "Months in the local peak fire-danger window. Not a forecast - see enso_tilt for this season's loading."
+  },
+  "enso_tilt": {
+    "as_at": "2026-08-27",
+    "state": "Very strong El Nino, firmly established and still intensifying",
+    "bom_status_issued": "2026-08-11",
+    "bom_status_headline": "Strong El Nino continues to intensify amid record-warm global sea-surface temperatures",
+    "relative_nino34_c": 2.2,
+    "relative_nino34_week_ending": "2026-08-09",
+    "soi_30day": -25.6,
+    "iod": "Neutral, hovering at the positive threshold; models favour a positive IOD developing and persisting into spring",
+    "confidence_in_phase": "very high",
+    "confidence_in_australian_impacts": "moderate",
+    "caveat": "BOM's own wording: 'A strong El Nino signal in the Nino3.4 region does not necessarily mean strong impacts on Australia's climate.' As of 27 Aug 2026 BOM has NOT yet issued a Dec-Feb long-range forecast - its model runs 4 months ahead, so the current issue (20 Aug 2026) reaches only to December. Everything below Dec is historical analogue, not forecast.",
+    "apply_to_normals": {
+      "port_douglas": {
+        "rain": "tilt drier, strongly in Dec-Jan, not in Feb",
+        "confidence": "moderate",
+        "detail": "In 6 strong El Nino summers since 1957, Port Douglas January median rainfall was 132 mm against an all-year median of 364 mm (-64%); February was 386 mm against 383 mm (no discount at all)."
+      },
+      "cairns": {
+        "rain": "tilt drier Dec-Jan, neutral Feb",
+        "confidence": "moderate",
+        "detail": "8 strong El Nino summers: DJF median 567 mm vs 926 mm all-year median; 6 of 8 below median."
+      },
+      "mission_beach": {
+        "rain": "tilt drier Dec-Jan, neutral Feb",
+        "confidence": "low-moderate",
+        "detail": "Same wet-tropics signal as Cairns/Port Douglas, but Innisfail's absolute totals are so high that even a 40% discount leaves a very wet month."
+      },
+      "hobart": {
+        "rain": "tilt drier",
+        "temp": "tilt hotter",
+        "fire": "elevated",
+        "confidence": "moderate-high",
+        "detail": "9 strong El Nino summers: Hobart DJF median 98 mm vs 135 mm all-year (-27%), 7 of 9 below median. AFAC's Spring 2026 outlook already flags increased fire risk for north-east and eastern Tasmania."
+      },
+      "launceston": {
+        "rain": "tilt drier",
+        "temp": "tilt hotter",
+        "fire": "elevated",
+        "confidence": "moderate-high",
+        "detail": "Same signal as Hobart; north-east Tasmania is the specific AFAC-flagged region."
+      },
+      "sydney": {
+        "rain": "no reliable tilt",
+        "temp": "tilt hotter",
+        "confidence": "high (that there is no tilt)",
+        "detail": "8 strong El Nino summers: Sydney DJF median 416 mm vs 262 mm all-year median - i.e. WETTER, and only 3 of 8 below median. El Nino's Australian rainfall signal is a winter-spring phenomenon that has largely decayed by summer. Use the raw December wet-day base rates."
+      },
+      "byron_bay": {
+        "rain": "no reliable tilt",
+        "temp": "tilt hotter",
+        "confidence": "low",
+        "detail": "Sample too small at Cape Byron (record starts 2004). Treat as east-coast: no dependable El Nino dry signal in summer."
+      },
+      "melbourne": {
+        "rain": "tilt drier",
+        "temp": "tilt hotter",
+        "fire": "elevated",
+        "confidence": "moderate",
+        "detail": "BOM's Sep-Nov outlook gives 60->80% chance of below-average rainfall across south-eastern Australia, with unusually high maximum temperatures over 80% likely in western and central Victoria."
+      },
+      "adelaide": {
+        "rain": "tilt drier",
+        "temp": "tilt hotter",
+        "fire": "elevated",
+        "confidence": "moderate",
+        "detail": "Southern Australia carries the strongest El Nino heat signal. BOM notes individual daily heat extremes tend to be HOTTER in El Nino years at Adelaide and Melbourne, though prolonged warm spells are less frequent."
+      },
+      "perth": {
+        "rain": "no meaningful effect",
+        "temp": "tilt hotter",
+        "confidence": "moderate",
+        "detail": "December rainfall median is 4.4 mm - there is nothing for El Nino to subtract. Note BOM's Sep-Nov outlook actually favours ABOVE average rainfall across most of Western Australia, driven by the Indian Ocean, not the Pacific."
+      },
+      "margaret_river": {
+        "rain": "no meaningful effect",
+        "temp": "tilt hotter",
+        "fire": "elevated",
+        "confidence": "moderate",
+        "detail": "Same as Perth. Fire risk in the SW is driven by fuel load and dry soil, both flagged by AFAC for parts of WA."
+      }
+    },
+    "sources": [
+      "http://www.bom.gov.au/climate/enso/",
+      "http://www.bom.gov.au/climate/ahead/outlooks/",
+      "http://www.bom.gov.au/climate/rainfall-onset/",
+      "http://www.bom.gov.au/climate/updates/articles/a008-el-nino-and-australia.shtml",
+      "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml",
+      "https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/",
+      "https://www.afac.com.au/public-resources/seasonal-bushfire-outlook-spring-2026"
+    ]
+  },
+  "locations": {
+    "perth": {
+      "name": "Perth",
+      "state": "WA",
+      "lat": -31.92,
+      "lon": 115.87,
+      "notes": "Mediterranean climate: December-February is the reliable dry season. Heat, not rain, is the planning variable - Perth Metro averages 5.4 days >=35 C in December and 7.7 in January.",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "dec",
+          "jan",
+          "feb"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 29.6,
+          "avg_low_c": 16.6,
+          "mean_rain_mm": 9.6,
+          "median_rain_mm": 4.4,
+          "rain_days_ge_1mm": 1.8,
+          "rain_days_ge_10mm": 0.2,
+          "days_ge_30c": 13.2,
+          "days_ge_35c": 5.4,
+          "rh_9am_pct": 50,
+          "rh_3pm_pct": 41,
+          "temp_3pm_c": 26.8,
+          "wind_3pm_kmh": 19.5,
+          "humidity": "dry",
+          "sea_surface_temp_c": 21.5
+        },
+        "jan": {
+          "avg_high_c": 31.4,
+          "avg_low_c": 18.2,
+          "mean_rain_mm": 15.9,
+          "median_rain_mm": 2.4,
+          "rain_days_ge_1mm": 1.6,
+          "rain_days_ge_10mm": 0.3,
+          "days_ge_30c": 18.3,
+          "days_ge_35c": 7.7,
+          "rh_9am_pct": 51,
+          "rh_3pm_pct": 39,
+          "temp_3pm_c": 29.0,
+          "wind_3pm_kmh": 19.0,
+          "humidity": "dry",
+          "sea_surface_temp_c": 22.5
+        },
+        "feb": {
+          "avg_high_c": 31.7,
+          "avg_low_c": 18.4,
+          "mean_rain_mm": 12.7,
+          "median_rain_mm": 3.0,
+          "rain_days_ge_1mm": 1.2,
+          "rain_days_ge_10mm": 0.4,
+          "days_ge_30c": 17.5,
+          "days_ge_35c": 7.1,
+          "rh_9am_pct": 53,
+          "rh_3pm_pct": 38,
+          "temp_3pm_c": 29.5,
+          "wind_3pm_kmh": 17.9,
+          "humidity": "dry",
+          "sea_surface_temp_c": 23.5
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "009225",
+          "station_name": "PERTH METRO",
+          "record_from": 1993,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_009225.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_009225_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "margaret_river": {
+      "name": "Margaret River",
+      "state": "WA",
+      "lat": -34.03,
+      "lon": 115.1,
+      "notes": "Witchcliffe (6 km S of Margaret River town) closed Oct 2021; 1999-2021 record still the best local normals. Coastal SW is 3-5 C cooler than Perth and windier (mean 3 pm wind 22-23 km/h).",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "dec",
+          "jan",
+          "feb",
+          "mar"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 24.9,
+          "avg_low_c": 12.4,
+          "mean_rain_mm": 17.9,
+          "median_rain_mm": 13.6,
+          "rain_days_ge_1mm": 3.0,
+          "rain_days_ge_10mm": 0.4,
+          "days_ge_30c": 4.2,
+          "days_ge_35c": 1.3,
+          "rh_9am_pct": 61,
+          "rh_3pm_pct": 52,
+          "temp_3pm_c": 22.3,
+          "wind_3pm_kmh": 22.1,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 20.0
+        },
+        "jan": {
+          "avg_high_c": 26.6,
+          "avg_low_c": 13.9,
+          "mean_rain_mm": 12.3,
+          "median_rain_mm": 5.8,
+          "rain_days_ge_1mm": 1.7,
+          "rain_days_ge_10mm": 0.4,
+          "days_ge_30c": 5.8,
+          "days_ge_35c": 1.4,
+          "rh_9am_pct": 62,
+          "rh_3pm_pct": 50,
+          "temp_3pm_c": 23.8,
+          "wind_3pm_kmh": 23.0,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 21.0
+        },
+        "feb": {
+          "avg_high_c": 27.1,
+          "avg_low_c": 14.4,
+          "mean_rain_mm": 12.2,
+          "median_rain_mm": 6.8,
+          "rain_days_ge_1mm": 2.4,
+          "rain_days_ge_10mm": 0.2,
+          "days_ge_30c": 6.8,
+          "days_ge_35c": 1.1,
+          "rh_9am_pct": 64,
+          "rh_3pm_pct": 48,
+          "temp_3pm_c": 24.8,
+          "wind_3pm_kmh": 21.9,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 22.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "009746",
+          "station_name": "WITCHCLIFFE",
+          "record_from": 1999,
+          "status": "Closed 26 Oct 2021",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_009746.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_009746_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "sydney": {
+      "name": "Sydney",
+      "state": "NSW",
+      "lat": -33.86,
+      "lon": 151.21,
+      "notes": "Observatory Hill closed as a manual site 31 Aug 2020 but holds the 162-year normals used here. December wet-day base rates: any rain 37%, >=1 mm 25%, >=10 mm 7% - the numbers behind the NYE rain odds.",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "nov",
+          "dec",
+          "jan",
+          "feb"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 25.3,
+          "avg_low_c": 17.6,
+          "mean_rain_mm": 77.1,
+          "median_rain_mm": 59.7,
+          "rain_days_ge_1mm": 7.9,
+          "rain_days_ge_10mm": 2.2,
+          "days_ge_30c": 3.3,
+          "days_ge_35c": 0.8,
+          "rh_9am_pct": 67,
+          "rh_3pm_pct": 59,
+          "temp_3pm_c": 23.8,
+          "wind_3pm_kmh": 19.5,
+          "humidity": "humid",
+          "sea_surface_temp_c": 21.0
+        },
+        "jan": {
+          "avg_high_c": 26.0,
+          "avg_low_c": 18.8,
+          "mean_rain_mm": 101.2,
+          "median_rain_mm": 78.2,
+          "rain_days_ge_1mm": 8.6,
+          "rain_days_ge_10mm": 2.7,
+          "days_ge_30c": 3.3,
+          "days_ge_35c": 0.9,
+          "rh_9am_pct": 71,
+          "rh_3pm_pct": 62,
+          "temp_3pm_c": 24.8,
+          "wind_3pm_kmh": 17.9,
+          "humidity": "humid",
+          "sea_surface_temp_c": 22.5
+        },
+        "feb": {
+          "avg_high_c": 25.8,
+          "avg_low_c": 18.9,
+          "mean_rain_mm": 119.3,
+          "median_rain_mm": 93.6,
+          "rain_days_ge_1mm": 9.0,
+          "rain_days_ge_10mm": 3.0,
+          "days_ge_30c": 2.3,
+          "days_ge_35c": 0.5,
+          "rh_9am_pct": 74,
+          "rh_3pm_pct": 64,
+          "temp_3pm_c": 24.9,
+          "wind_3pm_kmh": 16.8,
+          "humidity": "humid",
+          "sea_surface_temp_c": 23.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "066062",
+          "station_name": "SYDNEY (OBSERVATORY HILL)",
+          "record_from": 1858,
+          "status": "Closed 31 Aug 2020",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_066062.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_066062_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "melbourne": {
+      "name": "Melbourne",
+      "state": "VIC",
+      "lat": -37.83,
+      "lon": 144.98,
+      "notes": "Olympic Park (2013-) is the current city site but has only 13 years and no humidity record; humidity and wind fall back to Melbourne Regional Office (086071, 1908-2015).",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "dec",
+          "jan",
+          "feb",
+          "mar"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 24.7,
+          "avg_low_c": 14.4,
+          "mean_rain_mm": 50.2,
+          "median_rain_mm": 40.6,
+          "rain_days_ge_1mm": 6.3,
+          "rain_days_ge_10mm": 1.6,
+          "days_ge_30c": 6.5,
+          "days_ge_35c": 2.2,
+          "rh_9am_pct": 62,
+          "rh_3pm_pct": 47,
+          "temp_3pm_c": 22.4,
+          "wind_3pm_kmh": 15.3,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 17.5
+        },
+        "jan": {
+          "avg_high_c": 26.8,
+          "avg_low_c": 16.5,
+          "mean_rain_mm": 53.3,
+          "median_rain_mm": 48.0,
+          "rain_days_ge_1mm": 5.4,
+          "rain_days_ge_10mm": 1.8,
+          "days_ge_30c": 8.8,
+          "days_ge_35c": 3.4,
+          "rh_9am_pct": 63,
+          "rh_3pm_pct": 47,
+          "temp_3pm_c": 24.2,
+          "wind_3pm_kmh": 14.8,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 19.0
+        },
+        "feb": {
+          "avg_high_c": 25.9,
+          "avg_low_c": 16.0,
+          "mean_rain_mm": 24.7,
+          "median_rain_mm": 20.5,
+          "rain_days_ge_1mm": 3.5,
+          "rain_days_ge_10mm": 0.7,
+          "days_ge_30c": 6.3,
+          "days_ge_35c": 2.1,
+          "rh_9am_pct": 66,
+          "rh_3pm_pct": 48,
+          "temp_3pm_c": 24.7,
+          "wind_3pm_kmh": 14.3,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 20.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "086338",
+          "station_name": "MELBOURNE (OLYMPIC PARK)",
+          "record_from": 2013,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_086338.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_086338_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "BOM climate statistics - humidity/wind fallback",
+          "station_id": "086071",
+          "station_name": "MELBOURNE REGIONAL OFFICE",
+          "record_from": 1908,
+          "status": "Closed 06 Jan 2015",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_086071.shtml",
+          "provides": [
+            "rh_9am_pct",
+            "rh_3pm_pct",
+            "temp_3pm_c",
+            "wind_3pm_kmh"
+          ]
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "hobart": {
+      "name": "Hobart",
+      "state": "TAS",
+      "lat": -42.89,
+      "lon": 147.33,
+      "notes": "Driest capital after Adelaide in summer. Windy: mean 3 pm wind 19 km/h in Dec/Jan. Bushfire and smoke, not rain, are the summer risk.",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "dec",
+          "jan",
+          "feb",
+          "mar"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 20.4,
+          "avg_low_c": 10.9,
+          "mean_rain_mm": 56.6,
+          "median_rain_mm": 47.1,
+          "rain_days_ge_1mm": 7.2,
+          "rain_days_ge_10mm": 1.3,
+          "days_ge_30c": 1.2,
+          "days_ge_35c": 0.2,
+          "rh_9am_pct": 60,
+          "rh_3pm_pct": 56,
+          "temp_3pm_c": 18.1,
+          "wind_3pm_kmh": 19.1,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 15.0
+        },
+        "jan": {
+          "avg_high_c": 21.8,
+          "avg_low_c": 12.1,
+          "mean_rain_mm": 46.3,
+          "median_rain_mm": 36.4,
+          "rain_days_ge_1mm": 5.6,
+          "rain_days_ge_10mm": 1.1,
+          "days_ge_30c": 1.9,
+          "days_ge_35c": 0.4,
+          "rh_9am_pct": 60,
+          "rh_3pm_pct": 54,
+          "temp_3pm_c": 19.5,
+          "wind_3pm_kmh": 19.0,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 16.5
+        },
+        "feb": {
+          "avg_high_c": 21.8,
+          "avg_low_c": 12.1,
+          "mean_rain_mm": 38.8,
+          "median_rain_mm": 31.7,
+          "rain_days_ge_1mm": 4.9,
+          "rain_days_ge_10mm": 1.1,
+          "days_ge_30c": 1.6,
+          "days_ge_35c": 0.4,
+          "rh_9am_pct": 64,
+          "rh_3pm_pct": 55,
+          "temp_3pm_c": 19.7,
+          "wind_3pm_kmh": 17.7,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 17.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "094029",
+          "station_name": "HOBART (ELLERSLIE ROAD)",
+          "record_from": 1882,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_094029.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_094029_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "launceston": {
+      "name": "Launceston",
+      "state": "TAS",
+      "lat": -41.42,
+      "lon": 147.12,
+      "notes": "Warmer days and cooler nights than Hobart (inland Tamar valley). North-east Tasmania is the region AFAC flagged for elevated fire risk in spring 2026.",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "dec",
+          "jan",
+          "feb",
+          "mar"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 22.7,
+          "avg_low_c": 10.9,
+          "mean_rain_mm": 47.8,
+          "median_rain_mm": 43.6,
+          "rain_days_ge_1mm": 6.2,
+          "rain_days_ge_10mm": 1.6,
+          "days_ge_30c": 0.9,
+          "days_ge_35c": 0.0,
+          "rh_9am_pct": 66,
+          "rh_3pm_pct": 49,
+          "temp_3pm_c": 20.9,
+          "wind_3pm_kmh": 20.9,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 16.0
+        },
+        "jan": {
+          "avg_high_c": 24.7,
+          "avg_low_c": 12.6,
+          "mean_rain_mm": 44.5,
+          "median_rain_mm": 36.8,
+          "rain_days_ge_1mm": 5.0,
+          "rain_days_ge_10mm": 1.3,
+          "days_ge_30c": 2.1,
+          "days_ge_35c": 0.1,
+          "rh_9am_pct": 69,
+          "rh_3pm_pct": 48,
+          "temp_3pm_c": 22.8,
+          "wind_3pm_kmh": 20.8,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 17.5
+        },
+        "feb": {
+          "avg_high_c": 24.7,
+          "avg_low_c": 12.3,
+          "mean_rain_mm": 31.1,
+          "median_rain_mm": 24.6,
+          "rain_days_ge_1mm": 4.1,
+          "rain_days_ge_10mm": 1.0,
+          "days_ge_30c": 1.6,
+          "days_ge_35c": 0.0,
+          "rh_9am_pct": 74,
+          "rh_3pm_pct": 49,
+          "temp_3pm_c": 23.1,
+          "wind_3pm_kmh": 18.5,
+          "humidity": "moderate",
+          "sea_surface_temp_c": 18.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "091237",
+          "station_name": "LAUNCESTON (TI TREE BEND)",
+          "record_from": 1980,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_091237.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_091237_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "cairns": {
+      "name": "Cairns",
+      "state": "QLD",
+      "lat": -16.87,
+      "lon": 145.75,
+      "notes": "Wet-season base. February is the wettest month, not January. 26 days >=30 C in December and January, with 9 am humidity 70-78%.",
+      "flags": {
+        "stinger_season": true,
+        "cyclone_window": true,
+        "bushfire_months": []
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 31.5,
+          "avg_low_c": 23.4,
+          "mean_rain_mm": 193.8,
+          "median_rain_mm": 130.0,
+          "rain_days_ge_1mm": 10.7,
+          "rain_days_ge_10mm": 4.3,
+          "days_ge_30c": 26.5,
+          "days_ge_35c": 0.7,
+          "rh_9am_pct": 70,
+          "rh_3pm_pct": 62,
+          "temp_3pm_c": 29.9,
+          "wind_3pm_kmh": 17.0,
+          "humidity": "humid",
+          "sea_surface_temp_c": 28.0
+        },
+        "jan": {
+          "avg_high_c": 31.5,
+          "avg_low_c": 23.8,
+          "mean_rain_mm": 404.8,
+          "median_rain_mm": 361.9,
+          "rain_days_ge_1mm": 15.8,
+          "rain_days_ge_10mm": 8.3,
+          "days_ge_30c": 26.1,
+          "days_ge_35c": 1.1,
+          "rh_9am_pct": 75,
+          "rh_3pm_pct": 66,
+          "temp_3pm_c": 29.9,
+          "wind_3pm_kmh": 15.6,
+          "humidity": "humid",
+          "sea_surface_temp_c": 29.0
+        },
+        "feb": {
+          "avg_high_c": 31.3,
+          "avg_low_c": 23.8,
+          "mean_rain_mm": 437.5,
+          "median_rain_mm": 395.8,
+          "rain_days_ge_1mm": 16.1,
+          "rain_days_ge_10mm": 9.4,
+          "days_ge_30c": 22.1,
+          "days_ge_35c": 0.9,
+          "rh_9am_pct": 78,
+          "rh_3pm_pct": 69,
+          "temp_3pm_c": 29.6,
+          "wind_3pm_kmh": 14.6,
+          "humidity": "very humid",
+          "sea_surface_temp_c": 29.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "031011",
+          "station_name": "CAIRNS AERO",
+          "record_from": 1941,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_031011.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_031011_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "port_douglas": {
+      "name": "Port Douglas",
+      "state": "QLD",
+      "lat": -16.48,
+      "lon": 145.46,
+      "notes": "Warner St gauge has a 132-year rainfall record (1887-2020) - the longest of any base in this dataset - but only a short temperature record and no wind record. Slightly cooler and marginally drier than Cairns.",
+      "flags": {
+        "stinger_season": true,
+        "cyclone_window": true,
+        "bushfire_months": []
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 30.3,
+          "avg_low_c": 23.3,
+          "mean_rain_mm": 213.5,
+          "median_rain_mm": 137.4,
+          "rain_days_ge_1mm": 10.1,
+          "rain_days_ge_10mm": 4.5,
+          "days_ge_30c": null,
+          "days_ge_35c": null,
+          "rh_9am_pct": 72,
+          "rh_3pm_pct": 68,
+          "temp_3pm_c": 29.4,
+          "wind_3pm_kmh": null,
+          "humidity": "very humid",
+          "sea_surface_temp_c": 28.0
+        },
+        "jan": {
+          "avg_high_c": 30.3,
+          "avg_low_c": 23.7,
+          "mean_rain_mm": 395.8,
+          "median_rain_mm": 342.8,
+          "rain_days_ge_1mm": 13.8,
+          "rain_days_ge_10mm": 7.8,
+          "days_ge_30c": null,
+          "days_ge_35c": null,
+          "rh_9am_pct": 78,
+          "rh_3pm_pct": 73,
+          "temp_3pm_c": 29.4,
+          "wind_3pm_kmh": null,
+          "humidity": "very humid",
+          "sea_surface_temp_c": 29.0
+        },
+        "feb": {
+          "avg_high_c": 30.1,
+          "avg_low_c": 23.5,
+          "mean_rain_mm": 422.0,
+          "median_rain_mm": 378.7,
+          "rain_days_ge_1mm": 14.2,
+          "rain_days_ge_10mm": 8.2,
+          "days_ge_30c": null,
+          "days_ge_35c": null,
+          "rh_9am_pct": 81,
+          "rh_3pm_pct": 77,
+          "temp_3pm_c": 29.3,
+          "wind_3pm_kmh": null,
+          "humidity": "oppressive",
+          "sea_surface_temp_c": 29.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "031052",
+          "station_name": "PORT DOUGLAS - WARNER ST",
+          "record_from": 1884,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_031052.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_031052_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "mission_beach": {
+      "name": "Mission Beach",
+      "state": "QLD",
+      "lat": -17.52,
+      "lon": 146.03,
+      "notes": "PROXY STATION: BOM has no long-record station at Mission Beach itself; Innisfail (032025, ~45 km N, same wet-tropics coastal strip) is used. Innisfail is the wettest base in this dataset - February mean 584 mm. Treat as an upper bound for Mission Beach.",
+      "flags": {
+        "stinger_season": true,
+        "cyclone_window": true,
+        "bushfire_months": []
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 30.8,
+          "avg_low_c": 22.1,
+          "mean_rain_mm": 263.7,
+          "median_rain_mm": 178.0,
+          "rain_days_ge_1mm": 10.5,
+          "rain_days_ge_10mm": 5.0,
+          "days_ge_30c": 19.7,
+          "days_ge_35c": 0.5,
+          "rh_9am_pct": 76,
+          "rh_3pm_pct": 69,
+          "temp_3pm_c": 29.2,
+          "wind_3pm_kmh": 13.3,
+          "humidity": "very humid",
+          "sea_surface_temp_c": 28.0
+        },
+        "jan": {
+          "avg_high_c": 30.9,
+          "avg_low_c": 22.9,
+          "mean_rain_mm": 512.3,
+          "median_rain_mm": 452.8,
+          "rain_days_ge_1mm": 14.7,
+          "rain_days_ge_10mm": 8.8,
+          "days_ge_30c": 21.8,
+          "days_ge_35c": 0.9,
+          "rh_9am_pct": 82,
+          "rh_3pm_pct": 72,
+          "temp_3pm_c": 29.2,
+          "wind_3pm_kmh": 12.6,
+          "humidity": "very humid",
+          "sea_surface_temp_c": 29.0
+        },
+        "feb": {
+          "avg_high_c": 30.7,
+          "avg_low_c": 22.9,
+          "mean_rain_mm": 583.5,
+          "median_rain_mm": 493.8,
+          "rain_days_ge_1mm": 15.3,
+          "rain_days_ge_10mm": 9.6,
+          "days_ge_30c": 17.7,
+          "days_ge_35c": 0.8,
+          "rh_9am_pct": 85,
+          "rh_3pm_pct": 74,
+          "temp_3pm_c": 29.0,
+          "wind_3pm_kmh": 11.4,
+          "humidity": "very humid",
+          "sea_surface_temp_c": 29.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "032025",
+          "station_name": "INNISFAIL",
+          "record_from": 1881,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_032025.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_032025_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "byron_bay": {
+      "name": "Byron Bay",
+      "state": "NSW",
+      "lat": -28.64,
+      "lon": 153.64,
+      "notes": "Cape Byron AWS (058216) is an exposed headland site with no humidity record; humidity and wind fall back to Ballina Airport (058198, 25 km S). February is the wettest month. Outside the cyclone zone but exposed to ex-tropical-cyclone rain events and east-coast lows.",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "oct",
+          "nov",
+          "dec"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 26.8,
+          "avg_low_c": 20.0,
+          "mean_rain_mm": 128.2,
+          "median_rain_mm": 113.2,
+          "rain_days_ge_1mm": 10.0,
+          "rain_days_ge_10mm": 3.7,
+          "days_ge_30c": 3.8,
+          "days_ge_35c": 0.0,
+          "rh_9am_pct": 70,
+          "rh_3pm_pct": 64,
+          "temp_3pm_c": 25.9,
+          "wind_3pm_kmh": 24.7,
+          "humidity": "humid",
+          "sea_surface_temp_c": 24.0
+        },
+        "jan": {
+          "avg_high_c": 28.1,
+          "avg_low_c": 21.3,
+          "mean_rain_mm": 149.6,
+          "median_rain_mm": 127.0,
+          "rain_days_ge_1mm": 10.5,
+          "rain_days_ge_10mm": 3.8,
+          "days_ge_30c": 7.5,
+          "days_ge_35c": 0.0,
+          "rh_9am_pct": 74,
+          "rh_3pm_pct": 67,
+          "temp_3pm_c": 26.7,
+          "wind_3pm_kmh": 24.4,
+          "humidity": "humid",
+          "sea_surface_temp_c": 25.5
+        },
+        "feb": {
+          "avg_high_c": 27.6,
+          "avg_low_c": 21.2,
+          "mean_rain_mm": 199.6,
+          "median_rain_mm": 174.0,
+          "rain_days_ge_1mm": 12.1,
+          "rain_days_ge_10mm": 4.8,
+          "days_ge_30c": 4.7,
+          "days_ge_35c": 0.0,
+          "rh_9am_pct": 78,
+          "rh_3pm_pct": 68,
+          "temp_3pm_c": 26.5,
+          "wind_3pm_kmh": 23.0,
+          "humidity": "very humid",
+          "sea_surface_temp_c": 26.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "058216",
+          "station_name": "BYRON BAY (CAPE BYRON AWS)",
+          "record_from": 1994,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_058216.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_058216_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "BOM climate statistics - humidity/wind fallback",
+          "station_id": "058198",
+          "station_name": "BALLINA AIRPORT AWS",
+          "record_from": 1992,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_058198.shtml",
+          "provides": [
+            "rh_9am_pct",
+            "rh_3pm_pct",
+            "temp_3pm_c",
+            "wind_3pm_kmh"
+          ]
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    },
+    "adelaide": {
+      "name": "Adelaide",
+      "state": "SA",
+      "lat": -34.93,
+      "lon": 138.58,
+      "notes": "West Terrace / Ngayirdapira is the current official site (Kent Town 023090 closed Jul 2020 and ran ~1 C warmer). Driest and among the hottest of the southern bases: 5.5 days >=35 C in January.",
+      "flags": {
+        "stinger_season": false,
+        "cyclone_window": false,
+        "bushfire_months": [
+          "dec",
+          "jan",
+          "feb",
+          "mar"
+        ]
+      },
+      "months": {
+        "dec": {
+          "avg_high_c": 26.9,
+          "avg_low_c": 15.1,
+          "mean_rain_mm": 25.9,
+          "median_rain_mm": 18.8,
+          "rain_days_ge_1mm": 4.0,
+          "rain_days_ge_10mm": 0.7,
+          "days_ge_30c": 9.1,
+          "days_ge_35c": 3.8,
+          "rh_9am_pct": 52,
+          "rh_3pm_pct": 43,
+          "temp_3pm_c": 23.8,
+          "wind_3pm_kmh": 19.5,
+          "humidity": "dry",
+          "sea_surface_temp_c": 19.5
+        },
+        "jan": {
+          "avg_high_c": 28.7,
+          "avg_low_c": 16.6,
+          "mean_rain_mm": 20.1,
+          "median_rain_mm": 13.6,
+          "rain_days_ge_1mm": 2.8,
+          "rain_days_ge_10mm": 0.5,
+          "days_ge_30c": 11.9,
+          "days_ge_35c": 5.5,
+          "rh_9am_pct": 50,
+          "rh_3pm_pct": 39,
+          "temp_3pm_c": 26.7,
+          "wind_3pm_kmh": 19.2,
+          "humidity": "dry",
+          "sea_surface_temp_c": 21.0
+        },
+        "feb": {
+          "avg_high_c": 28.6,
+          "avg_low_c": 16.8,
+          "mean_rain_mm": 20.2,
+          "median_rain_mm": 9.9,
+          "rain_days_ge_1mm": 2.5,
+          "rain_days_ge_10mm": 0.5,
+          "days_ge_30c": 10.7,
+          "days_ge_35c": 4.3,
+          "rh_9am_pct": 52,
+          "rh_3pm_pct": 40,
+          "temp_3pm_c": 27.0,
+          "wind_3pm_kmh": 17.4,
+          "humidity": "dry",
+          "sea_surface_temp_c": 22.0
+        }
+      },
+      "sources": [
+        {
+          "type": "BOM climate statistics (main + all-available tables)",
+          "station_id": "023000",
+          "station_name": "ADELAIDE (WEST TERRACE / NGAYIRDAPIRA)",
+          "record_from": 1839,
+          "status": "Open",
+          "url": "http://www.bom.gov.au/climate/averages/tables/cw_023000.shtml",
+          "url_extended": "http://www.bom.gov.au/climate/averages/tables/cw_023000_All.shtml",
+          "provides": "all fields except those listed under the fallback source"
+        },
+        {
+          "type": "sea surface temperature",
+          "value": "approximate monthly climatology, +/- 1.5 C",
+          "note": "BOM does not publish tabular monthly SST normals by town. These are indicative regional climatological values, not station observations. Replace with BOM SST analysis or the Open-Meteo Marine API before surfacing them as data.",
+          "url": "http://www.bom.gov.au/climate/enso/#tabs=Sea-surface"
+        }
+      ]
+    }
+  }
+}
