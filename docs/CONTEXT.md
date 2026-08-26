@@ -5,7 +5,7 @@ Glossary for the Australia trip planner. Terms only — no implementation detail
 ## Terms
 
 - **Trip** — the whole journey: leave Valencia in December 2026, return from Australia's east coast in late January–mid February 2027.
-- **Traveller** — one of the two people taking the Trip. Costs are usually quoted per couple unless marked per person.
+- **Traveller** — one of the two people taking the Trip. Costs are usually quoted per couple unless marked per person. The two have distinct tastes the Plan must balance: **Paul** likes sports (minor sport outings fine; never build a big spend or a relocation around sport — it's a one-sided pick). **His girlfriend** is the hippie of the pair: psytrance festivals, doofs, hippie markets, alternative culture — these rate as first-class Event spend candidates, not curiosities.
 - **Anchor** — a fixed or semi-fixed date+place commitment the itinerary must honour. Hard anchors: Christmas in Perth (family), New Year's Eve in Sydney. Soft anchor: Australia Day (26 Jan) — be somewhere good for it, city decided by itinerary flow.
 - **Capsule** — a pre-researched, self-contained block of the trip that can be toggled on or off the Plan and moved around the calendar: a destination plus its recommended duration, best-of itinerary, and cost estimate (e.g. "Margaret River, 3 days", "Rottnest, day trip", "Great Barrier Reef, N days from a chosen base").
 - **Capsule idea** — a shallow catalog entry: a highly-rated Australian holiday idea captured in a few lines (name, region, rough days, rough cost, why people rate it, season fit) without deep research. The Catalog holds hundreds of these; the Travellers sift them, and survivors get promoted to full Capsules via research.
