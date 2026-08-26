@@ -4,12 +4,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ------------------------------------------------------------------
+   Southbound design tokens.
+
+   The palette is warm-bone type on cold navy, with a coral accent —
+   deliberately not shadcn's default neutral grey. Four semantic signal
+   colours (sea / good / warn / over) carry the domain meaning: sea =
+   travel + weather, good = under control, warn = attention, over =
+   budget or lock breached.
+
+   The Mapbox stage commits to a dark style, but the chrome does not:
+   the light palette is a warm parchment that reads as bone panels
+   floating over the dark globe.
+   ------------------------------------------------------------------ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-instrument-sans);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-plex-mono);
+  --font-heading: var(--font-bricolage);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +54,19 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  --color-ink: var(--sb-ink);
+  --color-panel: var(--sb-panel);
+  --color-panel-2: var(--sb-panel-2);
+  --color-hairline: var(--sb-line);
+  --color-dim: var(--sb-dim);
+  --color-faint: var(--sb-faint);
+  --color-brand: var(--sb-accent);
+  --color-sea: var(--sb-sea);
+  --color-good: var(--sb-good);
+  --color-warn: var(--sb-warn);
+  --color-over: var(--sb-over);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,73 +76,95 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Light — warm parchment chrome. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --sb-ink: #f5f1e8;
+  --sb-panel: #fffdf8;
+  --sb-panel-2: #efe9dc;
+  --sb-line: #d8cfbe;
+  --sb-text: #1d2733;
+  --sb-dim: #5a6673;
+  --sb-faint: #98a2ac;
+  --sb-accent: #d8452a;
+  --sb-sea: #2e7fa3;
+  --sb-good: #2f8b5c;
+  --sb-warn: #a97a10;
+  --sb-over: #c53b3b;
+  --sb-panel-glass: rgb(255 253 248 / 0.9);
+
+  --background: var(--sb-ink);
+  --foreground: var(--sb-text);
+  --card: var(--sb-panel);
+  --card-foreground: var(--sb-text);
+  --popover: var(--sb-panel);
+  --popover-foreground: var(--sb-text);
+  --primary: var(--sb-accent);
+  --primary-foreground: #fffdf8;
+  --secondary: var(--sb-panel-2);
+  --secondary-foreground: var(--sb-text);
+  --muted: var(--sb-panel-2);
+  --muted-foreground: var(--sb-dim);
+  --accent: var(--sb-panel-2);
+  --accent-foreground: var(--sb-text);
+  --destructive: var(--sb-over);
+  --border: var(--sb-line);
+  --input: var(--sb-line);
+  --ring: var(--sb-accent);
+  --chart-1: var(--sb-accent);
+  --chart-2: var(--sb-sea);
+  --chart-3: var(--sb-good);
+  --chart-4: var(--sb-warn);
+  --chart-5: var(--sb-over);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: var(--sb-panel);
+  --sidebar-foreground: var(--sb-text);
+  --sidebar-primary: var(--sb-accent);
+  --sidebar-primary-foreground: #fffdf8;
+  --sidebar-accent: var(--sb-panel-2);
+  --sidebar-accent-foreground: var(--sb-text);
+  --sidebar-border: var(--sb-line);
+  --sidebar-ring: var(--sb-accent);
+}
+
+/* Dark — cold navy panels, bone type. The globe's native register. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sb-ink: #0e1622;
+    --sb-panel: #16202e;
+    --sb-panel-2: #1c2836;
+    --sb-line: #2a3a4c;
+    --sb-text: #e9e4d8;
+    --sb-dim: #93a0ad;
+    --sb-faint: #5c6b79;
+    --sb-accent: #ff6b4a;
+    --sb-sea: #5fa8c7;
+    --sb-good: #4caf7d;
+    --sb-warn: #e3b34a;
+    --sb-over: #de5b5b;
+    --sb-panel-glass: rgb(18 27 40 / 0.82);
+
+    --primary-foreground: #121b28;
+    --sidebar-primary-foreground: #121b28;
+  }
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sb-ink: #0e1622;
+  --sb-panel: #16202e;
+  --sb-panel-2: #1c2836;
+  --sb-line: #2a3a4c;
+  --sb-text: #e9e4d8;
+  --sb-dim: #93a0ad;
+  --sb-faint: #5c6b79;
+  --sb-accent: #ff6b4a;
+  --sb-sea: #5fa8c7;
+  --sb-good: #4caf7d;
+  --sb-warn: #e3b34a;
+  --sb-over: #de5b5b;
+  --sb-panel-glass: rgb(18 27 40 / 0.82);
+
+  --primary-foreground: #121b28;
+  --sidebar-primary-foreground: #121b28;
 }
 
 @layer base {
@@ -127,4 +177,53 @@
   html {
     @apply font-sans;
   }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), Georgia, serif;
+    text-wrap: balance;
+  }
+}
+
+@utility sb-panel {
+  background: var(--sb-panel-glass);
+  border: 1px solid color-mix(in srgb, var(--sb-line) 85%, transparent);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow:
+    0 1px 0 0 color-mix(in srgb, var(--sb-text) 8%, transparent) inset,
+    0 18px 40px -18px rgb(0 0 0 / 0.55);
+}
+
+/* Uppercase micro-label. The one typographic move that keeps the HUD
+   readable at 10px without shouting. */
+@utility sb-label {
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--sb-dim);
+}
+
+@utility sb-num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Thin scrollbars so the catalog list does not grow a chunky OS bar
+   over the glass panel. */
+@utility sb-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-line) transparent;
+}
+
+/* Mapbox's own chrome, pulled into the palette. */
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib {
+  opacity: 0.45;
+}
+.mapboxgl-ctrl-bottom-left,
+.mapboxgl-ctrl-bottom-right {
+  z-index: 1;
 }
