@@ -190,6 +190,50 @@ Add-ons that the teaser rate hides [measured]:
 
 Add ~A$25–35/day if buying the waiver at the counter instead, and A$50–150 one-off for airport pickup fees and one-way drop fees.
 
+> **Note on the tiers above:** the "budget" tier (A$90/day mainland, A$130/day Tasmania) reflects **major-brand** pricing (Avis/Budget/Hertz/Thrifty/Europcar/Sixt) as surfaced by aggregators. It is not the market floor. See below.
+
+#### Budget-operator floor (added 2026-08-26 after user challenge)
+
+**Pricing rule applied here:** the floor is the **bare base rate** for the cheapest credible operator, small car, booked ahead. Excess-reduction and third-party excess cover are **deliberately excluded** from the per-day figures — the travellers are relying on complimentary credit-card rental excess cover. The card-cover caveats are in "What the floor does not include" below and must be checked before the model is trusted.
+
+**Independent operators — advertised base rates**
+
+| Operator | Market | Small car, advertised base | Standard excess | Notes |
+|---|---|---|---|---|
+| **Bayswater / No Birds** | Sydney (Mascot, Woolloomooloo, Artarmon), Perth | **A$30/day** "Early Bird" small hatch (Kia Stonic / Suzuki Swift / Mazda CX-3); A$35/day small-medium hatch | **A$5,000** | Fleet under 3 years old. **No airport counter** — three suburban depots, shuttle from SYD instead, so no airport surcharge. No km cap on standard rentals (a separate "City Use" rate is capped at 100 km/day). Ages 21–84, P1/P2 and international licences accepted. Damage-reduction to A$0 is A$15/day if wanted. 5% off for prepay 48h ahead. |
+| **Bargain Car Rentals** | Hobart city + Hobart Airport, Launceston Airport, Cairns, mainland capitals | **A$40/day** compact, Hobart, quoted for 29 Aug–3 Sep 2026 (off-peak); site banner "from A$35/day"; A$38.85/day seen as cheapest Hobart supplier in a 72-hour aggregator sample | **A$5,500** standard / A$6,500 commercial | Free additional driver, **free under-25 drivers**, no booking fee, free cancellation. Gold package drops excess to A$2,500, Platinum to nil. Min age 21 (25 luxury), 12 months' licence. Bond A$500 pre-auth. **Claims handling fee A$270 (single-vehicle/theft) to A$370 (multi-vehicle) on top of the excess.** 1.4% card surcharge. |
+| **Lo-Cost Auto Rent** | Hobart city, Hobart Airport, Launceston Airport | Rates not published on-site (phone/booking-form only) | **A$990** (AU/NZ licence) / A$1,500 (overseas licence) | Family-run since 1984. **The lowest standard excess found anywhere in this research by a factor of five** — which matters more than the headline rate if card cover has gaps. Fleet is deliberately older, "average 3 to 7 years". Min age **19**, P-platers accepted with 2 years' licence. Covers exactly the Hobart-pickup / Launceston-drop pattern this trip needs. **Ring for a January quote — this is the single highest-value call to make.** |
+| **East Coast Car Rentals** | Cairns, Sydney, Hobart, Launceston + 6 more airports | A$36.17/day seen in a 72-hour Cairns aggregator sample | not published | **Unlimited km on most rentals**, free airport shuttle at Cairns. Ran a 15% off all-inclusive/prepaid promo for Jan–Mar 2026 pickups; watch for the 2027 equivalent. |
+| **Apex** | Hobart Airport + mainland | from A$55/day at HBA (aggregator) | **A$2,750** | Mid-pack on rate, but half the excess of the other budget operators. |
+| **Redspot** | Hobart, Launceston | A$43/day economy (off-peak, VroomVroomVroom) | not published | Cheapest *listed* supplier on VVV's Hobart page. Does published Hobart↔Launceston one-way hire. |
+| **Alpha Car Hire**, **Atlas**, **SafeDrive**, **YesDrive**, **Economy Rent a Car**, **Kangaroo** | various | A$31–37/day off-peak teasers (Kayak Hobart supplier list: SafeDrive A$31, Kangaroo A$33, YesDrive A$33, Economy A$37) | not published | Aggregator teasers only; treat as unverified until quoted with dates. |
+
+**Jucy** is now effectively a campervan/motorhome brand in Australia (A$200+/day compact SUV, A$300+/day campervans) — **not a budget car option** for this trip. **"RediCar"** does not appear to exist as a Tasmanian operator; the likely intended name is **Redspot** (listed above).
+
+**Turo / peer-to-peer:** Turo operates in Australia (it absorbed Car Next Door) with listings in Sydney, Hobart and Cairns, and hosts commonly discount 3+/7+/30+ day trips. **No verifiable dated January price could be pulled** — turo.com returns 403 to automated fetches and prices are per-host. More importantly, **Turo is the wrong tool for this trip's insurance strategy**: Turo's guest protection is provided by Turo Travels Mutual, a discretionary mutual, **not an insurance policy**; decline it and the guest is liable for damage or theft "up to A$200,000". Complimentary credit-card rental excess cover almost universally requires a *licensed/recognised hire company under a formal rental agreement* and that the rental company's own waiver be taken — a peer-to-peer trip will very likely fall outside it. **Do not model Turo as the floor.** Uber Carshare (ex-Car Next Door) is also a poor fit: it prices per-hour **plus per-km**, so multi-hundred-km Tasmania days blow out (reported A$102 for one day including distance).
+
+**Corrected budget floor, per day held, base rate only**
+
+| Market | Off-peak observed base | **January 2027 budget floor (plan on)** | Derivation |
+|---|---|---|---|
+| **Mainland cities (Sydney, Cairns)** | A$30–40/day | **A$45/day** | No Birds Sydney publishes A$30/day small hatch year-round from suburban depots; Cairns is in its **low** season in January (wet season), with East Coast/Atlas teasers at A$36/day. A$45 carries a modest peak/availability buffer over the published rate. Cairns late-January is the cheaper end of this. |
+| **Tasmania (Hobart pickup, Jan)** | A$38–43/day | **A$85/day** | Budget operators sit at A$38–43/day off-peak. Hobart's January multiplier is real and large: VroomVroomVroom's Hobart average runs A$64/day in August vs **A$171/day in January** (×2.7); Kayak's Hobart average runs A$39/day in August vs A$116/day in December (×3.0). Those averages are all-classes and major-brand-weighted. Applying a conservative ~×2 to the *independent* small-car base gives **A$85/day**, well under the A$130 previously modelled but well over the off-peak rate. **Confidence: low-medium — this is the one number that most needs a real dated quote.** |
+
+Net effect on the model: the mainland car add-on floor drops from A$90 to **A$45/day**, and Tasmania from A$130 to **A$85/day**. Over a 9-day Tasmania leg plus 3 Sydney days that is roughly **A$540** back into the A$500/couple/day cap.
+
+**What the floor does not include — caveats, not dollars**
+
+- **Credit-card excess cover has conditions that bite.** Typically: the trip must be paid on the card; **only the cardholder is covered to drive** (a second driver voids it); the hire must be from a licensed rental company with the company's own insurance/waiver in place; hire periods are usually capped at 30 days; and the standard exclusions are **windscreens, tyres, headlights, and overhead/underbody damage** — which are precisely the Tasmanian gravel-road failure modes. Unsealed-road driving is excluded under both most card policies and most rental agreements. **Confirm the specific card's PDS covers *domestic* Australian hire** — several issuers (CommBank, ING, BankVic, Qudos) restrict the benefit to overseas travel only. And note **cards are actively withdrawing this benefit: a range of cards stopped offering complimentary rental vehicle cover from 15 May 2026** (BOQ and NAB flagged) — re-verify the card is still covered before relying on it.
+- **Excess sizes if the card cover fails:** No Birds A$5,000, Bargain A$5,500 (A$6,500 commercial), Apex A$2,750, **Lo-Cost A$990**. Lo-Cost's A$990 excess is small enough to self-insure, which is a genuinely different risk posture from the others.
+- **Claims handling fees sit *on top* of the excess** and card policies generally reimburse the excess, not admin fees — Bargain charges A$270–370, plus an administration fee "up to A$65".
+- **Airport vs suburban pickup:** an airport counter typically adds a **10–15% premium location surcharge**. No Birds sidesteps this entirely by being suburban-only with a shuttle; East Coast runs a free Cairns airport shuttle. Prefer city/suburban depots.
+- **One-way Hobart → Launceston:** no operator publishes the fee. Budget/Sixt/Redspot/Bargain/Lo-Cost all support it; Lo-Cost and Bargain have Launceston Airport counters. Budget one-way fees in Australia generally run **A$50–150** one-off, and some operators fold relocation into the quoted rate. **Get this quoted rather than assumed.**
+- **Fleet age:** No Birds is under 3 years; Lo-Cost is deliberately 3–7 years (that is the trade for the A$990 excess and the low rate).
+- **Km limits:** unlimited km is standard at East Coast and on No Birds' standard rate. Verify per-quote — a capped "city use" rate is useless for a Tasmania loop.
+- **Availability, not price, is the Tasmania constraint.** Independent Tasmanian fleets are small and sell out over the Christmas–January school holidays. The A$85 floor only exists if booked by **late September / early October 2026**.
+
+**Action to close the remaining uncertainty:** phone **Lo-Cost Auto Rent (03) 6231 0550** and **Bargain Car Rentals (03) 6165 0910** for a dated January 2027 Hobart-pickup / Launceston-drop quote, and price No Birds Sydney directly on nobirds.com.au for the Sydney dates. Aggregator engines returned **0 results** for January 2027 dates as of 26 Aug 2026, so no live dated quote could be captured in this pass.
+
 #### Peak availability warnings
 
 1. **Tasmania in January is the real constraint, not the price.** January is Tasmania's dearest car-hire month by a wide margin, the island's fleet is small, and vehicles sell out over the Christmas–January school holidays. **Book Tasmania by late September / early October 2026.** If a Tasmania Capsule is toggled on, the site should say so.
@@ -376,6 +420,25 @@ All accessed **26 August 2026**.
 - [KAYAK Australia — Cairns car hire](https://www.kayak.com.au/Cheap-Cairns-Car-Hire.23637.cars.ksp)
 - [National Cover Insurance — Rental car excess reduction costs](https://nationalcover.com.au/rental-car-excess-reduction/) — counter waiver A$30–45/day, standard excess A$3,300–8,000+
 - [RentalCover — Car rental insurance in Australia](https://rentalcover.com/en/rental-guides/car-rental-insurance-australia) — third-party cover A$5–12/day
+
+**Car rental — budget operators (all accessed 26 Aug 2026)**
+- [No Birds / Bayswater Car Rental — Sydney car hire](https://www.nobirds.com.au/sydney/car-hire) — small hatch A$30/day Early Bird, small-medium hatch A$35/day, small SUV A$40/day; excess A$5,000, damage reduction to A$0 A$15/day; ages 21–84; Mascot / Woolloomooloo / Artarmon depots, no airport counter; standard rentals uncapped km, "City Use" rate capped at 100 km/day
+- [Bargain Car Rentals — Hobart](https://bargaincarrentals.com.au/locations/hobart/) — "expect to pay between A$35 and A$85 a day"; 173 Harrington St Hobart city + Hobart Airport; free additional driver, free under-25 drivers
+- [Bargain Car Rentals — Terms & Conditions](https://bargaincarrentals.com.au/terms-and-conditions/) — excess A$5,500 standard / A$6,500 commercial, Gold A$2,500, Platinum nil; claims handling fee A$270–370; admin fee up to A$65; bond A$500; min age 21 (25 luxury), max 85; 1.4% card surcharge
+- [Lo-Cost Auto Rent — Tasmania](https://www.locostautorent.com/) — Hobart city, Hobart Airport, Launceston Airport; excess **A$990** AU/NZ licence, A$1,500 overseas; fleet "average 3 to 7 years old"; min age 19, P-platers with 2 years' licence; operating since 1984; rates not published online, (03) 6231 0550
+- [East Coast Car Rentals — Cairns Airport](https://www.eastcoastcarrentals.com.au/car-hire/cairns/) — unlimited km on most classes, free airport shuttle; rates quote-only
+- [East Coast Car Rentals — 15% off Jan–Mar 2026 pickups](https://www.eastcoastcarrentals.com.au/15offny2026/) — promo pattern to watch for Jan 2027
+- [Apex Car Rentals — excess reduction cover](https://www.carhireexcess.com.au/guides/apex-car-rental/) — standard excess A$2,750, reducible to A$500 or nil
+- [VroomVroomVroom — Hobart car hire](https://www.vroomvroomvroom.com.au/locations/hobart/) — **January A$171/day vs August A$64/day (×2.7)**; Bargain compact A$40/day and Redspot economy A$43/day quoted for 29 Aug–3 Sep 2026
+- [KAYAK Australia — Hobart car hire](https://www.kayak.com.au/Cheap-Hobart-Car-Hire.12823.cars.ksp) — **August A$39/day vs December A$116/day (×3.0)**; cheapest suppliers SafeDrive A$31, Kangaroo A$33, YesDrive A$33, Economy Rent a Car A$37
+- [Road Genius — Hobart Airport car hire](https://roadgenius.com.au/cars/rental/australia/hobart/hba-airport/) — airport counters carry a 10–15% premium location surcharge vs off-airport
+- KAYAK dated search, Hobart 10–17 Jan 2027 — **returned 0 results** on 26 Aug 2026; dated Jan-2027 aggregator quotes not yet obtainable
+
+**Car rental — insurance and card cover (all accessed 26 Aug 2026)**
+- [Finder — Cheap car hire excess insurance](https://www.finder.com.au/travel-insurance/car-rental-excess-insurance/cheap-car-hire-excess-insurance) — RACV A$6.31/day for A$4,000 cover, nil excess; Tripcover A$11.15/day, cover to A$100,000
+- [Canstar — Credit cards with complimentary car rental excess insurance](https://www.canstar.com.au/credit-cards/credit-cards-included-rental-car-insurance/) — **from 15 May 2026 a range of cards no longer offer complimentary rental vehicle cover (BOQ, NAB flagged)**; CommBank, ING, BankVic, Qudos restrict cover to overseas travel only; ANZ, Bendigo, Heritage, HSBC, NAB, St.George, Westpac list domestic cover; requires charging travel costs to the card and taking the hire company's own insurance
+- [CHOICE — Car hire excess and hidden fees](https://www.choice.com.au/travel/on-holidays/car-hire/articles/car-hire-excess-and-hidden-fees) — card policies typically exclude windscreens, tyres, headlights, overhead/underbody damage and unsealed-road use; only the cardholder is covered; hire period usually capped at 30 days
+- [Turo Australia — choosing a protection plan (guests)](https://help.turo.com/en_us/choosing-a-protection-plan-au-guests-H1_MqEuSi) and [Turo Travels Mutual](https://turo.com/au/en/policies/turotravels) — protection is a discretionary mutual, **not insurance**; declining leaves the guest liable for damage/theft up to A$200,000
 
 **NYE and peak season**
 - [Where to Stay for Sydney NYE — Sydney Expert](https://sydneyexpert.com/where-to-stay-for-new-years-eve-in-sydney/) — pub. 25 Jul 2026; 3-night harbourside minimum, YHA 7-night package, Airbnb cancellation risk, suburb alternatives
