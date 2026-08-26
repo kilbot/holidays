@@ -1,0 +1,1319 @@
+[
+  {
+    "name": "Coral Bay — Ningaloo reef-off-the-beach",
+    "region": "WA — Gascoyne / Coral Bay",
+    "tags": ["reef", "snorkel", "beach", "wildlife", "remote"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "900-1600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Water is warm and the reef starts 20m off the sand — you can snorkel without a boat. But it's 35-40C on land, cyclone season, and the marquee whale shark swims run Mar-Aug, so the headline act is missing. Manta ray tours run most of the year.",
+    "why_rated": "The only place people consistently describe as 'the Great Barrier Reef without the boat trip or the crowds' — fringing reef literally walkable from the beach, and a fraction of Queensland prices.",
+    "nearest_airport": "LEA",
+    "sources": [
+      "https://www.australiascoralcoast.com/destinations/coral-bay",
+      "https://www.worldatlas.com/cities/6-most-underrated-towns-in-western-australia.html",
+      "https://www.britz.com/au/en/get-inspired/driving-routes-australia/ningaloo-to-shark-bay"
+    ]
+  },
+  {
+    "name": "Exmouth, Cape Range NP & Turquoise Bay",
+    "region": "WA — Gascoyne / Exmouth",
+    "tags": ["reef", "snorkel", "national-park", "wildlife", "gorge", "remote"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "1200-2200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Dec-Feb is actually turtle nesting AND hatching season — Jurabi Turtle Centre runs guided eco-tours Dec-Mar and you can watch females come ashore at night. Offsetting that: 40C days, cyclone risk, and no whale sharks (Mar-Aug).",
+    "why_rated": "Turquoise Bay drift snorkel is routinely called the best beach snorkel in Australia; Yardie Creek gorge and the red range meeting white sand is the classic Ningaloo image. The summer turtle nesting is the one thing this trip's dates unlock.",
+    "nearest_airport": "LEA",
+    "sources": [
+      "https://www.westernaustralia.com/en/plan-my-trip/planning-tools/travel-stories/turtle-season-on-ningaloo-reef",
+      "https://www.australiascoralcoast.com/see-do/marine-interactions/sea-turtles",
+      "https://ningalooreefholidays.com.au/turtle-nesting-season-exmouth/"
+    ]
+  },
+  {
+    "name": "Karijini National Park gorges",
+    "region": "WA — Pilbara",
+    "tags": ["gorge", "hiking", "swimming", "national-park", "remote", "bucket-list"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "1100-2000",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG SEASON, hard no. 40-42C daily, hotter inside the gorges, and it's the rain season — gorges close on any rainfall for flash-flood risk and roads shut. Multiple guides say flatly: do not go Dec-Jan. Best Apr-Sep.",
+    "why_rated": "The single most-raved WA landscape on forums — narrow red iron gorges with cold plunge pools (Hancock, Weano, Hamersley, Fern Pool), zero phone signal, genuine adventure scrambling.",
+    "nearest_airport": "PBO",
+    "sources": [
+      "https://tessomewhere.com/complete-guide-to-karijini-national-park/",
+      "https://www.tripadvisor.co.nz/ShowTopic-g255101-i530-k11029062-Karijini_in_Dec_Jan-Western_Australia.html",
+      "https://karijiniecoretreat.com.au/about/nature/"
+    ]
+  },
+  {
+    "name": "Millstream Chichester NP & the Pilbara coast (Karratha, Dampier)",
+    "region": "WA — Pilbara",
+    "tags": ["gorge", "swimming", "rock-art", "remote", "national-park"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "900-1600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Same Pilbara summer problem as Karijini — 40C+, cyclone/wet risk, unsealed roads that close. Murujuga rock art is walkable but brutal in the heat.",
+    "why_rated": "Murujuga (Burrup Peninsula) holds the world's largest concentration of petroglyphs — over a million — and Python Pool and Deep Reach are palm-fringed swimming holes almost nobody outside WA has heard of.",
+    "nearest_airport": "KTA",
+    "sources": [
+      "https://www.australiasnorthwest.com/destinations/karratha",
+      "https://exploreparks.dbca.wa.gov.au/park/millstream-chichester-national-park"
+    ]
+  },
+  {
+    "name": "Shark Bay: Monkey Mia, Francois Peron & Shell Beach",
+    "region": "WA — Gascoyne / Denham",
+    "tags": ["wildlife", "beach", "world-heritage", "4wd", "remote"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "900-1700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Doable but sweaty — inland Denham pushes 40C in Jan and the Francois Peron 4WD tracks are unshaded. The morning dolphin feed runs year-round, so if you're passing through it still works; nobody chooses Shark Bay for January.",
+    "why_rated": "World Heritage on four separate criteria. Wild dolphins wading to your ankles at Monkey Mia, 3.5-billion-year-lineage stromatolites at Hamelin Pool, a beach made entirely of tiny shells, and red cliffs dropping into turquoise at Cape Peron.",
+    "nearest_airport": "MJK",
+    "sources": [
+      "https://www.sharkbay.org/place/monkey-mia/",
+      "https://www.sharkbay.org/place/hamelin-pool/stromatolites/",
+      "https://www.westernaustralia.com/us/places-to-visit/ningaloo-reef-and-the-coral-coast/monkey-mia-shark-bay"
+    ]
+  },
+  {
+    "name": "Kalbarri National Park — Skywalk, Nature's Window & coastal cliffs",
+    "region": "WA — Coral Coast / Kalbarri",
+    "tags": ["gorge", "hiking", "coast", "national-park", "scenic-drive"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "500-900",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "The inland Murchison Gorge section regularly hits 40C+ and DBCA closes gorge trails on hot days; the Loop/Z-Bend walks are effectively off. The coastal cliff lookouts and the town beach stay fine — treat it as a coastal stop, not a hiking capsule.",
+    "why_rated": "Nature's Window framing the Murchison River is one of WA's most photographed spots, and the 2020 Skywalk cantilevers 100m over the gorge. The coastal cliffs south of town (Island Rock, Natural Bridge) are the underrated half.",
+    "nearest_airport": "GET",
+    "sources": [
+      "https://www.australiascoralcoast.com/itineraries/explore-the-wonders-of-kalbarri",
+      "https://www.bush-and-bay.com/western-australia/kalbarri-itinerary/"
+    ]
+  },
+  {
+    "name": "Hutt Lagoon pink lake (Port Gregory)",
+    "region": "WA — Coral Coast / Port Gregory",
+    "tags": ["scenic", "photography", "day-trip", "roadside"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-150",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Colour depends on algae, sun and cloud rather than season — summer's high sun and clear skies are good for it. Midday is the best colour but also the hottest; it's a 20-minute roadside stop, so heat is manageable.",
+    "why_rated": "Bubblegum-pink to blood-red water from Dunaliella salina algae, free, and right on the Coral Coast Highway between Geraldton and Kalbarri. Pure spectacle for zero dollars — the definition of a good buffer-day stop.",
+    "nearest_airport": "GET",
+    "sources": [
+      "https://www.australiascoralcoast.com/destinations/kalbarri-surrounds/pink-lake",
+      "https://tessomewhere.com/western-australias-pink-lake-a-guide-to-visiting-hutt-lagoon/"
+    ]
+  },
+  {
+    "name": "Geraldton & the Houtman Abrolhos Islands",
+    "region": "WA — Coral Coast / Geraldton",
+    "tags": ["islands", "snorkel", "history", "scenic-flight", "underrated"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "600-1400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Fine weather-wise, but Geraldton's famous relentless afternoon sea breeze can cancel small-plane and boat day trips to the Abrolhos. Book early in a stay so you have a second shot.",
+    "why_rated": "Forum regulars call Geraldton the most underrated city in WA. The Abrolhos, 60km offshore, are coral atolls with sea lions and the wreck site of the Batavia — Australia's most gruesome shipwreck-and-mutiny story, told at the free WA Museum branch in town.",
+    "nearest_airport": "GET",
+    "sources": [
+      "https://www.australiascoralcoast.com/destinations/abrolhos-islands",
+      "https://www.worldatlas.com/cities/6-most-underrated-towns-in-western-australia.html"
+    ]
+  },
+  {
+    "name": "Pinnacles Desert (Nambung NP) & Lancelin sand dunes",
+    "region": "WA — Coral Coast / Cervantes",
+    "tags": ["desert", "scenic", "day-trip", "photography", "sandboarding"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-400",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Hot and shadeless — go at sunrise, sunset or after dark for stargazing, and skip the middle of the day entirely. That's true year-round but non-negotiable in January.",
+    "why_rated": "Thousands of limestone spires in yellow sand, straight out of a sci-fi film, two hours from Perth on a borrowed car. Lancelin's dunes on the way back add sandboarding for the price of a $15 board hire.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.westernaustralia.com/us/itinerary/coral-coast-highway/5af91ea17d1d7c61776a1001",
+      "https://bh.trip.com/moments/detail/western-australia-25030-134092694"
+    ]
+  },
+  {
+    "name": "Jurien Bay sea lion swim & Turquoise Coast",
+    "region": "WA — Coral Coast / Jurien Bay",
+    "tags": ["wildlife", "swim", "beach", "underrated", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "400-700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the operating season and the water is at its warmest. Trips are wind-dependent — morning departures have the best odds.",
+    "why_rated": "Swimming with wild Australian sea lions two hours from Perth, at maybe a third of what the equivalent costs in South Australia. Consistently the 'why doesn't anyone know about this' answer in WA threads.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.australiascoralcoast.com/destinations/jurien-bay",
+      "https://www.tripadvisor.com.au/Attractions-g255101-Activities-zft12156-Western_Australia.html"
+    ]
+  },
+  {
+    "name": "Perth city: Kings Park, Cottesloe & Boola Bardip",
+    "region": "WA — Perth",
+    "tags": ["city", "beach", "museum", "free", "home-base"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "0-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Perth summer is hot but bone-dry with a reliable 'Fremantle Doctor' sea breeze most afternoons. Beach mornings, museum afternoons, sunset at Kings Park. Home base — near-zero lodging cost.",
+    "why_rated": "Kings Park is bigger than Central Park with a free skyline-and-river view; Cottesloe and Scarborough are world-class city beaches; WA Museum Boola Bardip and AGWA are free and genuinely good. Almost all of it costs nothing when you already have a car and a bed.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://au.trip.com/moments/detail/perth-2014499-132384030",
+      "https://visit.museum.wa.gov.au/boolabardip"
+    ]
+  },
+  {
+    "name": "Fremantle: prison, Cappuccino Strip & the port town",
+    "region": "WA — Perth / Fremantle",
+    "tags": ["city", "history", "world-heritage", "food", "brewery", "home-base"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak Freo season — long evenings, sea breeze, outdoor everything. Summer is when the town is at its best.",
+    "why_rated": "A whole preserved 19th-century port town: World Heritage convict prison (the Torchlight tour is the one to book), the Shipwreck Galleries with the actual Batavia hull, Little Creatures brewery on the harbour, and a genuine scruffy-bohemian street life Perth proper lacks.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.visitfremantle.com.au/",
+      "https://fremantleprison.com.au/"
+    ]
+  },
+  {
+    "name": "Fremantle Markets & the Freo alternative scene",
+    "region": "WA — Perth / Fremantle",
+    "tags": ["market", "hippie", "food", "music", "free", "home-base"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-150",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Open Fri-Sun and most public holidays, year-round. Summer weekends are the busiest and liveliest; the Hall gets hot by early afternoon, so go in the morning.",
+    "why_rated": "1897 heritage market hall, 150+ stalls of craftspeople, incense, secondhand clothes, crystals and tie-dye alongside the produce yard, with buskers out front on the Cappuccino Strip. This is the WA hippie-market epicentre — free to wander, and walking distance from the rest of Freo.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://fremantlemarkets.com.au/",
+      "https://www.visitfremantle.com.au/explore/shopping/markets-and-collectives",
+      "https://en.wikipedia.org/wiki/Fremantle_Markets"
+    ]
+  },
+  {
+    "name": "FRINGE WORLD Perth (20 Jan – 14 Feb 2027)",
+    "region": "WA — Perth / Northbridge",
+    "tags": ["festival", "arts", "nightlife", "city", "date-locked"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "100-400",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Dates confirmed: 20 January – 14 February 2027 (2026 ran 21 Jan – 15 Feb). Squarely inside the trip window, but only if they swing back west — worth knowing before committing to a one-way eastward run.",
+    "why_rated": "One of the world's three biggest fringe festivals, 600+ shows, with the free-entry Pleasure Garden in Russell Square as an outdoor circus-and-cabaret beer garden. Cheap tickets ($20-35), heavy on circus, cabaret and street performance rather than straight theatre.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://fringeworld.com.au/",
+      "https://perth.wa.gov.au/news-and-updates/all-news/fringe-world-2026-to-light-up-the-city",
+      "https://en.wikipedia.org/wiki/Fringe_World"
+    ]
+  },
+  {
+    "name": "Swan Valley food-and-wine loop",
+    "region": "WA — Perth / Swan Valley",
+    "tags": ["wine", "food", "day-trip", "cycling", "home-base"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "80-250",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Inland and genuinely hot — 38-40C days are common and the cycling loop becomes punishing. Vintage is in full swing in Feb, which is good atmosphere. Best as an early-start morning or a late-afternoon dinner run.",
+    "why_rated": "Australia's oldest wine region after the Hunter, 25 minutes from Perth CBD, with a food trail that leans as much on chocolate, nougat, cheese and Mandoon/Feral breweries as on wine. Cheap because it's a day trip from a home base with a borrowed car.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.swanvalley.com.au/",
+      "https://www.destinationperth.com.au/explore-perth/swan-valley/"
+    ]
+  },
+  {
+    "name": "Guildford & the Perth Hills (Bickley Valley, Mundaring)",
+    "region": "WA — Perth Hills",
+    "tags": ["day-trip", "wine", "history", "underrated", "home-base"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-180",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Hills are a few degrees cooler than the plain but sit in high bushfire-risk country in Jan-Feb — check DFES before heading up, and don't plan a fixed date around it.",
+    "why_rated": "Guildford is a whole colonial-era streetscape reachable on a suburban train ticket, full of antique shops and pubs; Bickley/Carmel is a pocket-sized hill wine region that Perth locals treat as a secret. Cheapest possible day out from the home base.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://au.trip.com/moments/detail/perth-2014499-126624850",
+      "https://www.destinationperth.com.au/explore-perth/perth-hills/"
+    ]
+  },
+  {
+    "name": "Penguin Island & Shoalwater Islands Marine Park",
+    "region": "WA — Perth / Rockingham",
+    "tags": ["wildlife", "island", "day-trip", "kayak", "home-base"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "50-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Two problems. The island now closes whenever the forecast max is 35C or higher — common in Jan-Feb — so it can be shut on the day. And the little penguin colony has collapsed ~94% since 2007 to roughly 114 birds; the Discovery Centre closed in 2023 and the local council has asked for the island to be shut to visitors entirely. Manage expectations: you may see no penguins.",
+    "why_rated": "Still a lovely 5-minute-ferry island with sea lions, ospreys, snorkelling and kayak trails 45 minutes from Perth. Listed for completeness, but this one has faded badly and old guidebook enthusiasm is out of date.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.abc.net.au/news/2025-05-08/penguin-island-city-of-rockingham-calls-for-closure/105264676",
+      "https://www.abc.net.au/news/2025-01-13/calls-to-close-penguin-island-to-visitors/104792226",
+      "https://www.penguinisland.com.au/"
+    ]
+  },
+  {
+    "name": "Mandurah canals, dolphins & Yalgorup thrombolites",
+    "region": "WA — Peel / Mandurah",
+    "tags": ["wildlife", "kayak", "beach", "underrated", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak season — warm estuary water, crabbing season (blue swimmer crabs) runs through summer, and resident dolphins are in the canals year-round.",
+    "why_rated": "Repeatedly named WA's most underrated coastal city: an hour south of Perth, a canal network with wild dolphins swimming through it, cheap kayak hire, and the Lake Clifton thrombolites — living rock-building microbes — nearby. Reachable by train and bus from Perth.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.worldatlas.com/cities/6-most-underrated-towns-in-western-australia.html",
+      "https://www.visitmandurah.com/"
+    ]
+  },
+  {
+    "name": "Yanchep NP & Yanchep Lagoon",
+    "region": "WA — Perth north",
+    "tags": ["wildlife", "cave", "beach", "day-trip", "home-base"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-150",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Snorkelling the lagoon is best in summer when the water is calm and warm. Koalas and the cave tour are shaded, which helps on a 38C day.",
+    "why_rated": "One park with koalas on a boardwalk, a limestone cave tour (Crystal/Yonderup), grey kangaroos on the lawn, and 20 minutes up the road a reef-sheltered turquoise lagoon good for beginner snorkelling. All within an hour of Perth.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.worldatlas.com/cities/6-most-underrated-towns-in-western-australia.html",
+      "https://exploreparks.dbca.wa.gov.au/park/yanchep-national-park"
+    ]
+  },
+  {
+    "name": "Dwellingup, Lane Poole Reserve & the Munda Biddi",
+    "region": "WA — Peel / Dwellingup",
+    "tags": ["forest", "mountain-bike", "swimming", "camping", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "60-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "River swimming and the Murray River rapids are the summer draw, but this is jarrah forest in the worst bushfire month of the year — Dwellingup burned in 1961 and again in 2021. Check DFES daily, and never treat it as a fixed-date commitment.",
+    "why_rated": "90 minutes from Perth: 55,000 hectares of jarrah forest, free-ish riverside campsites, a steam railway, world-class mountain-bike trail network and swimming holes in the Murray River. Locals' default cheap weekend.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.destinationperth.com.au/explore-perth/mandurah-and-peel/dwellingup/",
+      "https://lostrealityescape.com.au/top-10-day-trips-from-perth/"
+    ]
+  },
+  {
+    "name": "Serpentine Falls & the Darling Scarp swimming holes",
+    "region": "WA — Perth south-east",
+    "tags": ["swimming", "day-trip", "free", "national-park", "home-base"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "20-80",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "The pool is at its lowest and most crowded in summer, and the park hits daily entry caps on hot weekends — arrive before 9am. The falls themselves are seasonal and will be barely trickling in January.",
+    "why_rated": "The classic cheap Perth hot-day escape: granite plunge pool 45 minutes from the city, kangaroos on the picnic lawn, $17 per car and nothing else to pay.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://lostrealityescape.com.au/top-10-day-trips-from-perth/",
+      "https://exploreparks.dbca.wa.gov.au/park/serpentine-national-park"
+    ]
+  },
+  {
+    "name": "Wave Rock & Hyden",
+    "region": "WA — Wheatbelt / Hyden",
+    "tags": ["scenic", "road-trip", "photography", "day-trip", "bucket-list"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Wheatbelt in January is 38-42C with no shade at the rock and a 4-hour drive each way from Perth. Physically fine as a dawn stop; miserable as a midday one. Do it as an overnight, not a day trip, in this season.",
+    "why_rated": "A 15m, 110m-long granite wave frozen mid-break, rising out of flat farmland — the most photographed rock in WA after Uluru's cousins. Hippos Yawn and the Mulka's Cave hand stencils are in the same loop, and Lake Grace/Lake King salt lakes are on the drive.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.australiasgoldenoutback.com/destination/wave-rock",
+      "https://rac.com.au/horizons/explore/golden-outback"
+    ]
+  },
+  {
+    "name": "Lake Ballard — Antony Gormley's 'Inside Australia'",
+    "region": "WA — Goldfields / Menzies",
+    "tags": ["art", "desert", "photography", "remote", "underrated", "free"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "Goldfields summer is 40C+ and this is an unshaded salt pan you walk across for hours — genuinely dangerous in January. Also 8+ hours from Perth. Apr-Oct only.",
+    "why_rated": "51 skeletal black steel figures cast from Menzies residents, scattered over 10 square kilometres of white salt lake. Free, unfenced, and universally described as the eeriest and best art experience in the country. Camp beside it and watch the sunset.",
+    "nearest_airport": "KGI",
+    "sources": [
+      "https://www.britz.com/au/en/get-inspired/driving-routes-australia/golden-quest-trail",
+      "https://rac.com.au/horizons/explore/golden-outback"
+    ]
+  },
+  {
+    "name": "Kalgoorlie-Boulder Super Pit & the Golden Quest Trail",
+    "region": "WA — Goldfields / Kalgoorlie",
+    "tags": ["history", "mining", "road-trip", "outback", "underrated"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "400-1000",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "Best Apr-Oct; summer temperatures are extreme and every guide says avoid. Ghost-town detours on unsealed roads in 42C with no traffic is a bad plan.",
+    "why_rated": "A 3.5km-long, 600m-deep open-cut mine you can watch from a viewing platform, a gold-rush main street of extravagant 1900s hotels, and a legendary frontier-town character. The Golden Quest self-drive strings it to Lake Ballard, Gwalia ghost town and Coolgardie.",
+    "nearest_airport": "KGI",
+    "sources": [
+      "https://www.discoveryholidayparks.com.au/holiday-inspiration/road-trips/perth-to-kalgoorlie",
+      "http://www.exploreshaw.com/a-road-trip-along-the-golden-quest-discovery-trail/"
+    ]
+  },
+  {
+    "name": "Esperance & Cape Le Grand NP (Lucky Bay)",
+    "region": "WA — Esperance",
+    "tags": ["beach", "national-park", "camping", "scenic-drive", "wildlife", "bucket-list"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "500-1100",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "This is the season — warm, swimmable, long days. Caveat: it is also the busiest, and the Lucky Bay campground (\\$15pp/night) fills through January, so book the moment the window opens or have a backup in Esperance town. Water stays bracing even in summer.",
+    "why_rated": "Lucky Bay is measured as the whitest sand in Australia, with kangaroos lying on the beach and a 4WD-able firm sand strip. The Great Ocean Drive out of town, Twilight Beach and the Frenchman Peak scramble round it out. The most consistently rated coastline in WA outside Ningaloo.",
+    "nearest_airport": "EPR",
+    "sources": [
+      "https://www.australiasgoldenoutback.com/blog/camping-in-cape-le-grand-national-park-esperance",
+      "https://exploreparks.dbca.wa.gov.au/site/lucky-bay",
+      "https://frugalfrolicker.com/things-to-do-in-esperance-beaches/"
+    ]
+  },
+  {
+    "name": "Fitzgerald River NP & Hopetoun",
+    "region": "WA — Great Southern / Hopetoun",
+    "tags": ["national-park", "beach", "hiking", "remote", "underrated", "biosphere"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Coastal so it stays tolerable, but this is a dieback-managed park with unsealed inland roads and the flowering season (Aug-Nov) is what it's famous for. Summer gives you empty beaches and hot, dry, scrubby walks.",
+    "why_rated": "A UNESCO Biosphere Reserve with 20% of WA's plant species, Point Ann whale-watching, the East Mt Barren climb, and beaches as good as Esperance's with a fraction of the visitors. The classic WA 'nobody goes there' park.",
+    "nearest_airport": "ALH",
+    "sources": [
+      "https://exploreparks.dbca.wa.gov.au/park/fitzgerald-river-national-park",
+      "https://www.australiasgoldenoutback.com/destination/hopetoun"
+    ]
+  },
+  {
+    "name": "Bremer Bay orca expedition",
+    "region": "WA — Great Southern / Bremer Bay",
+    "tags": ["wildlife", "boat", "splurge", "bucket-list", "date-locked"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "900-1500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "RIGHT SEASON — and it's narrow. The Bremer Canyon orca season runs January to early April, with Jan-Mar the peak. A January visit hits the opening of the world's most reliable killer whale aggregation. This is an Event-spend splurge, not a daily cost: ~\\$385pp for the standard full-day tour, ~\\$475pp ex-Albany with transfers.",
+    "why_rated": "The largest known aggregation of killer whales in the southern hemisphere, in a submarine canyon 70km offshore, with pods that hunt beaked whales and squid. Sightings rates quoted at ~95%. Genuinely one of the few world-class wildlife events that this trip's dates actually unlock.",
+    "nearest_airport": "ALH",
+    "sources": [
+      "https://whalewatchwesternaustralia.com/tours/bremer-bay-orca-experience/",
+      "https://naturalistecharters.com.au/bremercanyonkillerwhales/",
+      "https://whalewatchwesternaustralia.com/beginners-guide-to-killer-whale-watching-in-bremer-bay/"
+    ]
+  },
+  {
+    "name": "Albany: The Gap, Torndirrup & the Anzac Centre",
+    "region": "WA — Great Southern / Albany",
+    "tags": ["coast", "history", "museum", "scenic", "national-park"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-700",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Great Southern summer is mild — mid-20s where Perth is 40. This is where Perth people flee the heat, so book ahead over January.",
+    "why_rated": "The Gap's cantilevered platform over a granite chasm with the Southern Ocean smashing beneath it, the Natural Bridge, Whale World in a real decommissioned whaling station, and the National Anzac Centre — widely rated the best museum in WA. Middleton and Little Beach are the swim stops.",
+    "nearest_airport": "ALH",
+    "sources": [
+      "https://www.amazingalbany.com.au/",
+      "https://www.australiassouthwest.com/destinations/albany"
+    ]
+  },
+  {
+    "name": "Denmark: Greens Pool, Elephant Rocks & William Bay",
+    "region": "WA — Great Southern / Denmark",
+    "tags": ["beach", "swim", "scenic", "wine", "hippie", "market"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-700",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak season and it earns it — the granite boulders shelter Greens Pool into a flat turquoise lagoon that's actually swimmable when the rest of the south coast is too rough. Very busy in January; go early morning.",
+    "why_rated": "Greens Pool and Elephant Rocks are the most photographed swim spots in the south-west. Denmark itself is WA's alternative/artisan town — a strong local craft-and-produce market scene, cool-climate riesling, a food co-op culture, and a long-standing hippie streak that survives from the 70s back-to-the-land settlers.",
+    "nearest_airport": "ALH",
+    "sources": [
+      "https://denmarkwesternaustralia.com/denmark-wa-travel-destinations/greenspool",
+      "https://www.ytravelblog.com/elephant-rocks-greens-pool-denmark-western-australia/",
+      "https://www.westernaustralia.com/us/places-to-visit/margaret-river-and-the-south-west/denmark"
+    ]
+  },
+  {
+    "name": "Valley of the Giants Tree Top Walk (Walpole-Nornalup)",
+    "region": "WA — Great Southern / Walpole",
+    "tags": ["forest", "scenic", "day-trip", "accessible", "family"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "50-150",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Fine year-round; the tingle forest is shaded and cool, making it one of the better hot-day options in the south.",
+    "why_rated": "A 40m-high, 600m-long suspended walkway through the canopy of red tingle trees that grow nowhere else on earth, with a free Ancient Empire boardwalk at ground level through hollow-butted giants you can stand inside. Roughly $25pp.",
+    "nearest_airport": "ALH",
+    "sources": [
+      "https://www.westernaustralia.com/us/attraction/valley-of-the-giants-tree-top-walk/56b2669a2c5ca6c40e14b1a6",
+      "https://www.westernaustralia.com/us/places-to-visit/margaret-river-and-the-south-west/denmark"
+    ]
+  },
+  {
+    "name": "Stirling Range & Bluff Knoll",
+    "region": "WA — Great Southern / Stirling Range",
+    "tags": ["hiking", "national-park", "summit", "underrated"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "poor",
+    "season_note": "The climb is a 6km, 3-4 hour return with 600m of ascent and no shade — in a 35C+ inland summer that's a rescue-callout waiting to happen. Start at first light or don't do it. Trails can also close on extreme fire-danger days.",
+    "why_rated": "The highest peak in the south-west (1,099m) and the only place in WA that gets snow. Views over a range that erupts from wheat paddocks like an island. Wildflower diversity here rivals whole countries — but that's a spring story.",
+    "nearest_airport": "ALH",
+    "sources": [
+      "https://tessomewhere.com/complete-guide-to-hiking-bluff-knoll/",
+      "https://shanedrumm.com/denmark-bluff-knoll-western-australia/"
+    ]
+  },
+  {
+    "name": "Porongurup Range & the Granite Skywalk",
+    "region": "WA — Great Southern / Porongurup",
+    "tags": ["hiking", "scenic", "wine", "underrated", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "40-200",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Shorter and shadier than Bluff Knoll — a 4km return through karri forest to the summit — so it survives a summer morning where the Stirlings don't. Still hot by midday.",
+    "why_rated": "A ladder-and-catwalk 'skywalk' bolted around the top of Castle Rock, 670m up, with 360-degree views to the Stirlings and the coast. 1.1-billion-year-old granite. Locals rate it above Bluff Knoll for effort-to-payoff, and the Porongurup riesling vineyards are at the base.",
+    "nearest_airport": "ALH",
+    "sources": [
+      "https://exploreparks.dbca.wa.gov.au/park/porongurup-national-park",
+      "https://www.amazingalbany.com.au/"
+    ]
+  },
+  {
+    "name": "Pemberton karri forest, Gloucester Tree & Yeagarup dunes",
+    "region": "WA — South West / Pemberton",
+    "tags": ["forest", "4wd", "hiking", "swimming", "underrated"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "250-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Forest shade keeps it bearable and the Warren River swimming spots are the point in summer. Fire risk is real in karri country in Feb; check before booking anything non-refundable.",
+    "why_rated": "Climb 58m up a fire-lookout karri on steel pegs with no harness (the Gloucester and Dave Evans Bicentennial trees — terrifying and free), then 4WD onto a landlocked 10km sand dune system that runs to the Southern Ocean. Trout, marron and a tram through the forest.",
+    "nearest_airport": "BQB",
+    "sources": [
+      "https://www.australiassouthwest.com/destinations/pemberton",
+      "https://exploreparks.dbca.wa.gov.au/park/gloucester-national-park"
+    ]
+  },
+  {
+    "name": "Busselton Jetty & underwater observatory",
+    "region": "WA — South West / Busselton",
+    "tags": ["coast", "snorkel", "family", "day-trip", "quirky"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Geographe Bay is sheltered and warm in summer — this is the calmest swimming water in the south-west and the season the jetty snorkel trail actually works.",
+    "why_rated": "The longest timber-piled jetty in the southern hemisphere (1.8km), with a train out to an observatory 8m below the surface where the pylons have grown into an artificial coral reef. Snorkelling the pylons yourself is the cheap version and the better one.",
+    "nearest_airport": "BQB",
+    "sources": [
+      "https://www.busseltonjetty.com.au/",
+      "https://www.australiassouthwest.com/destinations/busselton"
+    ]
+  },
+  {
+    "name": "Bunbury dolphins, Collie & the Wellington Dam mega-mural",
+    "region": "WA — South West / Bunbury-Collie",
+    "tags": ["wildlife", "art", "swimming", "underrated", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-350",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is when Collie's dam and river swimming holes (Black Diamond Lake, Honeymoon Pool) are the draw, and Bunbury's dolphin interaction zone runs year-round with best odds in the morning.",
+    "why_rated": "Wild dolphins that come into knee-deep water at the Dolphin Discovery Centre, plus Australia's largest dam-wall mural — 8,000 square metres painted across the Wellington Dam wall — anchoring a 40-mural town trail. Collie reinvented itself from a coal town and the result is a genuinely odd, good detour.",
+    "nearest_airport": "BQB",
+    "sources": [
+      "https://www.destinationperth.com.au/explore-perth/mandurah-and-peel/dwellingup/",
+      "https://www.australiassouthwest.com/destinations/collie",
+      "https://www.dolphindiscovery.com.au/"
+    ]
+  },
+  {
+    "name": "Cape to Cape Track (Leeuwin-Naturaliste, multi-day walk)",
+    "region": "WA — South West / Margaret River region",
+    "tags": ["hiking", "multi-day", "coast", "camping", "endurance"],
+    "days_min": 3,
+    "days_ideal": 7,
+    "rough_cost_couple_aud": "300-900",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "135km of exposed clifftop and soft-sand beach walking with limited water. Summer is the season everyone warns against — heat, no shade, and fire risk. Sep-Nov or Apr-May are the walking windows. Individual day sections (Cape Naturaliste, Wilyabrup cliffs) are still fine as morning walks.",
+    "why_rated": "Australia's best-regarded coastal long walk after the Overland — limestone cliffs, caves, empty beaches and whales, with the Margaret River wineries close enough to bail into. Cheap: mostly free bush campsites.",
+    "nearest_airport": "BQB",
+    "sources": [
+      "https://www.capetocapetrack.com.au/",
+      "https://www.australiassouthwest.com/things-to-do/cape-to-cape-track"
+    ]
+  },
+  {
+    "name": "Bibbulmun Track section walk (Perth to Albany, 1000km)",
+    "region": "WA — South West / Perth-Albany",
+    "tags": ["hiking", "multi-day", "forest", "camping", "endurance", "free"],
+    "days_min": 2,
+    "days_ideal": 8,
+    "rough_cost_couple_aud": "150-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "The Bibbulmun Track Foundation itself discourages summer walking — heat, snakes, bushfire and dry water tanks. The official walking season is roughly Apr-Oct. A dawn day-section in the Perth Hills is the safe summer version.",
+    "why_rated": "1,000km from Kalamunda to Albany through jarrah, karri and tingle forest to the south coast, with free three-sided sleeping shelters and rainwater tanks every 15-25km. One of the world's great long-distance trails, and one of the cheapest.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.bibbulmuntrack.org.au/",
+      "https://www.thelifeofpy.com/perth-day-hikes"
+    ]
+  },
+  {
+    "name": "Nannup, Balingup & Bridgetown — the alternative Blackwood Valley",
+    "region": "WA — South West / Blackwood Valley",
+    "tags": ["hippie", "market", "arts", "forest", "underrated", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Hot inland valley towns; the Blackwood River swimming holes are the summer draw. The famous Nannup Music Festival is early March and the Blues at Bridgetown is November — both just outside the window, so this is the towns-and-markets version, not the festival version.",
+    "why_rated": "WA's counterculture belt — Balingup's Tinderbox herbal apothecary and Old Cheese Factory craft centre, Nannup's tie-dye-and-woodwork main street and Tulip Festival heritage, Bridgetown's jazz-and-blues bones. Cheap, unhurried, and where the WA hippie scene actually lives rather than performs.",
+    "nearest_airport": "BQB",
+    "sources": [
+      "https://www.australiassouthwest.com/destinations/nannup",
+      "https://www.australiassouthwest.com/destinations/balingup"
+    ]
+  },
+  {
+    "name": "Broome & Cable Beach in the wet",
+    "region": "WA — Kimberley / Broome",
+    "tags": ["beach", "sunset", "remote", "pearling", "storm-season"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "1200-2500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Dec-Mar is the monsoon: ~460mm of rain, cyclones, brutal humidity, and box jellyfish/irukandji making the ocean unswimmable without a stinger suit. The upside — genuinely — is dramatic lightning storms, empty town, and the lowest accommodation prices of the year. Staircase to the Moon runs Mar-Oct, not now.",
+    "why_rated": "22km of white sand against red pindan cliffs, camels at sunset, the Sun Pictures outdoor cinema (oldest in the world), and a pearling-town history that's genuinely strange. Everyone raves — but they went in July.",
+    "nearest_airport": "BME",
+    "sources": [
+      "https://www.australia.com/en/facts-and-planning/weather-in-australia/broome-weather.html",
+      "https://www.visitbroome.com.au/info/roads",
+      "https://www.kimberleyaustralia.com/kimberley_weather.html"
+    ]
+  },
+  {
+    "name": "Gibb River Road & the Kimberley gorges",
+    "region": "WA — Kimberley",
+    "tags": ["4wd", "gorge", "road-trip", "remote", "bucket-list", "epic"],
+    "days_min": 7,
+    "days_ideal": 14,
+    "rough_cost_couple_aud": "3000-6000",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "CLOSED. Main Roads WA routinely shuts the Gibb Dec-Apr; river crossings are impassable, most stations and parks lock their gates in November, and you risk being trapped for days by floodwater. This is a May-September capsule and nothing else.",
+    "why_rated": "660km of red dirt through Windjana, Bell, Manning, El Questro and Emma Gorge — the Australian outback road trip that experienced travellers name above the Red Centre. Listed so it's on the board for a future trip.",
+    "nearest_airport": "BME",
+    "sources": [
+      "https://www.mainroads.wa.gov.au/travel-information/driving-in-wa/gibb-river-road/",
+      "https://www.hemamaps.com/the-kimberley/when-to-go",
+      "https://kimberleyadventures.com.au/adventurefiles/best-time-year-visit-kimberley/"
+    ]
+  },
+  {
+    "name": "Purnululu NP — Bungle Bungle Range",
+    "region": "WA — Kimberley / Purnululu",
+    "tags": ["world-heritage", "hiking", "scenic-flight", "remote", "bucket-list"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "1200-2800",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "The park closes for the wet season — typically from around January to late March/early April — and the 53km access track is 4WD-only and impassable when wet. Scenic flights from Kununurra may still run but the ground experience is off.",
+    "why_rated": "Orange-and-black banded sandstone beehive domes only 'discovered' by the wider public in 1983, plus Cathedral Gorge and Echidna Chasm. World Heritage. Universally described as unlike anywhere else on earth.",
+    "nearest_airport": "KNX",
+    "sources": [
+      "https://exploreparks.dbca.wa.gov.au/park/purnululu-national-park",
+      "https://www.hemamaps.com/the-kimberley/when-to-go"
+    ]
+  },
+  {
+    "name": "Kununurra, Lake Argyle & the Ord",
+    "region": "WA — Kimberley / Kununurra",
+    "tags": ["swimming", "boat", "remote", "scenic", "underrated"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "800-1800",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Wet season heat and humidity, and many tours reduce or stop. That said, Lake Argyle is a freshwater lake — the famous infinity pool and sunset cruise operate more of the year than the gorge country does, and the wet is when the Ord landscape is greenest.",
+    "why_rated": "Lake Argyle is Australia's largest man-made reservoir — 18 times Sydney Harbour — with an infinity pool on a cliff above it that is one of the most-shared images in Australian travel. Freshwater crocs, rock wallabies, and Mirima NP's mini-Bungles in town.",
+    "nearest_airport": "KNX",
+    "sources": [
+      "https://www.australiasnorthwest.com/destinations/kununurra",
+      "https://kimberley-australia.com/about-the-kimberley/weather-in-the-kimberley/"
+    ]
+  },
+  {
+    "name": "Camp Doogs / WA south-west boutique doof",
+    "region": "WA — South West (Shire of Harvey)",
+    "tags": ["festival", "doof", "music", "camping", "hippie", "date-locked"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "500-900",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Camp Doogs itself runs in October, not Dec-Feb — wrong season for this trip. Listed because WA's bush-party calendar is thin and dispersed in high summer (total fire bans make big bush events hard), so the realistic summer version is smaller unlisted doofs and Perth club nights rather than a marquee festival. Verify current WA psy calendar closer to the date.",
+    "why_rated": "WA's flagship independent camping festival: secret lineup revealed on the day, DIY art aesthetic, run by a Perth music collective since 2013. The template for what the WA scene does well — small, weird, un-corporate.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://en.wikipedia.org/wiki/Camp_Doogs",
+      "https://www.adventuresnsunsets.com/transformational-festivals-in-australia-music-bush-doofs/",
+      "https://psymedia.co.za/event_country/australia/"
+    ]
+  },
+  {
+    "name": "Perth Scorchers BBL night at Optus Stadium",
+    "region": "WA — Perth / Burswood",
+    "tags": ["sport", "cricket", "city", "evening", "home-base"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-180",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "BBL 2026-27 runs 12 Dec 2026 to the final on 26 Jan 2027, so it overlaps the Perth leg exactly — including a Scorchers v Melbourne Stars fixture at Optus on Boxing Day, 26 Dec 2026. Tickets are cheap and the walk over Matagarup Bridge is part of it.",
+    "why_rated": "Sport idea — one traveller only. Optus Stadium is regularly voted among the world's best venues and a Scorchers home game is a loud, fast, three-hour summer night out for the price of a cinema ticket. Down-weight: not a shared-interest capsule.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.bigbash.com.au/matches",
+      "https://www.ticketmaster.com/perth-scorchers-tickets/artist/1620612",
+      "https://en.wikipedia.org/wiki/Big_Bash_League"
+    ]
+  },
+  {
+    "name": "Nullarbor crossing — Perth to Adelaide by road",
+    "region": "WA/SA — Eyre Highway",
+    "tags": ["road-trip", "epic", "outback", "endurance", "cross-state"],
+    "days_min": 4,
+    "days_ideal": 7,
+    "rough_cost_couple_aud": "900-1800",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "2,700km with 40C+ stretches, roadhouse fuel at a heavy premium, and a real breakdown-exposure problem in summer heat. The Bunda Cliffs and Head of Bight are the highlights and the Head of Bight whales are Jun-Oct — so summer strips out the best reason to stop.",
+    "why_rated": "The 90 Mile Straight (146.6km without a bend, Australia's longest), the Bunda Cliffs where the continent just ends in a 90m drop into the Southern Ocean, and the world's longest golf course strung across roadhouses. A rite of passage rather than a holiday.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.australiasgoldenoutback.com/destination/nullarbor",
+      "https://www.travellers-autobarn.com.au/blog/best-outback-australia-road-trips"
+    ]
+  },
+  {
+    "name": "Indian Pacific train — Perth to Adelaide",
+    "region": "WA/SA — trans-continental rail",
+    "tags": ["train", "splurge", "scenic", "cross-state", "slow-travel"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "3000-6000",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Runs year-round and the carriage is air-conditioned, so summer heat is somebody else's problem. Off-train excursions (Rawlinna, Cook) are short and can be brutal in January. Fares are all-inclusive and there is no cheap seat any more — Gold Service is the entry tier.",
+    "why_rated": "Two nights across the Nullarbor including the world's longest straight stretch of railway (478km). A genuine Event-spend splurge with no cheap tier — priced honestly here so it can be rejected on the numbers rather than romance.",
+    "nearest_airport": "PER",
+    "sources": [
+      "https://www.journeybeyondrail.com.au/journeys/indian-pacific/",
+      "https://www.travellers-autobarn.com.au/blog/best-outback-australia-road-trips"
+    ]
+  },
+  {
+    "name": "Adelaide city: Central Market, laneways & the parklands",
+    "region": "SA — Adelaide",
+    "tags": ["city", "food", "market", "free", "museum", "walkable"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Dry heat, occasional 40C+ spikes, and a city built around a shaded parkland ring and a free CBD tram/bus loop. Beach suburbs (Glenelg, Henley, Semaphore) are a 25-minute tram ride when it gets silly.",
+    "why_rated": "Adelaide Central Market is the largest fresh-produce market in the southern hemisphere and the best-value eating in any Australian capital. Add free entry to the SA Museum, Art Gallery and Botanic Garden, a small-bar laneway scene, and a compact grid you can walk. Consistently the 'most underrated Australian city' answer.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.timeout.com/australia/travel/most-underrated-cities-in-australia",
+      "https://glamadelaide.com.au/your-guide-to-adelaides-market-scene/",
+      "https://southaustralia.com/"
+    ]
+  },
+  {
+    "name": "Adelaide Fringe (19 Feb – 21 Mar 2027)",
+    "region": "SA — Adelaide",
+    "tags": ["festival", "arts", "nightlife", "hippie", "city", "date-locked"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "300-800",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Dates confirmed: 19 February – 21 March 2027. That opens right at the tail of the trip window (return is late Jan to mid Feb), so it's a stretch goal — only reachable if the return date slides to late February.",
+    "why_rated": "The second-largest annual arts festival on earth after Edinburgh, 8,000+ independent artists, with the Garden of Unearthly Delights and Gluttony turning the East Parklands into a month-long carnival of circus tents, fairy lights, food trucks and stalls. The closest thing to a citywide hippie carnival in Australia.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://adelaidefringe.com.au/",
+      "https://adelaidefringe.com.au/about-us",
+      "https://en.wikipedia.org/wiki/Adelaide_Fringe"
+    ]
+  },
+  {
+    "name": "Santos Tour Down Under (Jan 2027)",
+    "region": "SA — Adelaide & Adelaide Hills",
+    "tags": ["sport", "cycling", "festival", "free", "date-locked"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "0-200",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Runs 19-24 January 2027 with stages including Henley Beach to Gumeracha (19 Jan) and Norwood to Stirling (24 Jan). Falls neatly in the window and the roadside is free.",
+    "why_rated": "Sport idea — one traveller only, but it's the least sport-shaped sport entry here: the WorldTour's season opener doubles as a Hills-wide street party with free roadside viewing, village fetes and winery stops along every stage. Down-weight as a marquee, keep as a cheap add-on to an Adelaide Hills day.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.ahc.sa.gov.au/discover/tour-down-under",
+      "https://southaustralia.com/guides/the-south-australian-festivals-and-events-calendar"
+    ]
+  },
+  {
+    "name": "Adelaide Oval Test / Strikers BBL & the roof climb",
+    "region": "SA — Adelaide",
+    "tags": ["sport", "cricket", "city", "evening"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "60-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Cricket season is exactly Dec-Feb: Adelaide Oval hosts a summer Test (traditionally the day-night pink-ball match in December) and Strikers BBL fixtures through to the final on 26 Jan 2027. Fixtures for 2026-27 should be confirmed closer to the date.",
+    "why_rated": "Sport idea — one traveller only. Widely called the most beautiful cricket ground in the world, with the heritage scoreboard and Moreton Bay figs on the hill. The RoofClimb is the version that works for a non-cricket partner: a walk along the stadium roof at sunset over the city. Down-weight the cricket, keep the roof.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.bigbash.com.au/matches",
+      "https://en.wikipedia.org/wiki/Big_Bash_League"
+    ]
+  },
+  {
+    "name": "Adelaide Hills & Hahndorf",
+    "region": "SA — Adelaide Hills",
+    "tags": ["day-trip", "food", "wine", "wildlife", "village", "market"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Several degrees cooler than the city, which is the point in a 40C week. Summer is peak bushfire season in the Hills (2019-20 Cudlee Creek is recent memory) — check CFS on catastrophic days.",
+    "why_rated": "Twenty minutes from the CBD: Australia's oldest German settlement at Hahndorf, koalas you can walk among at Cleland, the Mount Lofty summit view over the whole city, and the Stirling/Aldgate village market scene. The most underrated day trip in the country according to SA regulars.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.nomadasaurus.com/things-to-do-in-south-australia/",
+      "https://southaustralia.com/destinations/adelaide-hills"
+    ]
+  },
+  {
+    "name": "Barossa Valley",
+    "region": "SA — Barossa",
+    "tags": ["wine", "food", "day-trip", "cycling", "heritage"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "200-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Hot (35-40C) but that is Barossa summer and the cellar doors are cold inside. February is vintage — trucks of fruit, crush pads running, and the region at its most alive. Cycling the valley in the afternoon heat is a mistake.",
+    "why_rated": "Australia's most famous wine region and home to the oldest continuously producing shiraz vines on earth (Langmeil's 1843 block). Sixth-generation German-Lutheran farming families, Maggie Beer's farm shop, and cellar doors that mostly still pour for free or credit the tasting fee.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://southaustralia.com/destinations/barossa",
+      "https://www.nomadasaurus.com/things-to-do-in-south-australia/"
+    ]
+  },
+  {
+    "name": "McLaren Vale, Willunga & the Fleurieu coast",
+    "region": "SA — Fleurieu Peninsula",
+    "tags": ["wine", "beach", "market", "hippie", "food", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "200-600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Coastal breeze takes the edge off. The Willunga Farmers Market runs Saturday mornings year-round. Port Willunga's sunsets over the Star of Greece jetty ruins are a January institution.",
+    "why_rated": "Wine region that runs straight down to swimmable beaches — you can taste grenache in the morning and swim at Port Willunga in the afternoon. Willunga and Aldinga are SA's alternative/organic belt: Saturday farmers market, artisan and co-op culture, and a laid-back hippie-adjacent scene that's the real thing rather than a tourist reconstruction. d'Arenberg Cube is the deliberate weird splurge.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://fleurieupeninsula.com.au/things-to-do/shopping-markets",
+      "https://www.southaustraliantrails.com/regions/fleurieu-peninsula/",
+      "https://www.theurbanlist.com/adelaide/a-list/road-trips-south-australia"
+    ]
+  },
+  {
+    "name": "Clare Valley & the Riesling Trail",
+    "region": "SA — Clare Valley",
+    "tags": ["wine", "cycling", "underrated", "heritage", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "200-500",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Inland and hot — 35-40C makes the Riesling Trail a dawn ride, not an afternoon one. The wine itself is at its best served cold in exactly this weather.",
+    "why_rated": "A 35km rail-trail on a disused line linking Auburn to Clare, flat, shaded in parts, with cellar doors every few kilometres and cheap bike hire. Sevenhill's Jesuit winery has been making wine since 1851; Mintaro and Martindale Hall are preserved 19th-century oddities. Quieter and cheaper than the Barossa.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://en.wikivoyage.org/wiki/Yorke_Peninsula",
+      "https://southaustralia.com/destinations/clare-valley",
+      "https://www.worldatlas.com/places/7-most-scenic-drives-in-south-australia.html"
+    ]
+  },
+  {
+    "name": "Kangaroo Island",
+    "region": "SA — Kangaroo Island",
+    "tags": ["wildlife", "island", "beach", "national-park", "bucket-list"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "900-2000",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak season: warm, swimmable, and everything open — but ferry fares peak too (roughly \\$440 return for two adults plus a car) and accommodation books out. Bushfire risk is real: the 2019-20 fires burned nearly half the island, and the western end is still regenerating. Sea lions, seals and echidnas are year-round.",
+    "why_rated": "Australia's third-largest island and its most concentrated wildlife: a sea lion colony you walk among at Seal Bay, fur seals at Admirals Arch, Remarkable Rocks, and koalas in the wild. Called 'Australia's Galapagos' constantly and, unusually, more or less deserves it.",
+    "nearest_airport": "KGC",
+    "sources": [
+      "https://plankangarooisland.com.au/how-to-get-there/ferry/cost/",
+      "https://www.sealink.com.au/kangaroo-island/sealink-kangaroo-island-ferry-service-fares/",
+      "https://www.nomadasaurus.com/things-to-do-in-south-australia/"
+    ]
+  },
+  {
+    "name": "Kangaroo Island Wilderness Trail (5-day walk)",
+    "region": "SA — Kangaroo Island",
+    "tags": ["hiking", "multi-day", "camping", "wildlife", "endurance"],
+    "days_min": 5,
+    "days_ideal": 6,
+    "rough_cost_couple_aud": "700-1400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "61km through Flinders Chase with limited water and full sun exposure across fire-regenerating country. Summer is the wrong season for a five-day walk here — and the trail has had extended closures since the 2020 fires, so verify it's open before planning around it.",
+    "why_rated": "Five days from Rocky River to Kelly Hill through the wildest end of the island, with sea eagles, coastal cliffs and campsites you have to yourself. One of Australia's newest signature walks.",
+    "nearest_airport": "KGC",
+    "sources": [
+      "https://www.parks.sa.gov.au/find-a-park/Browse_by_region/Kangaroo-Island/kangaroo-island-wilderness-trail",
+      "https://southaustralia.com/destinations/kangaroo-island"
+    ]
+  },
+  {
+    "name": "Victor Harbor, Granite Island & the SteamRanger",
+    "region": "SA — Fleurieu Peninsula",
+    "tags": ["day-trip", "coast", "heritage", "family", "wildlife"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer holiday season in full swing — the horse-drawn tram and the Cockle Train run more often, and the water is swimmable. The southern right whales are Jun-Sep, so no whales now. Granite Island's little penguin colony has crashed like WA's; don't count on penguins.",
+    "why_rated": "A horse-drawn tram across a causeway to a granite island, a steam train along the coast to Goolwa, and the Encounter Bikeway. Old-fashioned, cheap, and an hour from Adelaide.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.worldatlas.com/places/7-most-scenic-drives-in-south-australia.html",
+      "https://www.southaustraliantrails.com/regions/fleurieu-peninsula/"
+    ]
+  },
+  {
+    "name": "Deep Creek NP & the southern Fleurieu clifftops",
+    "region": "SA — Fleurieu Peninsula",
+    "tags": ["hiking", "coast", "camping", "underrated", "national-park"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "80-300",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Exposed clifftop walking with steep descents to remote beaches — hot in January, but sea breeze and early starts make it workable. Fire danger closes it on catastrophic days.",
+    "why_rated": "The wildest coast within 90 minutes of Adelaide: the Heysen Trail's southern end, waterfalls, kangaroos at dusk, and clifftop campsites looking across the Backstairs Passage to Kangaroo Island. Second Valley and Rapid Bay nearby are the underrated swim/jetty-dive spots.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.southaustraliantrails.com/regions/fleurieu-peninsula/",
+      "https://www.parks.sa.gov.au/find-a-park/Browse_by_region/Fleurieu-Peninsula/deep-creek-national-park"
+    ]
+  },
+  {
+    "name": "Hallett Cove & Onkaparinga Gorge (Adelaide day walks)",
+    "region": "SA — Adelaide south",
+    "tags": ["hiking", "geology", "free", "day-trip", "underrated"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "0-60",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "No shade on either — do them at dawn in summer. Both are free and reachable by train/bus from central Adelaide, which makes them ideal cheap buffer-day filler.",
+    "why_rated": "Hallett Cove's boardwalk crosses 280-million-year-old glacial pavement and the Sugarloaf badlands — a geology textbook you can walk on, described as a window into Earth's ancient past. Onkaparinga is a proper gorge with swimming holes 30 minutes from the CBD.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://sa.trip.com/moments/detail/adelaide-626-132190074",
+      "https://www.parks.sa.gov.au/find-a-park/Browse_by_region/Adelaide/hallett-cove-conservation-park"
+    ]
+  },
+  {
+    "name": "Yorke Peninsula & Innes National Park",
+    "region": "SA — Yorke Peninsula",
+    "tags": ["beach", "surf", "national-park", "underrated", "diving", "camping"],
+    "days_min": 2,
+    "days_ideal": 4,
+    "rough_cost_couple_aud": "300-700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the season — swimming, snorkelling the shipwreck trail, and camping in Innes. It's also when the campgrounds fill with Adelaide families over the school holidays; book Innes early.",
+    "why_rated": "SA's most-overlooked coast: Innes at the toe of the boot has Ethel Beach with a wreck in the surf, the Inneston ghost-town gypsum settlement, emus and roos everywhere, and beaches (Berry Bay, Dolphin Bay) that would be famous anywhere else. Wardang Island's maritime heritage trail has eight wrecks in shallow water for novice divers.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.nomadasaurus.com/things-to-do-in-south-australia/",
+      "https://en.wikivoyage.org/wiki/Yorke_Peninsula"
+    ]
+  },
+  {
+    "name": "Eyre Peninsula road trip (Port Lincoln to Streaky Bay)",
+    "region": "SA — Eyre Peninsula",
+    "tags": ["road-trip", "seafood", "beach", "wildlife", "underrated", "coast"],
+    "days_min": 4,
+    "days_ideal": 7,
+    "rough_cost_couple_aud": "800-1800",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Warm, dry and the season for swimming and oysters. Inland stretches get hot and the roadhouse gaps are long; the coast itself is breezy and pleasant.",
+    "why_rated": "The best seafood-and-empty-beach drive in the country and almost nobody outside SA does it: Coffin Bay oysters eaten where they're grown, Elliston's clifftop sculpture drive, Talia Caves, the Murphy's Haystacks granite inselbergs, Point Labatt's mainland sea lion colony, and Streaky Bay's kangaroo-strewn beaches.",
+    "nearest_airport": "PLO",
+    "sources": [
+      "https://www.frommers.com/destinations/the-eyre-peninsula/things-to-do/",
+      "https://www.nomadasaurus.com/things-to-do-in-south-australia/"
+    ]
+  },
+  {
+    "name": "Great white shark cage dive, Neptune Islands",
+    "region": "SA — Eyre Peninsula / Port Lincoln",
+    "tags": ["wildlife", "splurge", "diving", "bucket-list", "boat"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "1100-1600",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Runs year-round out of Port Lincoln, so the dates work. But shark numbers are seasonal — winter (May-Oct) is when the big females show and sightings are most reliable; summer trips see fewer, smaller sharks and no-show refunds/credits are a real possibility. Also a long, rough 3-hour crossing.",
+    "why_rated": "The only place in Australia licensed for great white cage diving. Around \\$495-560 per person for the surface cage full-day trip; no certification required. A pure Event-spend splurge.",
+    "nearest_airport": "PLO",
+    "sources": [
+      "https://www.onestopadventures.com.au/tour/port-lincoln-shark-cage-diving-experience/",
+      "https://www.onestopadventures.com.au/blog/how-much-is-shark-cage-diving-in-port-lincoln/",
+      "https://australiancoastalsafaris.com.au/stories/category/shark-cage-diving/"
+    ]
+  },
+  {
+    "name": "Baird Bay sea lion & dolphin swim",
+    "region": "SA — Eyre Peninsula / Baird Bay",
+    "tags": ["wildlife", "swim", "underrated", "boat", "bucket-list"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "400-700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is peak operating season with the warmest water; trips are weather-dependent and the operator is small and books out, so reserve well ahead.",
+    "why_rated": "Wild Australian sea lions that come to you and do somersaults around you in a shallow protected bay, with bottlenose dolphins often joining. Repeatedly described as the single best wildlife encounter in Australia by people who've done the famous ones — and it's a family operation in a village of about a dozen houses.",
+    "nearest_airport": "CED",
+    "sources": [
+      "https://www.frommers.com/destinations/the-eyre-peninsula/things-to-do/",
+      "https://www.nomadasaurus.com/things-to-do-in-south-australia/"
+    ]
+  },
+  {
+    "name": "Coffin Bay oyster farm wade & Port Lincoln tuna swim",
+    "region": "SA — Eyre Peninsula",
+    "tags": ["food", "seafood", "wildlife", "quirky", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 1,
+    "rough_cost_couple_aud": "200-500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is fine for both — waders in warm shallow water is pleasant rather than an ordeal, and the tuna pens run through the warm months. Oysters are available year-round in SA.",
+    "why_rated": "You stand waist-deep in the bay at a floating table, shucking oysters straight out of the water with a glass of local white. Down the road at Port Lincoln you can swim in a pen with 100kg southern bluefin tuna. Two of the most specific, least generic experiences in Australia, and cheap by splurge standards.",
+    "nearest_airport": "PLO",
+    "sources": [
+      "https://www.frommers.com/destinations/the-eyre-peninsula/things-to-do/",
+      "https://southaustralia.com/destinations/eyre-peninsula"
+    ]
+  },
+  {
+    "name": "Whyalla giant cuttlefish aggregation",
+    "region": "SA — Eyre Peninsula / Whyalla",
+    "tags": ["wildlife", "snorkel", "underrated", "bucket-list"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "WRONG SEASON. The aggregation runs roughly May to August, peaking June-July, and the cuttlefish die after breeding — in January there is simply nothing there. Also 15C water requiring a thick wetsuit.",
+    "why_rated": "The only known mass breeding aggregation of giant Australian cuttlefish on earth — hundreds of thousands of half-metre animals flashing colour across a few kilometres of shallow rocky reef, snorkellable from the shore for free. World-unique. Wrong dates entirely.",
+    "nearest_airport": "WYA",
+    "sources": [
+      "https://southaustralia.com/destinations/eyre-peninsula/whyalla",
+      "https://www.frommers.com/destinations/the-eyre-peninsula/things-to-do/"
+    ]
+  },
+  {
+    "name": "Ikara-Flinders Ranges & Wilpena Pound",
+    "region": "SA — Flinders Ranges",
+    "tags": ["outback", "hiking", "scenic-drive", "geology", "bucket-list"],
+    "days_min": 3,
+    "days_ideal": 5,
+    "rough_cost_couple_aud": "700-1500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Summer highs average 32-35C and regularly hit the 40s. Critically, the major walks — St Mary Peak and Mount Ohlssen Bagge — close entirely from December to February for heat risk, which removes the main reason to come. What survives: scenic drives (Brachina, Bunyeroo), short walks, scenic flights, low crowds and 14-hour days. Best Apr-May or Sep-Nov.",
+    "why_rated": "An 800-million-year-old amphitheatre of rock 17km across, Ediacaran fossils in Brachina Gorge, yellow-footed rock wallabies, and the outback that's still driveable in a normal car. The most-recommended SA trip after Kangaroo Island.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://theflinders.com.au/best-time-to-visit-the-flinders-ranges/",
+      "https://www.tripadvisor.com.au/ShowTopic-g4892263-i30913-k9248621-Is_January_too_hot_for_a_5_or_6_day_visit-Flinders_Ranges_South_Australia.html",
+      "https://southaustralia.com/destinations/flinders-ranges-and-outback/places/wilpena-pound"
+    ]
+  },
+  {
+    "name": "Arkaroola Wilderness Sanctuary & Ridgetop Tour",
+    "region": "SA — Northern Flinders",
+    "tags": ["outback", "4wd", "astronomy", "remote", "underrated"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "700-1400",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "Deep outback at 45C, 600km+ north of Adelaide on part-unsealed roads, and the sanctuary itself advises against summer visits. Astronomy nights are also worst in summer when it stays hot after dark. Apr-Oct only.",
+    "why_rated": "A private conservation sanctuary in the wildest end of the Flinders. The Ridgetop Tour is a 4-hour 4WD along a mining track that climbs ridgelines with drops on both sides — routinely called the best 4WD tour in Australia. Three observatories on site under some of the darkest skies on the continent.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.arkaroola.com.au/",
+      "https://theflinders.com.au/best-time-to-visit-the-flinders-ranges/"
+    ]
+  },
+  {
+    "name": "Coober Pedy — underground town, Breakaways & Painted Desert",
+    "region": "SA — Outback / Coober Pedy",
+    "tags": ["outback", "quirky", "underground", "desert", "road-trip"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "400-900",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "poor",
+    "season_note": "Surface temperatures routinely hit 45C, and reports of 43C at midday falling only to 40C after dark are normal in January. The saving grace is that the whole point of the town is that it's underground — dugout hotels hold a constant ~23C. Daytime outdoor sightseeing (Breakaways, Moon Plain) is dawn-and-dusk only.",
+    "why_rated": "More than half the population lives in dugouts carved into sandstone — houses, a church, a bookshop, a hotel. Opal capital of the world, Mad Max filming country, and the Kanku-Breakaways' colour-shifting mesas 25 minutes out. The strangest town in Australia and everyone who goes says so.",
+    "nearest_airport": "CPD",
+    "sources": [
+      "https://www.cooberpedy.com/attractions/",
+      "https://differentville.com/coober-pedy-underground-hotels/",
+      "https://www.tripadvisor.com/Attraction_Review-g255094-d8563749-Reviews-Kanku_Breakaways_Conservation_Park-Coober_Pedy_South_Australia.html"
+    ]
+  },
+  {
+    "name": "Oodnadatta Track & Kati Thanda-Lake Eyre",
+    "region": "SA — Outback",
+    "tags": ["4wd", "outback", "road-trip", "remote", "epic", "scenic-flight"],
+    "days_min": 4,
+    "days_ideal": 7,
+    "rough_cost_couple_aud": "1200-2500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "Summer on the Oodnadatta is genuinely dangerous — 45C+, no shade, 200km+ between fuel, and unsealed roads that close after rain. Lake Eyre only fills after Queensland flooding, which is unpredictable and usually shows in Apr-Jul when it happens at all. Apr-Sep.",
+    "why_rated": "620km of red dirt past mound springs, the old Ghan railway ruins, Lake Eyre South, William Creek (population ~10, with a pub and an airstrip that flies you over the lake) and the Pink Roadhouse at Oodnadatta. The most iconic outback track in South Australia.",
+    "nearest_airport": "CPD",
+    "sources": [
+      "https://southaustralia.com/destinations/flinders-ranges-and-outback",
+      "https://www.travellers-autobarn.com.au/blog/best-outback-australia-road-trips"
+    ]
+  },
+  {
+    "name": "Murray River houseboat (Riverland)",
+    "region": "SA — Riverland / Murray",
+    "tags": ["boat", "slow-travel", "self-catering", "wildlife", "underrated"],
+    "days_min": 3,
+    "days_ideal": 7,
+    "rough_cost_couple_aud": "1200-2600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is the season — swimming off the back deck, warm nights, red gum shade. It's also peak pricing, and the smaller boats that make it affordable for two people book out. Fuel, pump-out (~\\$60) and parking are extra on top of hire.",
+    "why_rated": "You drive it yourself with no licence: a floating apartment you moor wherever you like along red-gum cliffs, with kangaroos and pelicans and nobody else. Splits the lodging and transport cost into one line item, which makes it far better value for a week than it looks. Advertised from around \\$65 per person per night on a shared 7-night hire.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://southaustralia.com/destinations/riverland/houseboats",
+      "https://kodarihouseboats.com.au/aqua-leisure-houseboat-hire-murray-river/",
+      "https://www.houseboatbookings.com/"
+    ]
+  },
+  {
+    "name": "Riverland by land — Banrock Station, Loxton & the Big Bend cliffs",
+    "region": "SA — Riverland",
+    "tags": ["wine", "wildlife", "underrated", "road-trip", "scenic"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "250-600",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "ok",
+    "season_note": "Very hot inland (38-42C) but river-adjacent, and everything worth doing is either on the water or air-conditioned. Sunrise at the Big Bend cliffs is the move.",
+    "why_rated": "Banrock Station pairs a cellar door with a restored Ramsar wetland boardwalk; the Big Bend at Nildottie is a 30m ochre cliff face along the widest sweep of the river; and Loxton, Berri and Renmark are cheap, unpretentious river towns with free riverside camping nearby. SA's least-visited good region.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://southaustralia.com/destinations/riverland",
+      "https://www.theurbanlist.com/adelaide/a-list/road-trips-south-australia"
+    ]
+  },
+  {
+    "name": "Coorong National Park",
+    "region": "SA — Coorong / Murray Mouth",
+    "tags": ["kayak", "wildlife", "birds", "4wd", "underrated", "national-park"],
+    "days_min": 1,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "150-500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Summer is warm and calm for kayaking the lagoon, and migratory waders are present Nov-Mar having flown from Siberia. Very few facilities and no shade — carry water.",
+    "why_rated": "A 130km saltwater lagoon separated from the Southern Ocean by the Younghusband Peninsula dunes, with pelican breeding colonies, Ngarrindjeri cultural tours from Camp Coorong, and 4WD access onto a beach you can drive for 100km. The Storm Boy landscape. Almost nobody stops.",
+    "nearest_airport": "ADL",
+    "sources": [
+      "https://www.worldatlas.com/places/7-most-scenic-drives-in-south-australia.html",
+      "https://www.parks.sa.gov.au/find-a-park/Browse_by_region/Limestone-Coast/coorong-national-park"
+    ]
+  },
+  {
+    "name": "Mount Gambier — Blue Lake & Umpherston Sinkhole",
+    "region": "SA — Limestone Coast / Mount Gambier",
+    "tags": ["scenic", "geology", "free", "day-trip", "underrated", "photography"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "100-350",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "PERFECT TIMING — this is the one entry where Dec-Feb is objectively the best window. The Blue Lake flips from winter grey to vivid cobalt over a few days each November and holds that colour until it fades in late March. Visiting outside Nov-Mar and you see a grey lake.",
+    "why_rated": "A 70m-deep volcanic crater lake that turns an implausible cobalt blue as warming water precipitates limestone microcrystals, plus a Victorian gentleman's sunken garden built inside a collapsed cave, floodlit at night with possums coming out to feed. Both free. Add cave diving/snorkelling at Kilsby and Ewens Ponds nearby.",
+    "nearest_airport": "MGB",
+    "sources": [
+      "https://www.abc.net.au/news/2025-11-23/why-is-mount-gambier-blue-lake-so-blue/106031572",
+      "https://www.environment.sa.gov.au/goodliving/posts/2025/07/mt-gambier-state-heritage-areas",
+      "https://www.mountgambierpoint.com.au/attractions/umpherston-sinkhole/"
+    ]
+  },
+  {
+    "name": "Naracoorte Caves (World Heritage) & Coonawarra",
+    "region": "SA — Limestone Coast",
+    "tags": ["world-heritage", "cave", "wine", "underrated", "day-trip"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-450",
+    "cost_confidence": "medium",
+    "season_fit_dec_feb": "good",
+    "season_note": "Caves hold a constant ~17C, which makes them the best possible thing to do on a 40C day. Bat Cave infrared viewing is best Dec-Feb when the bent-wing bat maternity colony is in residence.",
+    "why_rated": "SA's only World Heritage site: 500,000 years of megafauna fossils — marsupial lions, giant kangaroos — in situ in limestone caves you tour by torchlight. Twenty minutes away, Coonawarra's terra rossa strip produces the cabernet that beats the Barossa in blind tastings, with cellar doors that are cheap and empty.",
+    "nearest_airport": "MGB",
+    "sources": [
+      "https://www.environment.sa.gov.au/goodliving/posts/2025/07/mt-gambier-state-heritage-areas",
+      "https://www.aussietowns.com.au/town/mount-gambier-sa"
+    ]
+  },
+  {
+    "name": "Robe, Beachport & the Limestone Coast beaches",
+    "region": "SA — Limestone Coast",
+    "tags": ["beach", "seafood", "village", "underrated", "road-trip"],
+    "days_min": 2,
+    "days_ideal": 3,
+    "rough_cost_couple_aud": "300-700",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "good",
+    "season_note": "Peak summer holiday season — Robe roughly quintuples in population in January and prices follow. Beachport and Canunda stay quiet. Water is cold-ish but swimmable.",
+    "why_rated": "Robe is a 1840s stone fishing village with a lobster fleet, a drivable Long Beach and the Obelisk on the headland — the smart Adelaide/Melbourne summer town nobody outside SA knows. Beachport's jetty, Pool of Siloam (seven times saltier than the sea, you float) and Canunda's dune fields are the emptier version next door.",
+    "nearest_airport": "MGB",
+    "sources": [
+      "https://www.theurbanlist.com/adelaide/a-list/road-trips-south-australia",
+      "https://southaustralia.com/destinations/limestone-coast"
+    ]
+  },
+  {
+    "name": "Head of Bight & the Bunda Cliffs (Nullarbor SA)",
+    "region": "SA — Far West / Nullarbor",
+    "tags": ["wildlife", "coast", "remote", "road-trip", "scenic"],
+    "days_min": 1,
+    "days_ideal": 2,
+    "rough_cost_couple_aud": "150-500",
+    "cost_confidence": "low",
+    "season_fit_dec_feb": "no",
+    "season_note": "The southern right whale nursery — the entire reason to stop here — runs roughly June to October, with hundreds of whales calving directly below the boardwalks. In January there are no whales and the interpretive centre reduces hours. The cliffs are still there but it's 45C and 300km from anywhere.",
+    "why_rated": "The best land-based whale watching in Australia: mothers and calves in clear water a few dozen metres below a clifftop boardwalk, with the Bunda Cliffs running 200km along the edge of the continent behind you. Spectacular — in the wrong half of the year.",
+    "nearest_airport": "CED",
+    "sources": [
+      "https://www.australiasgoldenoutback.com/destination/nullarbor",
+      "https://southaustralia.com/destinations/eyre-peninsula"
+    ]
+  }
+]
