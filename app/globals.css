@@ -274,6 +274,17 @@
   contain-intrinsic-size: auto 96px;
 }
 
+/* The same bargain as `sb-row`, for the Capsules page's card grid.
+   413 cards, each carrying an inline SVG cover, is far more paint than
+   413 rows were; `auto` still lets a card remember its measured height,
+   so the scrollbar stays honest while the off-screen ones cost nothing.
+   The intrinsic size is the tallest a grid card gets — a two-line name,
+   three lines of why and the verdict bar. */
+@utility sb-tile {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 330px;
+}
+
 /* Thin scrollbars so the catalog list does not grow a chunky OS bar
    over the glass panel. */
 @utility sb-scroll {

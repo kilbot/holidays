@@ -1,8 +1,8 @@
 import { CapsuleCardHost } from "@/components/capsule-card";
-import { CatalogDrawer } from "@/components/catalog-drawer";
 import { CostHud } from "@/components/cost-hud";
 import { DateStrip } from "@/components/date-strip";
 import { GlobeStage } from "@/components/globe-stage";
+import { ShortlistRail } from "@/components/shortlist-rail";
 
 /**
  * The Plan — the Globe stage (layout variant A, picked in #9).
@@ -29,14 +29,14 @@ export default function Plan() {
         </h1>
       </header>
 
-      <CatalogDrawer />
+      <ShortlistRail />
       <CostHud />
       <DateStrip />
 
-      {/* Mounted once, above everything. The three places that open a Capsule
-          — a Catalog row, the researched strip, a marker on the globe — are in
-          three different subtrees, so the card reads a module-level store
-          rather than being handed down as props. */}
+      {/* Mounted once, above everything. The two places that open a Capsule
+          on this page — a shortlist row and a marker on the globe — are in
+          different subtrees, so the card reads a module-level store rather
+          than being handed down as props. */}
       <CapsuleCardHost />
     </main>
   );
