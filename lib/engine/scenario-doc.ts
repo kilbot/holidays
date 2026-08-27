@@ -110,6 +110,11 @@ export function parseInput(raw: unknown): PlanInput {
     typeof item === "number" && Number.isFinite(item);
   const isBoolean = (item: unknown): item is boolean =>
     typeof item === "boolean";
+  // An Event knob is a switch or a replacement figure, and nothing else — a
+  // negative swap would be a Scenario that earns money, so it is repaired to
+  // absent rather than trusted.
+  const isEventKnob = (item: unknown): item is boolean | number =>
+    isBoolean(item) || (isNumber(item) && item >= 0);
 
   return {
     startDate:
@@ -124,6 +129,7 @@ export function parseInput(raw: unknown): PlanInput {
     ) as PlanInput["legModeOverrides"],
     lodgingTiers: record(raw.lodgingTiers, isString) as PlanInput["lodgingTiers"],
     carOverrides: record(raw.carOverrides, isBoolean),
+    eventOverrides: record(raw.eventOverrides, isEventKnob),
     fxStress: raw.fxStress === true,
     contingency: raw.contingency !== false,
     fareOverrides: record(raw.fareOverrides, isNumber),

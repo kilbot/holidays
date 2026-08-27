@@ -46,6 +46,7 @@ export const EMPTY_INPUT: PlanInput = {
   legModeOverrides: {},
   lodgingTiers: {},
   carOverrides: {},
+  eventOverrides: {},
   fxStress: false,
   contingency: true,
   fareOverrides: {},
@@ -76,6 +77,7 @@ export function buildPlan(
     capsules,
     lodgingTiers: input.lodgingTiers,
     carOverrides: input.carOverrides,
+    eventOverrides: input.eventOverrides,
     fxRate,
   });
 

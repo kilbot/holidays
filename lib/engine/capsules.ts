@@ -139,7 +139,10 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
         id: "nye-night",
         label: "New Year's Eve — vantage point and provisions",
         aud: aud(120, 0, 600),
+        // Date-locked. The offset used to put this on 30 December, because the
+        // Scheduler proposes the block on the 28th — #64 §7.2.
         dayOffset: 2,
+        date: "2026-12-31",
         source: `${RESEARCH}capsule-sydney-nye.md — the free ticketed vantage points cost nothing but a queue; the band's top is a ticketed NPWS site at A$100–300 pp, prices not published as of Aug 2026.`,
       },
     ],
@@ -281,7 +284,10 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
         id: "mel-laneway",
         label: "Laneway Festival, two tickets",
         aud: aud(400, 340, 480),
+        // Date-locked: a festival is a date. A Melbourne block moved off the
+        // weekend is a Melbourne block without a ticket to buy.
         dayOffset: 1,
+        date: "2027-02-19",
         source: `${RESEARCH}capsule-melbourne.md — Flemington Park, the Friday.`,
       },
       {

@@ -39,6 +39,7 @@ import {
 } from "@/lib/engine/constants";
 import { locationById } from "@/lib/engine/locations";
 import type {
+  CapsuleEvent,
   CapsuleSpec,
   Day,
   DayLine,
@@ -113,7 +114,35 @@ export interface LedgerInput {
   capsules: ReadonlyMap<string, CapsuleSpec>;
   lodgingTiers: Readonly<Record<string, LodgingTier>>;
   carOverrides: Readonly<Record<string, boolean>>;
+  /** Event id → off, or a different AUD figure. See `PlanInput`. */
+  eventOverrides?: Readonly<Record<string, boolean | number>>;
   fxRate: number;
+}
+
+/**
+ * Which day of its block an Event lands on, or `null` for "not on this Plan".
+ *
+ * Two kinds of Event, and the difference is the whole point of `date`:
+ *
+ * - **Offset Events** ride with the block. The reef day is the second day of
+ *   the reef Adventure wherever the reef Adventure is dragged to.
+ * - **Date-locked Events** do not move, because the world has already decided
+ *   when they are. They land on their own date if the block covers it, and if
+ *   the block does not cover it they do not happen — see `CapsuleEvent.date`.
+ */
+export function eventOffset(
+  event: CapsuleEvent,
+  placement: Placement,
+): number | null {
+  if (!event.date) {
+    return event.dayOffset >= 0 && event.dayOffset < placement.days
+      ? event.dayOffset
+      : null;
+  }
+  if (event.date < placement.startDate || event.date > placement.endDate) {
+    return null;
+  }
+  return daysBetween(placement.startDate, event.date) - 1;
 }
 
 /**
@@ -257,16 +286,31 @@ export function buildLedger(input: LedgerInput): Day[] {
 
     if (capsule && held) {
       for (const event of capsule.events) {
-        if (event.dayOffset !== held.offset) continue;
+        const override = input.eventOverrides?.[event.id];
+        // Switched off on this Scenario: the line is not here, and the
+        // Scenario comparison is where the reader sees what that bought.
+        if (override === false) continue;
+        if (eventOffset(event, held.placement) !== held.offset) continue;
+
+        const swapped = typeof override === "number";
+        // A swapped figure is a decision, not a research band: it collapses
+        // onto itself rather than inheriting the spread of the line it
+        // replaced. A A$51 ferry does not carry a A$380 cruise's worst case.
+        const aud: Rate = swapped
+          ? { plan: override, band: [override, override] }
+          : event.aud;
+
         lines.push(
           line(
             `${date}:${event.id}`,
             "event",
             event.label,
-            event.aud,
+            aud,
             fxRate,
             false,
-            event.source,
+            swapped
+              ? `${event.source} — swapped to A$${override} on this Scenario.`
+              : event.source,
           ),
         );
       }

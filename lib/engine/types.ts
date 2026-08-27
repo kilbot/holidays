@@ -77,8 +77,26 @@ export interface CapsuleEvent {
   label: string;
   /** AUD per couple. The deliberate splurge the daily thrift pays for. */
   aud: Rate;
-  /** Which day of the Capsule it lands on, 0-based. */
+  /** Which day of the Capsule it lands on, 0-based. Ignored when `date` is set. */
   dayOffset: number;
+  /**
+   * A **calendar date** the Event is nailed to, when it has one.
+   *
+   * `dayOffset` counts into the block, which is right for "the reef day is the
+   * second day of the reef Adventure wherever it lands" and wrong for anything
+   * the world has already dated. New Year's Eve is 31 December: with the Sydney
+   * block proposed on 28 December, an offset of 2 charged the vantage point and
+   * the provisions to the **30th** (#64 §7.2). Laneway is the Friday it is on.
+   *
+   * When this is set, the Event lands on this date and nowhere else — and if
+   * the block does not cover the date, the Event **does not happen and is not
+   * charged**. That is the honest reading rather than a clamp: a Melbourne
+   * block moved to the first week of February is a Melbourne block without a
+   * festival, and charging it two festival tickets would be a lie the total
+   * would carry. A block dragged off its own date-Lock already reports a
+   * `lock-violated` Warning, which is where the reader is told why.
+   */
+  date?: string;
   /** Where the figure comes from. */
   source: string;
 }
@@ -357,6 +375,24 @@ export interface PlanInput {
   lodgingTiers: Readonly<Record<string, LodgingTier>>;
   /** Capsule id → whether the block holds a paid car. Defaults to the spec. */
   carOverrides: Readonly<Record<string, boolean>>;
+  /**
+   * Event id → off, or a different AUD figure. The Scenario-level knob for
+   * **Event triage** (#65 §4.2, ordered by the #10 cost spec, which lists
+   * adding and removing an Event as a knob a Scenario holds).
+   *
+   * `false` takes the line off this Scenario entirely — the second reef boat,
+   * the Tasman Island cruise, the festival ticket. A number replaces the
+   * plan-on figure and collapses the band onto it, which is how an operator
+   * swap is expressed: the Wineglass Bay cruise at A$320 becomes the Bruny
+   * Island ferry at A$51 without inventing a second Capsule. `true` is the
+   * default and means the same as absent, so a Scenario can say "yes, on
+   * purpose" about a line it has thought about.
+   *
+   * It is deliberately **not** a way to add an Event that no Capsule carries:
+   * an Event belongs to an Adventure, and an Adventure that is off the Plan
+   * spends nothing. Toggling the Adventure is how you add one.
+   */
+  eventOverrides: Readonly<Record<string, boolean | number>>;
   /** #10 decision 3: one global FX stress toggle, 0.61 / 0.65. */
   fxStress: boolean;
   /** #10 decision 4: the contingency row, zeroable. */
