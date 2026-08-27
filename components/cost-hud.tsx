@@ -84,8 +84,11 @@ function WarningBadge() {
 export function CostHud() {
   const [open, setOpen] = useState(false);
 
+  // On narrow screens the HUD is pinned between the wordmark and the right
+  // edge rather than given a fixed width, so it can never run off the
+  // viewport; from `sm` up it takes its natural 272px column.
   return (
-    <section className="pointer-events-auto absolute top-4 right-4 z-30 w-[min(272px,calc(100vw-6.5rem))]">
+    <section className="pointer-events-auto absolute top-4 right-4 left-32 z-30 sm:left-auto sm:w-[272px]">
       <div className="sb-panel p-3.5">
         <div className="flex items-baseline justify-between gap-2">
           <p className="sb-label">Plan total</p>

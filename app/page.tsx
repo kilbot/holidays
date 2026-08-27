@@ -16,7 +16,9 @@ export default function Home() {
     <main className="relative h-dvh w-full overflow-hidden">
       <GlobeStage />
 
-      <header className="pointer-events-none absolute top-4 left-1/2 z-10 -translate-x-1/2">
+      {/* Centred over the globe on desktop; on a phone the cost HUD takes the
+          top-right, so the wordmark tucks into the free top-left corner. */}
+      <header className="pointer-events-none absolute top-5 left-4 z-10 lg:top-4 lg:left-1/2 lg:-translate-x-1/2">
         <h1 className="font-display text-[15px] font-extrabold tracking-[0.02em] text-[var(--sb-text)] [text-shadow:0_1px_12px_rgb(7_12_20/0.9)]">
           Southbound
         </h1>

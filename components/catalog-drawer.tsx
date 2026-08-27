@@ -99,7 +99,9 @@ function DrawerBody() {
         ))}
       </div>
 
-      <ul className="sb-scroll mt-3 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pr-1">
+      {/* The mask makes the cut-off row at the bottom read as "there is more"
+          rather than as a clipping bug. */}
+      <ul className="sb-scroll mt-3 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pr-1 [mask-image:linear-gradient(to_bottom,black_calc(100%-32px),transparent)]">
         {CATALOG_ENTRIES.map((entry) => (
           <CapsuleRow key={entry.id} entry={entry} />
         ))}
@@ -155,11 +157,13 @@ export function CatalogDrawer() {
         )}
       </aside>
 
-      {/* ---- Mobile: a launcher that opens the drawer over the globe ---- */}
+      {/* ---- Mobile: a launcher that opens the drawer over the globe.
+             It sits just above the date strip rather than top-left, so the
+             cost HUD gets the whole top row and stays readable. ---- */}
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="sb-panel pointer-events-auto absolute top-4 left-4 z-20 flex cursor-pointer items-center gap-2 px-3 py-2 lg:hidden"
+        className="sb-panel pointer-events-auto absolute bottom-[150px] left-4 z-20 flex cursor-pointer items-center gap-2 px-3 py-2 lg:hidden"
       >
         <Layers className="size-3.5 text-[var(--sb-accent)]" />
         <span className="sb-label">Catalog</span>
@@ -173,7 +177,7 @@ export function CatalogDrawer() {
             onClick={() => setMobileOpen(false)}
             className="absolute inset-0 cursor-default bg-[rgb(7_12_20/0.6)] backdrop-blur-[2px]"
           />
-          <div className="sb-panel absolute top-3 bottom-3 left-3 flex w-[min(320px,calc(100%-1.5rem))] flex-col p-3.5">
+          <div className="sb-panel absolute top-3 right-3 bottom-3 left-3 flex max-w-[320px] flex-col p-3.5">
             <button
               type="button"
               onClick={() => setMobileOpen(false)}
