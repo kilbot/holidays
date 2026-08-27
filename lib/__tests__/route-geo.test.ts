@@ -13,6 +13,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+import { AIRPORT_COORDINATES } from "@/lib/airports";
 import { capsuleCatalogue } from "@/lib/engine/capsules";
 import { buildPlan } from "@/lib/engine/plan";
 import { DEFAULT_SCENARIO } from "@/lib/engine/scenario-doc";
@@ -20,6 +21,7 @@ import type { Leg } from "@/lib/engine/types";
 import {
   buildRoute,
   greatCircle,
+  legEndsAtAirports,
   resolveEndpoint,
   routeArcsGeoJSON,
   routeStops,
@@ -79,6 +81,56 @@ test("home resolves through the international gateways, by name", () => {
   // A crossing's end genuinely is the terminal, so this is exact.
   assert.equal(end.approximate, false);
   assert.deepEqual(end.at, [-0.3763, 39.4699]);
+});
+
+test("an international Leg lands at the terminal, not at the block that follows", () => {
+  // The bug the whole rule exists for (#95): the crossing is aimed at the
+  // first Location of the trip, so tier 1 answered with that town's own
+  // coordinates and the 13,000 km arc terminated inland instead of at PER.
+  const crossing = leg({
+    id: "VLC>PER@2026-12-14",
+    fromLocationId: "origin",
+    toLocationId: "margaret-river",
+    from: "VLC",
+    to: "PER",
+  });
+  assert.equal(legEndsAtAirports(crossing), true);
+
+  const [arc] = routeArcsGeoJSON([crossing]).features;
+  const landing = arc.geometry.coordinates[arc.geometry.coordinates.length - 1];
+  assert.deepEqual(landing, AIRPORT_COORDINATES.PER);
+  assert.equal(arc.properties.approximate, false, "a terminal is not a guess");
+  assert.ok(arc.geometry.coordinates.length > 2, "and still a flown curve");
+
+  // The town keeps its own marker: the rule is about the arc, not the place.
+  const stop = routeStops([crossing]).features.find(
+    (feature) => feature.properties.id === "margaret-river",
+  );
+  assert.ok(stop);
+  assert.deepEqual(stop.geometry.coordinates, [115.075, -33.955]);
+});
+
+test("a domestic hop stays on the places it joins", () => {
+  const hop = leg({
+    id: "PER>SYD@2026-12-27",
+    fromLocationId: "perth",
+    toLocationId: "sydney",
+    from: "PER",
+    to: "SYD",
+  });
+  assert.equal(legEndsAtAirports(hop), false);
+
+  const [arc] = routeArcsGeoJSON([hop]).features;
+  // Perth CBD, not the terminal 11 km east of it. (The great circle's first
+  // vertex is the interpolation of the start, so this is a proximity check.)
+  const [lon, lat] = arc.geometry.coordinates[0];
+  assert.ok(Math.abs(lon - 115.8613) < 0.01 && Math.abs(lat + 31.9523) < 0.01);
+  assert.ok(Math.abs(lon - AIRPORT_COORDINATES.PER[0]) > 0.05);
+  // …and a drive between two ends of the same gateway is never a crossing.
+  assert.equal(
+    legEndsAtAirports({ ...hop, mode: "drive", to: "PER", toLocationId: "morawa" }),
+    false,
+  );
 });
 
 test("an airport-only Location is placed at its terminal and marked approximate", () => {
