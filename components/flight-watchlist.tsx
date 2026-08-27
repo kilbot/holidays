@@ -6,8 +6,11 @@
  * kilbot/holidays#68: *"sometimes you find a flight you think is good, but then
  * you forget which day it was."* This is the answer to the second half of that
  * sentence. Each row is a quote as it stood on the day it was pinned, next to
- * the newest price the store holds for the same route and day, with the
- * difference stated in the direction a buyer feels it.
+ * the newest price the store holds for the same route, day *and carrier*, with
+ * the difference stated in the direction a buyer feels it. When the store's
+ * newest observation is another airline's — it records each day's cheapest
+ * fare, whoever flies it — that figure appears labelled as the day's cheapest,
+ * never as this pin's "now".
  *
  * Two things it will not do, and both are the point:
  *
@@ -208,6 +211,8 @@ const NO_DRIFT_REASON: Record<NonNullable<PinDrift["reason"]>, string> = {
   estimate:
     "You pinned this against the research band rather than a quote, so there is no price change to report — only a first real fare, when one lands.",
   unpriced: "No price was recorded when this was pinned.",
+  "different-carrier":
+    "The store keeps each day's cheapest fare, whoever flies it, and the newest one is another carrier's — so there is no like-for-like quote to put next to this pin.",
 };
 
 function WatchRow({
@@ -222,7 +227,7 @@ function WatchRow({
   onJump: () => void;
   onUnpin: () => void;
 }) {
-  const drift = driftOf(pin, series?.current?.priceEur ?? null);
+  const drift = driftOf(pin, series?.current ?? null);
   const trend = series?.trend ?? null;
   const ink = driftInk(drift);
 
@@ -264,11 +269,25 @@ function WatchRow({
             <span className="sb-num text-[11px] text-[var(--sb-dim)]">
               now{" "}
               <span className="font-semibold" style={{ color: ink }}>
-                {drift.currentEurPP === null
-                  ? "nothing stored"
-                  : `${formatEur(drift.currentEurPP)} pp`}
+                {drift.currentEurPP !== null
+                  ? `${formatEur(drift.currentEurPP)} pp`
+                  : drift.cheapest
+                    ? "no quote for this carrier"
+                    : "nothing stored"}
               </span>
             </span>
+            {drift.cheapest && (
+              <span
+                className="sb-num text-[11px] text-[var(--sb-dim)]"
+                title="The newest stored observation — the cheapest fare seen on this day, which was another carrier's."
+              >
+                cheapest this day{" "}
+                <span className="font-semibold text-[var(--sb-text)]">
+                  {formatEur(drift.cheapest.eurPP)} pp
+                </span>{" "}
+                ({drift.cheapest.carrier})
+              </span>
+            )}
             <DriftChip drift={drift} />
             {trend && (
               <span
