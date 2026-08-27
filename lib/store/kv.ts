@@ -38,15 +38,46 @@ export interface KvClient {
   /** Write the document, overwriting whatever was there. */
   setJson(key: string, value: unknown): Promise<void>;
   /**
+   * Write the document with a lifetime, in one operation.
+   *
+   * One operation rather than a write and an expire, because the gap between
+   * two is a document that exists forever if the second call fails — which for
+   * the thing this was added for, unadopted Forks, is the leak it was meant to
+   * stop.
+   */
+  setJsonWithTtl(key: string, value: unknown, ttlSeconds: number): Promise<void>;
+  /**
+   * Change how long a key has left. `null` removes the expiry entirely, so the
+   * document lives until something deletes it.
+   *
+   * Both halves are used by Forks: a visit pushes the expiry back out, and an
+   * adopt takes it off, because a Fork the couple has copied into their
+   * Scenario list is part of the itinerary's history and not a draft.
+   */
+  setTtl(key: string, ttlSeconds: number | null): Promise<void>;
+  /**
    * Write only if the key is free. Returns whether this call did the writing —
    * how the bootstrap refuses to overwrite a Plan that already exists.
    */
   setJsonIfAbsent(key: string, value: unknown): Promise<boolean>;
   /**
    * Increment a counter and make sure it expires. Returns the value after the
-   * increment. The write throttle is the only caller.
+   * increment.
+   *
+   * The return value is the whole point for a cap: `INCR` is atomic, so the
+   * number it hands back is this caller's own place in the queue and no two
+   * concurrent callers can be given the same one. Reading a counter and then
+   * incrementing it is two operations and a race — see `lib/flights/quota.ts`.
    */
   incrementWithTtl(key: string, ttlSeconds: number): Promise<number>;
+  /**
+   * Give a counter back. Returns the value after the decrement.
+   *
+   * The other half of INCR-first budgeting: a caller that increments to find
+   * out whether it may proceed has to put the number back when the answer is
+   * no, or a refused call would cost the same as a made one.
+   */
+  decrement(key: string): Promise<number>;
   /** Put an observation at the front of a list. */
   listPush(key: string, value: unknown): Promise<void>;
   /** Keep an inclusive slice of a list. */
@@ -77,6 +108,13 @@ function upstashClient(redis: Redis): KvClient {
     async setJson(key, value) {
       await redis.set(key, JSON.stringify(value));
     },
+    async setJsonWithTtl(key, value, ttlSeconds) {
+      await redis.set(key, JSON.stringify(value), { ex: ttlSeconds });
+    },
+    async setTtl(key, ttlSeconds) {
+      if (ttlSeconds === null) await redis.persist(key);
+      else await redis.expire(key, ttlSeconds);
+    },
     async setJsonIfAbsent(key, value) {
       const result = await redis.set(key, JSON.stringify(value), { nx: true });
       return result === "OK";
@@ -87,6 +125,9 @@ function upstashClient(redis: Redis): KvClient {
       // writes cannot keep pushing the window out in front of itself.
       if (count === 1) await redis.expire(key, ttlSeconds);
       return count;
+    },
+    async decrement(key) {
+      return redis.decr(key);
     },
     async listPush(key, value) {
       await redis.lpush(key, value);

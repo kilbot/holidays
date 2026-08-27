@@ -28,9 +28,17 @@ async function storedFare(route: RouteGridEntry, date: string) {
 export async function getFare(
   route: RouteGridEntry,
   date: string,
-  { allowApi = true }: { allowApi?: boolean } = {},
+  {
+    allowApi = true,
+    asker,
+  }: { allowApi?: boolean; asker?: Request } = {},
 ) {
-  const live = allowApi ? await fetchFare(route.from, route.to, date, route) : null;
+  // `asker` is passed through for one purpose: charging a live call against the
+  // asking IP's daily allowance. Absent for the warming cron, which has no
+  // visitor behind it.
+  const live = allowApi
+    ? await fetchFare(route.from, route.to, date, route, asker)
+    : null;
   if (live) {
     const history = await readFareHistory(getKv(), route.from, route.to, date);
     return {

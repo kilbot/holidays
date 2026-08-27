@@ -23,10 +23,11 @@ import { isPlausibleId } from "@/lib/store/ids";
 import { getKv } from "@/lib/store/kv";
 import {
   adoptFork,
+  markForkAdopted,
   readFork,
   readPlan,
   readPlanMeta,
-  writePlan,
+  writePlanIfCurrent,
 } from "@/lib/store/plans";
 
 export const dynamic = "force-dynamic";
@@ -53,26 +54,59 @@ export async function POST(
   const forkId = (body.value as { forkId?: unknown } | null)?.forkId;
   if (!isPlausibleId(forkId)) return errorResponse("No such fork", 404);
 
-  const [plan, fork] = await Promise.all([
-    readPlan(kv, planId),
-    readFork(kv, forkId),
-  ]);
-  if (!plan) return errorResponse("No such plan", 404);
+  const fork = await readFork(kv, forkId);
   if (!fork || fork.forkedFrom !== planId) {
     return errorResponse("No such fork", 404);
   }
 
-  const adopted = adoptFork(plan, forkId, fork);
-  // Adopting the same Fork twice is a no-op, so the second call skips the write
-  // entirely rather than bumping `updatedAt` for a document that did not change.
-  const next = adopted.alreadyAdopted
-    ? plan
-    : await writePlan(kv, planId, adopted.state);
+  // Read, adopt, write-if-unchanged — and if the document moved underneath,
+  // read it again and adopt into the new one.
+  //
+  // Adopt is the one write that cannot answer a conflict with a 409: the couple
+  // pressed a button, the Fork is not going to change, and asking them to press
+  // it again would be the site making its own bookkeeping their problem. Two
+  // attempts, because `adoptFork` is idempotent on `adoptedFrom` — the retry
+  // either lands or discovers the Fork is already in the list.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const plan = await readPlan(kv, planId);
+    if (!plan) return errorResponse("No such plan", 404);
 
-  return jsonResponse({
-    planId,
-    plan: next,
-    scenarioId: adopted.scenarioId,
-    alreadyAdopted: adopted.alreadyAdopted,
-  });
+    const adopted = adoptFork(plan, forkId, fork);
+    // Adopting the same Fork twice is a no-op, so the second call skips the
+    // write rather than bumping `updatedAt` on a document that did not change.
+    if (adopted.alreadyAdopted) {
+      // Still worth stamping: a Fork adopted before #90 gave Forks a lifetime
+      // has no `adoptedAt`, so it would otherwise be handed a 90-day expiry by
+      // the next read of a document the Plan permanently points at.
+      await markForkAdopted(kv, forkId, fork);
+      return jsonResponse({
+        planId,
+        plan,
+        scenarioId: adopted.scenarioId,
+        alreadyAdopted: true,
+      });
+    }
+
+    const written = await writePlanIfCurrent(
+      kv,
+      planId,
+      adopted.state,
+      plan.version,
+    );
+    if (written.ok) {
+      // The Fork is now part of the itinerary's history, so its 90-day expiry
+      // comes off. After the write, never before: a Fork marked adopted by a
+      // write that then failed would outlive its only reason to exist.
+      await markForkAdopted(kv, forkId, fork);
+      return jsonResponse({
+        planId,
+        plan: written.plan,
+        scenarioId: adopted.scenarioId,
+        alreadyAdopted: false,
+      });
+    }
+    if (!written.current) return errorResponse("No such plan", 404);
+  }
+
+  return errorResponse("The plan is being written to — try again", 409);
 }

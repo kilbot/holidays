@@ -106,10 +106,13 @@ interface FakeServer {
 }
 
 /** `/api/plan/<id>`, in about twenty lines, with ADR 0001's one rule. */
-function fakeServer(doc: PlanDoc): FakeServer {
+function fakeServer(doc: Omit<PlanDoc, "version">): FakeServer {
   const original = globalThis.fetch;
   const server: FakeServer = {
-    doc,
+    // Seeded here rather than at every call site: this suite is about who may
+    // write, not about #90's version check, and the fake only has to keep the
+    // counter moving so the store has something real to send back.
+    doc: { ...doc, version: 0 },
     calls: [],
     restore: () => {
       globalThis.fetch = original;
@@ -131,7 +134,11 @@ function fakeServer(doc: PlanDoc): FakeServer {
     if (editKey !== EDIT_KEY) return json({ error: "forbidden" }, 403);
 
     const body = JSON.parse(String(init?.body)) as ScenarioState;
-    server.doc = { ...body, updatedAt: "2026-08-27T12:00:00.000Z" };
+    server.doc = {
+      ...body,
+      updatedAt: "2026-08-27T12:00:00.000Z",
+      version: server.doc.version + 1,
+    };
     return json({ plan: server.doc });
   }) as typeof globalThis.fetch;
 

@@ -17,11 +17,12 @@ import {
   errorResponse,
   jsonResponse,
   readJsonBody,
+  reserveDailyPerIp,
   throttleWrite,
 } from "@/lib/store/guards";
 import { isPlausibleId } from "@/lib/store/ids";
 import { getKv } from "@/lib/store/kv";
-import { createFork, readPlan } from "@/lib/store/plans";
+import { DAILY_FORK_CAP_PER_IP, createFork, readPlan } from "@/lib/store/plans";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,16 @@ export async function POST(
   const kv = getKv();
   const throttled = await throttleWrite(kv, request);
   if (!throttled.ok) return throttled.response;
+
+  // The per-minute throttle is the right shape for accidents and the wrong one
+  // for patience — 20 a minute is 28,800 Forks a day. This is the daily one.
+  // Above a friend saving a version or three, far below free file hosting.
+  if (!(await reserveDailyPerIp(kv, request, "fork", DAILY_FORK_CAP_PER_IP))) {
+    return errorResponse(
+      "That is a lot of forks for one day — try again tomorrow",
+      429,
+    );
+  }
 
   // A Fork records what it forked from, so the id has to name a real Plan.
   const plan = await readPlan(kv, planId);

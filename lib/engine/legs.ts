@@ -10,18 +10,40 @@
  * a Leg. Drag a Capsule and the Legs re-derive; toggle one off and the Leg it
  * required stops existing. Nothing to keep in step.
  *
- * ## Pricing, in four tiers
+ * ## Pricing, in three tiers and a flag
  *
- * 1. **`grid`** — `lib/flights/grid.ts` covers this route on this date, so
- *    `/api/fares` has a real answer. The figure here is the stored snapshot,
- *    standing in until the client hydrates the live fare through
- *    `fareOverrides`. A placeholder that is labelled is honest; a blank is not.
- * 2. **`snapshot`** — a stored research estimate for the route, with no live
- *    path for this date.
- * 3. **`band`** — no snapshot at all, so the research's own band for that kind
+ * 1. **`snapshot`** — a stored research estimate for the route.
+ * 2. **`band`** — no snapshot at all, so the research's own band for that kind
  *    of journey (`docs/research/domestic-flights.md` §2).
- * 4. **`computed`** — a drive. Distance × fuel, from cost-baselines §2.2. The
+ * 3. **`computed`** — a drive. Distance × fuel, from cost-baselines §2.2. The
  *    car itself is already a Day line, so the Leg only carries the fuel.
+ *
+ * `onGrid` is the flag, and it is orthogonal to all three: it says
+ * `lib/flights/grid.ts` covers this route on this date, so whatever figure is
+ * showing is a placeholder standing in until the client hydrates the live fare
+ * through `fareOverrides`. A placeholder that is labelled is honest; a blank is
+ * not.
+ *
+ * ## One-way, return, and why it is not a display detail
+ *
+ * Every live quote is a **one-way**: `lib/flights/searchapi.ts` asks for
+ * `flight_type=one_way`. The research's long-haul figure is a **return** —
+ * `docs/research/longhaul-comfort.md` heads its price table *"Bands, per
+ * person, return, open-jaw into PER / out of SYD-MEL-BNE"* and puts the
+ * premium-comfort row, the stated criterion for these crossings, at
+ * €1,500–2,300.
+ *
+ * This module used to charge that return figure to the outbound Leg and zero
+ * the homeward one, with a note saying the fare was on the outbound ticket.
+ * That is correct arithmetic on a return figure and catastrophic on a one-way
+ * one: as soon as a live fare hydrated the outbound crossing, the Plan was
+ * charging a single one-way ticket for a round trip and the entire journey home
+ * — €1–2k for two — vanished from the roll-up (kilbot/holidays#90).
+ *
+ * So provenance decides, per figure and per Leg. A return-basis figure is split
+ * across the two crossings (`OUTBOUND_SHARE`); a one-way figure is charged
+ * whole to the crossing it prices. Neither rule can lose a fare, and hydrating
+ * one crossing no longer says anything about the other.
  *
  * ## Mode
  *
@@ -47,15 +69,17 @@ import {
 } from "@/lib/engine/constants";
 import { cents, retotal } from "@/lib/engine/ledger";
 import { ORIGIN_AIRPORT, distanceKm, locationById } from "@/lib/engine/locations";
-import type { Day, Leg, LegMode } from "@/lib/engine/types";
+import type { Day, FareBasis, Leg, LegMode } from "@/lib/engine/types";
 import { FARE_SNAPSHOTS } from "@/lib/flights/snapshots";
-import { EUROPEAN_AIRPORTS, ROUTE_GRID } from "@/lib/flights/grid";
+import { EUROPEAN_AIRPORTS, ROUTE_GRID, resolveRoute } from "@/lib/flights/grid";
 
 /**
- * Research bands for routes the snapshots do not carry, EUR **per person**,
- * one-way. `docs/research/domestic-flights.md` §2 "Typical €" column, with the
- * long-hauls from `longhaul-comfort.md` §Price bands (comfort-first, which is
- * the stated criterion for the crossings — not cheapest).
+ * Research bands for routes the snapshots do not carry, EUR **per person,
+ * one-way**. `docs/research/domestic-flights.md` §2 "Typical €" column.
+ *
+ * Every row here is a one-way, and the long-haul band is deliberately *not* a
+ * row: it is quoted on a different basis and mixing the two in one table is
+ * how it came to be spent as if it were a one-way.
  */
 const RESEARCH_BANDS: Readonly<Record<string, [number, number]>> = {
   "PER-SYD": [245, 425], // §2 row 1, the critical Leg, 26–31 Dec
@@ -66,10 +90,34 @@ const RESEARCH_BANDS: Readonly<Record<string, [number, number]>> = {
   "SYD-MEL": [67, 110], // row 15
   "OOL-HBA": [67, 134], // no published row; Gold Coast → Hobart, one-stop
   "CNS-OOL": [90, 160], // Cairns → Gold Coast, Jetstar
-  // longhaul-comfort.md, premium-comfort band — a **return** per person, which
-  // is why only the outbound crossing carries a fare. December is the top of it.
-  LONGHAUL: [1_500, 2_300],
 };
+
+/** A domestic hop with no published row of its own. One-way, per person. */
+const DOMESTIC_BAND: readonly [number, number] = [90, 200];
+
+/**
+ * The ocean crossing, EUR per person — and a **return**, not a one-way.
+ *
+ * `docs/research/longhaul-comfort.md`, the table headed *"Bands, per person,
+ * return, open-jaw into PER / out of SYD-MEL-BNE"*: the premium-comfort row is
+ * €1,500–2,300, and comfort-first rather than cheapest is docs/CONTEXT.md's
+ * stated criterion for these two Legs. One figure, both crossings.
+ */
+const LONGHAUL_RETURN_BAND: readonly [number, number] = [1_500, 2_300];
+
+/**
+ * How much of a return figure the outbound crossing carries. The homeward one
+ * carries the rest.
+ *
+ * Not half. `longhaul-comfort.md` on the same page as the band: *"The outbound
+ * is peak; the return is the cheapest week of the year"* — aggregator averages
+ * for Sydney→Spain are €1,344 in December against €804 in February, which is
+ * five-eighths and three-eighths to within a euro. Splitting evenly would
+ * under-price the December crossing, and December is both the one the couple
+ * books first and the one a live one-way quote replaces first: a placeholder
+ * that jumps when the real number lands is a placeholder that was lying.
+ */
+const OUTBOUND_SHARE = 0.625;
 
 /**
  * Anything crossing an ocean prices off the long-haul band, not a domestic row.
@@ -163,27 +211,31 @@ export function deriveLegs(input: LegInput): LegResult {
     );
   }
 
-  // The homeward crossing is the second half of the same ticket.
+  // The homeward crossing, priced like any other Leg.
   //
-  // `longhaul-comfort.md` prices the crossing as one **return** — €1,500–2,300
-  // per person, comfort-first — and argues for an open jaw (out to Perth, home
-  // from the east coast) as a variant of that one ticket rather than two
-  // one-ways. So the outbound Leg above carries the whole fare and this one
-  // carries nothing. Charging both would double the largest line in the Plan.
+  // It used to be zeroed here. `longhaul-comfort.md` prices the crossing as one
+  // **return** and argues for an open jaw — out to Perth, home from the east
+  // coast — as a variant of that one ticket rather than two one-ways, so the
+  // outbound Leg carried the whole figure and this one carried a note saying
+  // the fare was over there. Two Legs, one charge, no double-count.
+  //
+  // The flaw was that the rule was written for the band and applied to
+  // everything. Live quotes are one-ways (`searchapi.ts`), so a hydrated
+  // outbound crossing meant a round trip priced as a single ticket west, with
+  // the journey home free (kilbot/holidays#90). `priceFlight` now splits a
+  // return-basis figure across the two crossings and charges a one-way figure
+  // whole, which needs no special case here at all.
   const last = days[days.length - 1];
-  const homeward = buildLeg({
-    date: last.date,
-    fromLocationId: last.locationId,
-    toLocationId: "origin",
-    from: locationById(last.locationId).airport,
-    to: ORIGIN_AIRPORT,
-    input,
-    note: "The homeward crossing — the return half of the outbound ticket, so the fare is carried there.",
-  });
   legs.push(
-    homeward.modeOverridden
-      ? homeward
-      : { ...homeward, eur: 0, bandEur: [0, 0] as [number, number] },
+    buildLeg({
+      date: last.date,
+      fromLocationId: last.locationId,
+      toLocationId: "origin",
+      from: locationById(last.locationId).airport,
+      to: ORIGIN_AIRPORT,
+      input,
+      note: "The homeward crossing. February is the cheapest month of the year out of Australia — longhaul-comfort.md — which is why it is the smaller half of the ticket.",
+    }),
   );
 
   // Charge each Leg to its Day. Two Legs on one Day (a same-day connection) is
@@ -256,9 +308,16 @@ function buildLeg(args: BuildLegArgs): Leg {
     eur: hydrated ? cents(live) : priced.eur,
     bandEur: hydrated ? [cents(live), cents(live)] : priced.bandEur,
     pricing: priced.pricing,
+    onGrid: priced.onGrid,
+    // A hydrated figure came from `/api/fares`, which asks SearchAPI for
+    // `flight_type=one_way`. It buys this crossing and nothing else — whatever
+    // the placeholder it replaced was a price for.
+    fareBasis: hydrated ? "one-way" : priced.fareBasis,
     hydrated,
     carrier: priced.carrier,
-    note: hydrated ? `${priced.note} Live fare from /api/fares.` : priced.note,
+    note: hydrated
+      ? `${priced.note} Live one-way fare from /api/fares, for this crossing only.`
+      : priced.note,
   };
 }
 
@@ -266,18 +325,48 @@ interface Priced {
   eur: number;
   bandEur: [number, number];
   pricing: Leg["pricing"];
+  onGrid: boolean;
+  fareBasis: Leg["fareBasis"];
   carrier: string | null;
   note: string;
 }
 
-/** Whether `/api/fares` can answer for this route on this date at all. */
+/**
+ * Whether `/api/fares` can answer for this route on this date at all.
+ *
+ * The same question `resolveRoute` answers, asked with its own function: the
+ * **pair** is a whitelist, because an open origin/destination on a metered API
+ * is a proxy somebody else can spend, and the **date** is a window, because a
+ * date is not a resource (`lib/flights/grid.ts`).
+ *
+ * It used to compare the date against `entry.dates`, which is the set the cron
+ * warms — a different question, and the wrong one. That is *"will this be a
+ * cache hit"*, and answering it here meant every Leg on a day the cron does not
+ * pay for was treated as unpriceable. The homeward crossing has fallen outside
+ * the warmed set twice now, once per re-plan, and each time it silently stopped
+ * being able to ask for the fare it was entitled to. `isPreWarmed` is still
+ * there for callers who genuinely want to know what a cold date costs.
+ */
 export function legIsOnGrid(from: string, to: string, date: string): boolean {
-  return ROUTE_GRID.some(
-    (entry) =>
-      entry.from === from &&
-      entry.to === to &&
-      entry.dates.some((gridDate) => gridDate === date),
-  );
+  return resolveRoute(from, to, date) !== null;
+}
+
+/**
+ * The fraction of a return-basis figure this Leg carries.
+ *
+ * Only the two ocean crossings are ever priced from a return figure — the
+ * research quotes nothing else that way — and they are also the only Legs with
+ * an `origin` end, so the direction reads straight off the Leg.
+ */
+function returnShare(args: BuildLegArgs): number {
+  return args.toLocationId === "origin" ? 1 - OUTBOUND_SHARE : OUTBOUND_SHARE;
+}
+
+/** Why a crossing carries part of a figure rather than all of it. */
+function splitNote(args: BuildLegArgs): string {
+  return args.toLocationId === "origin"
+    ? " That is a return figure per person, so this crossing carries three-eighths of it — February home is the cheapest month of the year, against a December peak out."
+    : " That is a return figure per person, so this crossing carries five-eighths of it — December out is the peak, against the cheapest month of the year coming home.";
 }
 
 function priceFlight(args: BuildLegArgs & { id: string }): Priced {
@@ -287,30 +376,50 @@ function priceFlight(args: BuildLegArgs & { id: string }): Priced {
   const onGrid = legIsOnGrid(from, to, date);
 
   const domestic = AUSTRALIAN.has(from) && AUSTRALIAN.has(to);
-  const band =
-    RESEARCH_BANDS[key] ??
-    RESEARCH_BANDS[`${to}-${from}`] ??
-    (domestic ? [90, 200] : RESEARCH_BANDS.LONGHAUL);
+  const published = RESEARCH_BANDS[key] ?? RESEARCH_BANDS[`${to}-${from}`];
+  const band = published ?? (domestic ? DOMESTIC_BAND : LONGHAUL_RETURN_BAND);
+  // Only the long-haul fallback is a return. Every published row is a one-way,
+  // and so is the domestic fallback.
+  const bandBasis: FareBasis =
+    published || domestic ? "one-way" : "return";
+
+  // Each figure is converted by its **own** provenance rather than by the
+  // route's: a snapshot and a band can disagree about what they are prices for,
+  // and guessing from the route is how the fare home went missing.
+  const perCouple = (value: number, basis: FareBasis) =>
+    cents((basis === "return" ? value * returnShare(args) : value) * TRAVELLERS);
+  const bandEur: [number, number] = [
+    perCouple(band[0], bandBasis),
+    perCouple(band[1], bandBasis),
+  ];
 
   if (snapshot) {
-    const perPerson = snapshot.priceEur;
     return {
-      eur: cents(perPerson * TRAVELLERS),
-      bandEur: [cents(band[0] * TRAVELLERS), cents(band[1] * TRAVELLERS)],
-      pricing: onGrid ? "grid" : "snapshot",
+      eur: perCouple(snapshot.priceEur, snapshot.basis),
+      bandEur,
+      pricing: "snapshot",
+      onGrid,
+      fareBasis: snapshot.basis === "return" ? "return-share" : "one-way",
       carrier: snapshot.carrier,
-      note: onGrid
-        ? `${note} Fare snapshot standing in until the live fare loads — this route and date are on the fares grid.`
-        : `${note} Stored research estimate, ${snapshot.fetchedAt}.`,
+      note:
+        (onGrid
+          ? `${note} Fare snapshot standing in until the live fare loads — this route and date are on the fares grid.`
+          : `${note} Stored research estimate, ${snapshot.fetchedAt}.`) +
+        (snapshot.basis === "return" ? splitNote(args) : ""),
     };
   }
 
   return {
-    eur: cents(band[0] * TRAVELLERS),
-    bandEur: [cents(band[0] * TRAVELLERS), cents(band[1] * TRAVELLERS)],
+    eur: bandEur[0],
+    bandEur,
     pricing: "band",
+    onGrid,
+    fareBasis: bandBasis === "return" ? "return-share" : "one-way",
     carrier: null,
-    note: `${note} No snapshot for this route — priced from the research band, ${domestic ? "domestic-flights.md §2" : "longhaul-comfort.md"}.`,
+    note:
+      `${note} No snapshot for this route — priced from the research band, ${domestic ? "domestic-flights.md §2" : "longhaul-comfort.md"}.` +
+      (bandBasis === "return" ? splitNote(args) : "") +
+      (onGrid ? " The live fare replaces it when it loads." : ""),
   };
 }
 
@@ -328,6 +437,8 @@ function priceDrive(args: BuildLegArgs): Priced {
       eur: 0,
       bandEur: [0, 0],
       pricing: "computed",
+      onGrid: false,
+      fareBasis: "one-way",
       carrier: null,
       note: `${args.note} Driven — no coordinates for one end, so the fuel is not priced.`,
     };
@@ -342,6 +453,9 @@ function priceDrive(args: BuildLegArgs): Priced {
     eur: cents(km * FUEL_AUD_PER_KM.plan * AUD_TO_EUR),
     bandEur: [cents(low), cents(high)],
     pricing: "computed",
+    onGrid: false,
+    // Petrol for one journey. Nothing about a tank of fuel is a return.
+    fareBasis: "one-way",
     carrier: null,
     note: `${args.note} Driven: ~${Math.round(km)} km at A$0.16/km (cost-baselines §2.2), about ${drivingDays} day${drivingDays === 1 ? "" : "s"} behind the wheel. Fuel only — the car is already a daily line.`,
   };

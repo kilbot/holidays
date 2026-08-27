@@ -67,6 +67,16 @@ export interface ForkDoc {
   createdAt: string;
   /** The Plan this was forked from. Always the canonical one, today. */
   forkedFrom: string;
+  /**
+   * When the couple adopted this Fork, if they have.
+   *
+   * It is what takes the expiry off. An unadopted Fork is a draft somebody left
+   * behind and it lives 90 days from its last visit; an adopted one is part of
+   * the itinerary's history — the Scenario in the Plan says "adopted from this"
+   * and a dead link there would be the site forgetting where its own trip came
+   * from — so it lives until something deletes it.
+   */
+  adoptedAt?: string;
 }
 
 // Both live in `lib/engine/scenario-doc.ts` — the shape of a stored Plan is
@@ -82,6 +92,31 @@ export const MAX_FORK_NAME_LENGTH = 60;
 /** Longest an author note may be. A sentence or two, not an essay. */
 export const MAX_AUTHOR_NOTE_LENGTH = 280;
 
+/**
+ * How long an unadopted Fork lives after its last visit.
+ *
+ * Anyone may write a Fork and nothing ever deletes one, so the key space only
+ * grows — a bounded leak for an audience of two, and an unbounded one for
+ * anybody who notices (kilbot/holidays#90). Ninety days is longer than this
+ * trip's whole planning window, and the clock restarts every time somebody
+ * opens the link: a Fork a friend keeps coming back to is not abandoned, and a
+ * Fork nobody has looked at since March is.
+ *
+ * An adopted Fork has no expiry at all — see `ForkDoc.adoptedAt`.
+ */
+export const FORK_TTL_SECONDS = 90 * 24 * 60 * 60;
+
+/**
+ * How many Forks one IP may create in a day.
+ *
+ * The write throttle already stops a script at 20 requests a minute, which is
+ * the right shape for accidents and the wrong one for patience: 20 a minute is
+ * 28,800 Forks a day. Ten is far above what a friend playing with the
+ * itinerary does — they save a version, not a hundred — and far below what
+ * makes the key space somebody's storage.
+ */
+export const DAILY_FORK_CAP_PER_IP = 10;
+
 /* ------------------------------------------------------------------ */
 /* Reading and writing the canonical Plan                              */
 /* ------------------------------------------------------------------ */
@@ -95,13 +130,66 @@ export async function readPlan(
   return toPlanDoc(raw);
 }
 
+/**
+ * Replace the Plan, whatever is there. Bumps the version.
+ *
+ * The unconditional write, for callers with no base version to claim: the
+ * seeding script, and a client old enough not to send one. Everything with a
+ * document in its hands should be using `writePlanIfCurrent` instead.
+ */
 export async function writePlan(
   kv: KvClient,
   planId: string,
   state: ScenarioState,
   now: Date = new Date(),
 ): Promise<PlanDoc> {
-  const doc: PlanDoc = { ...state, updatedAt: now.toISOString() };
+  const current = await readPlan(kv, planId);
+  return write(kv, planId, state, (current?.version ?? 0) + 1, now);
+}
+
+/**
+ * Replace the Plan **only if** it is still at the version the caller last saw.
+ *
+ * Optimistic concurrency, and the reason it exists is one specific data loss:
+ * `remote-store.ts` pushes the whole document on a debounce, so a push that was
+ * already in flight when the couple adopted a Fork would land afterwards and
+ * silently erase the adopted Scenario — a document it had never seen. `PUT`
+ * carries the version it is editing from; a write against a stale one is
+ * refused and the client refetches, merges and retries (kilbot/holidays#90).
+ *
+ * **The check is read-then-write, not a compare-and-set.** `KvClient` has no
+ * CAS verb and adding one would mean a Lua script on the Upstash REST client
+ * for an audience of two. What this closes is the window that actually bites —
+ * the seconds-wide one between a debounce firing and the request landing.
+ * What it leaves open is the microseconds between this read and this write,
+ * which needs two writers to arrive inside the same request round trip.
+ */
+export async function writePlanIfCurrent(
+  kv: KvClient,
+  planId: string,
+  state: ScenarioState,
+  baseVersion: number,
+  now: Date = new Date(),
+): Promise<
+  { ok: true; plan: PlanDoc } | { ok: false; current: PlanDoc | null }
+> {
+  const current = await readPlan(kv, planId);
+  if (!current) return { ok: false, current: null };
+  if (current.version !== baseVersion) return { ok: false, current };
+  return {
+    ok: true,
+    plan: await write(kv, planId, state, current.version + 1, now),
+  };
+}
+
+async function write(
+  kv: KvClient,
+  planId: string,
+  state: ScenarioState,
+  version: number,
+  now: Date,
+): Promise<PlanDoc> {
+  const doc: PlanDoc = { ...state, updatedAt: now.toISOString(), version };
   await kv.setJson(planKey(planId), doc);
   return doc;
 }
@@ -129,7 +217,9 @@ export async function createPlan(
 ): Promise<{ planId: string; editKey: string } | null> {
   const planId = newId();
   const editKey = newId();
-  const doc: PlanDoc = { ...seed, updatedAt: now.toISOString() };
+  // Version 0: nothing has written this document under the versioning rules
+  // yet, so the first conditional write against it is the first that counts.
+  const doc: PlanDoc = { ...seed, updatedAt: now.toISOString(), version: 0 };
 
   const claimed = await kv.setJsonIfAbsent(planKey(planId), doc);
   if (!claimed) return null;
@@ -141,13 +231,21 @@ export async function createPlan(
 /* Forks                                                               */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Read a Fork — and, if nobody has adopted it, push its expiry back out.
+ *
+ * "Touched on read" is what makes the 90-day lifetime a measure of *neglect*
+ * rather than of age. A Fork a friend keeps opening is alive; the countdown
+ * only runs on ones nobody visits. An adopted Fork has no expiry to push, and
+ * giving it one here would quietly re-arm the thing the adopt disarmed.
+ */
 export async function readFork(
   kv: KvClient,
   forkId: string,
 ): Promise<ForkDoc | null> {
   const raw = await kv.getJson<unknown>(forkKey(forkId));
   if (!isRecord(raw)) return null;
-  return {
+  const fork: ForkDoc = {
     name: typeof raw.name === "string" ? raw.name : "Untitled fork",
     planInput: parseInput(raw.planInput),
     ...(typeof raw.authorNote === "string" && raw.authorNote.length > 0
@@ -158,7 +256,32 @@ export async function readFork(
         ? raw.createdAt
         : new Date(0).toISOString(),
     forkedFrom: typeof raw.forkedFrom === "string" ? raw.forkedFrom : "",
+    ...(typeof raw.adoptedAt === "string" ? { adoptedAt: raw.adoptedAt } : {}),
   };
+
+  if (!fork.adoptedAt) await kv.setTtl(forkKey(forkId), FORK_TTL_SECONDS);
+  return fork;
+}
+
+/**
+ * Take the expiry off a Fork the couple has adopted, and record when.
+ *
+ * Called after the adopt has landed in the Plan, not before: a Fork marked
+ * adopted by a write that then failed would be a Fork that outlives its reason
+ * to exist. The other order — persist first, adopt second — leaks; this one, at
+ * worst, expires a Fork whose Scenario is already safely copied into the Plan.
+ */
+export async function markForkAdopted(
+  kv: KvClient,
+  forkId: string,
+  fork: ForkDoc,
+  now: Date = new Date(),
+): Promise<void> {
+  if (fork.adoptedAt) return;
+  await kv.setJson(forkKey(forkId), {
+    ...fork,
+    adoptedAt: now.toISOString(),
+  } satisfies ForkDoc);
 }
 
 /**
@@ -189,7 +312,10 @@ export async function createFork(
     createdAt: now.toISOString(),
     forkedFrom: input.forkedFrom,
   };
-  await kv.setJson(forkKey(forkId), fork);
+  // Written with its lifetime rather than given one afterwards: a two-call
+  // version leaves an immortal Fork behind whenever the second call fails,
+  // which is the leak this is here to close.
+  await kv.setJsonWithTtl(forkKey(forkId), fork, FORK_TTL_SECONDS);
   return { forkId, fork };
 }
 

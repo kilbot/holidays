@@ -105,10 +105,10 @@ interface FakeServer {
   restore(): void;
 }
 
-function fakeServer(doc: PlanDoc): FakeServer {
+function fakeServer(doc: Omit<PlanDoc, "version">): FakeServer {
   const original = globalThis.fetch;
   const server: FakeServer = {
-    doc,
+    doc: { ...doc, version: 0 },
     calls: [],
     restore: () => {
       globalThis.fetch = original;
@@ -128,7 +128,11 @@ function fakeServer(doc: PlanDoc): FakeServer {
     // The route parses the body exactly as the browser parses its own storage,
     // so a pin only reaches the Plan if the shared parser lets it.
     const state = parseScenarioState(JSON.parse(String(init?.body)));
-    server.doc = { ...state, updatedAt: "2026-08-27T12:00:00.000Z" };
+    server.doc = {
+      ...state,
+      updatedAt: "2026-08-27T12:00:00.000Z",
+      version: server.doc.version + 1,
+    };
     return json({ plan: server.doc });
   }) as typeof globalThis.fetch;
 

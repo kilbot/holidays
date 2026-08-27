@@ -189,6 +189,14 @@ function QuotaMeter({ quota }: { quota: FareQuota | null }) {
             rather than a budget
           </p>
         )}
+        {quota && (
+          <p className="mt-1">
+            {/* Stated because the budget is shared and the link is public: one
+                visitor cannot quietly be the reason it emptied. */}
+            Any one visitor may spend {quota.perIpDailyCap} of it a day. Past that,
+            their rows show stored prices; every other visitor&rsquo;s still load.
+          </p>
+        )}
       </details>
 
       {gated && (

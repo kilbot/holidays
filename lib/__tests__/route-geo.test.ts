@@ -46,6 +46,8 @@ function leg(partial: Partial<Leg>): Leg {
     eur: 0,
     bandEur: [0, 0],
     pricing: "band",
+    onGrid: false,
+    fareBasis: "one-way",
     hydrated: false,
     carrier: null,
     note: "",

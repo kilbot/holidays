@@ -253,6 +253,24 @@ export interface Day {
 export type LegMode = "flight" | "drive" | "train" | "ferry";
 
 /**
+ * What a quoted figure is a price **for**.
+ *
+ * Provenance, and it decides money rather than wording. SearchAPI is asked for
+ * `flight_type=one_way` (`lib/flights/searchapi.ts`), so every live quote pays
+ * for exactly one crossing. The research's long-haul figure is the opposite:
+ * `docs/research/longhaul-comfort.md` heads its table *"Bands, per person,
+ * **return**, open-jaw into PER / out of SYD-MEL-BNE"*, so one figure covers
+ * both crossings.
+ *
+ * Charging that return figure to the outbound Leg and nothing to the homeward
+ * one was right about the band and wrong about everything else: the moment a
+ * live one-way fare replaced the outbound placeholder the Plan lost the entire
+ * journey home, €1–2k for two (kilbot/holidays#90). So the basis travels with
+ * the figure, and `lib/engine/legs.ts` converts by it.
+ */
+export type FareBasis = "one-way" | "return" | "return-share";
+
+/**
  * A movement between places. **Derived, never placed** — the Scheduler puts
  * Capsules on Days and the Legs fall out of the sequence. docs/CONTEXT.md, Leg.
  */
@@ -271,13 +289,32 @@ export interface Leg {
   eur: number;
   bandEur: [number, number];
   /**
-   * `grid` means `lib/flights/grid.ts` covers this route and date, so
-   * `/api/fares` has a real answer and the figure here is the stored snapshot
-   * standing in until the client hydrates it. `snapshot` is a stored research
-   * estimate with no live path. `band` is the research's own range for the
-   * kind of journey. `computed` is a drive, priced from distance and fuel.
+   * Where the figure came from. `snapshot` is a stored research estimate for
+   * the route, `band` the research's own range for that kind of journey,
+   * `computed` a drive priced from distance and fuel.
    */
-  pricing: "grid" | "snapshot" | "band" | "computed";
+  pricing: "snapshot" | "band" | "computed";
+  /**
+   * Whether `lib/flights/grid.ts` covers this route on this date, so
+   * `/api/fares` has a real answer and whatever is above is a placeholder the
+   * client can replace with a live quote.
+   *
+   * Its own field since #90. It used to be a fourth `pricing` value, which
+   * conflated *where the figure came from* with *whether a live one exists* —
+   * and the Leg that suffered for it was the homeward crossing, which is on
+   * the grid, has no snapshot of its own, and was therefore labelled `band`
+   * and never asked for the live fare it could have had.
+   */
+  onGrid: boolean;
+  /**
+   * What this Leg's own figure is a price for.
+   *
+   * Never `"return"`: a Leg is one crossing, so a return-basis figure is split
+   * across the two of them before it lands here — `"return-share"` is the Leg
+   * saying it is carrying part of a larger ticket rather than a quote of its
+   * own.
+   */
+  fareBasis: Exclude<FareBasis, "return">;
   /** Set once a live fetch has replaced the placeholder. */
   hydrated: boolean;
   carrier: string | null;
