@@ -9,7 +9,10 @@
  *    reject, always repair.
  * 2. **The drift compares like with like.** A pin taken against the research
  *    band is not an observation, and reporting the gap between a guess and a
- *    quote as a price change would be the page inventing news.
+ *    quote as a price change would be the page inventing news. The same rule
+ *    across carriers: the store keeps each day's *cheapest* fare, whoever
+ *    flies it, so another airline's floor is never this pin's "now" — it is
+ *    handed over separately, labelled as the day's cheapest.
  * 3. **Nothing here spends a fare call.** The endpoint reads the history store
  *    and writes nothing at all, which the fake KV can prove by having recorded
  *    no writes and no `fetch` having been made.
@@ -177,24 +180,28 @@ test("duplicates collapse and the cap holds on read", () => {
 /* Drift                                                               */
 /* ------------------------------------------------------------------ */
 
+/** The newest stored observation, on the pin's own carrier unless said otherwise. */
+const quote = (priceEur: number, carrier = "Singapore Airlines") => ({ priceEur, carrier });
+
 test("a fare that has risen since the pin drifts up, to the euro", () => {
-  const drift = driftOf(pin({ fareEurPP: 1_240 }), 1_280.4);
+  const drift = driftOf(pin({ fareEurPP: 1_240 }), quote(1_280.4));
   assert.deepEqual(drift, {
     currentEurPP: 1_280,
     deltaEur: 40,
     direction: "up",
     reason: null,
+    cheapest: null,
   });
 });
 
 test("a fare that has fallen drifts down, and an unchanged one reads flat", () => {
-  assert.equal(driftOf(pin(), 1_200).direction, "down");
-  assert.equal(driftOf(pin(), 1_240).direction, "flat");
-  assert.equal(driftOf(pin(), 1_240).deltaEur, 0);
+  assert.equal(driftOf(pin(), quote(1_200)).direction, "down");
+  assert.equal(driftOf(pin(), quote(1_240)).direction, "flat");
+  assert.equal(driftOf(pin(), quote(1_240)).deltaEur, 0);
 });
 
 test("a pin taken against the research band has no drift to report", () => {
-  const drift = driftOf(pin({ fareSource: "estimate" }), 1_400);
+  const drift = driftOf(pin({ fareSource: "estimate" }), quote(1_400));
   assert.equal(drift.deltaEur, null);
   assert.equal(drift.reason, "estimate");
   // The current price is still worth showing; it is the *comparison* that would
@@ -207,10 +214,39 @@ test("nothing stored since the pin says so rather than reading as flat", () => {
   assert.equal(drift.reason, "nothing-since");
   assert.equal(drift.direction, null);
   assert.equal(drift.currentEurPP, null);
+  assert.equal(drift.cheapest, null);
 });
 
 test("a pin with no price at pin time reports why, not a delta", () => {
-  assert.equal(driftOf(pin({ fareEurPP: null }), 1_100).reason, "unpriced");
+  assert.equal(driftOf(pin({ fareEurPP: null }), quote(1_100)).reason, "unpriced");
+});
+
+test("another carrier's floor is never this pin's 'now'", () => {
+  // The observed bug: a Cathay Pacific MAD→PER pin showed "now €723" — the
+  // China Southern cheapest-of-the-day — as if Cathay had been re-quoted.
+  const drift = driftOf(
+    pin({ carrier: "Cathay Pacific", fareEurPP: 689 }),
+    quote(723.4, "China Southern"),
+  );
+  assert.deepEqual(drift, {
+    currentEurPP: null,
+    deltaEur: null,
+    direction: null,
+    reason: "different-carrier",
+    cheapest: { eurPP: 723, carrier: "China Southern" },
+  });
+});
+
+test("the mismatched floor still travels on pins that never had a delta", () => {
+  // An estimate-band pin reports its own reason first, but the day's cheapest
+  // is carried alongside — labelled, not passed off as "now".
+  const drift = driftOf(
+    pin({ carrier: "Cathay Pacific", fareSource: "estimate" }),
+    quote(723, "China Southern"),
+  );
+  assert.equal(drift.reason, "estimate");
+  assert.equal(drift.currentEurPP, null);
+  assert.deepEqual(drift.cheapest, { eurPP: 723, carrier: "China Southern" });
 });
 
 /* ------------------------------------------------------------------ */

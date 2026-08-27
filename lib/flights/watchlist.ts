@@ -25,7 +25,12 @@
  *    observes. The row's headline is the all-in total for two, and it moves
  *    with the positioning chain, the bags and the hotel as well as with the
  *    fare; drifting one against the other would report a €40 change that was
- *    really a €0 change and a different coach ticket.
+ *    really a €0 change and a different coach ticket. The same rule holds
+ *    across carriers: the store records the *cheapest* fare seen each day,
+ *    whoever flies it, so the newest observation is only this pin's "now" when
+ *    it names this pin's carrier. A Cathay Pacific pin shown a China Southern
+ *    floor as its current price would be reporting a €34 "drop" that was really
+ *    a different airline.
  * 3. **A pin taken against a research band is not an observation.** It is
  *    recorded, because the couple pinned it and losing it would be worse, but
  *    it carries its `fareSource` so the watchlist can say "estimate when you
@@ -245,8 +250,19 @@ export function parsePins(raw: unknown): FlightPin[] {
 
 export type DriftDirection = "up" | "down" | "flat";
 
+/** The newest stored observation, as the history store hands it over. */
+export interface PinQuote {
+  priceEur: number;
+  carrier: string;
+}
+
 export interface PinDrift {
-  /** The newest stored fare for this route and day, per person. */
+  /**
+   * The newest stored fare for this route and day, per person — and only when
+   * that observation names the pin's own carrier. The store keeps the cheapest
+   * fare seen each day, whoever flies it; another carrier's floor is not this
+   * pin's "now".
+   */
   currentEurPP: number | null;
   /** Current minus pinned, per person. Null when there is nothing to compare. */
   deltaEur: number | null;
@@ -259,8 +275,18 @@ export interface PinDrift {
    *   difference would be guess-versus-quote rather than a price change.
    * - `"nothing-since"` — no observation of this route and day is stored, so
    *   the honest answer is that nobody has looked since.
+   * - `"different-carrier"` — the newest observation is another carrier's
+   *   cheapest-of-the-day, so the difference would be airline-versus-airline
+   *   rather than a price change.
    */
-  reason: "unpriced" | "estimate" | "nothing-since" | null;
+  reason: "unpriced" | "estimate" | "nothing-since" | "different-carrier" | null;
+  /**
+   * The day's stored floor, when it belongs to another carrier: the newest
+   * observation, carried separately so the UI can *label* it as the cheapest
+   * on this day rather than passing it off as this pin's current price. Null
+   * whenever `currentEurPP` already tells the story.
+   */
+  cheapest: { eurPP: number; carrier: string } | null;
 }
 
 /**
@@ -269,22 +295,32 @@ export interface PinDrift {
  * Rounded to the euro, because a drift chip reading "▲€39.62 since pinned" is
  * claiming a precision that a cheapest-fare-of-the-day figure does not have.
  * Anything under a euro reads as flat, which is what it is.
+ *
+ * The carrier check is exact string equality, deliberately: both sides of the
+ * comparison — the pin's carrier and the stored entry's — are written by the
+ * same `parseFlight` in `lib/flights/searchapi.ts`, so a mismatch is a real
+ * difference, not a formatting one.
  */
-export function driftOf(
-  pin: FlightPin,
-  currentEurPP: number | null,
-): PinDrift {
-  const current = currentEurPP === null ? null : Math.round(currentEurPP);
+export function driftOf(pin: FlightPin, quote: PinQuote | null): PinDrift {
+  const matches = quote !== null && quote.carrier === pin.carrier;
+  const current = matches ? Math.round(quote.priceEur) : null;
+  const cheapest =
+    quote !== null && !matches
+      ? { eurPP: Math.round(quote.priceEur), carrier: quote.carrier }
+      : null;
 
-  if (pin.fareEurPP === null) {
-    return { currentEurPP: current, deltaEur: null, direction: null, reason: "unpriced" };
-  }
-  if (!isObserved(pin.fareSource)) {
-    return { currentEurPP: current, deltaEur: null, direction: null, reason: "estimate" };
-  }
-  if (current === null) {
-    return { currentEurPP: null, deltaEur: null, direction: null, reason: "nothing-since" };
-  }
+  const noDelta = (reason: NonNullable<PinDrift["reason"]>): PinDrift => ({
+    currentEurPP: current,
+    deltaEur: null,
+    direction: null,
+    reason,
+    cheapest,
+  });
+
+  if (pin.fareEurPP === null) return noDelta("unpriced");
+  if (!isObserved(pin.fareSource)) return noDelta("estimate");
+  if (quote === null) return noDelta("nothing-since");
+  if (current === null) return noDelta("different-carrier");
 
   const deltaEur = current - Math.round(pin.fareEurPP);
   return {
@@ -292,5 +328,6 @@ export function driftOf(
     deltaEur,
     direction: deltaEur > 0 ? "up" : deltaEur < 0 ? "down" : "flat",
     reason: null,
+    cheapest,
   };
 }
