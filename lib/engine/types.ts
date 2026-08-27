@@ -414,7 +414,11 @@ export interface PlanWeek {
   /** The place holding most of the week. */
   leadLocationId: string;
   leadLocationName: string;
-  /** "then Sydney" where the week straddles places. */
+  /**
+   * Where else the week goes, in visiting order: "then Sydney" when the other
+   * place follows the headline one, "after Sydney" when it came first. Null
+   * when the week is all one place.
+   */
   handover: string | null;
   costEur: number;
   /** Buffer days in the cell. Zero over a whole week is a Warning. */

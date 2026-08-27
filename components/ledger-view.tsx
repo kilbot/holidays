@@ -32,9 +32,19 @@
  *   them (`lib/engine/blocks.ts`), so the sections reconcile with the roll-up by
  *   construction rather than by agreement: block subtotals plus transit rows are
  *   the plan-on figure, to the cent.
- * - **It does not draw the Budget.** The plan-on total and the worst case are in
- *   the header as an orientation, and the link to /budget is the whole of the
- *   money view. Two pages drawing the same burn-down is two pages drifting.
+ * - **It does not draw the Budget.** The plan-on total, the contingency, the
+ *   plan total and the worst case are in the header as an orientation, and the
+ *   link to /budget is the whole of the money view. Two pages drawing the same
+ *   burn-down is two pages drifting.
+ *
+ *   The contingency is in that row because leaving it out made the two pages
+ *   disagree in public (#99): the Budget's headline is plan-on *plus* the ~10%
+ *   contingency and the Ledger's was plan-on alone, so the same trip carried
+ *   two different totals — €15,093 here against €16,603 there — while the two
+ *   worst cases matched to the cent, and the word "contingency" appeared
+ *   nowhere on this page to explain the gap. It is not folded into the sum of
+ *   the Days, which would break the invariant this page exists to show; it is
+ *   the visible line #10 asks for, standing next to the figure it is added to.
  * - **It does not edit.** Dragging Capsules is the Plan page's job. This is the
  *   document you read — and, per the print styles, the one you take to the
  *   airport on paper.
@@ -214,6 +224,7 @@ function DayRow({
   warnings,
   open,
   onToggle,
+  legModes,
 }: {
   entry: LedgerDay;
   capsule: CapsuleSpec | undefined;
@@ -221,9 +232,21 @@ function DayRow({
   warnings: Warning[];
   open: boolean;
   onToggle: () => void;
+  /** Transport line id → the mode of the Leg that charged it. */
+  legModes: ReadonlyMap<string, LegMode>;
 }) {
   const { day } = entry;
   const { text, of, anchor, transport } = whatOf(day, capsule);
+  // The row's own icon, not a stand-in for "travel" (#101). The transit rows
+  // between blocks have always drawn the Leg's mode; the day rows inside them
+  // drew a plane whatever the Leg was, so "Margaret River → Rottnest Island by
+  // drive" carried the same aeroplane as the Valencia long-haul above it. Leg
+  // mode is a first-class thing here — the whole point of the per-Leg override
+  // is that the journey can *be* the experience — and an icon that ignores it
+  // is the row disagreeing with its own sentence.
+  const TransportIcon = transport
+    ? MODE_ICON[legModes.get(transport.id) ?? "flight"]
+    : null;
   const overCap = day.livingEur > capEur;
   // The fare left for the transit row above, so the row shows what the day cost
   // in this place. Saying so on hover is the difference between a figure that
@@ -301,8 +324,11 @@ function DayRow({
               className="size-3 shrink-0 text-[var(--sb-accent)]"
             />
           )}
-          {transport && (
-            <Plane aria-hidden className="size-3 shrink-0 text-[var(--sb-sea)]" />
+          {TransportIcon && (
+            <TransportIcon
+              aria-hidden
+              className="size-3 shrink-0 text-[var(--sb-sea)]"
+            />
           )}
           <span
             className={cn(
@@ -707,6 +733,16 @@ export function LedgerView() {
     [plan.days, plan.warnings, plan.legs],
   );
 
+  /**
+   * The mode of the Leg behind every transport line, keyed the way `legs.ts`
+   * keys the line it charges, so a day row can draw the same icon as the
+   * transit row above it (#101).
+   */
+  const legModes = useMemo(
+    () => new Map(plan.legs.map((leg) => [`${leg.date}:${leg.id}`, leg.mode])),
+    [plan.legs],
+  );
+
   const byDate = useMemo(() => {
     const map = new Map<string, Warning[]>();
     for (const warning of plan.warnings) {
@@ -770,8 +806,47 @@ export function LedgerView() {
             <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
               <div>
                 <p className="sb-label text-[9px]">Plan-on</p>
-                <p className="sb-num text-[22px] leading-none font-semibold lg:text-[26px]">
+                <p
+                  className="sb-num text-[22px] leading-none font-semibold lg:text-[26px]"
+                  title="The sum of every Day below, to the cent. Before the contingency, which is its own line."
+                >
                   {formatEur(rollUp.planOnEur)}
+                </p>
+              </div>
+              {/* The gap between this page and the Budget, said out loud (#99).
+                  The Budget's headline is plan-on plus this; the Ledger's is
+                  plan-on alone, and it is the sum of the Days by construction.
+                  Both are right, and a visitor can only see that if the figure
+                  standing between them is on the page. */}
+              <div>
+                <p className="sb-label text-[9px]">
+                  {rollUp.contingencyOn ? "Contingency" : "Contingency zeroed"}
+                </p>
+                <p
+                  className={cn(
+                    "sb-num text-[15px] leading-none lg:text-[17px]",
+                    rollUp.contingencyOn
+                      ? "text-[var(--sb-dim)]"
+                      : "text-[var(--sb-faint)]",
+                  )}
+                  title={
+                    rollUp.contingencyOn
+                      ? "The ~10% 'stuff happens' row, kept as its own line and never folded into the Days. Switched on and off on the Budget."
+                      : "Zeroed on the Budget, so plan-on and the plan total are the same figure."
+                  }
+                >
+                  {rollUp.contingencyOn
+                    ? `+${formatEur(rollUp.contingencyEur)}`
+                    : formatEur(0)}
+                </p>
+              </div>
+              <div>
+                <p className="sb-label text-[9px]">Plan total</p>
+                <p
+                  className="sb-num text-[15px] leading-none text-[var(--sb-dim)] lg:text-[17px]"
+                  title="Plan-on plus the contingency — the figure the Budget leads with, so the two pages read as one trip."
+                >
+                  {formatEur(rollUp.totalEur)}
                 </p>
               </div>
               <div>
@@ -856,6 +931,7 @@ export function LedgerView() {
                     warnings={byDate.get(entry.day.date) ?? []}
                     open={allOpen || openDates.has(entry.day.date)}
                     onToggle={() => toggle(entry.day.date)}
+                    legModes={legModes}
                   />
                 ))}
               </ul>
@@ -867,9 +943,23 @@ export function LedgerView() {
           Every figure is the sum of its Days — {plan.dayCount} of them, priced
           one at a time. A place band is what those days cost on the ground; the
           journeys between them are the transit rows, and the two add up to{" "}
-          {formatEur(rollUp.planOnEur)}. Bands and sources are on the lines.
-          Australia 2026–27 · {scenarios.current.name} ·{" "}
-          {formatDayYear(plan.startDate)} – {formatDayYear(plan.endDate)}.
+          {formatEur(rollUp.planOnEur)}.{" "}
+          {rollUp.contingencyOn ? (
+            <>
+              Nothing on this page is the contingency: that is{" "}
+              {formatEur(rollUp.contingencyEur)} on top, its own line rather
+              than a margin hidden in the days, which is why the Budget leads
+              with {formatEur(rollUp.totalEur)}.
+            </>
+          ) : (
+            <>
+              The contingency is zeroed, so that is also the plan total the
+              Budget leads with.
+            </>
+          )}{" "}
+          Bands and sources are on the lines. Australia 2026–27 ·{" "}
+          {scenarios.current.name} · {formatDayYear(plan.startDate)} –{" "}
+          {formatDayYear(plan.endDate)}.
         </p>
       </div>
     </main>

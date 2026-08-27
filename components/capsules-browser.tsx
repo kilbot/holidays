@@ -334,11 +334,23 @@ export function CapsulesBrowser() {
           )}
         </section>
 
+        {/* The picture story, told the way Resources tells it (#102).
+
+            This used to say, without qualification, that covers are generated
+            placeholders and not photographs of the place. That stopped being
+            true when the region photography landed: every image on this page
+            is now a real served photograph, most of them carrying a credit
+            printed on the card itself, directly above the sentence denying
+            they were photographs at all. Resources had it right the whole
+            time; this is the same sentence, and a truer one. */}
         <p className="mt-10 border-t border-[var(--sb-line)] pt-4 text-[11px] leading-relaxed text-[var(--sb-faint)]">
-          Marks are kept in this browser — there are no accounts. Covers are
-          generated from each entry&rsquo;s own region and facets: placeholders,
-          not photographs of the place. Placing an idea on the calendar lands
-          with the Scheduler.
+          Marks are kept in this browser — there are no accounts. A researched
+          Adventure and a mapped region carry a real photograph of the place,
+          downloaded and served from this site rather than hotlinked, with the
+          credits on the card and the full list under Photography on Resources.
+          Every region the map does not cover keeps a cover generated from its
+          own facets, which is not a photograph and does not pretend to be one.
+          Placing an idea on the calendar lands with the Scheduler.
         </p>
       </div>
     </main>

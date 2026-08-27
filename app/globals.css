@@ -318,8 +318,18 @@
      the stage, and a pill pushed off the top would be worse than one
      sitting over the globe; `100%` resolves against the stage because a
      custom property is substituted where it is used. */
+  --sb-pill-gap: 6.75rem;
+
+  /* One line of pill. Not decoration: the cost HUD's floor is the pill's
+     *top* edge, and before #94 it reserved this gap and forgot the pill
+     standing in it — so an opened HUD ran 38px past the pill line and
+     printed its last warning row, the one saying warnings are being
+     withheld, underneath the pill. Named here so the two cannot drift
+     apart again. */
+  --sb-pill-h: 2.25rem;
+
   --sb-pill-bottom: min(
-    calc(var(--sb-strip-h) + 6.75rem),
+    calc(var(--sb-strip-h) + var(--sb-pill-gap)),
     calc(100% - 3.25rem)
   );
 

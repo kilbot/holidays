@@ -14,7 +14,7 @@
  *
  * `--sb-strip-h` is the resting height of the date strip, and three pieces of
  * chrome (including the share pill) clear it. Off the Plan page there is no
- * strip to clear, so the variable is zeroed here rather than each reader
+ * strip to clear, so the offsets are flattened here rather than each reader
  * learning about routes.
  */
 
@@ -24,7 +24,24 @@ import type { CSSProperties, ReactNode } from "react";
 import { PreviewNotice } from "@/components/preview-notice";
 import { ShareBar } from "@/components/share-bar";
 
-const NO_STRIP = { "--sb-strip-h": "0px" } as CSSProperties;
+/**
+ * Off the Plan page there is no strip, so there is nothing for the pill line to
+ * clear — and zeroing the strip alone does not move it (#94).
+ *
+ * `--sb-pill-bottom` is declared on `:root`, and a custom property's `var()`
+ * references are substituted where the property is *declared*, not where it is
+ * read. So zeroing `--sb-strip-h` here — on a descendant — never reached the
+ * arithmetic: the pill kept the Plan page's offset and parked ~320px above the
+ * bottom of the reading column on every other page, across the middle of the
+ * Ledger's day rows, the Budget's burn-down caption and the Flights watchlist.
+ *
+ * Both have to be set, then. The strip height because chrome still reads it,
+ * and the offset because it is already resolved by the time it gets here.
+ */
+const NO_STRIP = {
+  "--sb-strip-h": "0px",
+  "--sb-pill-bottom": "1rem",
+} as CSSProperties;
 
 export function ShellStage({ children }: { children: ReactNode }) {
   const onPlan = usePathname() === "/";
