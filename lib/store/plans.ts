@@ -95,13 +95,66 @@ export async function readPlan(
   return toPlanDoc(raw);
 }
 
+/**
+ * Replace the Plan, whatever is there. Bumps the version.
+ *
+ * The unconditional write, for callers with no base version to claim: the
+ * seeding script, and a client old enough not to send one. Everything with a
+ * document in its hands should be using `writePlanIfCurrent` instead.
+ */
 export async function writePlan(
   kv: KvClient,
   planId: string,
   state: ScenarioState,
   now: Date = new Date(),
 ): Promise<PlanDoc> {
-  const doc: PlanDoc = { ...state, updatedAt: now.toISOString() };
+  const current = await readPlan(kv, planId);
+  return write(kv, planId, state, (current?.version ?? 0) + 1, now);
+}
+
+/**
+ * Replace the Plan **only if** it is still at the version the caller last saw.
+ *
+ * Optimistic concurrency, and the reason it exists is one specific data loss:
+ * `remote-store.ts` pushes the whole document on a debounce, so a push that was
+ * already in flight when the couple adopted a Fork would land afterwards and
+ * silently erase the adopted Scenario — a document it had never seen. `PUT`
+ * carries the version it is editing from; a write against a stale one is
+ * refused and the client refetches, merges and retries (kilbot/holidays#90).
+ *
+ * **The check is read-then-write, not a compare-and-set.** `KvClient` has no
+ * CAS verb and adding one would mean a Lua script on the Upstash REST client
+ * for an audience of two. What this closes is the window that actually bites —
+ * the seconds-wide one between a debounce firing and the request landing.
+ * What it leaves open is the microseconds between this read and this write,
+ * which needs two writers to arrive inside the same request round trip.
+ */
+export async function writePlanIfCurrent(
+  kv: KvClient,
+  planId: string,
+  state: ScenarioState,
+  baseVersion: number,
+  now: Date = new Date(),
+): Promise<
+  { ok: true; plan: PlanDoc } | { ok: false; current: PlanDoc | null }
+> {
+  const current = await readPlan(kv, planId);
+  if (!current) return { ok: false, current: null };
+  if (current.version !== baseVersion) return { ok: false, current };
+  return {
+    ok: true,
+    plan: await write(kv, planId, state, current.version + 1, now),
+  };
+}
+
+async function write(
+  kv: KvClient,
+  planId: string,
+  state: ScenarioState,
+  version: number,
+  now: Date,
+): Promise<PlanDoc> {
+  const doc: PlanDoc = { ...state, updatedAt: now.toISOString(), version };
   await kv.setJson(planKey(planId), doc);
   return doc;
 }
@@ -129,7 +182,9 @@ export async function createPlan(
 ): Promise<{ planId: string; editKey: string } | null> {
   const planId = newId();
   const editKey = newId();
-  const doc: PlanDoc = { ...seed, updatedAt: now.toISOString() };
+  // Version 0: nothing has written this document under the versioning rules
+  // yet, so the first conditional write against it is the first that counts.
+  const doc: PlanDoc = { ...seed, updatedAt: now.toISOString(), version: 0 };
 
   const claimed = await kv.setJsonIfAbsent(planKey(planId), doc);
   if (!claimed) return null;

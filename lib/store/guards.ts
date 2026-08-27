@@ -34,6 +34,34 @@ export const THROTTLE_WINDOW_SECONDS = 60;
 export const EDIT_KEY_HEADER = "x-southbound-edit-key";
 
 /**
+ * The header a write's base version travels in.
+ *
+ * A header rather than a body field so the body stays exactly what
+ * `parseScenarioState` expects — a `ScenarioState` and nothing else. The
+ * concurrency token is a fact about the *request*, not about the itinerary.
+ */
+export const PLAN_VERSION_HEADER = "x-southbound-plan-version";
+
+/**
+ * The version this write claims to be editing from, or null if it claims none.
+ *
+ * Null is a legitimate answer and means an unconditional write. A caller with
+ * no document in its hands — the seeding script, a browser running JavaScript
+ * from before #90 — is not making a stale claim, it is making no claim, and
+ * refusing it would break the bootstrap to guard against a race it cannot be
+ * in. Anything that *is* a claim must be a whole non-negative number; garbage
+ * is treated as no claim rather than as version zero, which would be a claim
+ * nobody made and would fail against every real document.
+ */
+export function basePlanVersion(request: Request): number | null {
+  const raw = request.headers.get(PLAN_VERSION_HEADER);
+  if (raw === null || raw.trim() === "") return null;
+  const version = Number(raw);
+  if (!Number.isInteger(version) || version < 0) return null;
+  return version;
+}
+
+/**
  * Every response from these routes, with caching off.
  *
  * `no-store` rather than `no-cache`: the Plan is a single mutable document

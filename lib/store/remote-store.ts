@@ -24,10 +24,18 @@
  * fetch was in flight, their edit stands and the hydrate is discarded. Losing a
  * keystroke to a race is worse than showing a slightly older Plan for 200ms.
  *
- * There is no merge and no conflict dialogue. Two simultaneous editors is a
- * problem this site does not have, `updatedAt` comes back on every write so the
- * UI can say when it last saved, and ADR 0001's whole premise is that the
- * audience is small enough not to need the machinery.
+ * There is no conflict dialogue, and there was no merge either until #90 found
+ * what a whole-document push on a debounce can do. Adopt appends a Scenario on
+ * the *server*; a push that was already in flight knows nothing about it, and
+ * before the version check it landed afterwards and erased it. Two simultaneous
+ * editors is still a problem this site does not have — but "the tab that saves
+ * last wins" is a different claim from "a save may delete a document it never
+ * read", and only the first one was ever defensible.
+ *
+ * So a push carries the version it is editing from, a stale one comes back 409
+ * with the current document attached, and this store merges the two and retries
+ * once. Nothing is asked of the traveller; the machinery ADR 0001 wanted to
+ * avoid is a *dialogue*, and there still isn't one.
  *
  * ## What a visitor's write does (#58)
  *
@@ -44,9 +52,13 @@
  * it once.
  */
 
-import { toPlanDoc, type PlanDoc } from "@/lib/engine/scenario-doc";
+import {
+  mergeScenarioState,
+  toPlanDoc,
+  type PlanDoc,
+} from "@/lib/engine/scenario-doc";
 import type { ScenarioState, ScenarioStore } from "@/lib/engine/scenarios";
-import { EDIT_KEY_HEADER } from "@/lib/store/guards";
+import { EDIT_KEY_HEADER, PLAN_VERSION_HEADER } from "@/lib/store/guards";
 
 /**
  * How long a knob must sit still before the Plan is pushed.
@@ -165,6 +177,12 @@ export function remoteScenarioStore(
 ): ScenarioStore {
   let editedLocally = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
+  /**
+   * The version of the Plan this tab is editing from, or null before it has
+   * seen one. Null pushes unconditionally, which is what a tab that has never
+   * managed to read the server is entitled to do.
+   */
+  let baseVersion: number | null = null;
 
   /** Whether the server's Plan is now what this tab holds. */
   async function hydrate(force = false): Promise<boolean> {
@@ -177,6 +195,9 @@ export function remoteScenarioStore(
       }
       const body = (await response.json()) as { plan?: unknown };
       const plan = toPlanDoc(body.plan);
+      // Learned even when the hydrate is discarded below: this tab has now seen
+      // the server at this version, and its next push is an edit *from* it.
+      baseVersion = plan.version;
       // The traveller got there first. Their edit is the one to keep — unless
       // this is the deliberate re-read after an adopt, which is asking for the
       // server's copy precisely because it now has something the tab lacks.
@@ -202,7 +223,16 @@ export function remoteScenarioStore(
     }
   }
 
-  async function push(state: ScenarioState, keepalive = false) {
+  /**
+   * Push the whole document.
+   *
+   * `retriesLeft` is spent by a version conflict and nothing else. One retry is
+   * enough: the merge below is computed against the document the server just
+   * handed back, so a second conflict needs a *third* writer to have arrived
+   * inside the round trip — which for an audience of two, on a debounce, is not
+   * a thing that happens.
+   */
+  async function push(state: ScenarioState, keepalive = false, retriesLeft = 1) {
     const editKey = getEditKey();
     // Belt and braces: `write` already turns a keyless edit into a preview, and
     // an unguarded push would be a request the route can only answer with 403.
@@ -217,6 +247,9 @@ export function remoteScenarioStore(
         headers: {
           "content-type": "application/json",
           [EDIT_KEY_HEADER]: editKey,
+          ...(baseVersion === null
+            ? {}
+            : { [PLAN_VERSION_HEADER]: String(baseVersion) }),
         },
         body: JSON.stringify(state),
         keepalive,
@@ -227,15 +260,53 @@ export function remoteScenarioStore(
         setStatus("rejected");
         return;
       }
+      if (response.status === 409) {
+        await reconcile(response, state, keepalive, retriesLeft);
+        return;
+      }
       if (!response.ok) {
         setStatus("offline");
         return;
       }
       const body = (await response.json()) as { plan?: PlanDoc };
+      if (typeof body.plan?.version === "number") baseVersion = body.plan.version;
       setStatus("synced", body.plan?.updatedAt ?? new Date().toISOString());
     } catch {
       setStatus("offline");
     }
+  }
+
+  /**
+   * Fold the server's document into this tab's and try once more.
+   *
+   * The 409 carries the current Plan, so there is nothing to fetch: merge, keep
+   * the merged state locally — the tab should be showing the adopted Scenario
+   * from this moment, not from whenever the retry lands — and push again from
+   * the version that refused us.
+   *
+   * Out of retries, the status is `"rejected"` rather than `"offline"`. The
+   * network is plainly fine; what is true is that the server refused this write
+   * and these edits are local, which is exactly what the pill's "not saving"
+   * says.
+   */
+  async function reconcile(
+    response: Response,
+    state: ScenarioState,
+    keepalive: boolean,
+    retriesLeft: number,
+  ) {
+    const body = (await response.json()) as { plan?: unknown };
+    const server = toPlanDoc(body.plan);
+    baseVersion = server.version;
+
+    const merged = mergeScenarioState(state, server);
+    local.write(merged);
+
+    if (retriesLeft <= 0) {
+      setStatus("rejected");
+      return;
+    }
+    await push(merged, keepalive, retriesLeft - 1);
   }
 
   function schedulePush() {
@@ -263,6 +334,17 @@ export function remoteScenarioStore(
     // visitor discarding their preview — so its own edits stop counting.
     const wasPreviewing = status === "preview";
     editedLocally = false;
+
+    // Belt and braces over the version check: a debounced push still sitting on
+    // its timer is about to send state from *before* the adopt, and the point
+    // of this re-read is that such state is out of date. The version check
+    // would refuse it and the merge would put it right, but not firing a
+    // doomed request at all is cheaper and easier to reason about.
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+
     const restored = await hydrate(true);
 
     // Nothing came back, so nothing was discarded. Put the warning back rather

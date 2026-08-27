@@ -12,6 +12,7 @@
 
 import { parseScenarioState } from "@/lib/engine/scenario-doc";
 import {
+  basePlanVersion,
   errorResponse,
   hasEditKey,
   jsonResponse,
@@ -20,7 +21,12 @@ import {
 } from "@/lib/store/guards";
 import { isPlausibleId } from "@/lib/store/ids";
 import { getKv } from "@/lib/store/kv";
-import { readPlan, readPlanMeta, writePlan } from "@/lib/store/plans";
+import {
+  readPlan,
+  readPlanMeta,
+  writePlan,
+  writePlanIfCurrent,
+} from "@/lib/store/plans";
 
 export const dynamic = "force-dynamic";
 
@@ -47,10 +53,17 @@ export async function GET(
  * own localStorage, so the only thing a caller can store in the Plan is a Plan —
  * the edit key buys the right to write, not the right to write anything.
  *
- * There is no optimistic-concurrency check. The ADR's audience is two people
- * who are usually in the same room, `updatedAt` comes back so a client can see
- * it lost a race, and a version conflict dialogue for this audience would cost
- * more than the collision it prevents.
+ * There **is** an optimistic-concurrency check, added by #90, and the reason is
+ * not two people editing the same knob — the ADR is right that this audience
+ * does not have that problem. It is that this is a *whole-document* write on a
+ * debounce, so a push already in flight when the couple adopts a Fork lands
+ * afterwards and erases a Scenario the pushing tab has never seen. That is data
+ * loss, not a lost race, and no amount of "they're in the same room" fixes it.
+ *
+ * So a write may carry the version it is editing from, and a stale one is
+ * refused with `409` and the current document attached, which is what lets the
+ * client merge and retry without a second round trip. There is still no
+ * conflict dialogue: nothing here asks the traveller anything.
  */
 export async function PUT(
   request: Request,
@@ -73,6 +86,28 @@ export async function PUT(
   if (!body.ok) return body.response;
 
   const state = parseScenarioState(body.value);
-  const plan = await writePlan(kv, planId, state);
-  return jsonResponse({ planId, plan });
+  const base = basePlanVersion(request);
+
+  // No claimed version is not a stale claim — it is a caller with no document
+  // in its hands, and it writes unconditionally exactly as it always did.
+  if (base === null) {
+    return jsonResponse({ planId, plan: await writePlan(kv, planId, state) });
+  }
+
+  const written = await writePlanIfCurrent(kv, planId, state, base);
+  if (!written.ok) {
+    if (!written.current) return errorResponse("No such plan", 404);
+    // The current document travels with the refusal. The client's next move is
+    // to merge and retry, and making it fetch what this handler already had in
+    // memory would widen the very window the check exists to close.
+    return jsonResponse(
+      {
+        planId,
+        plan: written.current,
+        error: "The plan changed since this edit started",
+      },
+      409,
+    );
+  }
+  return jsonResponse({ planId, plan: written.plan });
 }

@@ -569,6 +569,19 @@ export function parseScenarioState(raw: unknown): ScenarioState {
 export interface PlanDoc extends ScenarioState {
   /** ISO instant of the last accepted write. The client syncs against it. */
   updatedAt: string;
+  /**
+   * How many accepted writes this document has had. The concurrency token.
+   *
+   * `updatedAt` cannot do this job. It is a wall clock, it is only accurate to
+   * the millisecond, and two writes in the same millisecond — or a server whose
+   * clock stepped backwards — would compare equal. A counter that only ever
+   * goes up is the whole requirement.
+   *
+   * A document written before #90 has no `version` at all, and
+   * `toPlanDoc` repairs that to 0 rather than refusing to load the couple's
+   * itinerary. Never reject, always repair: the same rule as every other field.
+   */
+  version: number;
 }
 
 /**
@@ -585,7 +598,67 @@ export function toPlanDoc(raw: unknown): PlanDoc {
     isRecord(raw) && typeof raw.updatedAt === "string"
       ? raw.updatedAt
       : new Date(0).toISOString();
-  return { ...state, updatedAt };
+  // A version from before the field existed reads as 0, which is exactly what
+  // it is: nobody has yet written this document under the versioning rules, so
+  // the first conditional write against it is the first one that counts.
+  // A whole non-negative number or nothing. Rounding a fractional one would
+  // invent a version somebody else may legitimately be holding; 0 is the
+  // honest answer to "this document has never been written under the rules".
+  const storedVersion = isRecord(raw) ? raw.version : undefined;
+  const version =
+    typeof storedVersion === "number" &&
+    Number.isInteger(storedVersion) &&
+    storedVersion >= 0
+      ? storedVersion
+      : 0;
+  return { ...state, updatedAt, version };
+}
+
+/**
+ * Fold a tab's state together with the server's, after a version conflict.
+ *
+ * The conflict this exists for is one specific and expensive one: the couple
+ * adopts a Fork, the server appends a Scenario the browser has never heard of,
+ * and a debounced whole-document `PUT` that was already in flight lands on top
+ * of it. Before #90 that push won and the adopted Scenario was gone — silently,
+ * because the ADR's "no merge, no conflict dialogue" was written about two
+ * people editing the same knob and not about a write that erases a document
+ * half of it never saw.
+ *
+ * Three rules, and each is a decision about whose intent is newer:
+ *
+ * 1. **A Scenario only the server has is kept.** That is the adopted Fork, and
+ *    it is the entire point.
+ * 2. **A Scenario both have is the local one.** The tab has been edited since
+ *    it last read the server; the server's copy is what the tab started from.
+ * 3. **Pins are unioned.** A pin is a dated observation of a real fare
+ *    (`lib/flights/watchlist.ts`), so neither side's is ever the stale one and
+ *    dropping either is losing data that cannot be re-derived.
+ */
+export function mergeScenarioState(
+  local: ScenarioState,
+  server: ScenarioState,
+): ScenarioState {
+  const mine = new Set(local.scenarios.map((scenario) => scenario.id));
+  const scenarios = [
+    ...local.scenarios,
+    ...server.scenarios.filter((scenario) => !mine.has(scenario.id)),
+  ];
+
+  const has = (id: string) => scenarios.some((scenario) => scenario.id === id);
+  const currentId = has(local.currentId)
+    ? local.currentId
+    : has(server.currentId)
+      ? server.currentId
+      : (scenarios[0]?.id ?? local.currentId);
+
+  const pins = [...local.pins];
+  const pinned = new Set(pins.map((pin) => pin.id));
+  for (const pin of server.pins) {
+    if (!pinned.has(pin.id)) pins.push(pin);
+  }
+
+  return { scenarios, currentId, pins };
 }
 
 /** A slug that is not already taken, so two "Doof NYE" forks can coexist. */
