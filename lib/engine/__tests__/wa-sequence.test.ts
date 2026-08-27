@@ -30,7 +30,7 @@ const plan = buildPlan(
 );
 
 /** The WA leg ends when the couple flies east. */
-const isWestern = (leg: Leg) => leg.mode === "drive" && leg.date < "2026-12-27";
+const isWestern = (leg: Leg) => leg.mode === "drive" && leg.date <= "2026-12-26";
 
 test("the WA leg runs in the order the couple asked for", () => {
   // #95, from the live map: *arrive Perth → Mundaring base, with the Perth and
@@ -62,12 +62,54 @@ test("the WA leg runs in the order the couple asked for", () => {
   const christmas = plan.days.find((day) => day.date === "2026-12-25");
   assert.equal(christmas?.locationId, "morawa");
 
-  // And the flight east leaves from Perth, the morning after the drive home.
+  // And the flight east leaves from Perth on Boxing Day itself — the same day
+  // as the drive home, on the 23:55 red-eye that lands at 06:15 on the 27th.
+  // `domestic-flights.md` grades 27–29 December the worst-priced days of the
+  // Australian year and names the 26th as the Plan's default (#107).
   const east = plan.legs.find((leg) => leg.to === "SYD");
   assert.ok(east);
   assert.equal(east.from, "PER");
   assert.equal(east.fromLocationId, "perth");
-  assert.equal(east.date, "2026-12-27");
+  assert.equal(east.date, "2026-12-26");
+
+  // Sydney still starts on the 27th: they land at dawn, so the block the flight
+  // opens begins the morning after the fare is dated.
+  const sydney = plan.days.find((day) => day.locationId === "sydney");
+  assert.equal(sydney?.date, "2026-12-27");
+});
+
+test("Boxing Day carries both journeys, and the Ledger files each where it belongs", () => {
+  const boxingDay = plan.days.find((day) => day.date === "2026-12-26");
+  assert.ok(boxingDay);
+
+  const journeys = boxingDay.lines.filter((line) => line.kind === "transport");
+  assert.equal(journeys.length, 2, "the drive down and the flight out");
+  assert.deepEqual(
+    journeys.map((line) => line.mode),
+    ["drive", "flight"],
+    "in the order they are travelled, and each knowing what it is",
+  );
+
+  // The fuel line is a couple of tanks; the fare is the biggest domestic
+  // number on the Plan. Both are on one Day and neither is inside a block.
+  const rows = intoLedger(plan.days, plan.warnings, plan.legs);
+  const onTheDay = rows.filter(
+    (row) => row.kind === "transit" && row.transit.date === "2026-12-26",
+  );
+  assert.equal(onTheDay.length, 2);
+
+  const perth = rows.findIndex(
+    (row) => row.kind === "block" && row.block.startDate === "2026-12-26",
+  );
+  const sydney = rows.findIndex(
+    (row) => row.kind === "block" && row.block.locationId === "sydney",
+  );
+  const drive = rows.findIndex((row) => row.id === "PER>PER@2026-12-26");
+  const flight = rows.findIndex((row) => row.id === "PER>SYD@2026-12-26");
+
+  assert.ok(drive < perth, "the drive opens the Perth day");
+  assert.ok(perth < flight, "the flight leaves after it");
+  assert.ok(flight < sydney, "and opens Sydney, which starts the next morning");
 });
 
 test("every relocation inside WA is a drive, and the Morawa run is both ways", () => {

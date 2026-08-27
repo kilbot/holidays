@@ -250,7 +250,12 @@ export function intoBlocks(
  * Three ways a Leg finds that block, in order:
  *
  * 1. A block in the Leg's destination that starts on the day it is travelled.
- * 2. Failing that, the block holding the day it is travelled — but only where
+ * 2. A block in the Leg's destination that starts the day **after** — the
+ *    red-eye case. The Perth → Sydney flight leaves at 23:55 on Boxing Day and
+ *    lands at 06:15 on the 27th, so the fare is dated the 26th and the block it
+ *    opens starts the 27th. Without this the arrival row filed itself against
+ *    the Perth block it was leaving, which reads as a flight to nowhere.
+ * 3. Failing both, the block holding the day it is travelled — but only where
  *    the Plan actually stays at the destination. A Leg that arrives somewhere
  *    nobody sleeps is a connection: Madrid and Hong Kong on the way out,
  *    Singapore and Barcelona on the way home.
@@ -288,6 +293,8 @@ export function intoLedger(
 
     const opened =
       startsOn(leg.date) ??
+      // The red-eye: it leaves the evening before the block it opens.
+      startsOn(addDays(leg.date, 1)) ??
       // Falling back to the block merely *holding* the day covers the shapes
       // the Scheduler does not currently produce (a Leg on a day that is not a
       // boundary) without ever dropping a fare.

@@ -73,6 +73,18 @@
  * relocation-drive case docs/CONTEXT.md names, and the one Paul's Perth→Sydney
  * hitchhike is the reason for.
  *
+ * ## Which day a Leg is dated on
+ *
+ * The arrival day, normally: that is the day the couple turns up somewhere and
+ * the day the block opens, and it is the date a fare is quoted against.
+ *
+ * A red-eye breaks that, and `OVERNIGHT_DEPARTURES` is the exception. The
+ * ticket, the airport and the whole of the travelling happen the evening
+ * before, so the fare is dated on the day the couple *leaves*. On the reference
+ * trip that is the difference between buying a Perth→Sydney seat on 26 December
+ * and buying one on the 27th, which `docs/research/domestic-flights.md` calls
+ * the worst-priced stretch of the Australian year.
+ *
  * ## Where the money lands
  *
  * A Leg's fare is pushed onto the Day it is travelled, as a `transport` line.
@@ -146,6 +158,31 @@ const LONGHAUL_RETURN_BAND: readonly [number, number] = [1_500, 2_300];
  */
 const OUTBOUND_SHARE = 0.625;
 
+
+/**
+ * Routes the research says are flown overnight, and the sentence that says why.
+ *
+ * A Leg on this list is dated on the day the couple **leaves** rather than the
+ * day it lands, and the difference is not cosmetic: it decides which calendar
+ * day the fare is quoted against.
+ *
+ * Only Perth→Sydney is on it, and `docs/research/domestic-flights.md` argues
+ * for it twice. §"Which day to fly" grades **27–29 Dec** *"worst — named peak
+ * days in every dataset. Avoid."* against 26 Dec as *"the best of the realistic
+ * options"*, and recommends the Plan default to the 26th outright. §"Red-eyes"
+ * then measures the slot: *"PER departures run 00:50 through 23:55; the last
+ * service leaves Perth 23:55 and lands Sydney 06:15… worth A$80–150 pp against
+ * a mid-morning departure, and it saves a hotel night."*
+ *
+ * So the couple drives down from Morawa on Boxing Day and flies out of Perth
+ * five minutes to midnight. One travelling day carries both journeys, the
+ * Sydney block still opens on the 27th — they land at dawn — and the fare is
+ * keyed to a date the grid warms and the research says to buy.
+ */
+const OVERNIGHT_DEPARTURES: Readonly<Record<string, string>> = {
+  "PER-SYD":
+    "Flown as the 23:55 red-eye, landing 06:15 the next morning, so it is dated the day the couple leaves. domestic-flights.md grades 27–29 Dec the worst-priced days of the Australian year and names 26 Dec as the Plan's default; the red-eye slot is worth another A$80–150 pp and saves a hotel night. Book by 1 Oct 2026.",
+};
 
 /**
  * Anything crossing an ocean prices off the long-haul band, not a domestic row.
@@ -409,15 +446,23 @@ export function deriveLegs(input: LegInput): LegResult {
     // Arriving where the outbound crossing already said it was going.
     if (previous.locationId === "transit") continue;
 
+    const from = locationById(previous.locationId).airport;
+    const to = locationById(day.locationId).airport;
+    // A red-eye is bought, flown and paid for the evening before it lands, and
+    // `previous` is the Day the couple spends in the place it leaves from.
+    const overnight = OVERNIGHT_DEPARTURES[`${from}-${to}`];
+
     legs.push(
       buildLeg({
-        date: day.date,
+        date: overnight ? previous.date : day.date,
         fromLocationId: previous.locationId,
         toLocationId: day.locationId,
-        from: locationById(previous.locationId).airport,
-        to: locationById(day.locationId).airport,
+        from,
+        to,
         input,
-        note: `Relocation — ${previous.locationName} to ${day.locationName}.`,
+        note: overnight
+          ? `Relocation — ${previous.locationName} to ${day.locationName}. ${overnight}`
+          : `Relocation — ${previous.locationName} to ${day.locationName}.`,
       }),
     );
   }
@@ -469,6 +514,8 @@ export function deriveLegs(input: LegInput): LegResult {
       // Legs" under Event spend and the Daily cap under living costs only.
       living: false,
       note: leg.note,
+      // So a Day carrying two journeys can draw each one as what it is.
+      mode: leg.mode,
     });
     retotal(day);
   }

@@ -215,6 +215,15 @@ export interface DayLine {
   living: boolean;
   /** One line of provenance, shown on drill-in. */
   note: string;
+  /**
+   * How the journey was made — `transport` lines only.
+   *
+   * On the line rather than looked up from the Leg because a Day can carry more
+   * than one journey and every surface that draws an icon for one needs to know
+   * which: Boxing Day is a 370 km drive *and* a red-eye, and a row that drew a
+   * plane beside both was the second half of kilbot/holidays#101.
+   */
+  mode?: LegMode;
 }
 
 /** One calendar day of the Plan, priced individually. docs/CONTEXT.md, Day. */
