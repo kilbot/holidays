@@ -12,9 +12,31 @@
       "The sources disagree materially and the disagreements are noted per airline. The two biggest: (a) Skytrax WAA 2025 ranks Qatar #1 / Singapore #2 while AirlineRatings' 2026 LONG-HAUL assessment ranks Singapore #1 (36.95) / Qatar #2 (36.24) — and AirlineRatings' 2026 OVERALL list ranks Qatar #1 / Cathay #2 / Singapore #3. (b) APEX 2026 lists no rating at all for Singapore Airlines, Qatar, Emirates or Turkish, which is a coverage artifact of its TripIt sampling, not a low score — those absences are recorded as null, never as zero.",
       "Skytrax stripped Qantas of its 5-star certification in March 2026, demoting it to 4-star. Skytrax's own A-Z index page still returned '5 stars' for Qantas when fetched on 2026-08-27 while its dedicated Qantas page and its 10-airline 5-star list both say 4-star. The dedicated page is treated as authoritative here.",
       "Wikipedia's 'Seat configurations of Airbus A380' page is stale (per longhaul-comfort.md) — it still shows Singapore's retired V1 layout and miscodes Qantas premium economy as economy. aeroLOPA is used instead."
-    ]
+    ],
+    "evidenceAudit": {
+      "issue": "https://github.com/kilbot/holidays/issues/69",
+      "auditedOn": "2026-08-27",
+      "trigger": "User challenge: 'is it empirical, or are you just pulling it out of your ass? If you can back it by science and data, that's worth way more.'",
+      "labels": {
+        "measured": "A controlled study measured this effect and reported a direction and a significance level. The magnitude in 0-10 points is still a mapping choice.",
+        "rated": "The input is a third-party rating, an expert aggregate, or a published physical measurement — real data, but not a causal finding about comfort.",
+        "judgment": "No literature located. The number is a defensible guess and is presented as one. Not dressed as evidence."
+      },
+      "verdict": "Partly empirical. The seat axis (width, pitch, middle-seat penalty) has controlled experimental support and one component the formula was MISSING — cabin altitude — has the strongest evidence in the whole literature (Muhm 2007, NEJM, n=502, 20h blinded chamber trial). The 0.55/0.45 airline/aircraft weight is bracketed 0.30-0.70 by literature pointing in both directions and is retained as an explicit judgment. Three of the four adjustments are judgment. Full write-up in comfort-ratings.md, section 'Evidence basis'.",
+      "keyContradiction": "The document previously said 'lower cabin altitude and higher humidity are real but don't recover width'. The first half was wrong. The width claim rests on 10-minute lab exposures (Anjani et al. 2021, n=311); the cabin-altitude claim rests on a blinded 20-hour hypobaric chamber trial with 502 subjects (Muhm et al. 2007). Cabin altitude is better evidenced than anything else this formula scores and was scored at zero. It is now an explicit adjustment.",
+      "keyCalibrationGap": "The carrierConfigs scale implies a width:pitch exchange rate of about 7.5:1 (0.8in of width moves a score 3.0 points; 2in of pitch moves it 1.0 point). The measured rate is about 4:1 (Anjani et al. 2021). Width is over-weighted relative to pitch by roughly a factor of two. This does not move the top three, which are all 18in/32in A350s, but TK's 18in/31in A350 at 8.5 is the config most clearly out of line — on a 4:1 scale it belongs within ~0.3 of SQ's 9.0.",
+      "notFound": [
+        "No study comparing a single ultra-long sector against a split itinerary with a stopover, for passenger comfort, fatigue or sleep outcomes. The extraSector adjustment therefore has no evidential support in either direction.",
+        "No intervention trial showing that raising cabin humidity improves passenger outcomes. Complaints about low humidity are well documented (Wang et al. 2022; Beko et al. 2015); benefit is not. No humidity term is scored.",
+        "No validation study for Skytrax / AirlineRatings / APEX ratings against measured passenger comfort or wellbeing. The airline axis carries 55% of the weight and is the weakest-evidenced axis in the model."
+      ],
+      "missingComponents": [
+        "Arrival and departure time. Huang et al. (2026, Sleep 49(6):zsag063), 55,296 simulated flights: for 1-9 hour time-zone shifts jetlag is minimised when the flight departs or arrives near habitual wake time, and with in-flight sleep restricted (i.e. economy) the shortest jetlag comes from arrivals during the circadian day. Europe->Perth is a 7-hour shift, squarely in that band. The formula scores no clock time at all. This is the single best candidate for a future component.",
+        "Noise and vibration. Vink et al. (2022, IJAAA 9(1)) rank them among the top discomfort drivers. Not scored here.",
+        "Passenger anthropometry. Molenbroek et al. (2017) and Marazita & Parkinson (2026) both show comfort effects are body-size dependent, and that seated hip breadth (not buttock-knee length) is the dimension that has grown. This dataset scores a generic passenger."
+      ]
+    }
   },
-
   "airlines": [
     {
       "iata": "SQ",
@@ -38,7 +60,9 @@
         "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
         "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
         "docs/research/longhaul-comfort.md#2-what-actually-determines-economy-comfort-seat-geometry"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "QR",
@@ -62,7 +86,9 @@
         "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
         "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
         "https://www.airhelp.com/en/airhelp-score/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "CX",
@@ -71,7 +97,10 @@
       "skytraxStarsAsOf": "2026",
       "reviewScore": {
         "skytraxWorldAirlineAwardsRank2025": 3,
-        "skytraxCategoryWins2025": ["World's Best Economy Class", "World's Best Inflight Entertainment"],
+        "skytraxCategoryWins2025": [
+          "World's Best Economy Class",
+          "World's Best Inflight Entertainment"
+        ],
         "airlineRatingsOverallRank2026": 2,
         "airlineRatingsLongHaulRank2026": 3,
         "airlineRatingsLongHaulScore2026": 33.41,
@@ -85,7 +114,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "EK",
@@ -105,7 +136,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
         "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "EY",
@@ -126,7 +159,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/",
         "docs/research/longhaul-comfort.md#which-long-haul-carriers-actually-serve-which-spanish-city-for-perth-in-december"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "QF",
@@ -147,7 +182,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/",
         "docs/research/longhaul-comfort.md#5-the-famous-nonstop--london--perth-on-qantas-qf10--considered-and-rejected"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "TK",
@@ -166,7 +203,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
         "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "MH",
@@ -185,7 +224,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/",
         "https://www.australianfrequentflyer.com.au/malaysia-airlines-a330neo-economy-review/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "BA",
@@ -206,7 +247,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "LH",
@@ -227,7 +270,9 @@
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://www.euronews.com/travel/2026/05/15/the-world-has-10-five-star-airlines-and-none-are-european",
         "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "AF",
@@ -245,7 +290,9 @@
         "https://skytraxratings.com/a-z-of-airline-ratings",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "KL",
@@ -264,7 +311,9 @@
         "https://skytraxratings.com/a-z-of-airline-ratings",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "NH",
@@ -283,7 +332,9 @@
         "https://skytraxratings.com/the-worlds-5-star-airlines",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "JL",
@@ -303,7 +354,9 @@
         "https://skytraxratings.com/the-worlds-5-star-airlines",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "docs/research/longhaul-comfort.md#2-what-actually-determines-economy-comfort-seat-geometry"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "KE",
@@ -321,7 +374,9 @@
         "https://skytraxratings.com/the-worlds-5-star-airlines",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "OZ",
@@ -339,7 +394,9 @@
         "https://skytraxratings.com/the-worlds-5-star-airlines",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "CI",
@@ -357,7 +414,9 @@
         "https://skytraxratings.com/airlines/china-airlines-rating",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "TG",
@@ -375,7 +434,9 @@
         "https://skytraxratings.com/a-z-of-airline-ratings",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "VN",
@@ -394,7 +455,9 @@
         "https://skytraxratings.com/a-z-of-airline-ratings",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "CZ",
@@ -412,7 +475,9 @@
         "https://skytraxratings.com/a-z-of-airline-ratings",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
         "docs/research/longhaul-comfort.md#4-the-budget-floor--madrid--guangzhou--perth-on-china-southern"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     },
     {
       "iata": "MU",
@@ -429,99 +494,183 @@
       "sources": [
         "https://skytraxratings.com/a-z-of-airline-ratings",
         "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/"
-      ]
+      ],
+      "evidence": "rated",
+      "evidenceNote": "Composite of third-party expert audits and passenger votes (Skytrax star certification, Skytrax WAA 2025, AirlineRatings 2026, APEX 2026). No published study validates any of these ratings against measured passenger comfort or wellbeing outcomes."
     }
   ],
-
   "aircraft": [
     {
       "type": "A380-800",
       "baseScore0to10": 8.5,
       "rationale": "Widest fuselage in service — wide enough that even a 10-abreast 3-4-3 main deck holds 18.0-18.5in seats, where a 777 at the same 3-4-3 drops to 17.0in. The upper deck at 2-4-2 is the single best economy geometry available anywhere (see A380-800-upper-deck). Base score assumes the TYPICAL 2026 case, which is main deck 3-4-3, because upper-deck economy has nearly vanished from the fleet.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "low",
+      "cabinAltitudeNote": "Manufacturer/secondary sourced; figures of 5,000-6,000 ft are reported. Aluminium-and-composite airframe that nonetheless achieves a low cabin altitude — which is why \"composite fuselage\" is the wrong variable.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "A380-800-upper-deck",
       "baseScore0to10": 9.5,
       "rationale": "Scored separately because it is a different product, not a different seat. 2-4-2 means a couple books a side pair and has NO third passenger in the row — the only structural (as opposed to subjective) advantage in this entire dataset. Add a ~104-seat mini-cabin instead of ~199 below, less galley and lavatory traffic, and side storage bins under the windows unique to the A380 upper deck. Held at 9.5 rather than 10 because every surviving operator pairs it with 31in pitch.",
       "confidence": "high",
-      "availabilityWarning": "As of Dec 2026 only British Airways, Lufthansa, Qatar and Asiana retain any upper-deck economy, and NONE of them fly it on a Europe<->Australia or Gulf<->Australia sector. Reachable only on the Europe->Southeast Asia leg."
+      "availabilityWarning": "As of Dec 2026 only British Airways, Lufthansa, Qatar and Asiana retain any upper-deck economy, and NONE of them fly it on a Europe<->Australia or Gulf<->Australia sector. Reachable only on the Europe->Southeast Asia leg.",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "low",
+      "cabinAltitudeNote": "Same airframe as A380-800.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "A350-900",
       "baseScore0to10": 9.0,
       "rationale": "Airbus sized the A350 fuselage specifically to fit an 18in economy seat at 9-abreast, and operators have overwhelmingly held that line. 3-3-3 at ~18.0in and 32in is the best geometry a couple can reliably book on a Europe<->Australia sector in 2026. Also carries the modern-widebody soft advantages (higher cabin humidity, lower cabin altitude, quieter) that the A380 shares but the 777 does not.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Composite fuselage; 6,000 ft is the design figure.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "A350-1000",
       "baseScore0to10": 9.0,
       "rationale": "Same cross-section and same 18in 3-3-3 as the -900; some operators (Qatar) give it 33in pitch rather than 32in, which is the only reason it ever scores above the -900 at config level.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Composite fuselage; 6,000 ft is the design figure.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "A330-900neo",
       "baseScore0to10": 8.5,
       "rationale": "Scores far above the 787 despite a narrower fuselage, because operators fly it 8-abreast at 2-4-2 rather than squeezing in a ninth seat. A couple gets a true side pair with no stranger — the same structural win as an A380 upper deck, on a much more available aircraft. Typical 17.5in/32in. Docked from 9.0 for a smaller, older-feeling cabin and lower ceilings than the A350.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 7500,
+      "cabinAltitudeConfidence": "medium",
+      "cabinAltitudeNote": "Aluminium airframe. Reported above 7,000 ft and below 8,000 ft — NOT the 6,000 ft of the composite types, despite the neo branding. Recorded as 7,500 as the midpoint of the reported range.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "A330-300",
       "baseScore0to10": 8.0,
       "rationale": "Same 2-4-2 side-pair advantage as the A330neo at ~17.5in, but typically 31in pitch and an older cabin, IFE and air system.",
-      "confidence": "medium"
+      "confidence": "medium",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 8000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Aluminium, previous generation.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "787-8",
       "baseScore0to10": 6.5,
       "rationale": "The 787 cabin is roughly 5-6in narrower than the A350's. At the 9-abreast 3-3-3 that almost every operator outside Japan chose, that lands the seat at ~17.0-17.2in — about 0.8in narrower than an A350 seat at identical pitch. That 0.8in is the whole difference between the good and bad long-haul economy cabins. The Dreamliner's real advantages (lower cabin altitude, higher humidity, bigger windows) are genuine but do not recover the width.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Composite fuselage; 6,000 ft is the design figure.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "787-9",
       "baseScore0to10": 6.5,
       "rationale": "Identical cross-section and identical 9-abreast penalty to the 787-8. This is the aircraft on the Qantas LHR-PER nonstop — the narrowest geometry in the dataset flown for the longest unbroken sit (16h40).",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Composite fuselage; 6,000 ft is the design figure.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "787-10",
       "baseScore0to10": 6.5,
       "rationale": "Same cross-section again — a stretch adds length, not width. Note the operator conflict recorded in carrierConfigs: Singapore Airlines publishes 18in for its 787-10 economy seat, which is not reconcilable with the fuselage geometry that gives every other 9-abreast 787 ~17.2in. Independent sources put the real figure at 17.2-17.5in.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Composite fuselage; 6,000 ft is the design figure.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "787-8-2-4-2",
       "baseScore0to10": 9.0,
       "rationale": "The exception that proves the width rule. Japan Airlines flies its 787s 8-abreast at 2-4-2 and has taken the best-economy-seat title six years running on the strength of it. Same airframe as the 6.5-scoring configs above — the entire difference is one seat per row. Not bookable on this trip (JAL does not serve Perth); included as proof that the CONFIG, not the type, is what should drive the ranking.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 6000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Composite fuselage; 6,000 ft is the design figure.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "777-300ER",
       "baseScore0to10": 6.0,
       "rationale": "Lowest-scoring widebody here, and the score is measured rather than felt: Emirates flies the A380 at 18.0in and the 777-300ER at 17.0in with the SAME 32in pitch, so the type penalty is a clean full inch. Almost universally 10-abreast 3-4-3 in 2026, giving 17.0-17.3in. Also an older cabin environment than the A350/787 generation. The rare 9-abreast 3-3-3 777 is a completely different product at ~18.5in/34in — see 777-300ER-3-3-3.",
-      "confidence": "high"
+      "confidence": "high",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 8000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Aluminium, previous generation. The 777X moves to 6,000 ft; the -300ER does not.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "777-300ER-3-3-3",
       "baseScore0to10": 8.5,
       "rationale": "Rare 9-abreast 777 economy at ~18.5in and 34in pitch — the widest single economy seat in the dataset. Essentially extinct on Europe<->Australia routes in 2026; recorded for completeness and to keep the Flights page from scoring a 777 low when it happens to be one of these.",
-      "confidence": "medium"
+      "confidence": "medium",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 8000,
+      "cabinAltitudeConfidence": "high",
+      "cabinAltitudeNote": "Aluminium, previous generation.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "747-400",
       "baseScore0to10": 6.5,
       "rationale": "Included only because the issue asked. No 747 operates any Europe<->Australia economy sector relevant to this trip — Lufthansa's 747-8 is the last significant passenger 747 out of Europe and it does not serve Australia. Where one is encountered, 3-4-3 at ~17.2in with an old cabin environment; the 747 upper deck is business class on every remaining operator, so it offers no economy equivalent to the A380's upper deck.",
       "confidence": "low",
-      "availabilityWarning": "Not bookable on any Europe<->Perth itinerary in Dec 2026."
+      "availabilityWarning": "Not bookable on any Europe<->Perth itinerary in Dec 2026.",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 8000,
+      "cabinAltitudeConfidence": "medium",
+      "cabinAltitudeNote": "Aluminium, previous generation.",
+      "cabinAltitudeEvidence": "rated"
     },
     {
       "type": "A320/A321/A330-regional",
       "baseScore0to10": 5.5,
       "rationale": "Narrowbody positioning sectors (VLC-LHR, VLC-MUC, VLC-MAD/BCN, MAD-BCN). Scored low but they are short, so the block-hour weighting in the formula correctly stops them from dominating. Their real cost on this trip is a lost connection, not a narrow seat — see the through-ticket analysis in longhaul-comfort.md.",
-      "confidence": "medium"
+      "confidence": "medium",
+      "evidence": "judgment",
+      "evidenceNote": "The 0-10 base score is a judgment mapping. What it encodes IS evidence-backed in direction: seat width dominates pitch (Anjani et al. 2021, n=311 — one inch of width is worth about four inches of pitch), and the middle seat is measurably worse than window or aisle (Anjani et al. 2020, n=294). The mapping over-weights width relative to pitch by roughly 2x against that measured exchange rate — see meta.evidenceAudit.keyCalibrationGap.",
+      "cabinAltitudeFt": 8000,
+      "cabinAltitudeConfidence": "medium",
+      "cabinAltitudeNote": "Typical narrowbody figure. Irrelevant in practice — positioning sectors are below the 6-hour threshold for the cabinAltitude adjustment.",
+      "cabinAltitudeEvidence": "rated"
     }
   ],
-
   "carrierConfigs": [
     {
       "carrier": "SQ",
@@ -534,7 +683,12 @@
       "configScore0to10": 9.0,
       "confidence": "high",
       "note": "The single most important config in this file — it is the 13-hour sector of the recommended itinerary. Safran Z300 recliners.",
-      "source": "docs/research/longhaul-comfort.md#5-origin-arbitrage (VERIFIED); https://www.singaporeair.com/"
+      "source": "docs/research/longhaul-comfort.md#5-origin-arbitrage (VERIFIED); https://www.singaporeair.com/",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "SQ",
@@ -547,7 +701,12 @@
       "configScore0to10": 9.0,
       "confidence": "medium",
       "note": "SIN-PER runs a MIX of A350-900 and 787-10 across 28 weekly nonstops. Request the A350 rotation. At a 5-hour sector this is a tiebreak, not a dealbreaker — it moves the itinerary score by ~0.3.",
-      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what"
+      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "SQ",
@@ -559,7 +718,12 @@
       "configScore0to10": 7.0,
       "confidence": "medium",
       "note": "CONFLICT: Singapore Airlines publishes 18in for this seat, and third-party guides repeat it. That figure cannot be reconciled with the 787 fuselage, which yields ~17.0-17.2in at 9-abreast for every other operator; the A350 gets 18in because its cabin is ~5-6in wider. 17.5in is recorded here as the generous end of the independently supportable range. If SQ's 18in is literally true it is measured differently (e.g. armrest outer edges), not a wider seat.",
-      "source": "https://cabin.coach/aircraft-reviews/singapore-airlines-787-10-seat-guide; https://simpleflying.com/how-much-wider-airbus-a350-cabin-boeing-787-dreamliner/"
+      "source": "https://cabin.coach/aircraft-reviews/singapore-airlines-787-10-seat-guide; https://simpleflying.com/how-much-wider-airbus-a350-cabin-boeing-787-dreamliner/",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "SQ",
@@ -572,7 +736,12 @@
       "configScore0to10": 9.0,
       "confidence": "high",
       "note": "The widest main-deck economy seat in the dataset — 18.5in, half an inch MORE than an A350. Only 3-4-3 rather than 3-3-3 keeps it level with the A350 rather than above it. NO economy on the upper deck: the old V1 layout with 88 upper-deck economy seats is retired and all 12 aircraft are on the 2017 layout. This is how the couple gets Singapore Airlines AND an A380 — on the way home, at no extra cost. Aim for the rear taper rows, where the side blocks drop from 3 seats to 2.",
-      "source": "https://www.businesstraveller.com/news/airlines/flight-review-singapore-airlines-a380-economy-class/; https://mainlymiles.com/fleet-a380v3/; docs/research/longhaul-comfort.md#the-a380s-that-are-on-this-trips-likely-path"
+      "source": "https://www.businesstraveller.com/news/airlines/flight-review-singapore-airlines-a380-economy-class/; https://mainlymiles.com/fleet-a380v3/; docs/research/longhaul-comfort.md#the-a380s-that-are-on-this-trips-likely-path",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "CX",
@@ -585,7 +754,12 @@
       "configScore0to10": 9.0,
       "confidence": "high",
       "note": "The only itinerary in the dataset that delivers an 18in A350 on BOTH sectors, on the airline that holds Skytrax World's Best Economy Class 2025. Madrid only — Cathay's Barcelona service is summer-seasonal and does not operate in December.",
-      "source": "docs/research/longhaul-comfort.md#2-the-value-comfort-line; https://cabin.coach/aircraft-reviews/cathay-pacific-airbus-a350-900-seat-guide"
+      "source": "docs/research/longhaul-comfort.md#2-the-value-comfort-line; https://cabin.coach/aircraft-reviews/cathay-pacific-airbus-a350-900-seat-guide",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "QR",
@@ -597,7 +771,12 @@
       "configScore0to10": 9.5,
       "confidence": "medium",
       "note": "Highest config score in the file — 18in at 33in pitch, Recaro CL3710. Qatar's Europe sector is excellent; the problem is what it connects to.",
-      "source": "https://cabin.coach/aircraft/qatar-airways-boeing-777-300er-seat-guide"
+      "source": "https://cabin.coach/aircraft/qatar-airways-boeing-777-300er-seat-guide",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "QR",
@@ -609,7 +788,12 @@
       "configScore0to10": 5.5,
       "confidence": "high",
       "note": "Decisive against Qatar for this trip. Qatar explicitly REVERSED its plan to put the A380 on Perth and confirmed the 777-300ER; the Qatar A380 returns to Australia on Sydney only from March 2027, i.e. after this trip. So the best airline on the Skytrax list flies its worst economy hardware on the exact sector this trip needs, for ~11 hours. Recaro slimline, quoted 17.0-17.3in.",
-      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what; https://cabin.coach/aircraft/qatar-airways-boeing-777-300er-seat-guide"
+      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what; https://cabin.coach/aircraft/qatar-airways-boeing-777-300er-seat-guide",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "EK",
@@ -622,7 +806,12 @@
       "configScore0to10": 8.5,
       "confidence": "high",
       "note": "Best seats 68A/68K and 81A/81K (no seat in front, big legroom, storage); quietest rows 80-88, then 43-51. Emirates' remaining upper-deck economy exists only on the 615-seat two-class frames and all 15 were due to be converted by ~Nov 2026 — assume none by December.",
-      "source": "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes"
+      "source": "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "EK",
@@ -634,7 +823,12 @@
       "configScore0to10": 5.5,
       "confidence": "high",
       "note": "The cleanest measurement in the dataset: same airline, same 32in pitch, one full inch narrower than its own A380. DO NOT assume an A380 on DXB-PER — this route has flip-flopped twice in 2026.",
-      "source": "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes"
+      "source": "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "QF",
@@ -646,7 +840,12 @@
       "configScore0to10": 6.0,
       "confidence": "high",
       "note": "Worst seat on the longest sit. Also note the route is currently ASYMMETRIC: westbound PER-LHR runs via Singapore through 31 Jan 2027; only the eastbound direction they would fly is nonstop.",
-      "source": "docs/research/longhaul-comfort.md#5-the-famous-nonstop--london--perth-on-qantas-qf10--considered-and-rejected"
+      "source": "docs/research/longhaul-comfort.md#5-the-famous-nonstop--london--perth-on-qantas-qf10--considered-and-rejected",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "QF",
@@ -659,7 +858,12 @@
       "configScore0to10": 6.5,
       "confidence": "medium",
       "note": "NO economy upstairs — the upper-deck mini-cabin was removed in the 2019-20 refit and the upper deck is now Business + Premium Economy (VERIFIED, aeroLOPA). Qantas flies no A380 to Perth at all. Notably worse than the Singapore A380 on the same return sector: 17.5in/31in vs 18.5in/32in.",
-      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck"
+      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "QF",
@@ -671,7 +875,12 @@
       "configScore0to10": 7.5,
       "confidence": "medium",
       "note": "2-4-2, so the side-pair advantage applies here too. Held below the Malaysia A330neo on pitch (31in vs 32in) and cabin age.",
-      "source": "docs/research/longhaul-comfort.md#3-the-upper-deck-play; operator fleet data"
+      "source": "docs/research/longhaul-comfort.md#3-the-upper-deck-play; operator fleet data",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "BA",
@@ -684,7 +893,12 @@
       "configScore0to10": 8.0,
       "confidence": "high",
       "note": "The ONLY routing out of Europe that gives the couple a row with no stranger. Book 70A/70K or 80A/80K (front row, extra legroom, side storage bins). Avoid exit rows — they have no windows at all. Score is 8.0 not 9.5 because 17.6in and 31in are both below the Lufthansa upper deck.",
-      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck (VERIFIED, aeroLOPA)"
+      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck (VERIFIED, aeroLOPA)",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "BA",
@@ -697,7 +911,12 @@
       "configScore0to10": 6.5,
       "confidence": "high",
       "note": "RETROFIT ROULETTE. The refit began June 2026, the first refurbished frame is due back late 2026 and the fleet completes end-2027, so a December booking is a coin-flip between this config and the 8.0 one above. Main-deck fallback seat: 25D (no seat in front). Only book the upper-deck play if the seat map AT THE MOMENT OF BOOKING shows 2-4-2 in rows 70-83.",
-      "source": "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip"
+      "source": "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "LH",
@@ -710,7 +929,12 @@
       "configScore0to10": 9.5,
       "confidence": "high",
       "note": "The best economy SEAT reachable on this trip, full stop: 18in at 2-4-2 in a 35-seat mini-cabin. And it is the SAFEST upper-deck bet because Lufthansa's 2026 VantageXL retrofit touches Business only — First, Premium Economy and Economy are untouched. Pick 95E, 96A or 96C (cited as the quietest economy on the aircraft); rows 96-98 A/K have the side storage; avoid 95A/95K (no window). All LH A380s are Munich-based. The catch is everything around the seat: a 6.5 airline, a third sector, and Bangkok instead of Changi.",
-      "source": "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip (VERIFIED, aeroLOPA)"
+      "source": "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip (VERIFIED, aeroLOPA)",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "TK",
@@ -723,7 +947,12 @@
       "configScore0to10": 8.5,
       "confidence": "medium",
       "note": "Full 18in width but 31in pitch and only ~3in of recline, notably less than peers on the same airframe. Structurally attractive for the return: a single ticket, all-A350, Changi-transiting itinerary that ends AT Valencia airport with no train. Turkish does not serve Perth, so it cannot do the outbound.",
-      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what; https://cabin.coach/aircraft/turkish-airlines-airbus-a350-900-seat-guide"
+      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what; https://cabin.coach/aircraft/turkish-airlines-airbus-a350-900-seat-guide",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "MH",
@@ -736,7 +965,12 @@
       "configScore0to10": 8.0,
       "confidence": "high",
       "note": "The sleeper. 2-4-2 means a couple books a true side pair with NO stranger — the same structural win as an A380 upper deck, on a widely available aircraft, without the retrofit gamble. Safran RAVE IFE, AC and USB at every seat, 4-way headrest. Narrower seat than an A350 (17.5in) but the row structure more than compensates for a couple. Needs LHR or CDG positioning: no Spanish service.",
-      "source": "https://www.australianfrequentflyer.com.au/malaysia-airlines-a330neo-economy-review/"
+      "source": "https://www.australianfrequentflyer.com.au/malaysia-airlines-a330neo-economy-review/",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "MH",
@@ -748,7 +982,12 @@
       "configScore0to10": 9.0,
       "confidence": "medium",
       "note": "Malaysia's long-haul flagship config. Combined with the A330neo second sector this is the best HARDWARE pairing available after Singapore and Cathay — it loses on the airline score (6.5) and the London positioning, not the metal.",
-      "source": "https://skytraxratings.com/a-z-of-airline-ratings; operator fleet data"
+      "source": "https://skytraxratings.com/a-z-of-airline-ratings; operator fleet data",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "CZ",
@@ -760,7 +999,12 @@
       "configScore0to10": 5.5,
       "confidence": "low",
       "note": "LOW CONFIDENCE — one secondary source quotes 17.6in for this cabin, which is not consistent with 9-abreast 787 geometry; 17.2in at 31in is used as the defensible figure. CZ also rotates A330-300s on some CAN-PER services, which would score higher (2-4-2). Verify the specific metal at booking.",
-      "source": "https://www.aerolopa.com/cz-78w; https://cabin.coach/aircraft/china-southern-787-9-seat-guide"
+      "source": "https://www.aerolopa.com/cz-78w; https://cabin.coach/aircraft/china-southern-787-9-seat-guide",
+      "evidence": {
+        "dimensions": "rated",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "EY",
@@ -772,7 +1016,12 @@
       "configScore0to10": 5.5,
       "confidence": "medium",
       "note": "Relevant only for the free-stopover play on the return: Etihad's promo (book by 20 Dec 2026, travel to end of Jan 2027) gives economy up to 2 free hotel nights in Abu Dhabi and matches the return window almost exactly. That is a cost lever, not a comfort one.",
-      "source": "docs/research/longhaul-comfort.md#cross-cutting-moves-that-apply-to-all-five"
+      "source": "docs/research/longhaul-comfort.md#cross-cutting-moves-that-apply-to-all-five",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "OZ",
@@ -785,7 +1034,12 @@
       "configScore0to10": 8.5,
       "confidence": "medium",
       "note": "The only upper-deck-economy A380 that touches Australia at all. Wrong direction, wrong hub, unconfirmed past 31 Dec 2026, and the airline score is the least reliable in the file (Skytrax 5-star but #41 by vote). Recorded so the Flights page does not miss it if a Seoul routing surfaces.",
-      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck (VERIFIED, aeroLOPA)"
+      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck (VERIFIED, aeroLOPA)",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     },
     {
       "carrier": "*",
@@ -797,10 +1051,14 @@
       "configScore0to10": 5.5,
       "confidence": "medium",
       "note": "Generic narrowbody placeholder. Short enough that block-hour weighting keeps it from moving an itinerary score much. Its real risk is the missed connection, not the seat — a missed connection on a sold-out mid-December Perth flight is close to uncoverable.",
-      "source": "docs/research/longhaul-comfort.md#through-ticket-vs-self-connect--the-lore-is-unanimous"
+      "source": "docs/research/longhaul-comfort.md#through-ticket-vs-self-connect--the-lore-is-unanimous",
+      "evidence": {
+        "dimensions": "measured",
+        "score": "judgment",
+        "note": "economySeatWidthIn / pitchIn / layout are physical measurements from aeroLOPA, carrier publications or seat guides (see source). configScore0to10 is a judgment mapping of those measurements onto 0-10."
+      }
     }
   ],
-
   "formula": {
     "airlineWeight": 0.55,
     "aircraftWeight": 0.45,
@@ -813,26 +1071,42 @@
     "multiSectorRule": {
       "method": "block-hour weighting",
       "expression": "airlineScore = sum(sectorHours_i * airlineScore_i) / sum(sectorHours_i); seatScore = sum(sectorHours_i * configScore_i) / sum(sectorHours_i)",
-      "justification": "An itinerary is not one airline and one aeroplane. Weighting each sector by block time is the only way a 13-hour A350 and a 5-hour 787 combine into an honest number, and it correctly stops a 2h20 narrowbody positioning hop from dragging down a 20-hour journey."
+      "justification": "An itinerary is not one airline and one aeroplane. Weighting each sector by block time is the only way a 13-hour A350 and a 5-hour 787 combine into an honest number, and it correctly stops a 2h20 narrowbody positioning hop from dragging down a 20-hour journey.",
+      "evidence": "rated",
+      "evidenceNote": "Direction supported, functional form is judgment. Discomfort is measurably time-dependent: Lewis et al. (2026, Experimental Physiology) found mood, pain and discomfort all worsened across a 6.5-hour simulated flight (time, all P<0.05), and Muhm et al. (2007, NEJM) found cabin-altitude discomfort emerging only after 3-9 hours of exposure. So weighting a sector by its duration is right. LINEAR weighting is a simplification: the evidence says discomfort grows with time, not that it grows in a straight line, and the seat studies used 10-minute exposures so they say nothing about duration at all."
     },
     "adjustments": [
       {
         "name": "gulfHubReliability",
         "points": -1.0,
         "appliesTo": "Any Dec 2026 - Jan 2027 itinerary transiting DOH, DXB or AUH",
-        "justification": "Not a comfort judgement — a reliability one, and the trip has a hard anchor (Christmas in Perth with family). As of mid-Aug 2026 the 2026 Gulf airspace disruption is NOT resolved: EASA conflict-zone guidance for the Persian Gulf and Gulf of Oman extended to at least 31 Aug 2026 advising operators not to overfly at any level; Doha airspace partially closed; Dubai restricted to approved corridors. Qatar has restored ~85% of its pre-crisis schedule, Emirates ~75%. Australian Frequent Flyer's read is that Gulf fares stay competitive precisely because the passenger carries the risk, and travel insurance may not respond where a government advisory is in force. A routing 5% more comfortable that materially raises the chance of stranding them in a restricted-airspace hub on 22 December is not comfort-optimal."
+        "justification": "Not a comfort judgement — a reliability one, and the trip has a hard anchor (Christmas in Perth with family). As of mid-Aug 2026 the 2026 Gulf airspace disruption is NOT resolved: EASA conflict-zone guidance for the Persian Gulf and Gulf of Oman extended to at least 31 Aug 2026 advising operators not to overfly at any level; Doha airspace partially closed; Dubai restricted to approved corridors. Qatar has restored ~85% of its pre-crisis schedule, Emirates ~75%. Australian Frequent Flyer's read is that Gulf fares stay competitive precisely because the passenger carries the risk, and travel insurance may not respond where a government advisory is in force. A routing 5% more comfortable that materially raises the chance of stranding them in a restricted-airspace hub on 22 December is not comfort-optimal.",
+        "evidence": "judgment",
+        "evidenceNote": "Explicitly outside the comfort literature — this is an operational and geopolitical reliability judgment about a trip with a hard Christmas anchor. No study supports the magnitude. Labelled judgment deliberately; it is the largest single adjustment in the model and the least empirical."
       },
       {
         "name": "metalUncertainty",
         "points": -0.75,
         "appliesTo": "BA A380 LHR-SIN (retrofit roulette) and any sector where the operating type is not confirmed at booking",
-        "justification": "Expected-value correction. The BA A380 is a coin-flip between a 8.0 upper-deck config and a 6.5 main-deck one on the same flight number, which is worth about -0.7 in expected seat score. Applying it as an explicit, visible adjustment rather than burying it in the config score keeps the gamble legible to the user."
+        "justification": "Expected-value correction. The BA A380 is a coin-flip between a 8.0 upper-deck config and a 6.5 main-deck one on the same flight number, which is worth about -0.7 in expected seat score. Applying it as an explicit, visible adjustment rather than burying it in the config score keeps the gamble legible to the user.",
+        "evidence": "judgment",
+        "evidenceNote": "Expected-value arithmetic over this file's OWN config scores (a coin flip between 8.0 and 6.5 is worth about -0.7 of seat score, weighted back to -0.75 overall). That makes it internally derived, not externally evidenced. If the config scores are recalibrated, this number must be recomputed with them."
       },
       {
         "name": "extraSector",
         "points": -0.25,
         "appliesTo": "Each sector beyond the second",
-        "justification": "Modest and deliberately so. Each extra sector is another bag transfer, another boarding, another missed-connection exposure — but the evidence in longhaul-comfort.md is that a WELL-PLACED stop (Singapore, same time zone as Perth) is worth far more than it costs, so this must never be large enough to make a nonstop win by default. It is a tiebreak, not a thesis."
+        "justification": "Modest and deliberately so. Each extra sector is another bag transfer, another boarding, another missed-connection exposure — but the evidence in longhaul-comfort.md is that a WELL-PLACED stop (Singapore, same time zone as Perth) is worth far more than it costs, so this must never be large enough to make a nonstop win by default. It is a tiebreak, not a thesis.",
+        "evidence": "judgment",
+        "evidenceNote": "NO EVIDENCE LOCATED IN EITHER DIRECTION. No published study compares a single ultra-long sector with a split itinerary for passenger comfort, fatigue or sleep. Adjacent findings do not settle it: WHO's WRIGHT project (2007) found VTE risk roughly doubles after 4+ hours of seated travel, which makes immobility duration the hazard, but nobody has tested whether a mid-journey walk resets that clock. Huang et al. (2026) suggest the routing variable that actually matters is arrival and departure CLOCK TIME, not sector count. Retained at -0.25 as a tiebreak and labelled judgment."
+      },
+      {
+        "name": "cabinAltitude",
+        "points": -0.25,
+        "appliesTo": "Each sector of 6 block hours or more flown on an aircraft type whose cabin is pressurised to ~8,000 ft (aircraft[].cabinAltitudeFt >= 7500). Types at ~6,000 ft — A350, 787, A380, 777X — take no penalty.",
+        "addedOn": "2026-08-27",
+        "evidence": "measured",
+        "justification": "ADDED BY THE ISSUE #69 EVIDENCE AUDIT. This is the only component of this formula with a controlled trial behind it. Muhm, Rock, McMullin, Jones, Lu, Eilers, Space & McMullen (2007), 'Effect of aircraft-cabin altitude on passenger discomfort', New England Journal of Medicine 357(1):18-27, put 502 subjects in a blinded hypobaric chamber for a 20-hour simulated flight at 650, 4,000, 6,000, 7,000 and 8,000 ft equivalent. Reported discomfort rose with altitude and was GREATER AT 7,000-8,000 FT THAN AT ALL LOWER ALTITUDES COMBINED, appearing after 3-9 hours of exposure; oxygen saturation fell up to 4.4 percentage points at 8,000 ft. Botonis et al. (2025, Experimental Physiology 110:1584-1602) add that mild hypoxic exposure may partly explain post-flight fatigue independent of jet lag. WHAT IS MEASURED: the direction, the significance, and the 3-9 hour onset window. WHAT IS JUDGMENT: the -0.25 magnitude in 0-10 points, and the choice of a 6-hour threshold as a conservative midpoint of the measured 3-9 hour onset window. NOTE THAT 'COMPOSITE FUSELAGE' IS THE WRONG VARIABLE: the A380 (aluminium) and the 777X also hold ~6,000 ft, while the A330-900neo (aluminium) sits at ~7,000-8,000 ft despite the neo branding. Aircraft generation predicts cabin altitude, not material. RANKING IMPACT, computed by hand: only Qatar (777-300ER, ~11h to Perth) and Emirates (777-300ER, ~10h45 to Perth) take the penalty among the ranked itineraries. Qatar 7.1 -> 6.9, Emirates 6.4 -> 6.2. NOTHING REORDERS. The strongest evidence in the literature confirms the existing answer rather than correcting it. It does, however, mean Qantas' LHR-PER 787-9 nonstop is NOT penalised: 16h40 at ~6,000 ft is the one genuine, evidence-backed thing the 787 gives back for its narrow seat. SENSITIVITY: at a 3-hour threshold (the early end of Muhm's onset window) Malaysia's KUL-PER A330neo sector and Qantas' SIN-PER A330-300 sector would also take -0.25, moving those itineraries to 7.2 and 6.6 respectively — still no reordering."
       }
     ],
     "justification": "0.55 airline / 0.45 aircraft, essentially even with a deliberate tilt to the airline. Three reasons.\n\n(1) THE TWO AXES HAVE COMPARABLE SPREAD. Across the realistic Europe->Perth set, airline scores span 5.5-9.5 (4 points) and seat-config scores span 5.5-9.5 (4 points). A near-even weighting is the only one under which neither axis can silently decide every ranking. Weight the aircraft at 60% and the Lufthansa A380 upper deck starts beating Singapore Airlines on the strength of one seat; weight the airline at 70% and Qatar's 3-4-3 777 to Perth disappears from view. Both of those are wrong answers.\n\n(2) THE AIRLINE COVERS MORE OF THE 24 HOURS. Seat geometry is the single biggest lever WITHIN the flight — that is the finding of longhaul-comfort.md and nothing here overturns it. But the airline determines crew, catering, IFE, ground and lounge product, the hub they sit in for hours, and, critically, how they are treated when something breaks on a sold-out December date. On a 20+ hour door-to-door journey with a stopover, more of the elapsed experience is airline than seat.\n\n(3) THE AIRLINE IS THE PART THAT IS ACTUALLY GUARANTEED. This is the decisive argument. At the moment of booking, the carrier is contractual; the aircraft is a schedule intention. This dataset alone documents Qatar reversing the A380 on Perth, Emirates pulling the A380 off DXB-PER and back and cutting frequency, Emirates downgrading BCN from A380 to 777, and BA mid-retrofit on the exact aircraft the upper-deck play depends on. Weighting the more volatile variable higher would make the ranking less stable than the world it describes.\n\nThe residual 45% on the aircraft is high enough that the 787-vs-A350 gap — 0.8in of width, worth ~2.5 points of config score — moves an itinerary by more than a full point, which is exactly the sensitivity the user asked for when they said to rank by aircraft as well as airline.",
@@ -840,50 +1114,333 @@
       {
         "label": "Singapore Airlines, BCN-SIN-PER, all A350 (RECOMMENDED)",
         "sectors": [
-          {"carrier": "SQ", "type": "A350-900 Long Haul", "hours": 13, "airlineScore": 9.5, "configScore": 9.0},
-          {"carrier": "SQ", "type": "A350-900", "hours": 5, "airlineScore": 9.5, "configScore": 9.0}
+          {
+            "carrier": "SQ",
+            "type": "A350-900 Long Haul",
+            "hours": 13,
+            "airlineScore": 9.5,
+            "configScore": 9.0
+          },
+          {
+            "carrier": "SQ",
+            "type": "A350-900",
+            "hours": 5,
+            "airlineScore": 9.5,
+            "configScore": 9.0
+          }
         ],
         "weightedAirlineScore": 9.5,
         "weightedSeatScore": 9.0,
         "adjustments": 0,
-        "comfortScore": 9.3
+        "comfortScore": 9.3,
+        "adjustmentBreakdown": "none; cabinAltitude 0 (no sector of 6h+ on an ~8,000 ft type)"
       },
       {
         "label": "Singapore Airlines, BCN-SIN-PER, 787-10 on the Perth sector",
         "sectors": [
-          {"carrier": "SQ", "type": "A350-900 Long Haul", "hours": 13, "airlineScore": 9.5, "configScore": 9.0},
-          {"carrier": "SQ", "type": "787-10", "hours": 5, "airlineScore": 9.5, "configScore": 7.0}
+          {
+            "carrier": "SQ",
+            "type": "A350-900 Long Haul",
+            "hours": 13,
+            "airlineScore": 9.5,
+            "configScore": 9.0
+          },
+          {
+            "carrier": "SQ",
+            "type": "787-10",
+            "hours": 5,
+            "airlineScore": 9.5,
+            "configScore": 7.0
+          }
         ],
         "weightedAirlineScore": 9.5,
         "weightedSeatScore": 8.4,
         "adjustments": 0,
         "comfortScore": 9.0,
-        "note": "The whole cost of drawing the 787-10 rotation is 0.3 points. Worth requesting the A350; not worth restructuring the trip for."
+        "note": "The whole cost of drawing the 787-10 rotation is 0.3 points. Worth requesting the A350; not worth restructuring the trip for.",
+        "adjustmentBreakdown": "none; cabinAltitude 0 (no sector of 6h+ on an ~8,000 ft type)"
       },
       {
         "label": "Lufthansa A380 upper deck, VLC-MUC-BKK-PER — the pure A380 play",
         "sectors": [
-          {"carrier": "LH", "type": "A320", "hours": 2.3, "airlineScore": 6.5, "configScore": 5.5},
-          {"carrier": "LH", "type": "A380 upper deck", "hours": 10.75, "airlineScore": 6.5, "configScore": 9.5},
-          {"carrier": "TG", "type": "787-8", "hours": 7, "airlineScore": 6.0, "configScore": 6.0}
+          {
+            "carrier": "LH",
+            "type": "A320",
+            "hours": 2.3,
+            "airlineScore": 6.5,
+            "configScore": 5.5
+          },
+          {
+            "carrier": "LH",
+            "type": "A380 upper deck",
+            "hours": 10.75,
+            "airlineScore": 6.5,
+            "configScore": 9.5
+          },
+          {
+            "carrier": "TG",
+            "type": "787-8",
+            "hours": 7,
+            "airlineScore": 6.0,
+            "configScore": 6.0
+          }
         ],
         "weightedAirlineScore": 6.3,
         "weightedSeatScore": 7.8,
         "adjustments": -0.25,
         "comfortScore": 6.7,
-        "note": "THE KEY WORKED EXAMPLE. It carries the best economy seat in the dataset (9.5) and still finishes 2.6 points behind Singapore Airlines, because the seat is attached to a 6.5 airline, a 6.0 second carrier and a third sector. This is the arithmetic answer to 'the A380 is well-rated — which is best?'"
+        "note": "THE KEY WORKED EXAMPLE. It carries the best economy seat in the dataset (9.5) and still finishes 2.6 points behind Singapore Airlines, because the seat is attached to a 6.5 airline, a 6.0 second carrier and a third sector. This is the arithmetic answer to 'the A380 is well-rated — which is best?'",
+        "adjustmentBreakdown": "extraSector -0.25; cabinAltitude 0 (no sector of 6h+ on an ~8,000 ft type)"
       },
       {
         "label": "Qatar Airways, MAD-DOH-PER",
         "sectors": [
-          {"carrier": "QR", "type": "A350-1000", "hours": 7, "airlineScore": 9.0, "configScore": 9.5},
-          {"carrier": "QR", "type": "777-300ER", "hours": 11, "airlineScore": 9.0, "configScore": 5.5}
+          {
+            "carrier": "QR",
+            "type": "A350-1000",
+            "hours": 7,
+            "airlineScore": 9.0,
+            "configScore": 9.5
+          },
+          {
+            "carrier": "QR",
+            "type": "777-300ER",
+            "hours": 11,
+            "airlineScore": 9.0,
+            "configScore": 5.5
+          }
         ],
         "weightedAirlineScore": 9.0,
         "weightedSeatScore": 7.1,
-        "adjustments": -1.0,
-        "comfortScore": 7.1,
-        "note": "Highest airline score in the set after SQ, and the highest single config score in the file on its Europe sector — then it puts the longest leg on its narrowest aircraft and routes through restricted airspace. Raw score before the Gulf adjustment is 8.1."
+        "adjustments": -1.25,
+        "comfortScore": 6.9,
+        "note": "Highest airline score in the set after SQ, and the highest single config score in the file on its Europe sector — then it puts the longest leg on its narrowest aircraft and routes through restricted airspace. Raw score before the Gulf adjustment is 8.1. UPDATED 2026-08-27 by the issue #69 evidence audit: the cabinAltitude adjustment adds -0.25, taking 7.1 to 6.9. Rank unchanged.",
+        "adjustmentBreakdown": "gulfHubReliability -1.0; cabinAltitude -0.25 (DOH-PER, ~11h on a 777-300ER at 8,000 ft)"
+      }
+    ],
+    "weightsEvidence": "judgment",
+    "weightsEvidenceNote": "AUDITED 2026-08-27 and RETAINED at 0.55/0.45. The literature brackets this weight rather than setting it, because it splits by which outcome is measured. Physical-comfort studies put the aircraft first: Vink et al. (2012, Applied Ergonomics 43(2):354-359) found legroom the top comfort factor at r=0.718 across 10,000+ trip reports and 153 interviews, which read alone would argue for roughly 0.30 airline / 0.70 aircraft. Satisfaction studies put the airline first: Ban & Kim (2019, Sustainability 11(15):4066), n=9,632 Skytrax reviews, standardised betas on customer satisfaction of value-for-money 0.603, staff 0.176, food and beverage 0.102, SEAT COMFORT 0.080, ground service 0.042, entertainment -0.003 (n.s.); grouping the airline-controlled factors gives 0.320 against 0.080, i.e. 80/20 the other way. Ahmadpour et al. (2016, Applied Ergonomics 52:301-308) show comfort and discomfort are one spectrum, so these two literatures are measuring the same axis and genuinely disagree. There is no principled basis in the published evidence for picking a point inside the 0.30-0.70 bracket, so 0.55/0.45 stays and is labelled judgment. IMPORTANT AND CHECKED BY HAND: the recommendation is invariant across the whole bracket. Singapore Airlines BCN-SIN-PER scores 9.2 at 0.30/0.70, 9.3 at 0.55/0.45 and 9.4 at 0.70/0.30, and wins at every point because it leads on both axes. The weight only rearranges the middle of the table: at aircraft-heavy, Malaysia Airlines climbs to third (8.0); at airline-heavy, Qatar does (7.4). That is exactly the trade the issue #69 workstream-B slider should expose.",
+    "superseded": [
+      {
+        "field": "formula.airlineWeight / formula.aircraftWeight",
+        "oldValue": "0.55 / 0.45",
+        "newValue": "0.55 / 0.45 (RETAINED)",
+        "reviewedOn": "2026-08-27",
+        "reason": "Reviewed against the literature in issue #69 and retained. Evidence brackets the weight at 0.30-0.70 and points in both directions depending on whether the outcome measured is physical comfort or overall satisfaction. Relabelled from an argued number to an explicit judgment. Verified by hand that the top recommendation is invariant across the entire bracket."
+      },
+      {
+        "field": "aircraft['787-*'].rationale",
+        "oldValue": "'Lower cabin altitude and higher humidity are real but don't recover width.'",
+        "newValue": "Cabin altitude is now scored explicitly via the cabinAltitude adjustment; the humidity half of the old claim stands (no benefit evidence located).",
+        "reviewedOn": "2026-08-27",
+        "reason": "CONTRADICTED BY EVIDENCE. The dismissal was backwards on cabin altitude: Muhm et al. (2007) is a blinded 20-hour chamber trial with 502 subjects, while the width claim it was dismissed in favour of rests on 10-minute lab exposures (Anjani et al. 2021). Cabin altitude was the best-evidenced variable in the literature and the formula scored it at zero."
+      },
+      {
+        "field": "carrierConfigs[].configScore0to10 — implied width:pitch exchange rate",
+        "oldValue": "~7.5:1 (3.75 points per inch of width; 0.5 points per inch of pitch)",
+        "newValue": "NOT CHANGED — flagged only",
+        "reviewedOn": "2026-08-27",
+        "reason": "The measured exchange rate is ~4:1 (Anjani et al. 2021: one extra inch of width is similar to four extra inches of pitch). The scale over-weights width by roughly 2x. Left unchanged because rebuilding 22 config scores would move nothing at the top of the table — rows 1-3 are all 18in/32in A350s — and because config scores also encode layout, cabin age and seat product, not geometry alone. The one config clearly out of line is TK A350-900 at 18in/31in scoring 8.5; on a 4:1 scale it belongs within ~0.3 of SQ's 9.0. Revisit if the config table is ever regenerated."
+      }
+    ],
+    "citations": [
+      {
+        "id": "anjani2021width",
+        "authors": "Anjani, S., Song, Y., Hou, T., Ruiter, I. A., & Vink, P.",
+        "year": 2021,
+        "title": "The effect of 17-inch-wide and 18-inch-wide airplane passenger seats on comfort",
+        "venue": "International Journal of Industrial Ergonomics 82:103097",
+        "finding": "n=311 in a Boeing 737 fuselage: the 18-inch seat produced more comfort and less discomfort in most body regions; one extra inch of width is similar to four extra inches of pitch.",
+        "limitation": "10-minute exposure. Nobody has tested 17 vs 18 inches over a 13-hour sector.",
+        "supports": [
+          "seat width dominance in configScore",
+          "carrierConfigs width sensitivity"
+        ],
+        "url": "https://www.sciencedirect.com/science/article/abs/pii/S0169814121000159"
+      },
+      {
+        "id": "anjani2020pitch",
+        "authors": "Anjani, S., Li, W., Ruiter, I. A., & Vink, P.",
+        "year": 2020,
+        "title": "The effect of aircraft seat pitch on comfort",
+        "venue": "Applied Ergonomics 88:103132",
+        "finding": "n=294 at 28/30/32/34 inches: significant relationship between pitch and both comfort and discomfort; the middle seat scored measurably worse than window or aisle at every pitch, though pitch mattered more than seat position.",
+        "supports": [
+          "pitch sensitivity in configScore",
+          "2-4-2 side-pair premium"
+        ],
+        "doi": "10.1016/j.apergo.2020.103132"
+      },
+      {
+        "id": "kremser2012",
+        "authors": "Kremser, F., Guenzkofer, F., Sedlmeier, C., Sabbah, O., & Bengler, K.",
+        "year": 2012,
+        "title": "Aircraft seating comfort: the influence of seat pitch on passengers' well-being",
+        "venue": "Work 41(Suppl 1):4936-4942",
+        "finding": "n=30 in a mock-up adjustable 28-43 inches: overall well-being peaks at 34-40 inches depending on anthropometry and DECLINES beyond that. Every pitch in this dataset (31-33 inches) sits below the optimum and above the unacceptable floor, where the dose-response is real but shallow.",
+        "doi": "10.3233/WOR-2012-0789-4936"
+      },
+      {
+        "id": "liu2021staggered",
+        "authors": "Liu, Z., Rotte, T., Anjani, S., & Vink, P.",
+        "year": 2021,
+        "title": "Seat pitch and comfort of a staggered seat configuration",
+        "venue": "Work 68(s1)",
+        "finding": "n=53 at 27/29/31 inches: 27 inches rated unacceptably low, 29 and 31 acceptable; very few complaints about lateral space when each passenger had their own armrest and shoulder space.",
+        "supports": [
+          "2-4-2 side-pair premium"
+        ]
+      },
+      {
+        "id": "anjani2021floorplan",
+        "authors": "Anjani, S., Song, Y., & Vink, P.",
+        "year": 2021,
+        "title": "Designing a floor plan using aircraft seat comfort knowledge by aircraft interior experts",
+        "venue": "Work 68(s1):S7-S18",
+        "finding": "Restates the width/pitch equivalence: an 18x30-inch seat gives nearly the same comfort as a 17x34-inch seat.",
+        "doi": "10.3233/WOR-208001"
+      },
+      {
+        "id": "molenbroek2017",
+        "authors": "Molenbroek, J. F. M., Albin, T. J., & Vink, P.",
+        "year": 2017,
+        "title": "Thirty years of anthropometric changes relevant to the width and depth of transportation seating spaces, present and future",
+        "venue": "Applied Ergonomics 65:130-138",
+        "finding": "Seated hip breadth has grown over three decades while buttock-knee length has not — the modern fit problem in airline seating is width, not legroom.",
+        "doi": "10.1016/j.apergo.2017.06.003"
+      },
+      {
+        "id": "marazita2026",
+        "authors": "Marazita, Z. V., & Parkinson, M. B.",
+        "year": 2026,
+        "title": "The effects of aeroplane seat width, load factor and demographics on the spatial sufficiency, acceptability and comfort of passengers",
+        "venue": "Ergonomics",
+        "finding": "Wider seats substantially improve accommodation across all metrics; higher load factors reduce comfort by limiting adjacent empty seats; women are disproportionately disaccommodated because seated hip breadth is larger.",
+        "supports": [
+          "seat width dominance",
+          "2-4-2 side-pair premium",
+          "missing anthropometry component"
+        ],
+        "doi": "10.1080/00140139.2026.2675534"
+      },
+      {
+        "id": "vink2012",
+        "authors": "Vink, P., Bazley, C., Kamp, I., & Blok, M.",
+        "year": 2012,
+        "title": "Possibilities to improve the aircraft interior comfort experience",
+        "venue": "Applied Ergonomics 43(2):354-359",
+        "finding": "10,000+ internet trip reports plus 153 passenger interviews: comfort relates most to legroom (r=0.718), hygiene, crew attention and seat/personal space; rude flight attendants and bad hygiene reduce the comfort experience drastically.",
+        "bearsOn": "Cuts BOTH ways on the airline/aircraft weight — legroom first (aircraft) but crew attention and hygiene in the top four (airline).",
+        "doi": "10.1016/j.apergo.2011.06.011"
+      },
+      {
+        "id": "ahmadpour2016",
+        "authors": "Ahmadpour, N., Robert, J.-M., & Lindgaard, G.",
+        "year": 2016,
+        "title": "Aircraft passenger comfort experience: underlying factors and differentiation from discomfort",
+        "venue": "Applied Ergonomics 52:301-308",
+        "finding": "Comfort and discomfort are not underpinned by different factor sets; passenger comfort should be evaluated on one spectrum. This is why the comfort literature and the satisfaction literature can be compared at all — they measure the same axis.",
+        "doi": "10.1016/j.apergo.2015.07.029"
+      },
+      {
+        "id": "vink2022priorities",
+        "authors": "Vink, P., Vledder, G., Song, Y., Herbig, B., Reichherzer, A., & Mansfield, N.",
+        "year": 2022,
+        "title": "Aircraft interior and seat design: priorities based on passengers' opinions",
+        "venue": "International Journal of Aviation, Aeronautics, and Aerospace 9(1)",
+        "finding": "Noise, vibration and the seat are among the most important discomfort factors; space, lighting, temperature and seat the most important comfort factors. Noise and vibration are not scored in this model.",
+        "url": "https://commons.erau.edu/ijaaa/vol9/iss1/3/"
+      },
+      {
+        "id": "ban2019",
+        "authors": "Ban, H.-J., & Kim, H.-S.",
+        "year": 2019,
+        "title": "Understanding customer experience and satisfaction through airline passengers' online review",
+        "venue": "Sustainability 11(15):4066",
+        "finding": "n=9,632 Skytrax reviews of the top 10 airlines. Standardised betas on customer satisfaction: value for money 0.603, staff 0.176, food and beverage 0.102, SEAT COMFORT 0.080, ground service 0.042, entertainment -0.003 (n.s.). On recommendation: value for money 0.577, staff 0.197, seat comfort 0.045.",
+        "limitation": "All sub-ratings are self-reported in one sitting (common-method variance); the dominant variable, value for money, is not in this formula at all; and the source database, airlinequality.com, is the one that closed in Feb 2026 over fake reviews.",
+        "bearsOn": "The airline-heavy end of the 0.30-0.70 weight bracket.",
+        "doi": "10.3390/su11154066"
+      },
+      {
+        "id": "akan2025",
+        "authors": "Akan, S.",
+        "year": 2025,
+        "title": "Multidimensional seat comfort and its influence on passenger recommendation behavior: insights from Skytrax reviews",
+        "venue": "Journal of Aviation 9(3):676-683",
+        "finding": "n=1,062 reviews of the world's top 20 airlines: seat recline and aisle space were the strongest determinants of recommendation, followed by seat width, screen viewing and legroom.",
+        "doi": "10.30518/jav.1773181"
+      },
+      {
+        "id": "muhm2007",
+        "authors": "Muhm, J. M., Rock, P. B., McMullin, D. L., Jones, S. P., Lu, I. L., Eilers, K. D., Space, D. R., & McMullen, A.",
+        "year": 2007,
+        "title": "Effect of aircraft-cabin altitude on passenger discomfort",
+        "venue": "New England Journal of Medicine 357(1):18-27",
+        "finding": "n=502, blinded hypobaric chamber, 20-hour simulated flight at 650/4,000/6,000/7,000/8,000 ft. Reported discomfort was greater at 7,000-8,000 ft than at all lower altitudes combined, appearing after 3-9 hours of exposure; oxygen saturation fell up to 4.4 percentage points at 8,000 ft; acute mountain sickness occurred in 7.4% with no altitude effect.",
+        "supports": [
+          "cabinAltitude adjustment",
+          "block-hour weighting (duration dependence)"
+        ],
+        "doi": "10.1056/NEJMoa062770",
+        "url": "https://www.nejm.org/doi/full/10.1056/NEJMoa062770"
+      },
+      {
+        "id": "huang2026jetlag",
+        "authors": "Huang, S., Bin, Y. S., Caillaud, C., & Postnova, S.",
+        "year": 2026,
+        "title": "Modeling the effects of flight itinerary on jetlag duration",
+        "venue": "Sleep 49(6):zsag063",
+        "finding": "55,296 simulated flights: for time-zone shifts of 1-9 hours jetlag is minimised when the flight departs or arrives near habitual wake time and maximised near habitual sleep onset; when in-flight sleep is restricted the shortest jetlag comes from arrivals during the circadian day.",
+        "bearsOn": "MISSING COMPONENT — the formula scores no clock time, and this is the journey-structure variable with actual modelling behind it. Europe->Perth is a 7-hour shift, inside the modelled band.",
+        "doi": "10.1093/sleep/zsag063"
+      },
+      {
+        "id": "botonis2025",
+        "authors": "Botonis, P. G., Toubekis, A. G., Hill, D. W., & Mundel, T.",
+        "year": 2025,
+        "title": "Impact of long-haul airline travel on athletic performance and recovery: a critical review of the literature",
+        "venue": "Experimental Physiology 110:1584-1602",
+        "finding": "Mild hypoxic exposure in the cabin may partly explain post-flight fatigue independent of jet lag. Recovery 3-5 days at 4-5 time zones, 4-7 days at 6-8, up to 10-13 days eastbound at 8+; the authors state it is not yet possible to conclude any particular recovery time.",
+        "doi": "10.1113/EP091831"
+      },
+      {
+        "id": "lewis2026seating",
+        "authors": "Lewis, J., McDonnell, B. J., Butlin, M., et al.",
+        "year": 2026,
+        "title": "The impact of healthy motion seating on lower-limb blood flow and blood pressure response to simulated long-haul air travel",
+        "venue": "Experimental Physiology",
+        "finding": "Mood, pain and discomfort all worsened across a 6.5-hour flight simulation (time, all P<0.05) — direct evidence that seated discomfort accumulates with duration.",
+        "supports": [
+          "block-hour weighting"
+        ]
+      },
+      {
+        "id": "wang2022cabinair",
+        "authors": "Wang, F., You, R., Zhang, T., & Chen, Q.",
+        "year": 2022,
+        "title": "Recent progress on studies of airborne infectious disease transmission, air quality, and thermal comfort in the airliner cabin",
+        "venue": "Indoor Air 32(4)",
+        "finding": "Two-decade review: low humidity is a major complaint from passengers and crew, with no significant cabin air-quality problems otherwise identified. No intervention trial showing raised humidity improves outcomes was located.",
+        "bearsOn": "Why no humidity term is scored."
+      },
+      {
+        "id": "beko2015",
+        "authors": "Beko, G., Allen, J. G., Weschler, C. J., Vallarino, J., & Spengler, J. D.",
+        "year": 2015,
+        "title": "Impact of cabin ozone concentrations on passenger reported symptoms in commercial aircraft",
+        "venue": "PLoS ONE",
+        "finding": "In-flight symptom prevalence: dry mouth or lips 26%, dry eyes 22.1%, nasal stuffiness 18.9%."
+      },
+      {
+        "id": "who2007wright",
+        "authors": "World Health Organization",
+        "year": 2007,
+        "title": "WRIGHT project phase I: study results released on travel and blood clots",
+        "venue": "WHO",
+        "finding": "Risk of venous thromboembolism roughly doubles after 4 or more hours of seated travel; absolute risk about 1 in 6,000; risk stays elevated for about four weeks. The hazard is immobility duration. Whether a mid-journey walk resets that clock has not been tested.",
+        "bearsOn": "extraSector adjustment — adjacent evidence, not decisive.",
+        "url": "https://www.who.int/news/item/29-06-2007-study-results-released-on-travel-and-blood-clots"
       }
     ]
   }
