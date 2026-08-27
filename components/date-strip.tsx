@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlarmClock, ChevronDown, TriangleAlert } from "lucide-react";
 
 import { daysUntil, useToday } from "@/lib/countdown";
@@ -469,6 +469,18 @@ export function DateStrip() {
 
   const change = (end: RangeEnd, date: string) => moveRange(end, date);
 
+  // Escape closes the week, as it does the Capsule card and the globe popups.
+  // The close control shrank to a chip in #56, so the keyboard way out matters
+  // more than it did when it was a full-width bar.
+  useEffect(() => {
+    if (!zoomed) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenWeek(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoomed]);
+
   // Warnings with no Day of their own — the ones about the Plan as a whole.
   // Everything dated is a dot on its week and a badge in the day view.
   const warnings = plan.warnings.filter(
@@ -574,18 +586,8 @@ export function DateStrip() {
             week={zoomed}
             id={WEEK_ZOOM_ID}
             capEur={DAILY_CAP_AUD * plan.rollUp.fxRate}
+            onClose={() => setOpenWeek(null)}
           />
-        )}
-
-        {zoomed && (
-          <button
-            type="button"
-            onClick={() => setOpenWeek(null)}
-            className="mt-1.5 flex w-full cursor-pointer items-center justify-center gap-1 rounded-md py-1 text-[10px] font-semibold tracking-[0.13em] text-[var(--sb-dim)] uppercase transition-colors hover:text-[var(--sb-text)] motion-reduce:transition-none"
-          >
-            Close week
-            <ChevronDown className="size-3 rotate-180" />
-          </button>
         )}
       </div>
     </section>

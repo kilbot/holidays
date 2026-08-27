@@ -118,6 +118,17 @@ export function formatWeekdayDay(iso: string): string {
   return `${WEEKDAYS[weekdayOf(iso)]} ${Number(iso.slice(8, 10))}`;
 }
 
+/** "Fri" — for a band that spans days the column headings already date. */
+export function weekdayName(iso: string): string {
+  return WEEKDAYS[weekdayOf(iso)];
+}
+
+/** "Mon–Fri", or just "Mon" for a single day. */
+export function formatWeekdaySpan(startIso: string, endIso: string): string {
+  const from = weekdayName(startIso);
+  return startIso === endIso ? from : `${from}–${weekdayName(endIso)}`;
+}
+
 /** "12–18 Dec", collapsing the month when both ends share one. */
 export function formatSpan(startIso: string, endIso: string): string {
   if (startIso === endIso) return formatDay(startIso);
