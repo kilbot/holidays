@@ -289,49 +289,66 @@ export function FareDateField({
           date={isoAt(Math.max(0, index - 1))}
         />
 
-        <ul className="flex gap-1">
-          {days.map((date) => {
-            const day = coverage.get(date);
-            const selected = date === value;
-            return (
-              <li key={date}>
-                <button
-                  type="button"
-                  onClick={() => onChange(date)}
-                  aria-current={selected ? "date" : undefined}
-                  title={describeDay(date, day, date === defaultDate)}
-                  className={cn(
-                    "flex min-h-8 w-[38px] cursor-pointer flex-col items-center justify-center rounded-md border px-1 py-1 transition-colors motion-reduce:transition-none",
-                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
-                    selected
-                      ? "border-[var(--sb-accent)] bg-[color-mix(in_srgb,var(--sb-accent)_16%,transparent)]"
-                      : "border-[var(--sb-line)] bg-[var(--sb-panel)] hover:bg-[var(--sb-panel-2)]",
-                  )}
-                >
-                  <span
+        {/* The strip scrolls on its own, and this is the container that lets it
+            (#96).
+
+            Nine 38px cells plus their gaps are 374px wide, and with the ‹ ›
+            steppers and the "All 90 days" button on the same row the row wants
+            about 450px. That is wider than a 375px phone, and with nothing here
+            to catch it the overflow used to fall through to the page's own
+            scroller: /flights measured 462px against a 375px column and the
+            whole page — watchlist, ranked rows, headings — slid sideways.
+
+            `min-w-0` is what makes it shrink rather than push, and the cells
+            keep their width (`shrink-0`) so a scrolled strip still reads as
+            days rather than as slivers. The vertical padding is bought back
+            with a negative margin: `overflow-x` computes `overflow-y` to
+            `auto` as well, which would otherwise clip the cells' focus ring. */}
+        <div className="sb-scroll -my-1 min-w-0 flex-1 overflow-x-auto py-1">
+          <ul className="flex w-max gap-1">
+            {days.map((date) => {
+              const day = coverage.get(date);
+              const selected = date === value;
+              return (
+                <li key={date} className="shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onChange(date)}
+                    aria-current={selected ? "date" : undefined}
+                    title={describeDay(date, day, date === defaultDate)}
                     className={cn(
-                      "block text-[8px] leading-none tracking-[0.08em] uppercase",
-                      selected ? "text-[var(--sb-accent)]" : "text-[var(--sb-faint)]",
+                      "flex min-h-8 w-[38px] cursor-pointer flex-col items-center justify-center rounded-md border px-1 py-1 transition-colors motion-reduce:transition-none",
+                      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
+                      selected
+                        ? "border-[var(--sb-accent)] bg-[color-mix(in_srgb,var(--sb-accent)_16%,transparent)]"
+                        : "border-[var(--sb-line)] bg-[var(--sb-panel)] hover:bg-[var(--sb-panel-2)]",
                     )}
                   >
-                    {WEEKDAY_INITIALS[columnOf(date)]}
-                  </span>
-                  <span
-                    className={cn(
-                      "sb-num mt-[3px] block text-[11.5px] leading-none font-semibold tabular-nums",
-                      selected ? "text-[var(--sb-accent)]" : "text-[var(--sb-text)]",
-                    )}
-                  >
-                    {Number(date.slice(8, 10))}
-                  </span>
-                  <span className="mt-[3px] block">
-                    <DayMark coverage={day} muted={selected} />
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                    <span
+                      className={cn(
+                        "block text-[8px] leading-none tracking-[0.08em] uppercase",
+                        selected ? "text-[var(--sb-accent)]" : "text-[var(--sb-faint)]",
+                      )}
+                    >
+                      {WEEKDAY_INITIALS[columnOf(date)]}
+                    </span>
+                    <span
+                      className={cn(
+                        "sb-num mt-[3px] block text-[11.5px] leading-none font-semibold tabular-nums",
+                        selected ? "text-[var(--sb-accent)]" : "text-[var(--sb-text)]",
+                      )}
+                    >
+                      {Number(date.slice(8, 10))}
+                    </span>
+                    <span className="mt-[3px] block">
+                      <DayMark coverage={day} muted={selected} />
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         <StepButton
           direction="forward"
@@ -347,7 +364,7 @@ export function FareDateField({
           aria-controls={panelId}
           title={`Jump anywhere between ${formatDayYear(WINDOW_START)} and ${formatDayYear(WINDOW_END)}`}
           className={cn(
-            "flex min-h-8 cursor-pointer items-center gap-1 rounded-md border px-2 text-[10px] font-semibold transition-colors motion-reduce:transition-none",
+            "flex min-h-8 shrink-0 cursor-pointer items-center gap-1 rounded-md border px-2 text-[10px] font-semibold transition-colors motion-reduce:transition-none",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
             open
               ? "border-[var(--sb-accent)] bg-[color-mix(in_srgb,var(--sb-accent)_16%,transparent)] text-[var(--sb-accent)]"
@@ -417,7 +434,7 @@ function StepButton({
       aria-label={
         direction === "back" ? `A day earlier — ${formatDayYear(date)}` : `A day later — ${formatDayYear(date)}`
       }
-      className="flex min-h-8 w-6 cursor-pointer items-center justify-center rounded-md border border-[var(--sb-line)] bg-[var(--sb-panel)] text-[var(--sb-dim)] transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] disabled:cursor-default disabled:opacity-40 motion-reduce:transition-none"
+      className="flex min-h-8 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md border border-[var(--sb-line)] bg-[var(--sb-panel)] text-[var(--sb-dim)] transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] disabled:cursor-default disabled:opacity-40 motion-reduce:transition-none"
     >
       <Icon className="size-3.5" aria-hidden />
     </button>
