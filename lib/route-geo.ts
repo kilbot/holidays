@@ -129,25 +129,31 @@ const LONG_HAUL_KM = 4_000;
  * ideas — so it has no Valencia and no Singapore. The crossings at either end
  * of every Scenario need them, and the outbound hubs are on the fares grid
  * (`lib/flights/grid.ts`), so a Scenario routed through Madrid or Istanbul
- * draws rather than vanishing. Coordinates are the terminal's own
- * [longitude, latitude].
+ * draws rather than vanishing.
+ *
+ * Each carries its city as well as its coordinates. Home is the one end of
+ * every trip that has no Location behind it, and the engine calls it by its
+ * IATA code — right for a ledger row, wrong for the one label on the European
+ * side of a map whose whole job is saying where things are.
  */
-export const GATEWAY_COORDINATES: Readonly<Record<string, Coordinates>> = {
-  VLC: [-0.3763, 39.4699], // Valencia — home, and every Plan's first and last end
-  BCN: [2.0785, 41.2971], // Barcelona
-  MAD: [-3.5676, 40.4722], // Madrid Barajas
-  MXP: [8.7281, 45.6306], // Milan Malpensa
-  CDG: [2.5479, 49.0097], // Paris Charles de Gaulle
-  LHR: [-0.4543, 51.47], // London Heathrow
-  FRA: [8.5622, 50.0379], // Frankfurt
-  MUC: [11.7861, 48.3537], // Munich
-  FCO: [12.2508, 41.8003], // Rome Fiumicino
-  AMS: [4.7639, 52.3105], // Amsterdam Schiphol
-  ZRH: [8.5492, 47.4647], // Zurich
-  VIE: [16.5697, 48.1103], // Vienna
-  IST: [28.7519, 41.2753], // Istanbul
-  BRU: [4.4844, 50.9014], // Brussels
-  SIN: [103.9915, 1.3644], // Singapore Changi — the stopover the crossings use
+export const GATEWAYS: Readonly<
+  Record<string, { at: Coordinates; city: string }>
+> = {
+  VLC: { at: [-0.3763, 39.4699], city: "Valencia" }, // home: every Plan's first and last end
+  BCN: { at: [2.0785, 41.2971], city: "Barcelona" },
+  MAD: { at: [-3.5676, 40.4722], city: "Madrid" },
+  MXP: { at: [8.7281, 45.6306], city: "Milan" },
+  CDG: { at: [2.5479, 49.0097], city: "Paris" },
+  LHR: { at: [-0.4543, 51.47], city: "London" },
+  FRA: { at: [8.5622, 50.0379], city: "Frankfurt" },
+  MUC: { at: [11.7861, 48.3537], city: "Munich" },
+  FCO: { at: [12.2508, 41.8003], city: "Rome" },
+  AMS: { at: [4.7639, 52.3105], city: "Amsterdam" },
+  ZRH: { at: [8.5492, 47.4647], city: "Zurich" },
+  VIE: { at: [16.5697, 48.1103], city: "Vienna" },
+  IST: { at: [28.7519, 41.2753], city: "Istanbul" },
+  BRU: { at: [4.4844, 50.9014], city: "Brussels" },
+  SIN: { at: [103.9915, 1.3644], city: "Singapore" }, // the stopover the crossings use
 };
 
 /** A researched Capsule's base, by the gateway it is reached through. */
@@ -203,7 +209,9 @@ export function resolveEndpoint(
   code: string,
 ): RouteEndpoint {
   const home = isOrigin(locationId);
-  const name = home ? code : locationById(locationId).name;
+  const name = home
+    ? (GATEWAYS[code]?.city ?? code)
+    : locationById(locationId).name;
 
   const place = KNOWN_LOCATIONS.get(locationId)?.coords ?? null;
   if (place) {
@@ -215,7 +223,7 @@ export function resolveEndpoint(
     return { locationId, code, name, at: base, source: "capsule", approximate: false };
   }
 
-  const terminal = AIRPORT_COORDINATES[code] ?? GATEWAY_COORDINATES[code] ?? null;
+  const terminal = AIRPORT_COORDINATES[code] ?? GATEWAYS[code]?.at ?? null;
   if (terminal) {
     return {
       locationId,

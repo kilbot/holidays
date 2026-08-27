@@ -68,10 +68,12 @@ test("a researched Location resolves to the place, not its gateway", () => {
   assert.ok(end.at[1] > -16.6, "should be north of the airport");
 });
 
-test("home resolves through the international gateways", () => {
+test("home resolves through the international gateways, by name", () => {
   const end = resolveEndpoint("origin", "VLC");
   assert.equal(end.source, "airport");
-  assert.equal(end.name, "VLC");
+  // The engine calls home by its IATA code, which is right for a ledger row
+  // and cryptic as the one label on the European side of the map.
+  assert.equal(end.name, "Valencia");
   // A crossing's end genuinely is the terminal, so this is exact.
   assert.equal(end.approximate, false);
   assert.deepEqual(end.at, [-0.3763, 39.4699]);
