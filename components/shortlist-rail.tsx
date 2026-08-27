@@ -354,7 +354,7 @@ export function ShortlistRail() {
             type="button"
             onClick={() => choose(false)}
             className="sb-panel flex w-full cursor-pointer flex-col items-center gap-2.5 py-3 transition-colors hover:bg-[var(--sb-panel-2)] motion-reduce:transition-none"
-            aria-label={`Open the shortlist — ${benched} marked`}
+            aria-label={`Expand the shortlist rail — ${benched} marked`}
           >
             <Star className="size-4 text-[var(--sb-accent)]" />
             <span
@@ -369,7 +369,7 @@ export function ShortlistRail() {
             <button
               type="button"
               onClick={() => choose(true)}
-              aria-label="Collapse the shortlist"
+              aria-label="Collapse the shortlist rail"
               className="absolute top-2.5 right-2.5 z-10 cursor-pointer rounded-md p-1 text-[var(--sb-faint)] transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)] motion-reduce:transition-none"
             >
               <ChevronLeft className="size-3.5" />
@@ -406,7 +406,9 @@ export function ShortlistRail() {
             onClick={() => setSheetOpen(false)}
             className="absolute inset-0 cursor-default bg-[rgb(7_12_20/0.6)] backdrop-blur-[2px]"
           />
-          <div className="sb-panel absolute top-3 right-3 bottom-3 left-3 flex max-w-[340px] flex-col p-3.5">
+          {/* Shrink-wrapped, like the docked rail: a sheet that always reached
+              the tab bar spent most of its glass on nothing. */}
+          <div className="sb-panel absolute top-3 right-3 left-3 flex max-h-[calc(100%-1.5rem)] max-w-[340px] flex-col p-3.5">
             <button
               type="button"
               onClick={() => setSheetOpen(false)}

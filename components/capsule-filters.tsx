@@ -147,7 +147,7 @@ export function CapsuleFilters({
     <div className="flex flex-col gap-2.5">
       {/* ---- Row one: search, topical chips, the count ---- */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <div className="relative w-full shrink-0 sm:w-[248px]">
+        <div className="relative min-w-[148px] flex-1 sm:w-[248px] sm:flex-none">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-[var(--sb-faint)]" />
           <input
             id={searchId}
@@ -170,7 +170,10 @@ export function CapsuleFilters({
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+        {/* One scrollable line on a phone, a wrapping block on a laptop.
+            Twelve chips wrap to five rows at 375px, and five rows inside a
+            *sticky* bar is half the viewport gone before the first card. */}
+        <div className="sb-scroll order-last flex w-full min-w-0 items-center gap-1.5 overflow-x-auto pb-0.5 lg:order-none lg:w-auto lg:flex-1 lg:flex-wrap lg:overflow-x-visible lg:pb-0">
           {FACETS.map((facet) => {
             const on = filters.facets.includes(facet.id);
             return (
@@ -180,7 +183,7 @@ export function CapsuleFilters({
                 onClick={() => onChange({ facets: toggle(filters.facets, facet.id) })}
                 aria-pressed={on}
                 title={facet.hint}
-                className={cn(CHIP_BASE, !on && CHIP_OFF)}
+                className={cn(CHIP_BASE, "shrink-0", !on && CHIP_OFF)}
                 style={on ? chipOn(TONE_TOKEN[facet.tone]) : undefined}
               >
                 {facet.label}
