@@ -28,6 +28,7 @@ import {
   deepCapsuleById,
   deepCapsulesMentioning,
   formatCapsuleDays,
+  formatDayCount,
   formatEur,
   type Caveat,
   type CostTier,
@@ -223,7 +224,7 @@ function CostLadder({ capsule }: { capsule: DeepCapsule }) {
             {row.label}
           </span>
           <span className="sb-num w-[74px] shrink-0 text-[11px] text-[var(--sb-dim)]">
-            {row.count} {capsule.days.unit}
+            {formatDayCount(row.count, capsule.days.unit)}
           </span>
           <span className="sb-num flex-1 text-right text-[12.5px] font-medium">
             {formatEur(row.tier.eur)}
@@ -320,20 +321,27 @@ function Operators({ capsule }: { capsule: DeepCapsule }) {
               : "border-[var(--sb-line)] bg-[color-mix(in_srgb,var(--sb-panel-2)_55%,transparent)]",
           )}
         >
-          <div className="flex items-baseline justify-between gap-2">
-            <p className="min-w-0 text-[11.5px] font-semibold">
-              {operator.name}
-              {operator.pick && (
-                <span className="ml-1 text-[var(--sb-accent)]" title="The research's own pick">
-                  ★
-                </span>
-              )}
-            </p>
-            <p className="sb-num shrink-0 text-[10.5px] font-medium text-[var(--sb-text)]">
+          {/* Name, then where and price on their own line. Several fares are a
+              sentence rather than a number ("A$338 incl. fuel · intro dive
+              A$92"), and hanging those off the right of the name squeezed it
+              to nothing. */}
+          <p className="text-[11.5px] leading-snug font-semibold">
+            {operator.name}
+            {operator.pick && (
+              <span
+                className="ml-1 text-[var(--sb-accent)]"
+                title="The research's own pick"
+              >
+                ★
+              </span>
+            )}
+          </p>
+          <p className="mt-0.5 flex flex-wrap items-baseline gap-x-1.5 text-[10px] text-[var(--sb-faint)]">
+            <span>{operator.where}</span>
+            <span className="sb-num font-medium text-[var(--sb-text)]">
               {operator.price}
-            </p>
-          </div>
-          <p className="mt-0.5 text-[10px] text-[var(--sb-faint)]">{operator.where}</p>
+            </span>
+          </p>
           <p className="mt-1 text-[11px] leading-snug text-[var(--sb-dim)]">
             {operator.note}
           </p>
@@ -731,7 +739,15 @@ export function CapsuleCardHost() {
         </div>
 
         {/* ---- Scrolling body ---- */}
-        <div ref={scrollRef} className="sb-scroll min-h-0 flex-1 overflow-y-auto">
+        {/* tabIndex so the card can be read with a keyboard alone: this is a
+            long scrolling region and several of its sections hold no focusable
+            control at all, so without it there is no way to page through the
+            itinerary or the caveats. */}
+        <div
+          ref={scrollRef}
+          tabIndex={0}
+          className="sb-scroll min-h-0 flex-1 overflow-y-auto outline-none"
+        >
           <div className="px-4 pt-3.5 pb-3">
             <h2
               id="capsule-card-title"

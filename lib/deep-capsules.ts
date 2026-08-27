@@ -1744,10 +1744,21 @@ export function formatEur(value: number): string {
   return `€${value.toLocaleString("en-GB")}`;
 }
 
-/** "3–5 nights", "1 day", "+1 extra day". */
+/**
+ * "5 nights", "1 day", "0 extra days".
+ *
+ * The unit is stored plural because that is how it reads in every other
+ * context; one night is the case that has to be de-pluralised, and Rottnest is
+ * the reason — a Capsule that is exactly one day long should not say "1 days".
+ */
+export function formatDayCount(count: number, unit: string): string {
+  return `${count} ${count === 1 ? unit.replace(/s$/, "") : unit}`;
+}
+
+/** "3–5 nights", "1 day". The min–ideal span, for a chip or a row. */
 export function formatCapsuleDays(capsule: DeepCapsule): string {
   const { min, ideal, unit } = capsule.days;
-  if (min === ideal) return `${ideal} ${ideal === 1 ? unit.replace(/s$/, "") : unit}`;
+  if (min === ideal) return formatDayCount(ideal, unit);
   return `${min}–${ideal} ${unit}`;
 }
 

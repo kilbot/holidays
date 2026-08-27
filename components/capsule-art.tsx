@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactElement } from "react";
+import { useId, useMemo, type ReactElement } from "react";
 
 import { SCENE_LABEL, capsuleScene, type CapsuleScene } from "@/lib/capsule-art";
 import type { FacetId } from "@/lib/facets";
@@ -289,9 +289,14 @@ export function CapsuleArt({
 
   const hy = scene.horizon * H;
   const Motif = MOTIFS[scene.id];
-  // Gradient ids have to be unique per instance: several scenes can be on
-  // screen at once and SVG resolves `url(#…)` document-wide, not per-svg.
-  const uid = `art-${seed.replace(/[^a-z0-9-]/gi, "")}-${scene.id}`;
+  // Gradient ids must be unique per *instance*, not per entry: SVG resolves
+  // `url(#…)` against the whole document, and the same Capsule is on screen
+  // twice whenever its card is open above its own thumbnail in the strip.
+  // Deriving the id from the seed collided in exactly that case and left both
+  // gradient fills unresolved — a transparent sky over whatever panel colour
+  // happened to be behind it, which read as a washed-out picture in the light
+  // theme and as a plausible-but-wrong one in the dark.
+  const uid = useId().replace(/:/g, "");
   const hero = variant === "hero";
 
   return (

@@ -119,7 +119,10 @@ const PALETTES: Record<SceneId, ScenePalette> = {
 
 const TAG_SETS: Record<string, readonly string[]> = {
   tropicalWater: ["reef", "coral-cay", "snorkel", "diving", "island"],
-  water: ["beach", "coast", "swimming", "surf", "sailing", "boat", "waterfront", "ferry"],
+  // Deliberately narrow. `swimming` and `boat` used to live here and dragged
+  // the Pilbara's gorges and Kakadu's billabong cruise into a blue coastal
+  // scene — a swimming hole is not a shore and a wetland cruise is not the sea.
+  shore: ["beach", "coast", "surf", "sailing", "waterfront", "ferry"],
   night: ["doof", "psytrance", "techno", "electronic", "nightlife", "music", "reggae"],
   dry: ["desert", "outback", "4wd", "roadside", "geology", "gorge", "station-stay"],
   green: ["rainforest", "forest", "national-park", "waterfall", "hiking", "wildlife", "river"],
@@ -127,6 +130,9 @@ const TAG_SETS: Record<string, readonly string[]> = {
   urban: ["city", "museum", "art", "architecture", "nightlife", "queer", "multicultural"],
   table: ["wine", "food", "seafood", "market", "beer", "pub", "food-pilgrimage"],
 };
+
+/** Dry-set tags that only mean "dry" in a dry state. See rule 5. */
+const AMBIGUOUS_DRY: readonly string[] = ["gorge", "geology"];
 
 /** States whose default weather is hot and dry rather than green. */
 const DRY_STATES = new Set(["WA", "NT", "SA"]);
@@ -156,39 +162,55 @@ export function sceneFor(input: {
   const { state, tags, facets } = input;
   const has = (facet: FacetId) => facets.includes(facet);
 
-  // 1. After dark beats everything. Two signals needed so a folk festival in a
-  //    field doesn't come out as a rave.
+  // 1. After dark beats everything. `doof`, `psytrance` and `nye` are on their
+  //    own unambiguous; everything else needs two signals, so a folk festival
+  //    in a field doesn't come out as a rave.
+  if (tags.includes("doof") || tags.includes("psytrance") || tags.includes("nye")) {
+    return "night";
+  }
   if (hits(tags, TAG_SETS.night) >= 2) return "night";
   if (has("music") && has("hippie")) return "night";
 
-  // 2. Water, split by latitude — the reef is a different colour to the Bight.
+  // 2. A wine region is a wine region, even when it also has a coastline.
+  //    Without this, Margaret River and the Fleurieu come out as generic blue
+  //    coast and lose the one thing they are actually known for.
+  if (tags.includes("wine")) return "harvest";
+
+  // 3. Water, split by latitude — the reef is a different colour to the Bight.
   if (hits(tags, TAG_SETS.tropicalWater) >= 1) {
     return TROPICAL_STATES.has(state) || hits(tags, TAG_SETS.tropicalWater) >= 2
       ? "reef"
       : "coast";
   }
-  if (has("beach") || hits(tags, TAG_SETS.water) >= 1) {
+  if (hits(tags, TAG_SETS.shore) >= 1) {
     return TROPICAL_STATES.has(state) ? "reef" : "coast";
   }
 
-  // 3. Cold high country, before the generic outdoors rule swallows it.
+  // 4. Cold high country, before the generic outdoors rule swallows it.
   if (hits(tags, TAG_SETS.cold) >= 1 && (COLD_STATES.has(state) || tags.includes("alpine"))) {
     return "alpine";
   }
 
-  // 4. The dry interior. `road-trip` alone isn't enough — the Great Ocean Road
-  //    is a road trip and it is not ochre.
-  if (hits(tags, TAG_SETS.dry) >= 1) return "ochre";
+  // 5. The dry interior. `road-trip` alone isn't enough — the Great Ocean Road
+  //    is a road trip and it is not ochre. `gorge` and `geology` are the two
+  //    ambiguous members of the set: the Pilbara's gorges are red rock,
+  //    Tasmania's are wet green, so on their own they only count in a dry
+  //    state and otherwise fall through to the green rule below.
+  const dryHits = hits(tags, TAG_SETS.dry);
+  if (dryHits >= 1) {
+    const onlyAmbiguous = dryHits === hits(tags, AMBIGUOUS_DRY);
+    if (!onlyAmbiguous || DRY_STATES.has(state)) return "ochre";
+  }
 
-  // 5. Green country.
+  // 6. Green country.
   if (hits(tags, TAG_SETS.green) >= 1) return COLD_STATES.has(state) ? "alpine" : "forest";
 
-  // 6. Culture: the table before the city, because a market day does not read
+  // 7. Culture: the table before the city, because a market day does not read
   //    as a skyline.
   if (hits(tags, TAG_SETS.table) >= 1) return "harvest";
   if (hits(tags, TAG_SETS.urban) >= 1 || has("city")) return "city";
 
-  // 7. Nothing said anything. Fall back on where it is.
+  // 8. Nothing said anything. Fall back on where it is.
   if (DRY_STATES.has(state)) return "ochre";
   if (COLD_STATES.has(state)) return "alpine";
   return "forest";
