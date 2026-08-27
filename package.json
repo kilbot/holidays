@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import ./lib/engine/__tests__/alias-hook.mjs --test --test-concurrency=1 'lib/engine/__tests__/*.test.ts'"
+    "test": "node --import ./lib/engine/__tests__/alias-hook.mjs --test --test-concurrency=1 'lib/engine/__tests__/*.test.ts' 'lib/store/__tests__/*.test.ts'",
+    "bootstrap:plan": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/bootstrap-plan.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

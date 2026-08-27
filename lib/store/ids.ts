@@ -76,6 +76,9 @@ export function isPlausibleId(value: unknown): value is string {
  */
 export function secretsMatch(a: unknown, b: unknown): boolean {
   if (typeof a !== "string" || typeof b !== "string") return false;
+  // An empty secret matching an empty secret would mean a Plan whose meta
+  // document lost its key is editable by a request that sends no key at all.
+  if (a.length === 0 || b.length === 0) return false;
   let difference = a.length ^ b.length;
   const length = Math.max(a.length, b.length);
   for (let index = 0; index < length; index += 1) {
