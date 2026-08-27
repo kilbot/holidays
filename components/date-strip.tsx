@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AlarmClock, ChevronDown, TriangleAlert } from "lucide-react";
 
 import { daysUntil, useToday } from "@/lib/countdown";
@@ -460,6 +460,7 @@ function WeekCell({
 export function DateStrip() {
   const { plan, moveRange } = usePlan();
   const [openWeek, setOpenWeek] = useState<string | null>(null);
+  const strip = useRef<HTMLElement>(null);
 
   const range = { start: plan.startDate, end: plan.endDate };
   // Week ids are positional, so a range change can leave the open one pointing
@@ -468,6 +469,42 @@ export function DateStrip() {
   const zoomed = plan.weeks.find((week) => week.id === openWeek) ?? null;
 
   const change = (end: RangeEnd, date: string) => moveRange(end, date);
+
+  /**
+   * Publish how tall the strip actually is.
+   *
+   * `--sb-strip-h` used to be a hand-maintained constant standing for the
+   * strip's *resting* height, and four pieces of chrome cleared it by
+   * arithmetic: the shortlist rail, the cost HUD, the share pill and Mapbox's
+   * attribution. Two things were wrong with that. The constant had drifted 22px
+   * from the real resting height, and — the bug #56 was filed for — opening a
+   * week grows the strip by two hundred-odd pixels that the constant knew
+   * nothing about, so the share pill printed itself over the week's weather
+   * column.
+   *
+   * Measuring is the fix rather than a bigger constant: nothing that reads the
+   * variable feeds back into the strip's own height, so one observer keeps all
+   * four readers honest at every breakpoint and in every state. The CSS value
+   * stays as the first-paint fallback, and is restored on unmount for the pages
+   * that have no strip at all.
+   */
+  useEffect(() => {
+    const node = strip.current;
+    if (!node) return;
+    const publish = () => {
+      document.documentElement.style.setProperty(
+        "--sb-strip-h",
+        `${Math.round(node.getBoundingClientRect().height)}px`,
+      );
+    };
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(node);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.removeProperty("--sb-strip-h");
+    };
+  }, []);
 
   // Escape closes the week, as it does the Capsule card and the globe popups.
   // The close control shrank to a chip in #56, so the keyboard way out matters
@@ -488,7 +525,10 @@ export function DateStrip() {
   );
 
   return (
-    <section className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20">
+    <section
+      ref={strip}
+      className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20"
+    >
       <div className="sb-panel px-3 py-2.5">
         {/* One header line: the dates, the totals, the deadline chip and the
             legend. Before #36 the deadlines had a banner of their own above

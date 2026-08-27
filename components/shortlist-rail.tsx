@@ -392,7 +392,7 @@ export function ShortlistRail() {
         type="button"
         onClick={() => setSheetOpen(true)}
         aria-label={`Open the shortlist — ${benched} marked`}
-        className="sb-panel pointer-events-auto absolute bottom-[calc(var(--sb-strip-h)+3.5rem)] left-4 z-30 flex min-h-11 cursor-pointer items-center gap-1.5 px-3 py-2 lg:hidden"
+        className="sb-panel pointer-events-auto absolute bottom-[var(--sb-pill-bottom)] left-4 z-30 flex min-h-11 cursor-pointer items-center gap-1.5 px-3 py-2 lg:hidden"
       >
         <Star className="size-3.5 text-[var(--sb-accent)]" />
         <span className="sb-num text-[12px] font-semibold text-[var(--sb-text)]">

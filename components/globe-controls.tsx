@@ -69,7 +69,11 @@ export function GlobeControls({
   const off = Math.round(bearing) === 0 ? 0 : Math.round(bearing);
 
   return (
-    <div className="pointer-events-auto absolute top-1/2 right-3 z-20 -translate-y-1/2">
+    // Centred on the globe the traveller can actually see, not on the stage:
+    // the bottom of the stage is the date strip, and half of it is an opened
+    // week. Riding the strip's live height keeps the stack off the share pill
+    // and off the week panel at every breakpoint (#56).
+    <div className="pointer-events-auto absolute top-[calc(50%-var(--sb-strip-h)/2)] right-3 z-20 -translate-y-1/2">
       <div className="sb-panel flex flex-col divide-y divide-[var(--sb-line)] overflow-hidden">
         <ControlButton onClick={onZoomIn} label="Zoom in">
           <Plus className="size-4" />

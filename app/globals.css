@@ -289,22 +289,43 @@
 }
 
 /* ------------------------------------------------------------------
-   Resting height of the docked date strip, measured at its collapsed
-   default. Three pieces of chrome have to clear it — the catalog rail's
-   bottom edge, Mapbox's logo and its attribution — and before #36 each
+   How tall the docked date strip currently is. Four pieces of chrome
+   clear it — the shortlist rail's bottom edge, the cost HUD's ceiling,
+   the share pill and Mapbox's logo/attribution — and before #36 each
    carried its own hard-coded copy of the number, which drifted every
-   time the strip changed. One variable, three readers.
+   time the strip changed. One variable, four readers.
 
-   It is a *resting* height on purpose: opening a week zoom grows the
-   strip over the globe rather than pushing this out, which is what an
-   overlay should do.
+   The values here are the *first-paint fallback* only. Since #56 the
+   strip measures itself and writes the real height onto the document
+   element (see `components/date-strip.tsx`), because the constant was
+   both stale and, more importantly, blind to the week zoom: an opened
+   week grows the strip by a couple of hundred pixels, and chrome that
+   cleared a resting height sat on top of it.
    ------------------------------------------------------------------ */
 :root {
   --sb-strip-h: 212px;
+
+  /* Where the two bottom-corner pills sit — the share pill and, on a
+     phone, the shortlist launcher.
+
+     Clear of the strip, and clear of Mapbox's logo and compact
+     attribution stacked above it: those are 73px of chrome that has to
+     stay visible under Mapbox's terms, so ours moves rather than
+     covering it. Before #56 the pills cleared the strip by 3.5rem and
+     sat on the logo by about 18px.
+
+     The `min()` is the floor. On a phone an opened week can be most of
+     the stage, and a pill pushed off the top would be worse than one
+     sitting over the globe; `100%` resolves against the stage because a
+     custom property is substituted where it is used. */
+  --sb-pill-bottom: min(
+    calc(var(--sb-strip-h) + 6.75rem),
+    calc(100% - 3.25rem)
+  );
 }
 @media (min-width: 1024px) {
   :root {
-    --sb-strip-h: 140px;
+    --sb-strip-h: 162px;
   }
 }
 
