@@ -21,7 +21,7 @@
 import type { CatalogIdea, SeasonFit } from "@/lib/catalog";
 import { SEASON_RANK } from "@/lib/catalog";
 import type { DeepCapsule } from "@/lib/deep-capsules";
-import { capsuleState, capsuleWhere } from "@/lib/deep-capsules";
+import { capsuleState } from "@/lib/deep-capsules";
 import type { FacetId } from "@/lib/facets";
 import { FACETS } from "@/lib/facets";
 import type { ShortlistMap } from "@/lib/shortlist";
@@ -326,10 +326,4 @@ export function siftDeepCapsules(
   return capsules.filter((capsule) =>
     matchesFilters(candidateFromCapsule(capsule), filters, marks, needle),
   );
-}
-
-/** "WA — South West / Margaret River" for a researched Capsule. */
-export function capsuleRegionLine(capsule: DeepCapsule): string {
-  const where = capsuleWhere(capsule);
-  return where ? `${capsuleState(capsule)} · ${where}` : capsuleState(capsule);
 }
