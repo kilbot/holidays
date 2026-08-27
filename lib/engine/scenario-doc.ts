@@ -125,13 +125,27 @@ const ADVENTURES = [
 const WA_EVENINGS = ["perth-live-music-night", "fremantle-fish-and-chips"];
 
 /**
- * "The All-Stops Tour" — the reference trip, with all nine researched Capsules
- * on and both WA evenings booked. It is a starting position, not a
- * recommendation: everything in it can be toggled off, dragged, or forked.
+ * "The All-Stops Tour" — the reference trip: **the everything version, the
+ * ceiling the other Scenarios cut from.** All nine researched Adventures on,
+ * both WA evenings booked, nothing traded away anywhere.
+ *
+ * The couple renamed it on the live Plan (*"belt-and-suspenders… all the hits —
+ * Perth, Cairns, Tasmania… this is the most expensive it would get"*), and this
+ * is that name brought back into the seed so a future re-seed keeps it.
+ *
+ * **The id stays `fireworks-nye` and must.** `scripts/seed-scenarios.mjs` adds
+ * seeded Scenarios to the live document by id and leaves everything matching
+ * alone, so the id is what stops a re-seed appending a duplicate of a Scenario
+ * that is already there under a name the couple chose. A rename is a change of
+ * label, not of identity — the same rule `rename()` follows for the couple's
+ * own Scenarios.
+ *
+ * It is a starting position and not a recommendation: everything in it can be
+ * toggled off, dragged, or forked.
  */
 export const DEFAULT_SCENARIO: Scenario = {
   id: "fireworks-nye",
-  name: "Fireworks NYE",
+  name: "The All-Stops Tour",
   createdAt: "2026-08-27T00:00:00.000Z",
   input: {
     ...EMPTY_INPUT,
@@ -178,7 +192,8 @@ const PERTH_CITY_DAYS = "perth-city-kings-park-cottesloe-and-boola-bardip";
  *
  * Levers 1–3 — the rate floors and the mechanical Event corrections — are not
  * here because they are not choices. They are in `constants.ts` and
- * `capsules.ts` and they apply to *every* Scenario, "Fireworks NYE" included.
+ * `capsules.ts` and they apply to *every* Scenario, the All-Stops Tour
+ * included.
  *
  * **Given up:** two Pennicott cruises, the second reef boat and its intro
  * dives, and about 28 nights under canvas. **Depends on** camping gear reaching
@@ -289,8 +304,8 @@ export const AGGRESSIVE_SCENARIO: Scenario = {
  * priced, so the couple can flip between them and feel the difference rather
  * than read about it.
  *
- * "Fireworks NYE" is the current one. The other two are alternatives sitting
- * beside it, which is what docs/CONTEXT.md means by a Scenario — *"exactly one
+ * "The All-Stops Tour" is the current one — the everything version, and the
+ * ceiling the other two cut from. They are alternatives sitting beside it, which is what docs/CONTEXT.md means by a Scenario — *"exactly one
  * is marked as the current Plan"*.
  */
 export const INITIAL_STATE: ScenarioState = {

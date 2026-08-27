@@ -100,7 +100,7 @@ test("writing a default explicitly is not a change", () => {
 /* Comfortable, against the reference trip                             */
 /* ------------------------------------------------------------------ */
 
-test("Comfortable is cheaper than Fireworks NYE and keeps every day", () => {
+test("Comfortable is cheaper than the All-Stops Tour and keeps every day", () => {
   const diff = diffScenarios(comfortable, fireworks);
 
   assert.equal(diff.identical, false);
