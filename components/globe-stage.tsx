@@ -9,10 +9,12 @@ import { Star, X } from "lucide-react";
 import { GlobeControls } from "@/components/globe-controls";
 import { LegPopup } from "@/components/leg-popup";
 import {
+  CARD_SLIDEOVER_WIDTH_PX,
   FOCUS_FLIGHT_MS,
   FOCUS_ZOOM,
+  NO_PADDING,
   capsuleLocation,
-  focusOffset,
+  focusPadding,
   framePadding,
 } from "@/lib/capsule-camera";
 import {
@@ -286,7 +288,17 @@ export function GlobeStage() {
       const duration = animate && !prefersReducedMotion() ? 900 : 0;
 
       if (width < COMPACT_CAMERA_MAX_WIDTH_PX) {
-        map.easeTo({ ...COMPACT_CAMERA, bearing: 0, pitch: 0, duration });
+        // `NO_PADDING` because COMPACT_CAMERA was hand-framed against an
+        // unpadded camera: padding is sticky, so an open card's reservation
+        // has to be cleared here or the restored frame is the old one shoved
+        // sideways.
+        map.easeTo({
+          ...COMPACT_CAMERA,
+          bearing: 0,
+          pitch: 0,
+          padding: NO_PADDING,
+          duration,
+        });
         return;
       }
 
@@ -745,10 +757,9 @@ export function GlobeStage() {
     const camera = {
       center: location.at,
       zoom: FOCUS_ZOOM,
-      // Keeps the place in the map the card leaves visible, rather than
-      // behind it. See `focusOffset` for why this is an offset and not
-      // Mapbox's sticky camera padding.
-      offset: focusOffset(container.clientWidth),
+      // Reserves the slide-over's width, so the place lands in the map the
+      // card leaves visible rather than behind it.
+      padding: focusPadding(container.clientWidth),
       bearing: 0,
       pitch: 0,
     };
@@ -850,6 +861,9 @@ export function GlobeStage() {
           onZoomIn={() => zoomBy(1)}
           onZoomOut={() => zoomBy(-1)}
           onFrameRoute={() => frameRouteRef.current(true)}
+          // An open card takes the right-hand column; the stack steps left of
+          // it so the map it leaves visible is still a map you can zoom.
+          clearRight={focus ? CARD_SLIDEOVER_WIDTH_PX + 12 : undefined}
         />
       )}
 
