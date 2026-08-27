@@ -17,12 +17,19 @@ import { describe, it } from "node:test";
 
 import {
   airlineScoreOf,
+  bracketWeights,
   comfortBand,
+  credentialsOf,
+  DEFAULT_AIRLINE_WEIGHT,
   middleEastTransitsOf,
   MIDDLE_EAST_TRANSIT_HUBS,
   rawScoreOf,
+  reweigh,
   scoreItinerary,
   seatScoreOf,
+  sourcesFor,
+  topPickAcrossBracket,
+  WEIGHT_BRACKET,
   type Sector,
 } from "@/lib/flights/comfort";
 
@@ -31,6 +38,32 @@ const sector = (partial: Partial<Sector> & Pick<Sector, "carrier" | "aircraft" |
   metalConfirmed: true,
   ...partial,
 });
+
+/**
+ * The four itineraries the evidence audit checked by hand across the weight
+ * bracket, at the research's own block hours. They are shared fixtures rather
+ * than inline literals because the weight tests below have to compare the same
+ * four journeys at nine different settings.
+ */
+const SINGAPORE_SECTORS: readonly Sector[] = [
+  sector({ carrier: "SQ", aircraft: "A350-900", hours: 13, to: "SIN" }),
+  sector({ carrier: "SQ", aircraft: "A350-900", hours: 5, to: "PER" }),
+];
+
+const CATHAY_SECTORS: readonly Sector[] = [
+  sector({ carrier: "CX", aircraft: "A350-900", hours: 13, to: "HKG" }),
+  sector({ carrier: "CX", aircraft: "A350-900", hours: 7.7, to: "PER" }),
+];
+
+const MALAYSIA_SECTORS: readonly Sector[] = [
+  sector({ carrier: "MH", aircraft: "A350-900", hours: 12.5, to: "KUL" }),
+  sector({ carrier: "MH", aircraft: "A330-900neo", hours: 5.3, to: "PER" }),
+];
+
+const QATAR_SECTORS: readonly Sector[] = [
+  sector({ carrier: "QR", aircraft: "A350-1000", hours: 7, to: "DOH" }),
+  sector({ carrier: "QR", aircraft: "777-300ER", hours: 11, to: "PER" }),
+];
 
 describe("the research's worked examples", () => {
   it("scores Singapore Airlines BCN-SIN-PER at 9.3", () => {
@@ -55,7 +88,15 @@ describe("the research's worked examples", () => {
     assert.equal(result.score, 9);
   });
 
-  it("scores Qatar MAD-DOH-PER at 7.1, and 8.1 before the Gulf adjustment", () => {
+  /**
+   * 6.9, where the file's ranked table published 7.1 before the evidence audit.
+   * The 0.2 is the cabin-altitude adjustment the audit added (issue #69): the
+   * eleven-hour Perth sector is a 777-300ER pressurised to ~8,000 ft, and Muhm
+   * et al. (2007) is the strongest evidence in the whole literature. The audit
+   * predicted exactly this pair of moves — Qatar 7.1 → 6.9, Emirates 6.4 → 6.2
+   * — and verified by hand that nothing reorders.
+   */
+  it("scores Qatar MAD-DOH-PER at 6.9, and 8.1 before the adjustments", () => {
     const result = scoreItinerary([
       sector({ carrier: "QR", aircraft: "A350-1000", hours: 7, to: "DOH" }),
       sector({ carrier: "QR", aircraft: "777-300ER", hours: 11, to: "PER" }),
@@ -65,10 +106,38 @@ describe("the research's worked examples", () => {
     assert.equal(result.seatScore, 7.1);
     assert.deepEqual(
       result.adjustments.map((adjustment) => [adjustment.name, adjustment.points]),
-      [["gulfHubReliability", -1]],
+      [
+        ["gulfHubReliability", -1],
+        ["cabinAltitude", -0.25],
+      ],
     );
-    assert.equal(result.score, 7.1);
+    assert.equal(result.score, 6.9);
     assert.equal(rawScoreOf(result), 8.1);
+  });
+
+  it("charges cabin altitude per sector, and never on a 6,000 ft type", () => {
+    // The A350 and the 787 hold ~6,000 ft, so neither takes it however long
+    // the sector — which is the one evidence-backed thing the 787's narrow
+    // seat gives back, and why Qantas' 16h40 nonstop is unpenalised.
+    const lowCabin = scoreItinerary([
+      sector({ carrier: "SQ", aircraft: "A350-900", hours: 13, to: "SIN" }),
+      sector({ carrier: "SQ", aircraft: "787-10", hours: 5, to: "PER" }),
+    ]);
+    assert.equal(lowCabin.adjustments.some((a) => a.name === "cabinAltitude"), false);
+
+    // Two long sectors at ~8,000 ft is two lots of the penalty, not one.
+    const twice = scoreItinerary([
+      sector({ carrier: "VN", aircraft: "777-300ER", hours: 11, to: "SGN" }),
+      sector({ carrier: "VN", aircraft: "777-300ER", hours: 7, to: "PER" }),
+    ]);
+    assert.equal(twice.adjustments.find((a) => a.name === "cabinAltitude")?.points, -0.5);
+
+    // Short sectors are under the six-hour threshold, whatever the cabin.
+    const short = scoreItinerary([
+      sector({ carrier: "QF", aircraft: "A330-300", hours: 5.2, to: "PER" }),
+      sector({ carrier: "QF", aircraft: "A330-300", hours: 4, to: "SIN" }),
+    ]);
+    assert.equal(short.adjustments.some((a) => a.name === "cabinAltitude"), false);
   });
 
   it("reproduces the Lufthansa upper-deck play — the best seat, and still eighth", () => {
@@ -149,15 +218,19 @@ describe("the published ranking, rebuilt", () => {
     assert.equal(result.score, 6.7);
   });
 
-  /** Rank 8: Emirates, an A380 on the wrong half of the journey. */
-  it("scores Emirates MAD-DXB-PER at 6.4", () => {
+  /**
+   * Rank 8: Emirates, an A380 on the wrong half of the journey — and, since the
+   * audit, the second of the two rows that take the cabin-altitude penalty. The
+   * eleven-hour Perth sector is the same 8,000 ft 777-300ER as Qatar's.
+   */
+  it("scores Emirates MAD-DXB-PER at 6.2", () => {
     const result = scoreItinerary([
       sector({ carrier: "EK", aircraft: "A380-800", hours: 7.3, to: "DXB" }),
       sector({ carrier: "EK", aircraft: "777-300ER", hours: 11.2, to: "PER" }),
     ]);
 
     assert.equal(result.seatScore, 6.7);
-    assert.equal(result.score, 6.4);
+    assert.equal(result.score, 6.2);
   });
 
   /** The return leg the research calls out: the A380 the couple actually gets. */
@@ -318,5 +391,225 @@ describe("the Middle East hub set", () => {
   it("finds the excluded hub inside a multi-stop routing, in order flown", () => {
     assert.deepEqual(middleEastTransitsOf(["MEL", "DOH"]), ["DOH"]);
     assert.deepEqual(middleEastTransitsOf(["SIN"]), []);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The evidence audit, made computable (kilbot/holidays#69)            */
+/* ------------------------------------------------------------------ */
+
+describe("carrier credentials", () => {
+  it("gives Cathay the economy award first, because this trip flies economy", () => {
+    const cathay = credentialsOf("CX");
+    assert.ok(cathay);
+    assert.equal(cathay.name, "Cathay Pacific");
+    assert.equal(cathay.stars, 5);
+    assert.equal(cathay.honours[0], "Skytrax World's Best Economy Class 2025");
+    assert.ok(cathay.honours.includes("#2 AirlineRatings 2026"));
+    // Airline ratings are somebody else's ratings, and the chip says so.
+    assert.equal(cathay.evidence.label, "rated");
+  });
+
+  it("leads Singapore with the two economy-specific firsts it actually holds", () => {
+    const singapore = credentialsOf("SQ");
+    assert.ok(singapore);
+    assert.equal(singapore.honours[0], "#1 long-haul AirlineRatings 2026");
+    assert.ok(
+      singapore.honours.some((honour) => honour.startsWith("Flyers' Choice 2026")),
+      singapore.honours.join(" · "),
+    );
+    // The Flyers' Choice entry is a paragraph in the file; the line takes the claim.
+    assert.equal(
+      singapore.honours.find((honour) => honour.startsWith("Flyers' Choice")),
+      "Flyers' Choice 2026 · Preferred Economy Airline — 1st",
+    );
+  });
+
+  it("does not turn a 62nd place into a credential", () => {
+    const vietnam = credentialsOf("VN");
+    assert.ok(vietnam);
+    assert.equal(
+      vietnam.honours.some((honour) => honour.includes("Skytrax 2025")),
+      false,
+      vietnam.honours.join(" · "),
+    );
+  });
+
+  it("has nothing to say about a carrier the research does not rate", () => {
+    assert.equal(credentialsOf("TR"), null);
+  });
+
+  it("rides on every scored sector, so a row can show it without the dataset", () => {
+    const result = scoreItinerary([
+      sector({ carrier: "SQ", aircraft: "A350-900", hours: 13, to: "SIN" }),
+      sector({ carrier: "SQ", aircraft: "A350-900", hours: 5, to: "PER" }),
+    ]);
+    assert.equal(result.sectors[0].credentials?.name, "Singapore Airlines");
+  });
+});
+
+describe("evidence labels", () => {
+  it("labels the airline axis rated and the seat mapping judgment", () => {
+    const result = scoreItinerary([
+      sector({ carrier: "SQ", aircraft: "A350-900", hours: 13, to: "SIN" }),
+      sector({ carrier: "SQ", aircraft: "A350-900", hours: 5, to: "PER" }),
+    ]);
+
+    assert.equal(result.sectors[0].credentials?.evidence.label, "rated");
+    // The inches are measured; the 0–10 mapping of them is not.
+    assert.equal(result.sectors[0].seatEvidence.dimensions?.label, "measured");
+    assert.equal(result.sectors[0].seatEvidence.score.label, "judgment");
+    assert.deepEqual(result.sectors[0].seatDimensions, {
+      widthIn: 18,
+      pitchIn: 32,
+      layout: "3-3-3",
+    });
+  });
+
+  it("carries no measured dimensions when the seat came from the type table", () => {
+    const seat = seatScoreOf("VN", "777-300ER");
+    assert.equal(seat.seatSource, "type");
+    assert.equal(seat.seatDimensions, null);
+    assert.equal(seat.seatEvidence.dimensions, null);
+    assert.equal(seat.seatEvidence.score.label, "judgment");
+  });
+
+  it("labels every adjustment, and only cabin altitude as measured", () => {
+    const result = scoreItinerary([
+      sector({ carrier: "QR", aircraft: "A350-1000", hours: 7, to: "DOH" }),
+      sector({ carrier: "QR", aircraft: "777-300ER", hours: 11, to: "PER", metalConfirmed: false }),
+    ]);
+
+    const labels = Object.fromEntries(
+      result.adjustments.map((adjustment) => [adjustment.name, adjustment.evidence.label]),
+    );
+    assert.deepEqual(labels, {
+      gulfHubReliability: "judgment",
+      metalUncertainty: "judgment",
+      cabinAltitude: "measured",
+    });
+    // Every chip has an explanation behind it, or the label is decoration.
+    for (const adjustment of result.adjustments) {
+      assert.ok(adjustment.evidence.note.length > 40, adjustment.name);
+    }
+  });
+
+  it("says the weight is a judgment, and quotes the bracket", () => {
+    const result = scoreItinerary([sector({ carrier: "SQ", aircraft: "A350-900", hours: 13 })]);
+    assert.equal(result.weights.evidence.label, "judgment");
+    assert.ok(result.weights.evidence.note.includes("0.30-0.70"));
+  });
+
+  it("resolves the studies the panel links to, with somewhere to click", () => {
+    const sources = sourcesFor(["muhm2007", "anjani2021width", "ban2019", "vink2012"]);
+    assert.equal(sources.length, 4);
+    for (const source of sources) {
+      assert.ok(source.href?.startsWith("https://"), `${source.id}: ${source.href}`);
+      assert.ok(source.finding.length > 40, source.id);
+    }
+    assert.equal(sources[0].label, "Muhm et al. 2007, New England Journal of Medicine");
+  });
+});
+
+describe("the airline-vs-aircraft weight", () => {
+  const singapore = () =>
+    scoreItinerary([
+      sector({ carrier: "SQ", aircraft: "A350-900", hours: 13, to: "SIN" }),
+      sector({ carrier: "SQ", aircraft: "A350-900", hours: 5, to: "PER" }),
+    ]);
+
+  it("starts where the research put it, and reports what it used", () => {
+    assert.equal(DEFAULT_AIRLINE_WEIGHT, 0.55);
+    assert.deepEqual(
+      { airline: singapore().weights.airline, aircraft: singapore().weights.aircraft },
+      { airline: 0.55, aircraft: 0.45 },
+    );
+  });
+
+  it("moves the score the way the weight says", () => {
+    // 9.5 airline against 9.0 seat: airline-heavy is worth more here.
+    assert.equal(scoreItinerary(SINGAPORE_SECTORS, 0.3).score, 9.2);
+    assert.equal(scoreItinerary(SINGAPORE_SECTORS, 0.7).score, 9.4);
+    // Malaysia is the other way round — a mediocre airline in a very good seat.
+    assert.equal(scoreItinerary(MALAYSIA_SECTORS, 0.3).score, 8);
+    assert.equal(scoreItinerary(MALAYSIA_SECTORS, 0.7).score, 7.2);
+  });
+
+  it("clamps to the bracket rather than accepting a weight nobody argued for", () => {
+    assert.equal(scoreItinerary(SINGAPORE_SECTORS, 0).score, scoreItinerary(SINGAPORE_SECTORS, WEIGHT_BRACKET.min).score);
+    assert.equal(scoreItinerary(SINGAPORE_SECTORS, 1).score, scoreItinerary(SINGAPORE_SECTORS, WEIGHT_BRACKET.max).score);
+  });
+
+  it("reweighs an already-scored itinerary to exactly what scoring it again gives", () => {
+    // The slider re-ranks from the scores the page already holds; the day this
+    // identity breaks is the day the slider starts lying about the formula.
+    for (const weight of bracketWeights()) {
+      for (const sectors of [SINGAPORE_SECTORS, MALAYSIA_SECTORS, QATAR_SECTORS]) {
+        assert.equal(
+          reweigh(scoreItinerary(sectors), weight).score,
+          scoreItinerary(sectors, weight).score,
+          `${weight}`,
+        );
+      }
+    }
+  });
+
+  it("steps in twentieths from 0.30 to 0.70 and stops there", () => {
+    const stops = bracketWeights();
+    assert.equal(stops[0], WEIGHT_BRACKET.min);
+    assert.equal(stops[stops.length - 1], WEIGHT_BRACKET.max);
+    assert.equal(stops.length, 9);
+  });
+});
+
+describe("the top pick across the bracket", () => {
+  /**
+   * The reassurance the page prints, pinned.
+   *
+   * The audit checked by hand that Singapore Airlines wins at 0.30, 0.55 and
+   * 0.70 — it leads on both axes, so the weight cannot dethrone it, and the
+   * slider only rearranges the middle of the table. The page states that in
+   * words, so it has to keep being true of the seeded itineraries.
+   */
+  const seeded = [
+    { id: "SQ BCN-SIN-PER", comfort: scoreItinerary(SINGAPORE_SECTORS) },
+    { id: "CX MAD-HKG-PER", comfort: scoreItinerary(CATHAY_SECTORS) },
+    { id: "MH LHR-KUL-PER", comfort: scoreItinerary(MALAYSIA_SECTORS) },
+    { id: "QR MAD-DOH-PER", comfort: scoreItinerary(QATAR_SECTORS) },
+  ];
+
+  it("is Singapore at every weight in the bracket", () => {
+    const verdict = topPickAcrossBracket(seeded);
+    assert.equal(verdict.winner?.id, "SQ BCN-SIN-PER");
+    assert.equal(verdict.stable, true);
+    assert.equal(verdict.atMin, 9.2);
+    assert.equal(verdict.atMax, 9.4);
+
+    for (const weight of bracketWeights()) {
+      const ranked = [...seeded].sort(
+        (a, b) => (reweigh(b.comfort, weight).score ?? 0) - (reweigh(a.comfort, weight).score ?? 0),
+      );
+      assert.equal(ranked[0].id, "SQ BCN-SIN-PER", `at ${weight}`);
+    }
+  });
+
+  it("is the middle of the table that the weight actually rearranges", () => {
+    // The trade the slider exists to expose. Aircraft-heavy, Malaysia's 2-4-2
+    // A350 is a point and a half clear of Qatar; airline-heavy, Qatar's five
+    // stars have closed the whole gap — the audit's own hand-worked table has
+    // them both at 7.2 there, which is a values question, not a measurement.
+    const at = (index: number, weight: number) => reweigh(seeded[index].comfort, weight).score ?? 0;
+    const gapAt = (weight: number) => at(2, weight) - at(3, weight);
+
+    assert.ok(gapAt(WEIGHT_BRACKET.min) >= 1.5, `${gapAt(WEIGHT_BRACKET.min)}`);
+    assert.ok(gapAt(WEIGHT_BRACKET.max) <= 0, `${gapAt(WEIGHT_BRACKET.max)}`);
+  });
+
+  it("has no winner to report when nothing in the list is rated", () => {
+    const verdict = topPickAcrossBracket([
+      { id: "TR", comfort: scoreItinerary([sector({ carrier: "TR", aircraft: "787-8", hours: 12 })]) },
+    ]);
+    assert.equal(verdict.winner, null);
+    assert.equal(verdict.stable, false);
   });
 });

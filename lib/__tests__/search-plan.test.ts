@@ -83,12 +83,17 @@ describe("the metal each itinerary flies", () => {
    * These four are the research's own published scores, and they only come out
    * right if the metal table is being found: a missed key falls back to a
    * generic 787 and the unconfirmed penalty, which is a silent 1.5-point drop.
+   *
+   * The two Gulf rows sit a quarter-point below the published table because of
+   * the cabin-altitude adjustment the evidence audit added (kilbot/holidays#69):
+   * both put a long Perth sector on a 777-300ER pressurised to ~8,000 ft. The
+   * audit predicted the pair and verified that nothing reorders.
    */
   it("reproduces the published scores for the headline itineraries", () => {
     assert.equal(scoreOf(outbound, "BCN", "Singapore Airlines"), 9.3);
     assert.equal(scoreOf(outbound, "MAD", "Cathay Pacific"), 9);
-    assert.equal(scoreOf(outbound, "MAD", "Qatar Airways"), 7.1);
-    assert.equal(scoreOf(outbound, "MAD", "Emirates"), 6.4);
+    assert.equal(scoreOf(outbound, "MAD", "Qatar Airways"), 6.8);
+    assert.equal(scoreOf(outbound, "MAD", "Emirates"), 6.2);
     assert.equal(scoreOf(returns, "SYD", "Turkish Airlines"), 7.7);
     assert.equal(scoreOf(returns, "SYD", "Singapore Airlines"), 9.3);
     assert.equal(scoreOf(returns, "SYD", "Cathay Pacific"), 9);
