@@ -535,14 +535,32 @@ function ActiveRules({
  * one claim on this page nobody could check, which is the opposite of the
  * point; if a fare, a date or a corrected dataset ever makes it untrue, this
  * paragraph says the true thing instead.
+ *
+ * ## Naming a winner the list does not contain (#100)
+ *
+ * "Every rule switched off" is doing real work in that sentence, and on the
+ * outbound search it used to be the whole problem. Singapore holds the best
+ * comfort score there and every one of its routings is over the €1,000 cap, so
+ * the paragraph named a carrier that appears nowhere in the eleven rows under
+ * it: a visitor read "Singapore Airlines is the answer", scanned the list, and
+ * found Cathay. The same paragraph is right on the return search, which is how
+ * it survived — one sentence, two searches, true in one of them.
+ *
+ * The greyed bands already do this correctly for the rows ("32 not shown ·
+ * Over €1,000 per person"). This is the same courtesy applied to the page's
+ * own argument: if the carrier it names is being held back, it says by which
+ * control and what to move.
  */
 function WeightNote({
   airlineWeight,
   rows,
+  rules,
 }: {
   airlineWeight: number;
   /** Every priced row in the search, rules off — the same set the floor reads. */
-  rows: readonly { option: SearchOption }[];
+  rows: readonly { option: SearchOption; price: OptionPrice }[];
+  /** The two rules as they stand, so the note can say what they are hiding. */
+  rules: DefaultRules;
 }) {
   const airline = Math.round(airlineWeight * 100);
   const verdict = useMemo(
@@ -552,6 +570,26 @@ function WeightNote({
   const winner = verdict.winner
     ? (rows.find((row) => row.option.id === verdict.winner?.id)?.option ?? null)
     : null;
+
+  /**
+   * Whether the carrier the note is about to name is on the visible list, and
+   * if not, what is holding it back — read from the same `heldBackBy` the rows
+   * themselves carry, so the sentence and the greyed band can never disagree.
+   */
+  const held = useMemo(() => {
+    if (!winner) return null;
+    const mine = rows.filter((row) => row.option.carrier === winner.carrier);
+    if (mine.some((row) => heldBackBy(row.option, row.price, rules) === null)) {
+      return null;
+    }
+    const reasons = mine.map((row) => heldBackBy(row.option, row.price, rules)!);
+    return {
+      cheapestEurPP: Math.min(...mine.map((row) => perPersonTotal(row.price)[0])),
+      everyOneOverCap: reasons.every((reason) => reason.overCap),
+      everyOneViaGulf: reasons.every((reason) => reason.middleEast.length > 0),
+      capEurPP: rules.maxEurPP,
+    };
+  }, [winner, rows, rules]);
 
   return (
     <p aria-live="polite" className="mt-1.5 max-w-[80ch] text-[12px] leading-snug text-[var(--sb-dim)]">
@@ -582,8 +620,15 @@ function WeightNote({
           <span className="sb-num text-[var(--sb-faint)]">
             ({verdict.atMin.toFixed(1)} seat-heavy → {verdict.atMax.toFixed(1)} airline-heavy)
           </span>
-          , because it leads on both halves at once. What the slider rearranges is
-          the middle of the table — which is where the disagreement actually is.
+          , because it leads on both halves at once.{" "}
+          {held ? (
+            <HeldBackWinner held={held} />
+          ) : (
+            <>
+              What the slider rearranges is the middle of the table — which is
+              where the disagreement actually is.
+            </>
+          )}
         </>
       )}
       {winner && !verdict.stable && (
@@ -593,10 +638,64 @@ function WeightNote({
             The best comfort score in this search does change inside the bracket
           </span>{" "}
           — {winner.carrier} leads at this setting, but not at all of them. Worth
-          looking at both ends before deciding.
+          looking at both ends before deciding.{" "}
+          {held && <HeldBackWinner held={held} />}
         </>
       )}
     </p>
+  );
+}
+
+/**
+ * The half-sentence that stops the paragraph arguing with the list under it.
+ *
+ * It names the control, not just the fact — a visitor who has just been told
+ * the best answer is invisible should not then have to work out which of the
+ * two sliders above did it.
+ */
+function HeldBackWinner({
+  held,
+}: {
+  held: {
+    cheapestEurPP: number;
+    everyOneOverCap: boolean;
+    everyOneViaGulf: boolean;
+    capEurPP: number;
+  };
+}) {
+  return (
+    <>
+      <span className="text-[var(--sb-text)]">
+        It is not on the list below, though
+      </span>
+      {held.everyOneOverCap && !held.everyOneViaGulf && (
+        <>
+          : at {formatEur(held.cheapestEurPP)} pp its cheapest routing is over
+          the {formatEur(held.capEurPP)} per person you have set, so every one
+          of its rows is in the greyed band. Raise the cap to bring them back.
+        </>
+      )}
+      {held.everyOneViaGulf && !held.everyOneOverCap && (
+        <>
+          : every one of its routings transits a Gulf hub, and the Middle East
+          switch above is holding them back. Turn it off to see them.
+        </>
+      )}
+      {held.everyOneViaGulf && held.everyOneOverCap && (
+        <>
+          : every one of its routings transits a Gulf hub <em>and</em> is over
+          the {formatEur(held.capEurPP)} per person you have set, cheapest at{" "}
+          {formatEur(held.cheapestEurPP)} pp. Either control brings them back.
+        </>
+      )}
+      {!held.everyOneViaGulf && !held.everyOneOverCap && (
+        <>
+          : every one of its routings is caught by one of the two rules above,
+          the cheapest of them at {formatEur(held.cheapestEurPP)} pp. The greyed
+          bands say which caught what.
+        </>
+      )}
+    </>
   );
 }
 
@@ -1402,7 +1501,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
           heldBack={viaMiddleEast.length + overCap.length}
         />
 
-        <WeightNote airlineWeight={airlineWeight} rows={rows} />
+        <WeightNote airlineWeight={airlineWeight} rows={rows} rules={rules} />
 
         <LiveDayNote date={date} calls={coldPairs.length} origins={pairs.length} />
 
