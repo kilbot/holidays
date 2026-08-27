@@ -150,7 +150,7 @@ export function AppRail() {
             {current && (
               <span
                 aria-hidden
-                className="absolute top-1/2 -left-3 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--sb-accent)]"
+                className="absolute top-1/2 -left-1.5 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--sb-accent)]"
               />
             )}
 
