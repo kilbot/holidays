@@ -319,8 +319,14 @@ export function CostHud() {
           The floor is the share pill's top edge, not the viewport's: both live
           in the right-hand column, and a HUD that ran the full height would
           print its warnings over the one control that says whether the Plan is
-          even being saved. */}
-      <div className="sb-panel sb-scroll-seen max-h-[calc(100dvh-var(--sb-strip-h)-7.5rem)] overflow-y-auto p-3">
+          even being saved.
+
+          That is the *whole* pill line — the gap the pill clears the strip by
+          and the pill standing in it. Reserving only the gap (#94) left the
+          panel 38px too tall at 1400×900, and the row it lost was its last
+          one: "+2 more on the Days they belong to", the only thing telling a
+          visitor that some warnings are not in the list. */}
+      <div className="sb-panel sb-scroll-seen max-h-[calc(100dvh-var(--sb-strip-h)-var(--sb-pill-gap)-var(--sb-pill-h)-1.5rem)] overflow-y-auto p-3">
         <div className="flex items-start justify-between gap-2">
           <button
             type="button"
