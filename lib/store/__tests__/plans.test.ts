@@ -48,7 +48,11 @@ test("createPlan writes the document and keeps the key out of it", async () => {
 
   const plan = await readPlan(kv, created.planId);
   assert.ok(plan);
-  assert.equal(plan.scenarios.length, 1);
+  assert.deepEqual(
+    plan.scenarios.map((scenario) => scenario.id),
+    INITIAL_STATE.scenarios.map((scenario) => scenario.id),
+    "the whole seed lands, savings Scenarios included",
+  );
   assert.equal(plan.currentId, DEFAULT_SCENARIO.id);
 
   // The whole reason the meta document is a separate key: the view route hands
@@ -93,7 +97,10 @@ test("a plan document from an older build is repaired, not rejected", () => {
 
 test("a corrupt plan document falls back to the reference trip", () => {
   assert.equal(toPlanDoc("not a plan").currentId, DEFAULT_SCENARIO.id);
-  assert.equal(toPlanDoc(null).scenarios.length, 1);
+  assert.equal(
+    toPlanDoc(null).scenarios.length,
+    INITIAL_STATE.scenarios.length,
+  );
 });
 
 test("writePlan stamps updatedAt", async () => {
