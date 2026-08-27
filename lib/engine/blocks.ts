@@ -1,5 +1,5 @@
 /**
- * Place blocks — the Ledger's sections.
+ * Place blocks and the transit rows between them — the Ledger's sections.
  *
  * `plan.ts` already cuts the trip into seven-day cells for the strip. A
  * full-page ledger wants the other cut: **a run of consecutive Days in one
@@ -14,13 +14,33 @@
  * leftover slack. Putting them in their own section would read as an
  * interruption of the block they belong to.
  *
- * Every figure here is a re-aggregation of `Day` totals — the same rule
- * `rollup.ts` follows. Nothing is priced a second way, so the blocks' subtotals
- * sum to the Plan's plan-on figure exactly.
+ * ## Getting there is not being there (#53)
+ *
+ * `legs.ts` charges every Leg's fare onto the Day it is travelled, because the
+ * Plan's total is the sum of its Days and a fare living anywhere else would
+ * break that. But the Day a Leg is travelled is the *first* Day of the place it
+ * arrives in — so a naive block subtotal charges Margaret River for the €3,800
+ * crossing from Valencia, and a four-day drive down the coast reads as a
+ * five-thousand-euro adventure. That is the bug the user reported: "which makes
+ * the Margaret River trip look like it's thousands of dollars."
+ *
+ * So this module lifts each Leg's fare back out of the block it landed in and
+ * gives it a **transit row** of its own, sitting between the block it leaves and
+ * the block it reaches. A block's subtotal is then what the couple spends *on
+ * the ground there* — living, the car, the Event spend — and a block's cost
+ * never includes the cost of reaching it.
+ *
+ * Nothing is re-priced. The lift is exact and by identity: the fare comes out of
+ * the Day at the same figure `legs.ts` put on it, so
+ *
+ * > sum(block subtotals) + sum(transit rows) = the Plan's plan-on figure
+ *
+ * holds to the cent, and `__tests__/blocks.test.ts` asserts it.
  */
 
-import type { Day, Warning } from "@/lib/engine/types";
+import type { Day, DayLine, Leg, LegMode, Warning } from "@/lib/engine/types";
 import { cents } from "@/lib/engine/ledger";
+import { locationById } from "@/lib/engine/locations";
 import { formatSpan } from "@/lib/trip-dates";
 
 /** A peak rule that bit somewhere in a block, named once however many Days it covered. */
@@ -28,6 +48,26 @@ export interface BlockPeak {
   id: string;
   label: string;
   note: string;
+}
+
+/**
+ * One Day as the Ledger draws it: the priced Day, with the Leg fares travelled
+ * that day lifted onto their own transit rows.
+ *
+ * The `Day` itself is untouched — it is the engine's atom and every other
+ * surface reads its full `totalEur`. What changes here is only the attribution:
+ * a row inside the Margaret River block shows what that day cost in Margaret
+ * River, so the rows visibly add up to the band overhead.
+ */
+export interface LedgerDay {
+  day: Day;
+  /** `day.totalEur` less the Leg fares lifted out of it. */
+  costEur: number;
+  bandEur: [number, number];
+  /** The lines that stay on the Day — everything except those fares. */
+  lines: DayLine[];
+  /** The fares that left, so the drill-in can say where they went. */
+  transitLines: DayLine[];
 }
 
 /** One run of consecutive Days in one place. docs/CONTEXT.md, Day and Location. */
@@ -42,11 +82,15 @@ export interface LedgerBlock {
   endDate: string;
   /** "14–27 Dec". */
   label: string;
-  days: Day[];
+  days: LedgerDay[];
   /** Capsules owning Days in the run, in the order they start. */
   capsuleIds: string[];
   capsuleNames: string[];
-  /** Sum of the run's Day totals. */
+  /**
+   * What the run costs **on the ground**: the sum of its Days' totals, less any
+   * inter-city Leg fare travelled inside it. Reaching a place is a transit row,
+   * not part of the place.
+   */
   costEur: number;
   bandEur: [number, number];
   bufferDays: number;
@@ -55,10 +99,58 @@ export interface LedgerBlock {
   warnings: Warning[];
 }
 
+/**
+ * A Leg, as a row of its own between two blocks.
+ *
+ * Everything here is read off the Leg and off the `transport` line it already
+ * put on a Day. `costEur` in particular is the **line's** figure and not the
+ * Leg's: they are equal by construction, and taking the one that was actually
+ * charged is what makes the reconciliation an identity rather than an agreement.
+ */
+export interface LedgerTransit {
+  /** The Leg's own id — "PER>SYD@2026-12-28". */
+  id: string;
+  date: string;
+  fromLocationId: string;
+  toLocationId: string;
+  /** "Margaret River", or the IATA code where the end is home rather than a place. */
+  fromName: string;
+  toName: string;
+  /** IATA, for the small mono pair. */
+  from: string;
+  to: string;
+  mode: LegMode;
+  /** Known for snapshot-priced flights; null for a band estimate or a drive. */
+  carrier: string | null;
+  pricing: Leg["pricing"];
+  hydrated: boolean;
+  costEur: number;
+  bandEur: [number, number];
+  note: string;
+}
+
+/** The Ledger, in the order it is read: blocks, with the journeys between them. */
+export type LedgerRow =
+  | { kind: "block"; id: string; block: LedgerBlock }
+  | { kind: "transit"; id: string; transit: LedgerTransit };
+
+/** `${leg.date}:${leg.id}` — the id `legs.ts` gives the line it charges. */
+function lineIdOf(leg: Leg): string {
+  return `${leg.date}:${leg.id}`;
+}
+
+/** "Margaret River", or the IATA code where the end is home rather than a place. */
+function endName(locationId: string, iata: string): string {
+  return locationId === "origin" ? iata : locationById(locationId).name;
+}
+
 export function intoBlocks(
   days: readonly Day[],
   warnings: readonly Warning[],
+  legs: readonly Leg[],
 ): LedgerBlock[] {
+  const lifted = new Set(legs.map(lineIdOf));
+
   const runs: Day[][] = [];
   for (const day of days) {
     const current = runs[runs.length - 1];
@@ -77,15 +169,40 @@ export function intoBlocks(
     const capsuleIds: string[] = [];
     const capsuleNames: string[] = [];
     const peaks: BlockPeak[] = [];
+    const ledgerDays: LedgerDay[] = [];
     let costEur = 0;
     let low = 0;
     let high = 0;
     let bufferDays = 0;
 
     for (const day of run) {
-      costEur += day.totalEur;
-      low += day.bandEur[0];
-      high += day.bandEur[1];
+      const lines: DayLine[] = [];
+      const transitLines: DayLine[] = [];
+      for (const line of day.lines) {
+        (lifted.has(line.id) ? transitLines : lines).push(line);
+      }
+
+      const fare = transitLines.reduce((total, line) => total + line.eur, 0);
+      const fareLow = transitLines.reduce(
+        (total, line) => total + line.bandEur[0],
+        0,
+      );
+      const fareHigh = transitLines.reduce(
+        (total, line) => total + line.bandEur[1],
+        0,
+      );
+
+      const dayCost = cents(day.totalEur - fare);
+      const dayBand: [number, number] = [
+        cents(day.bandEur[0] - fareLow),
+        cents(day.bandEur[1] - fareHigh),
+      ];
+
+      ledgerDays.push({ day, costEur: dayCost, bandEur: dayBand, lines, transitLines });
+
+      costEur += dayCost;
+      low += dayBand[0];
+      high += dayBand[1];
       if (day.buffer) bufferDays += 1;
       if (day.capsuleId && !capsuleIds.includes(day.capsuleId)) {
         capsuleIds.push(day.capsuleId);
@@ -108,7 +225,7 @@ export function intoBlocks(
       startDate: first.date,
       endDate: last.date,
       label: formatSpan(first.date, last.date),
-      days: run,
+      days: ledgerDays,
       capsuleIds,
       capsuleNames,
       costEur: cents(costEur),
@@ -120,4 +237,89 @@ export function intoBlocks(
       ),
     };
   });
+}
+
+/**
+ * The whole Ledger in reading order — every block, with a transit row before the
+ * block each Leg arrives in.
+ *
+ * A Leg is filed against the block that **starts** on the day it is travelled,
+ * because that is what arriving means: the Perth → Sydney flight on 28 December
+ * is the thing that opens the Sydney block, and it belongs above its band rather
+ * than buried in its first day. The homeward crossing arrives nowhere on this
+ * trip, so it trails the last block, which is exactly where it happens.
+ */
+export function intoLedger(
+  days: readonly Day[],
+  warnings: readonly Warning[],
+  legs: readonly Leg[],
+): LedgerRow[] {
+  const blocks = intoBlocks(days, warnings, legs);
+  const lineByDate = new Map<string, Map<string, DayLine>>();
+  for (const day of days) {
+    lineByDate.set(day.date, new Map(day.lines.map((line) => [line.id, line])));
+  }
+
+  const before = new Map<string, LedgerTransit[]>();
+  const trailing: LedgerTransit[] = [];
+
+  for (const leg of legs) {
+    const transit = toTransit(leg, lineByDate.get(leg.date)?.get(lineIdOf(leg)));
+
+    // The block this Leg opens. Falling back to the block merely *holding* the
+    // day covers the shapes the Scheduler does not currently produce (a Leg on
+    // a day that is not a boundary) without ever dropping a fare.
+    const opened =
+      blocks.find(
+        (block) =>
+          block.startDate === leg.date && block.locationId === leg.toLocationId,
+      ) ??
+      (leg.toLocationId === "origin"
+        ? undefined
+        : blocks.find((block) =>
+            block.days.some((entry) => entry.day.date === leg.date),
+          ));
+
+    if (!opened) {
+      trailing.push(transit);
+      continue;
+    }
+    const queued = before.get(opened.id);
+    if (queued) queued.push(transit);
+    else before.set(opened.id, [transit]);
+  }
+
+  const rows: LedgerRow[] = [];
+  for (const block of blocks) {
+    for (const transit of before.get(block.id) ?? []) {
+      rows.push({ kind: "transit", id: transit.id, transit });
+    }
+    rows.push({ kind: "block", id: block.id, block });
+  }
+  for (const transit of trailing) {
+    rows.push({ kind: "transit", id: transit.id, transit });
+  }
+
+  return rows;
+}
+
+function toTransit(leg: Leg, line: DayLine | undefined): LedgerTransit {
+  return {
+    id: leg.id,
+    date: leg.date,
+    fromLocationId: leg.fromLocationId,
+    toLocationId: leg.toLocationId,
+    fromName: endName(leg.fromLocationId, leg.from),
+    toName: endName(leg.toLocationId, leg.to),
+    from: leg.from,
+    to: leg.to,
+    mode: leg.mode,
+    carrier: leg.carrier,
+    pricing: leg.pricing,
+    hydrated: leg.hydrated,
+    // The charged line, not the Leg, so the row and the lift cannot disagree.
+    costEur: cents(line?.eur ?? leg.eur),
+    bandEur: line ? [cents(line.bandEur[0]), cents(line.bandEur[1])] : leg.bandEur,
+    note: leg.note,
+  };
 }
