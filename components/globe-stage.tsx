@@ -1,13 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Star, X } from "lucide-react";
 
 import { GlobeControls } from "@/components/globe-controls";
 import { LegPopup } from "@/components/leg-popup";
-import { openCatalogIdea, openDeepCapsule } from "@/lib/capsule-focus";
+import {
+  FOCUS_FLIGHT_MS,
+  FOCUS_ZOOM,
+  capsuleLocation,
+  focusOffset,
+  framePadding,
+} from "@/lib/capsule-camera";
+import {
+  openCatalogIdea,
+  openDeepCapsule,
+  useCapsuleFocus,
+} from "@/lib/capsule-focus";
 import { formatEurBand } from "@/lib/catalog";
 import { DEEP_CAPSULE_BY_ROUTE_CODE } from "@/lib/deep-capsules";
 import {
@@ -20,8 +32,6 @@ import { useShortlist } from "@/lib/shortlist";
 import {
   COMPACT_CAMERA,
   COMPACT_CAMERA_MAX_WIDTH_PX,
-  DESKTOP_BREAKPOINT_PX,
-  FRAME_PADDING,
   GLOBE_MAX_FIT_ZOOM,
   LEG_FACTS,
   MAP_STYLE,
@@ -40,12 +50,6 @@ const SOURCE_INTERESTED = "interested-ideas";
 const CAPSULE_LAYERS = ["capsules-dot", "capsules-halo"];
 const INTERESTED_LAYERS = ["interested-dot", "interested-halo"];
 const LEG_LAYERS = ["legs-hit"];
-
-function framePadding(width: number) {
-  return width >= DESKTOP_BREAKPOINT_PX
-    ? FRAME_PADDING.desktop
-    : FRAME_PADDING.compact;
-}
 
 function prefersReducedMotion(): boolean {
   return (
@@ -121,6 +125,35 @@ type Anchored = (
   screen: ScreenPoint | null;
 };
 
+/**
+ * Where the open card's Adventure is, marked on the ground it flew to.
+ *
+ * The pulse is the point: after a two-second flight across a hemisphere the
+ * eye needs telling which of the dots now on screen is the one that was asked
+ * for, and a ring that breathes says it without adding a colour or a shape the
+ * map does not already use. It is slow (2.6s) and it is off under
+ * `prefers-reduced-motion`, where the dot and its name are the whole message
+ * and were always the part carrying the information.
+ *
+ * Rendered through a portal into a `mapboxgl.Marker`'s element so that Mapbox
+ * owns the projection — including fading the marker out when the flight leaves
+ * its point around the back of the globe, which the anchored popups above have
+ * to work out for themselves.
+ */
+function FocusMarker({ name }: { name: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="relative flex size-3.5 items-center justify-center">
+        <span className="absolute size-full animate-ping rounded-full bg-[var(--sb-map-stop)] opacity-40 [animation-duration:2.6s] motion-reduce:hidden" />
+        <span className="relative size-3.5 rounded-full border-2 border-[var(--sb-map-halo)] bg-[var(--sb-map-stop)] shadow-[0_1px_5px_rgb(0_0_0/0.5)]" />
+      </span>
+      <span className="line-clamp-2 max-w-[168px] rounded-full bg-[rgb(6_10_16/0.78)] px-2 py-[3px] text-center text-[10px] leading-[1.25] font-semibold text-balance text-[rgb(255_253_248/0.95)] backdrop-blur-sm">
+        {name}
+      </span>
+    </div>
+  );
+}
+
 export function GlobeStage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -130,6 +163,45 @@ export function GlobeStage() {
 
   const { marks } = useShortlist();
   const clusters = useMemo(() => interestedClusters(marks), [marks]);
+
+  // What the detail card is showing, and where on Earth that is. Null while
+  // nothing is open, and also for the twelve Catalog entries that are a route
+  // rather than a place — see `capsuleLocation`.
+  const focus = useCapsuleFocus();
+  const location = useMemo(() => capsuleLocation(focus), [focus]);
+
+  /**
+   * The anchored popup, if a card is not standing in front of it.
+   *
+   * An open card and an anchored popup are two answers to "what is here" and
+   * only one of them can be on screen: the card's flight is about to take the
+   * popup's point off the edge of the world. The popup is hidden rather than
+   * dismissed, because closing the card flies back to the same route frame it
+   * was anchored in — so it returns where it was, still pointing at the Leg
+   * the traveller was reading about.
+   */
+  const popup = focus ? null : anchored;
+
+  /**
+   * True while the camera is somewhere a card put it.
+   *
+   * Read by the resize handler below, which otherwise re-frames the route on
+   * every container resize and would quietly undo the flight — a phone
+   * rotating, or the browser's own chrome resolving a second after load.
+   */
+  const flownRef = useRef(false);
+
+  // The marker's host element. Created once and handed to Mapbox, with the
+  // contents rendered into it by React, so the label is written in JSX next to
+  // the rest of the design tokens rather than assembled by hand.
+  const [markerElement] = useState<HTMLDivElement | null>(() => {
+    if (typeof document === "undefined") return null;
+    const element = document.createElement("div");
+    // Inert: the map underneath keeps every click, including the one that
+    // opens a different Adventure.
+    element.style.pointerEvents = "none";
+    return element;
+  });
 
   const failure = MAPBOX_TOKEN
     ? mapError
@@ -599,7 +671,11 @@ export function GlobeStage() {
     // correction and later window resizes.
     const refit = () => {
       map.resize();
-      if (!userMoved && map.isStyleLoaded()) frameRoute(false);
+      // `flownRef` keeps a resize from undoing an open card's flight; without
+      // it, a phone rotating mid-read snaps the camera back to the route.
+      if (!userMoved && !flownRef.current && map.isStyleLoaded()) {
+        frameRoute(false);
+      }
     };
 
     const observer = new ResizeObserver(refit);
@@ -627,7 +703,7 @@ export function GlobeStage() {
 
   // The selected Leg lights its arc and rings the Capsules at its endpoints —
   // "this flight is how you reach those three".
-  const selectedLegId = anchored?.kind === "leg" ? anchored.id : null;
+  const selectedLegId = popup?.kind === "leg" ? popup.id : null;
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
@@ -638,6 +714,76 @@ export function GlobeStage() {
       ["literal", selectedLegId ? capsulesOnLeg(selectedLegId) : []],
     ]);
   }, [selectedLegId, ready]);
+
+  /* ---- The flight (#75) ----
+     Opening an Adventure's card takes the globe to it. The plan is a list of
+     names to anyone who does not already know Australia, and watching the
+     camera travel to the top of Queensland answers "where is that?" in the
+     one register a map is better at than prose. */
+  useEffect(() => {
+    const map = mapRef.current;
+    const container = containerRef.current;
+    if (!ready || !map || !container) return;
+
+    if (!focus) {
+      // Card closed: back to the route frame, and by the same call that drew
+      // it at load, so it is the same frame rather than a near miss. Only
+      // when a flight actually took the camera away — a card that never flew
+      // should not re-frame a globe the traveller had spun themselves.
+      if (flownRef.current) {
+        flownRef.current = false;
+        frameRouteRef.current(true);
+      }
+      return;
+    }
+
+    // A card with no resolvable coordinates: it just opens. No flight, no
+    // marker, no complaint, and the camera stays exactly where it was.
+    if (!location) return;
+
+    flownRef.current = true;
+    const camera = {
+      center: location.at,
+      zoom: FOCUS_ZOOM,
+      // Keeps the place in the map the card leaves visible, rather than
+      // behind it. See `focusOffset` for why this is an offset and not
+      // Mapbox's sticky camera padding.
+      offset: focusOffset(container.clientWidth),
+      bearing: 0,
+      pitch: 0,
+    };
+
+    if (prefersReducedMotion()) {
+      // A jump, not a flight — and deliberately ours rather than Mapbox's.
+      // `flyTo` would collapse to a jump on its own here, but only because
+      // `essential` is left unset; setting `essential: true` (the flag that
+      // makes an animation ignore the preference) is the one thing that would
+      // be wrong, so the branch is written out instead of implied.
+      map.easeTo({ ...camera, duration: 0 });
+      return;
+    }
+
+    map.flyTo({ ...camera, duration: FOCUS_FLIGHT_MS, curve: 1.42 });
+  }, [focus, location, ready]);
+
+  // The marker for the place just flown to. Mapbox owns its projection, which
+  // includes fading it out if the point ends up behind the planet.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !markerElement || !location) return;
+    const marker = new mapboxgl.Marker({
+      element: markerElement,
+      // The element hangs its label below the dot, so the dot is its top edge;
+      // the offset lifts it back onto the coordinate.
+      anchor: "top",
+      offset: [0, -7],
+    })
+      .setLngLat(location.at)
+      .addTo(map);
+    return () => {
+      marker.remove();
+    };
+  }, [location, ready, markerElement]);
 
   // Escape closes the popup, as it does the Capsule card.
   useEffect(() => {
@@ -670,8 +816,8 @@ export function GlobeStage() {
   }, [anchorAt]);
 
   const cluster =
-    anchored?.kind === "airport"
-      ? clusters.find((entry) => entry.code === anchored.code)
+    popup?.kind === "airport"
+      ? clusters.find((entry) => entry.code === popup.code)
       : undefined;
 
   return (
@@ -695,6 +841,10 @@ export function GlobeStage() {
         }}
       />
 
+      {markerElement && location
+        ? createPortal(<FocusMarker name={location.name} />, markerElement)
+        : null}
+
       {ready && (
         <GlobeControls
           onZoomIn={() => zoomBy(1)}
@@ -707,7 +857,7 @@ export function GlobeStage() {
           translated onto the projected point, so the panel keeps its own
           layout while the anchor does the moving. `-translate-x-1/2` centres
           it on the point; it sits above, with the clamp keeping it on screen. */}
-      {anchored?.screen && (
+      {popup?.screen && (
         <div
           className="pointer-events-none absolute inset-0 z-30"
           onClick={() => setAnchored(null)}
@@ -715,15 +865,15 @@ export function GlobeStage() {
           <div
             className="pointer-events-auto absolute -translate-x-1/2 -translate-y-full"
             style={{
-              left: `clamp(150px, ${anchored.screen.x}px, calc(100% - 150px))`,
-              top: `clamp(230px, ${anchored.screen.y - 14}px, calc(100% - 20px))`,
+              left: `clamp(150px, ${popup.screen.x}px, calc(100% - 150px))`,
+              top: `clamp(230px, ${popup.screen.y - 14}px, calc(100% - 20px))`,
             }}
             onClick={(event) => event.stopPropagation()}
           >
-            {anchored.kind === "leg" ? (
+            {popup.kind === "leg" ? (
               <LegPopup
-                key={anchored.id}
-                legId={anchored.id}
+                key={popup.id}
+                legId={popup.id}
                 onClose={() => setAnchored(null)}
               />
             ) : cluster ? (

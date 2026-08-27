@@ -18,6 +18,7 @@ import {
   CARD_SLIDEOVER_MIN_WIDTH_PX,
   CARD_SLIDEOVER_WIDTH_PX,
   capsuleLocation,
+  focusOffset,
   focusPadding,
   framePadding,
 } from "@/lib/capsule-camera";
@@ -87,5 +88,24 @@ describe("focusPadding", () => {
       centre < width - CARD_SLIDEOVER_WIDTH_PX,
       `flown-to place at ${centre}px would sit under the card`,
     );
+  });
+});
+
+describe("focusOffset", () => {
+  it("lands the place where the padding says it should", () => {
+    for (const width of [640, 768, 1024, 1440, 1920]) {
+      const padding = focusPadding(width);
+      const [x] = focusOffset(width);
+      // Mapbox puts the target at the container centre plus the offset.
+      const landsAt = width / 2 + x;
+      const wanted = padding.left + (width - padding.left - padding.right) / 2;
+      assert.equal(landsAt, wanted, `at ${width}px`);
+    }
+  });
+
+  it("pulls the place up and left, clear of the card and the date strip", () => {
+    const [x, y] = focusOffset(1440);
+    assert.ok(x < 0, "the card is on the right, so the place goes left");
+    assert.ok(y < 0, "the date strip is at the bottom, so the place goes up");
   });
 });

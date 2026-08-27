@@ -130,3 +130,24 @@ export function focusPadding(width: number): CameraPadding {
   if (width < CARD_SLIDEOVER_MIN_WIDTH_PX) return base;
   return { ...base, right: CARD_SLIDEOVER_WIDTH_PX + CARD_GUTTER_PX };
 }
+
+/**
+ * The same reservation, expressed as Mapbox's per-animation `offset` — how
+ * far off the container's centre the flown-to place should land, in px.
+ *
+ * Deliberately not `easeTo({padding})`, which is the other way to do this.
+ * Camera padding is *sticky*: it lives on the transform until something sets
+ * it again, and `fitBounds` — which is how the route frame is restored —
+ * pointedly deletes padding from its own options, so it would compute a frame
+ * for one viewport and render it through the leftover padding of another. An
+ * `offset` belongs to a single flight and is gone when the flight ends, which
+ * means closing the card can restore the route frame with the exact call that
+ * drew it in the first place. Nothing to reset, nothing to drift.
+ */
+export function focusOffset(width: number): [number, number] {
+  const padding = focusPadding(width);
+  return [
+    (padding.left - padding.right) / 2,
+    (padding.top - padding.bottom) / 2,
+  ];
+}
