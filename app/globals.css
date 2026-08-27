@@ -271,7 +271,7 @@
    scrollbar stays honest. */
 @utility sb-row {
   content-visibility: auto;
-  contain-intrinsic-size: auto 74px;
+  contain-intrinsic-size: auto 96px;
 }
 
 /* Thin scrollbars so the catalog list does not grow a chunky OS bar
