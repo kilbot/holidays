@@ -4,7 +4,7 @@ import { unstable_cache } from "next/cache";
 
 import { MIDDLE_EAST_TRANSIT_HUBS } from "@/lib/flights/comfort";
 import { appendFareHistory } from "@/lib/flights/history";
-import { reserveFareCall } from "@/lib/flights/quota";
+import { reserveFareCall, reserveIpFareCall } from "@/lib/flights/quota";
 import { getKv } from "@/lib/store/kv";
 
 const ADULTS = 2;
@@ -73,17 +73,33 @@ function parseFlight(value: unknown): FareCandidate | null {
   };
 }
 
+/**
+ * The cheapest acceptable quote for a route on a day, or null.
+ *
+ * `asker` is the request that wants it, and it is only ever used to charge the
+ * call against that IP's daily allowance (kilbot/holidays#90, finding 4). It is
+ * read **inside** `unstable_cache`, so a cache hit costs nobody anything — the
+ * allowance is for calls that actually leave the building. Optional, because
+ * the warming cron has no visitor to charge and is not the thing being guarded
+ * against.
+ */
 export async function fetchFare(
   from: string,
   to: string,
   date: string,
   { ttlSeconds, minEur, maxEur }: FareBounds,
+  asker?: Request,
 ): Promise<FareResult | null> {
   try {
     return await unstable_cache(async () => {
       const apiKey = process.env.SEARCHAPI_KEY;
       if (!apiKey) throw new Error("Fare API unavailable");
       const kv = getKv();
+      // The visitor's own allowance first: refusing here must not spend the
+      // couple's shared budget on a request that was never going to be made.
+      if (asker && !(await reserveIpFareCall(kv, asker))) {
+        throw new Error("Fare quota exhausted for this visitor");
+      }
       if (!(await reserveFareCall(kv))) throw new Error("Fare quota exhausted");
 
       const params = new URLSearchParams({

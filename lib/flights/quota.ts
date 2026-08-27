@@ -25,6 +25,7 @@
  * that shape (docs/CONTEXT.md, Constraint) — applies to its own metered API.
  */
 
+import { reserveDailyPerIp } from "@/lib/store/guards";
 import type { KvClient } from "@/lib/store/kv";
 
 export const MONTHLY_CALL_BUDGET = 2_000;
@@ -37,6 +38,27 @@ export const MONTHLY_CALL_BUDGET = 2_000;
  * things halfway through an afternoon.
  */
 export const DAILY_CALL_CAP = 500;
+
+/**
+ * How many live fare calls one IP address may spend in a day.
+ *
+ * `/api/fares` takes no key. That is deliberate and it stays: the view link is
+ * the permission, and a friend the couple sent the link to is a legitimate
+ * spender of this budget by design. But a public endpoint that spends metered
+ * money for anyone is also a public endpoint anyone can drain, and until now
+ * the only thing standing between one script and the whole month was the
+ * runaway guard — which is to say, four days.
+ *
+ * 300 is set well above what the page can do by hand. The Flights search is
+ * fourteen origins on one date; a determined afternoon of moving the date strip
+ * is tens of calls, not hundreds, and the warmed dates are cache hits that cost
+ * nothing. Somebody who reaches 300 is not reading a fare calendar.
+ *
+ * It is not authentication and does not pretend to be — `x-forwarded-for` is
+ * spoofable by anyone who cares. It is the difference between "drainable by
+ * accident or by a bored script" and "drainable by somebody who means it".
+ */
+export const DAILY_CALL_CAP_PER_IP = 300;
 
 const MONTH_TTL_SECONDS = 35 * 24 * 60 * 60;
 const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
@@ -61,6 +83,12 @@ export interface FareQuota {
   /** Calls made today, against the runaway guard. */
   usedToday: number;
   dailyCap: number;
+  /**
+   * What one visitor may spend in a day. Reported so the meter's fine print can
+   * say it: a shared budget with no per-visitor limit stated is a budget the
+   * couple cannot reason about when it empties.
+   */
+  perIpDailyCap: number;
   gate: QuotaGate;
 }
 
@@ -100,8 +128,26 @@ export async function readFareQuota(kv: KvClient, now = new Date()): Promise<Far
     month: monthOf(now),
     usedToday,
     dailyCap: DAILY_CALL_CAP,
+    perIpDailyCap: DAILY_CALL_CAP_PER_IP,
     gate: gateOf(used, usedToday),
   };
+}
+
+/**
+ * Reserve one live fare call against the asking IP's own daily allowance.
+ *
+ * Separate from `reserveFareCall` because it answers a different question. That
+ * one asks *may this site spend*; this one asks *may this visitor spend*, and
+ * the answer to the second being no is not a reason to tell the couple their
+ * month is gone. Both refusals fall back to stored history or the research
+ * band, which is the honest answer either way.
+ */
+export function reserveIpFareCall(
+  kv: KvClient,
+  request: Request,
+  now = new Date(),
+): Promise<boolean> {
+  return reserveDailyPerIp(kv, request, "fare", DAILY_CALL_CAP_PER_IP, now);
 }
 
 /**

@@ -149,6 +149,45 @@ export async function throttleWrite(
 }
 
 /**
+ * Take one unit of an IP's daily allowance of something, or refuse it.
+ *
+ * The shape is `reserveFareCall`'s and for the same reason: **increment first,
+ * then look at the number you were handed**. `INCR` is atomic, so no two
+ * concurrent callers get the same value, and a burst cannot walk past a ceiling
+ * that a read-then-check would have shown all of them as open. Over the line,
+ * the number goes back.
+ *
+ * Fails **open**, like `throttleWrite` and for the same reason: a limiter that
+ * takes the site down when the store is unreachable has become the outage it
+ * exists to prevent.
+ *
+ * `name` keys the allowance — `"fare"` and `"fork"` are separate budgets that
+ * happen to be counted the same way.
+ */
+export async function reserveDailyPerIp(
+  kv: KvClient,
+  request: Request,
+  name: string,
+  limit: number,
+  now: Date = new Date(),
+): Promise<boolean> {
+  const key = `ip:${name}:${clientIp(request)}:${now.toISOString().slice(0, 10)}`;
+  try {
+    const used = await kv.incrementWithTtl(key, DAY_TTL_SECONDS);
+    if (used > limit) {
+      await kv.decrement(key);
+      return false;
+    }
+  } catch {
+    return true;
+  }
+  return true;
+}
+
+/** Two days, so a counter outlives the day it is counting and no longer. */
+const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
+
+/**
  * Who is asking, as far as the platform will say.
  *
  * Vercel sets `x-forwarded-for` and it is the only source available in a route

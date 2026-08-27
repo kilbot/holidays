@@ -3,10 +3,12 @@ import test from "node:test";
 
 import {
   DAILY_CALL_CAP,
+  DAILY_CALL_CAP_PER_IP,
   MONTHLY_CALL_BUDGET,
   monthlyResetLabel,
   readFareQuota,
   reserveFareCall,
+  reserveIpFareCall,
 } from "@/lib/flights/quota";
 import { fakeKv } from "@/lib/store/__tests__/fake-kv";
 
@@ -45,6 +47,7 @@ test("the quota read reports the current month and zero when unused", async () =
     month: "2026-08",
     usedToday: 0,
     dailyCap: DAILY_CALL_CAP,
+    perIpDailyCap: DAILY_CALL_CAP_PER_IP,
     gate: "open",
   });
 });
@@ -163,6 +166,82 @@ test("a refused call costs nothing, so the next one still gets through", async (
   const tomorrow = new Date("2026-08-28T09:00:00.000Z");
   assert.equal(await reserveFareCall(kv, tomorrow), true);
   assert.equal(await kv.getJson("quota:2026-08"), 1);
+});
+
+/* ------------------------------------------------------------------ */
+/* The per-IP allowance: /api/fares is keyless, not free                */
+/* ------------------------------------------------------------------ */
+
+/** A fare request from one address. The header Vercel actually sets. */
+const from = (ip: string) =>
+  new Request("https://example.test/api/fares?from=BCN&to=PER&date=2026-12-12", {
+    headers: { "x-forwarded-for": `${ip}, 10.0.0.1` },
+  });
+
+test("one visitor's allowance runs out without touching anybody else's", async () => {
+  const kv = fakeKv({
+    [`ip:fare:1.2.3.4:2026-08-27`]: DAILY_CALL_CAP_PER_IP - 1,
+  });
+
+  assert.equal(await reserveIpFareCall(kv, from("1.2.3.4"), NOW), true);
+  assert.equal(await reserveIpFareCall(kv, from("1.2.3.4"), NOW), false);
+  assert.equal(
+    await kv.getJson(`ip:fare:1.2.3.4:2026-08-27`),
+    DAILY_CALL_CAP_PER_IP,
+    "the refused call was handed back",
+  );
+
+  // The couple, on a different connection, are unaffected — which is the whole
+  // reason this is a per-IP cap and not a lower shared one.
+  assert.equal(await reserveIpFareCall(kv, from("5.6.7.8"), NOW), true);
+});
+
+test("a burst from one address cannot walk past its allowance", async () => {
+  const kv = fakeKv({
+    [`ip:fare:1.2.3.4:2026-08-27`]: DAILY_CALL_CAP_PER_IP - 5,
+  });
+
+  const results = await Promise.all(
+    Array.from({ length: 60 }, () => reserveIpFareCall(kv, from("1.2.3.4"), NOW)),
+  );
+
+  assert.equal(results.filter(Boolean).length, 5);
+  assert.equal(
+    await kv.getJson(`ip:fare:1.2.3.4:2026-08-27`),
+    DAILY_CALL_CAP_PER_IP,
+  );
+});
+
+test("the allowance is per day, and yesterday's is not this one", async () => {
+  const kv = fakeKv({
+    [`ip:fare:1.2.3.4:2026-08-27`]: DAILY_CALL_CAP_PER_IP,
+  });
+
+  assert.equal(await reserveIpFareCall(kv, from("1.2.3.4"), NOW), false);
+  assert.equal(
+    await reserveIpFareCall(kv, from("1.2.3.4"), new Date("2026-08-28T01:00:00.000Z")),
+    true,
+  );
+});
+
+test("an unreachable store lets the visitor through rather than blocking them", async () => {
+  // Fails open, like every other guard here. A limiter that takes the site down
+  // when Redis is unreachable has become the outage it exists to prevent.
+  const broken = {
+    ...fakeKv(),
+    async incrementWithTtl(): Promise<number> {
+      throw new Error("no store");
+    },
+  };
+  assert.equal(await reserveIpFareCall(broken, from("1.2.3.4"), NOW), true);
+});
+
+test("the meter is told what one visitor may spend", async () => {
+  // The fine print on the Flights page reads this. A shared budget with no
+  // stated per-visitor limit is one the couple cannot reason about when it
+  // empties.
+  const quota = await readFareQuota(fakeKv(), NOW);
+  assert.equal(quota.perIpDailyCap, DAILY_CALL_CAP_PER_IP);
 });
 
 test("the monthly reset reads as a date, and wraps at the year", () => {
