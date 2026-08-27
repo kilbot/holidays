@@ -3,7 +3,7 @@
  *
  * The grid is a whitelist, not a search engine: a request outside it 404s. That
  * is what keeps a metered API from being an open proxy, and it is also what the
- * nightly cron warms, so everything on this list is normally a cache hit by the
+ * weekly cron warms, so everything on this list is normally a cache hit by the
  * time anyone asks for it.
  *
  * Three tiers live here:
@@ -36,8 +36,11 @@ export interface RouteGridEntry {
   maxEur: number;
 }
 
-/** Long-haul bounds: below €400 or above €3,500 pp is a parsing error, not a fare. */
-const LONGHAUL = { ttlSeconds: 86_400, minEur: 400, maxEur: 3_500 } as const;
+/** User directive: "ballpark suffices" — keep long-haul quotes for seven days. */
+const LONGHAUL = { ttlSeconds: 604_800, minEur: 400, maxEur: 3_500 } as const;
+
+/** User directive: "ballpark suffices" — keep domestic quotes for 72 hours. */
+const DOMESTIC_TTL_SECONDS = 259_200;
 
 /**
  * The outbound search dates. The middle one is the page's default — the
@@ -137,12 +140,12 @@ const returnRoutes: readonly RouteGridEntry[] = RETURN_ORIGINS.flatMap((origin) 
 );
 
 const domesticRoutes: readonly RouteGridEntry[] = [
-  { from: "PER", to: "SYD", dates: ["2026-12-24", "2026-12-26", "2026-12-28"], ttlSeconds: 21_600, minEur: 80, maxEur: 900 },
-  { from: "SYD", to: "CNS", dates: ["2027-01-16", "2027-01-20"], ttlSeconds: 21_600, minEur: 30, maxEur: 500 },
-  { from: "OOL", to: "HBA", dates: ["2027-02-01", "2027-02-04"], ttlSeconds: 21_600, minEur: 30, maxEur: 500 },
-  { from: "HBA", to: "MEL", dates: ["2027-02-08", "2027-02-12"], ttlSeconds: 21_600, minEur: 25, maxEur: 400 },
-  { from: "PER", to: "MEL", dates: ["2026-12-24", "2026-12-26", "2026-12-28"], ttlSeconds: 21_600, minEur: 30, maxEur: 600 },
-  { from: "SYD", to: "MEL", dates: ["2027-01-16", "2027-01-18", "2027-01-20"], ttlSeconds: 21_600, minEur: 30, maxEur: 600 },
+  { from: "PER", to: "SYD", dates: ["2026-12-24", "2026-12-26", "2026-12-28"], ttlSeconds: DOMESTIC_TTL_SECONDS, minEur: 80, maxEur: 900 },
+  { from: "SYD", to: "CNS", dates: ["2027-01-16", "2027-01-20"], ttlSeconds: DOMESTIC_TTL_SECONDS, minEur: 30, maxEur: 500 },
+  { from: "OOL", to: "HBA", dates: ["2027-02-01", "2027-02-04"], ttlSeconds: DOMESTIC_TTL_SECONDS, minEur: 30, maxEur: 500 },
+  { from: "HBA", to: "MEL", dates: ["2027-02-08", "2027-02-12"], ttlSeconds: DOMESTIC_TTL_SECONDS, minEur: 25, maxEur: 400 },
+  { from: "PER", to: "MEL", dates: ["2026-12-24", "2026-12-26", "2026-12-28"], ttlSeconds: DOMESTIC_TTL_SECONDS, minEur: 30, maxEur: 600 },
+  { from: "SYD", to: "MEL", dates: ["2027-01-16", "2027-01-18", "2027-01-20"], ttlSeconds: DOMESTIC_TTL_SECONDS, minEur: 30, maxEur: 600 },
 ];
 
 export const ROUTE_GRID: readonly RouteGridEntry[] = [

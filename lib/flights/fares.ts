@@ -1,12 +1,38 @@
 import "server-only";
 
 import type { RouteGridEntry } from "@/lib/flights/grid";
+import { fareTrend, readFareHistory } from "@/lib/flights/history";
 import { fetchFare } from "@/lib/flights/searchapi";
 import { FARE_SNAPSHOTS } from "@/lib/flights/snapshots";
+import { getKv } from "@/lib/store/kv";
 
-export async function getFare(route: RouteGridEntry, date: string) {
-  const live = await fetchFare(route.from, route.to, date, route);
+async function storedFare(route: RouteGridEntry, date: string) {
+  const history = await readFareHistory(getKv(), route.from, route.to, date);
+  const latest = history[0];
+  if (latest) {
+    return {
+      priceEur: latest.priceEur,
+      carrier: latest.carrier,
+      durationMin: null,
+      stops: null,
+      source: "history" as const,
+      fetchedAt: latest.ts,
+      trend: fareTrend(history),
+    };
+  }
+
+  const snapshot = FARE_SNAPSHOTS[`${route.from}-${route.to}`];
+  return snapshot ? { ...snapshot, source: "snapshot" as const, trend: null } : null;
+}
+
+export async function getFare(
+  route: RouteGridEntry,
+  date: string,
+  { allowApi = true }: { allowApi?: boolean } = {},
+) {
+  const live = allowApi ? await fetchFare(route.from, route.to, date, route) : null;
   if (live) {
+    const history = await readFareHistory(getKv(), route.from, route.to, date);
     return {
       priceEur: live.priceEur,
       carrier: live.carrier,
@@ -17,9 +43,9 @@ export async function getFare(route: RouteGridEntry, date: string) {
       stops: live.stops,
       source: "live" as const,
       fetchedAt: new Date().toISOString(),
+      trend: fareTrend(history),
     };
   }
 
-  const snapshot = FARE_SNAPSHOTS[`${route.from}-${route.to}`];
-  return snapshot ? { ...snapshot, source: "snapshot" as const } : null;
+  return storedFare(route, date);
 }

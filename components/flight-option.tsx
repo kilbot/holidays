@@ -103,9 +103,16 @@ function FlagChip({ flag }: { flag: Flag }) {
 
 const SOURCE_LABEL: Record<PriceSource, string> = {
   live: "live fare",
+  history: "fare history",
   snapshot: "fare snapshot",
   estimate: "estimate",
 };
+
+const TREND = {
+  up: { mark: "▲", ink: "var(--sb-over)", title: "Fare is up versus the median of prior observations" },
+  down: { mark: "▼", ink: "var(--sb-good)", title: "Fare is down versus the median of prior observations" },
+  flat: { mark: "—", ink: "var(--sb-faint)", title: "Fare is flat versus the median of prior observations" },
+} as const;
 
 /* ------------------------------------------------------------------ */
 /* The chain                                                           */
@@ -408,6 +415,15 @@ export function FlightOptionRow({ option, price, arbitrage, loading }: OptionRow
           <span className="text-right">
             <span className="sb-num block text-[13px] leading-tight font-semibold text-[var(--sb-text)] sm:text-[15px]">
               {formatBand(price.totalEurCouple)}
+              {price.trend && (
+                <span
+                  className="ml-1 text-[9px]"
+                  style={{ color: TREND[price.trend].ink }}
+                  title={TREND[price.trend].title}
+                >
+                  {TREND[price.trend].mark}
+                </span>
+              )}
             </span>
             <span className="block text-[9.5px] text-[var(--sb-faint)]">for two, all in</span>
             <span
