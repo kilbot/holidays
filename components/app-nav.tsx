@@ -1,10 +1,20 @@
 "use client";
 
 /**
- * The site's sections, as a rail and as a tab bar: five in the open, the rest
- * behind a ⋯.
+ * The site's sections, as a rail and as a tab bar: every one of them, in the
+ * open, on both form factors.
  *
- * Two renderings of one list, because the two form factors want opposite
+ * There used to be a ⋯ overflow holding Resources back, on the theory that
+ * five icons is a rail you read at a glance and six is a list you scan. It
+ * bought nothing. The rail had room — six 44px icons is a third of a laptop's
+ * height — and the phone's bar divides into six as evenly as it divided into
+ * five. What the overflow did buy was a menu: open state, a dismiss scrim, a
+ * second list to keep in step with the first, and a click-through bug that
+ * outlived two attempts to fix it. A destination you cannot see is a
+ * destination nobody visits, and none of that machinery was earning its place
+ * on a six-item nav. One flat list, one source of truth.
+ *
+ * Two renderings of that list, because the two form factors want opposite
  * things. On a desktop the globe is the point, so navigation is a 56px column
  * of icons down the left edge with the names held back until a pointer or the
  * keyboard asks for them — the same progressive-disclosure bargain the cost HUD
@@ -13,20 +23,20 @@
  * outright.
  *
  * The icons are inline SVG rather than an icon set: a handful of glyphs is not
- * worth a dependency, and drawing them here means the Capsule and Ledger marks
- * can say what those words mean in *this* site rather than borrowing whatever a
- * generic set calls closest.
+ * worth a dependency, and drawing them here means the Adventure and Ledger
+ * marks can say what those words mean in *this* site rather than borrowing
+ * whatever a generic set calls closest.
  */
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ComponentType, type SVGProps } from "react";
+import { type ComponentType, type SVGProps } from "react";
 
 import { cn } from "@/lib/utils";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
-/** Shared geometry, so the four marks sit on one optical grid. */
+/** Shared geometry, so the six marks sit on one optical grid. */
 function Glyph({ children, ...props }: IconProps) {
   return (
     <svg
@@ -133,17 +143,6 @@ function ScenariosIcon(props: IconProps) {
   );
 }
 
-/** More — the overflow itself, drawn as the ellipsis it is. */
-function MoreIcon(props: IconProps) {
-  return (
-    <Glyph {...props}>
-      <circle cx="5.2" cy="12" r="1.35" fill="currentColor" stroke="none" />
-      <circle cx="12" cy="12" r="1.35" fill="currentColor" stroke="none" />
-      <circle cx="18.8" cy="12" r="1.35" fill="currentColor" stroke="none" />
-    </Glyph>
-  );
-}
-
 type NavItem = {
   href:
     | "/"
@@ -175,31 +174,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   },
   { href: "/ledger", label: "Ledger", hint: "Day-by-day costs", Icon: LedgerIcon },
   { href: "/budget", label: "Budget", hint: "Spend against the ceiling", Icon: BudgetIcon },
-];
-
-/**
- * The sections that live behind the ⋯, and why there is a ⋯ at all.
- *
- * Five icons is a rail you read at a glance; six is a list you scan. Resources
- * is also the one section nobody navigates to *while planning* — it is a shelf
- * you visit deliberately, once, to set a waitlist or check a deadline, not a
- * view you flick between. That asymmetry is exactly what an overflow is for:
- * the five things worth a permanent slot keep theirs, and the shelf costs one
- * extra click instead of a sixth of the rail's attention.
- *
- * Scenarios sits here too, and it is the harder call. #59 is a *findability*
- * bug — the couple could not tell there were alternate trips at all — and an
- * overflow is where findable things go to be forgotten. It is here anyway,
- * because the asymmetry above holds for it as well: it is a place you go to
- * decide, not a view you flick between while deciding. What answers the bug is
- * the second entrance, which is the one you cannot miss: the cost HUD's chip
- * carries the current Scenario's name on every screen of the site and links
- * straight here. Two doors, one of them always in shot.
- *
- * Both form factors share this list, so the phone never grows a section the
- * desktop doesn't have.
- */
-export const OVERFLOW_ITEMS: readonly NavItem[] = [
   {
     href: "/scenarios",
     label: "Scenarios",
@@ -216,97 +190,10 @@ export const OVERFLOW_ITEMS: readonly NavItem[] = [
 
 /**
  * `/` is only current when it is exactly `/` — every other section owns its
- * subtree, so a future `/capsules/rottnest` still lights Capsules.
+ * subtree, so a future `/adventures/rottnest` still lights Adventures.
  */
 function isCurrent(pathname: string, href: NavItem["href"]): boolean {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
-}
-
-/**
- * Open/closed for the overflow, with the two things a menu owes its reader:
- * Escape closes it, and arriving somewhere closes it.
- *
- * The state is *which page the menu is open on* rather than a boolean, which is
- * what makes the second promise free. Navigation inside the shell is a soft
- * one — the rail is never remounted — so a boolean would leave the menu hanging
- * open over the page it just took you to, and closing it would need an effect
- * that fires a second render for every navigation. Comparing against the live
- * pathname closes it during the render that navigated.
- */
-function useOverflowMenu(pathname: string) {
-  const [openOn, setOpenOn] = useState<string | null>(null);
-  const open = openOn === pathname;
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpenOn(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  return {
-    open,
-    toggle: () => setOpenOn((current) => (current === pathname ? null : pathname)),
-    close: () => setOpenOn(null),
-  };
-}
-
-/**
- * The click-anywhere-else target.
- *
- * A transparent full-viewport button rather than a document listener: it can't
- * race the toggle's own click, and it puts the dismiss affordance in the tree
- * where the menu is. Hidden from assistive tech, which has Escape and the
- * toggle's `aria-expanded` instead.
- */
-function Scrim({ onClose }: { onClose: () => void }) {
-  return (
-    <button
-      type="button"
-      aria-hidden
-      tabIndex={-1}
-      onClick={onClose}
-      // Below the section links deliberately. It used to sit at the same layer
-      // as the rest of the nav and, being later in the DOM, painted over every
-      // icon in it: with the menu open, a click on Flights hit the scrim and
-      // the page did not change. A dismiss target should catch the *page*, not
-      // the navigation it is attached to.
-      className="fixed inset-0 z-30 cursor-default"
-    />
-  );
-}
-
-/** One row inside an open overflow panel. */
-function OverflowLink({
-  item,
-  current,
-}: {
-  item: NavItem;
-  current: boolean;
-}) {
-  return (
-    <Link
-      href={item.href}
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        "flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors motion-reduce:transition-none",
-        "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
-        current
-          ? "bg-[color-mix(in_srgb,var(--sb-accent)_16%,transparent)] text-[var(--sb-accent)]"
-          : "text-[var(--sb-text)] hover:bg-[var(--sb-panel-2)]",
-      )}
-    >
-      <item.Icon className="size-4 shrink-0" />
-      <span className="min-w-0">
-        <span className="block text-[12px] font-semibold">{item.label}</span>
-        <span className="block text-[10.5px] leading-tight text-[var(--sb-dim)]">
-          {item.hint}
-        </span>
-      </span>
-    </Link>
-  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -315,8 +202,6 @@ function OverflowLink({
 
 export function AppRail() {
   const pathname = usePathname();
-  const { open, toggle, close } = useOverflowMenu(pathname);
-  const inOverflow = OVERFLOW_ITEMS.some((item) => isCurrent(pathname, item.href));
 
   return (
     <nav
@@ -329,12 +214,11 @@ export function AppRail() {
           <Link
             key={href}
             href={href}
+            // The visible glyph says nothing to a screen reader, so the link
+            // carries both words itself — name and hint, the same pair the
+            // hover label shows.
             aria-label={`${label} — ${hint}`}
             aria-current={current ? "page" : undefined}
-            // Clicking a section closes the overflow as well as navigating —
-            // including on the page you are already on, where there is no
-            // pathname change for `useOverflowMenu` to notice.
-            onClick={close}
             className={cn(
               "group relative z-40 flex size-11 items-center justify-center rounded-xl transition-colors motion-reduce:transition-none",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
@@ -377,48 +261,6 @@ export function AppRail() {
           </Link>
         );
       })}
-
-      {/* ---- The overflow ---- */}
-      {open && <Scrim onClose={close} />}
-
-      <div className="relative z-50 mt-1">
-        <button
-          type="button"
-          onClick={toggle}
-          aria-expanded={open}
-          aria-haspopup="menu"
-          aria-label="More sections"
-          className={cn(
-            "flex size-11 cursor-pointer items-center justify-center rounded-xl transition-colors motion-reduce:transition-none",
-            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
-            // The ⋯ carries the active mark on behalf of whatever is behind
-            // it, so the rail never goes dark on a page you are looking at.
-            inOverflow
-              ? "bg-[color-mix(in_srgb,var(--sb-accent)_16%,transparent)] text-[var(--sb-accent)]"
-              : "text-[var(--sb-dim)] hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)]",
-          )}
-        >
-          <MoreIcon className="size-5" />
-          {inOverflow && (
-            <span
-              aria-hidden
-              className="absolute top-1/2 -left-1.5 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--sb-accent)]"
-            />
-          )}
-        </button>
-
-        {open && (
-          <div className="sb-panel absolute bottom-0 left-full ml-2 w-[248px] p-1.5">
-            {OVERFLOW_ITEMS.map((item) => (
-              <OverflowLink
-                key={item.href}
-                item={item}
-                current={isCurrent(pathname, item.href)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
     </nav>
   );
 }
@@ -429,67 +271,44 @@ export function AppRail() {
 
 export function AppTabBar() {
   const pathname = usePathname();
-  const { open, toggle, close } = useOverflowMenu(pathname);
-  const inOverflow = OVERFLOW_ITEMS.some((item) => isCurrent(pathname, item.href));
 
   return (
     <nav
       aria-label="Sections"
       className="relative z-40 flex shrink-0 border-t border-[var(--sb-line)] bg-[var(--sb-panel)] pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >
-      {NAV_ITEMS.map(({ href, label, Icon }) => {
+      {NAV_ITEMS.map(({ href, label, hint, Icon }) => {
         const current = isCurrent(pathname, href);
         return (
           <Link
             key={href}
             href={href}
+            // The word under the icon is already the name; the hint is the
+            // part a phone has no room to print, and naming the link with
+            // both hands it to a screen reader anyway. The visible label
+            // opens the string, so speaking it still matches what is read.
+            aria-label={`${label} — ${hint}`}
             aria-current={current ? "page" : undefined}
-            onClick={close}
             className={cn(
-              "relative z-40 flex min-h-14 flex-1 flex-col items-center justify-center gap-[3px] transition-colors motion-reduce:transition-none",
+              "relative z-40 flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-[3px] px-0.5 transition-colors motion-reduce:transition-none",
               "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
               current
                 ? "text-[var(--sb-accent)]"
                 : "text-[var(--sb-dim)] active:text-[var(--sb-text)]",
             )}
           >
-            <Icon className="size-5" />
-            <span className="text-[10px] font-semibold tracking-[0.02em]">{label}</span>
+            <Icon className="size-5 shrink-0" />
+            {/* Six names across a 375px phone leaves ~62px a column, and
+                "Adventures" is the one that has to be measured rather than
+                assumed. It fits at 10px; the tracking comes off below 400px
+                so the narrowest phones still set it on one line rather than
+                truncating a destination's name. */}
+            <span className="text-[10px] leading-none font-semibold tracking-[0.02em] max-[400px]:tracking-normal">
+              {label}
+            </span>
           </Link>
         );
       })}
-
-      {/* ---- The same overflow, opening upwards ---- */}
-      {open && <Scrim onClose={close} />}
-
-      <button
-        type="button"
-        onClick={toggle}
-        aria-expanded={open}
-        aria-haspopup="menu"
-        className={cn(
-          "z-50 flex min-h-14 flex-1 cursor-pointer flex-col items-center justify-center gap-[3px] transition-colors motion-reduce:transition-none",
-          "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
-          inOverflow || open
-            ? "text-[var(--sb-accent)]"
-            : "text-[var(--sb-dim)] active:text-[var(--sb-text)]",
-        )}
-      >
-        <MoreIcon className="size-5" />
-        <span className="text-[10px] font-semibold tracking-[0.02em]">More</span>
-      </button>
-
-      {open && (
-        <div className="sb-panel absolute right-2 bottom-[calc(100%+8px)] z-50 w-[248px] p-1.5">
-          {OVERFLOW_ITEMS.map((item) => (
-            <OverflowLink
-              key={item.href}
-              item={item}
-              current={isCurrent(pathname, item.href)}
-            />
-          ))}
-        </div>
-      )}
     </nav>
   );
 }
