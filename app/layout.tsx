@@ -20,7 +20,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Southbound — Valencia to Australia, Dec 2026",
+  title: "Australia 2026–27",
   description:
     "Trip planner for a Valencia → Australia journey, December 2026 – February 2027.",
 };

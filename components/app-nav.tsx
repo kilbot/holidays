@@ -87,7 +87,7 @@ function BudgetIcon(props: IconProps) {
 }
 
 type NavItem = {
-  href: "/" | "/capsules" | "/ledger" | "/budget";
+  href: "/" | "/adventures" | "/ledger" | "/budget";
   label: string;
   /** Said to a screen reader, and to anyone who hovers long enough. */
   hint: string;
@@ -97,8 +97,8 @@ type NavItem = {
 export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/", label: "Plan", hint: "The globe and the current itinerary", Icon: PlanIcon },
   {
-    href: "/capsules",
-    label: "Capsules",
+    href: "/adventures",
+    label: "Adventures",
     hint: "Browse and sift the catalog",
     Icon: CapsulesIcon,
   },

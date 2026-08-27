@@ -5,9 +5,9 @@ import { CapsuleCardHost } from "@/components/capsule-card";
 import { CapsulesBrowser } from "@/components/capsules-browser";
 
 export const metadata: Metadata = {
-  title: "Capsules — Southbound",
+  title: "Australia 2026–27",
   description:
-    "413 Australian holiday ideas and eight researched Capsules, sifted into a shortlist.",
+    "413 Australian holiday ideas and eight researched Adventures, sifted into a shortlist.",
 };
 
 /**
@@ -44,9 +44,9 @@ function CatalogLoading() {
   return (
     <main className="h-full w-full overflow-hidden">
       <div className="mx-auto max-w-[1440px] px-5 pt-8 sm:px-8 lg:pt-10">
-        <p className="sb-label">Southbound · the catalog</p>
+        <p className="sb-label">The catalog</p>
         <h1 className="mt-2 font-display text-[32px] leading-[1.05] font-extrabold tracking-[-0.02em] text-[var(--sb-text)] lg:text-[40px]">
-          Capsules
+          Adventures
         </h1>
         <p className="mt-3 text-[13.5px] text-[var(--sb-dim)]">
           Sorting the catalog…

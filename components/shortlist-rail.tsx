@@ -264,7 +264,7 @@ function ShortlistBody() {
           way into the 413 from this page now, and a link that quiet would be
           a dead end wearing a signpost. */}
       <Link
-        href="/capsules"
+        href="/adventures"
         className="group mt-2.5 flex min-h-9 items-center gap-2 rounded-lg border border-[color-mix(in_srgb,var(--sb-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--sb-accent)_10%,transparent)] px-2.5 py-1.5 transition-colors hover:bg-[color-mix(in_srgb,var(--sb-accent)_18%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
       >
         <span className="min-w-0 flex-1 text-[11.5px] leading-tight font-semibold text-[var(--sb-text)]">

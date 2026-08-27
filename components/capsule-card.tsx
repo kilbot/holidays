@@ -397,7 +397,7 @@ function Related({ ids }: { ids: readonly string[] }) {
       </ul>
       <p className="mt-1.5 text-[10px] leading-snug text-[var(--sb-faint)]">
         Neighbours and alternatives this research argues with — not part of the
-        Capsule.
+        Adventure.
       </p>
     </Section>
   );
@@ -536,7 +536,7 @@ function IdeaBody({ idea }: { idea: CatalogIdea }) {
           >
             <FlaskConical className="size-3.5 shrink-0 text-[var(--sb-accent)]" />
             <span className="min-w-0 flex-1 text-[11.5px] font-semibold">
-              Open the deep Capsule
+              Open the deep Adventure
             </span>
             <ChevronRight className="size-3.5 shrink-0 text-[var(--sb-accent)]" />
           </button>
@@ -554,14 +554,14 @@ function IdeaBody({ idea }: { idea: CatalogIdea }) {
               <span className="font-semibold text-[var(--sb-accent)]">
                 interested
               </span>{" "}
-              and it can be promoted to a full Capsule.
+              and it can be promoted to a full Adventure.
             </p>
           </div>
 
           {mentions.length > 0 && (
             <>
               <p className="mt-2.5 text-[10px] leading-snug text-[var(--sb-faint)]">
-                It does come up in researched Capsules, though:
+                It does come up in researched Adventures, though:
               </p>
               <ul className="mt-1 flex flex-col gap-1">
                 {mentions.map((capsule) => (
@@ -684,7 +684,7 @@ export function CapsuleCardHost() {
     <div className="fixed inset-0 z-50">
       <button
         type="button"
-        aria-label="Close the capsule"
+        aria-label="Close the adventure"
         onClick={closeCapsule}
         className="absolute inset-0 cursor-default bg-[rgb(7_12_20/0.55)] backdrop-blur-[3px]"
       />

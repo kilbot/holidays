@@ -26,7 +26,6 @@ export function ComingSoon({
   return (
     <main className="sb-scroll h-full w-full overflow-y-auto">
       <div className="mx-auto flex min-h-full max-w-[520px] flex-col justify-center px-6 py-16">
-        <p className="sb-label">Southbound</p>
         <h1 className="mt-2 font-display text-[30px] leading-[1.1] font-extrabold tracking-[-0.01em] text-[var(--sb-text)]">
           {title}
         </h1>
