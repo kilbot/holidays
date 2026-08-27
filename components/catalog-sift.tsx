@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   MapPin,
   RotateCcw,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { CatalogRow } from "@/components/catalog-row";
+import { DeepCapsuleStrip } from "@/components/deep-capsule-strip";
 import {
   AUD_TO_EUR,
   CATALOG,
@@ -121,7 +122,6 @@ export function CatalogSift() {
   const [lens, setLens] = useState<LensId>("both");
   const [shelf, setShelf] = useState<ShelfId>("open");
   const [showFilters, setShowFilters] = useState(false);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const { marks, counts, toggle: mark } = useShortlist();
 
@@ -181,10 +181,6 @@ export function CatalogSift() {
       .map((scored) => scored.idea);
   }, [query, facets, states, seasons, maxDays, maxCost, lens, shelf, marks]);
 
-  const onToggleExpand = useCallback((id: string) => {
-    setExpandedId((current) => (current === id ? null : id));
-  }, []);
-
   const reset = () => {
     setQuery("");
     setFacets([]);
@@ -239,6 +235,9 @@ export function CatalogSift() {
           </>
         )}
       </p>
+
+      {/* ---- The eight researched Capsules, above the sift and outside it ---- */}
+      <DeepCapsuleStrip />
 
       {/* ---- Search ---- */}
       <div className="relative mt-2.5">
@@ -470,8 +469,6 @@ export function CatalogSift() {
             key={idea.id}
             idea={idea}
             state={marks[idea.id] ?? "unseen"}
-            expanded={expandedId === idea.id}
-            onToggleExpand={onToggleExpand}
             onMark={mark}
           />
         ))}

@@ -3,6 +3,7 @@
 import { memo } from "react";
 import { MapPin, Star, TriangleAlert, X } from "lucide-react";
 
+import { openCatalogIdea } from "@/lib/capsule-focus";
 import {
   SEASON_LABEL,
   SEASON_TOKEN,
@@ -17,10 +18,12 @@ import { cn } from "@/lib/utils";
 /**
  * One Catalog idea.
  *
- * Collapsed it is three lines — name and cost, where, then the season chip and
- * the mark buttons. Clicking anywhere on it opens the research underneath:
- * why people rate it, what the summer does to it, and its tags. Only one row
- * is ever open, so the drawer never turns into a wall of prose.
+ * Three lines — name and cost, where, then the season chip and the mark
+ * buttons — and clicking anywhere on it opens the detail card. The row used to
+ * expand in place instead; the card replaced that because it is a superset
+ * (the same why-rated and season note, plus the sources, the flags and the
+ * research links) and because two ways to open the same content in a 320px
+ * column is one too many.
  *
  * Memoised on purpose: a keystroke in the search box re-renders the list, and
  * the rows that survived the filter should not re-render with it.
@@ -56,18 +59,10 @@ const ROW_TONE: Record<ShortlistState, string> = {
 interface CatalogRowProps {
   idea: CatalogIdea;
   state: ShortlistState;
-  expanded: boolean;
-  onToggleExpand: (id: string) => void;
   onMark: (id: string, state: MarkedState) => void;
 }
 
-function CatalogRowImpl({
-  idea,
-  state,
-  expanded,
-  onToggleExpand,
-  onMark,
-}: CatalogRowProps) {
+function CatalogRowImpl({ idea, state, onMark }: CatalogRowProps) {
   const caveat = warningLabel(idea);
 
   return (
@@ -79,17 +74,13 @@ function CatalogRowImpl({
     >
       <button
         type="button"
-        onClick={() => onToggleExpand(idea.id)}
-        aria-expanded={expanded}
+        onClick={() => openCatalogIdea(idea.id)}
+        aria-haspopup="dialog"
+        title={`Open ${idea.name}`}
         className="w-full cursor-pointer px-2.5 pt-2 pb-1.5 text-left"
       >
         <div className="flex items-start gap-2">
-          <span
-            className={cn(
-              "min-w-0 flex-1 text-[12.5px] leading-tight font-semibold",
-              expanded ? "" : "line-clamp-2",
-            )}
-          >
+          <span className="line-clamp-2 min-w-0 flex-1 text-[12.5px] leading-tight font-semibold">
             {idea.name}
           </span>
           <span className="sb-num shrink-0 text-[11.5px] leading-tight font-medium tracking-tight">
@@ -166,30 +157,6 @@ function CatalogRowImpl({
         })}
       </div>
 
-      {expanded && (
-        <div className="border-t border-[var(--sb-line)] px-2.5 py-2">
-          <p className="text-[11px] leading-snug text-[var(--sb-dim)]">
-            {idea.why_rated}
-          </p>
-          <p className="mt-1.5 text-[10.5px] leading-snug text-[var(--sb-faint)]">
-            <span className="font-semibold">Summer:</span> {idea.season_note}
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-1">
-            {idea.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-[4px] bg-[color-mix(in_srgb,var(--sb-line)_45%,transparent)] px-1.5 py-0.5 text-[9.5px] text-[var(--sb-dim)]"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-          <p className="sb-num mt-2 text-[9.5px] text-[var(--sb-faint)]">
-            {idea.nearest_airport} · A${idea.rough_cost_couple_aud} ·{" "}
-            {idea.cost_confidence} confidence
-          </p>
-        </div>
-      )}
     </li>
   );
 }

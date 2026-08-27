@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+import { openDeepCapsule } from "@/lib/capsule-focus";
+import { DEEP_CAPSULE_BY_ROUTE_CODE } from "@/lib/deep-capsules";
 import {
   COMPACT_CAMERA,
   COMPACT_CAMERA_MAX_WIDTH_PX,
@@ -235,6 +237,34 @@ export function GlobeStage() {
           "text-opacity": 0.9,
         },
       });
+
+      // Route markers that stand for a researched Capsule open its card. The
+      // stops on this route *are* the Capsules' own gateways, so the mapping is
+      // a lookup rather than a nearest-neighbour search — and the two hubs with
+      // nothing researched behind them (Barcelona, Singapore) simply stay
+      // inert, cursor and all.
+      const capsuleAt = (event: mapboxgl.MapMouseEvent): string | undefined => {
+        const hit = map.queryRenderedFeatures(event.point, {
+          layers: ["points", "points-halo"],
+        })[0];
+        const code = hit?.properties?.code;
+        return typeof code === "string"
+          ? DEEP_CAPSULE_BY_ROUTE_CODE[code]
+          : undefined;
+      };
+
+      for (const layer of ["points", "points-halo"]) {
+        map.on("click", layer, (event) => {
+          const id = capsuleAt(event);
+          if (id) openDeepCapsule(id);
+        });
+        map.on("mousemove", layer, (event) => {
+          canvas.style.cursor = capsuleAt(event) ? "pointer" : "";
+        });
+        map.on("mouseleave", layer, () => {
+          canvas.style.cursor = "";
+        });
+      }
 
       frameRoute(false);
       setReady(true);
