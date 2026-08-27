@@ -80,7 +80,7 @@ import {
   WEIGHT_BRACKET,
   WEIGHT_EVIDENCE,
 } from "@/lib/flights/comfort";
-import type { FareQuota } from "@/lib/flights/quota";
+import { monthlyResetLabel, type FareQuota } from "@/lib/flights/quota";
 import { formatEur } from "@/lib/engine";
 import { formatDayYear } from "@/lib/trip-dates";
 import { FareDateField, type CoverageByDate, type DayCoverage } from "@/components/fare-dates";
@@ -151,14 +151,53 @@ async function fetchQuote(
   }
 }
 
+/**
+ * The meter, and — when one of the two ceilings is shut — the sentence that
+ * used to be missing.
+ *
+ * The counter alone could not explain what the couple was seeing. Hitting the
+ * daily guard at 151 calls of a 2,000-call month looks, in a meter, like
+ * plenty of headroom; every row after it quietly showed a stored price, and the
+ * honest reading of that was *the data doesn't work*. So the gate is stated
+ * where the degrading happens, in the words for the ceiling that is actually
+ * shut: one clears overnight and the other does not.
+ *
+ * Loud enough to find, quiet enough not to shout: the numbers stay folded away,
+ * and the gate line is the only part that comes out of the disclosure.
+ */
 function QuotaMeter({ quota }: { quota: FareQuota | null }) {
+  const gated = quota && quota.gate !== "open";
+
   return (
-    <details className="mt-2 w-fit text-[10px] text-[var(--sb-faint)]">
-      <summary className="cursor-pointer">
-        live quota: {quota ? `${quota.used}/${quota.budget} this month` : "checking…"}
-      </summary>
-      {quota && <p className="mt-1">{quota.month} · soft stop at 150 calls per day</p>}
-    </details>
+    <div className="mt-2">
+      <details className="w-fit text-[10px] text-[var(--sb-faint)]">
+        <summary className="cursor-pointer">
+          live quota: {quota ? `${quota.used}/${quota.budget} this month` : "checking…"}
+        </summary>
+        {quota && (
+          <p className="mt-1">
+            {quota.month} · {quota.usedToday}/{quota.dailyCap} today, a runaway guard
+            rather than a budget
+          </p>
+        )}
+      </details>
+
+      {gated && (
+        <p className="mt-1.5 flex items-start gap-1.5 text-[11px] leading-snug text-[var(--sb-dim)]">
+          <span aria-hidden className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--sb-warn)]" />
+          <span>
+            <span className="font-semibold text-[var(--sb-warn)]">
+              {quota.gate === "daily"
+                ? "Daily live-quota guard reached — fresh prices resume tomorrow."
+                : `Monthly budget spent — stored prices until ${monthlyResetLabel(quota.month)}.`}
+            </span>{" "}
+            Rows are showing the newest stored fare or the research band, labelled as
+            such. Nothing is blocked: the ranking, the comfort scores and the
+            watchlist all work on what is already here.
+          </span>
+        </p>
+      )}
+    </div>
   );
 }
 

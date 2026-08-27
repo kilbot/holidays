@@ -1,6 +1,43 @@
+/**
+ * The two ceilings on live fare calls, and the words for hitting one.
+ *
+ * They are not the same kind of thing, and conflating them is what made the
+ * page lie about itself:
+ *
+ * - **The monthly budget is the couple's own choice.** 2,000 calls is the plan
+ *   they are paying for, and spending it is the point — the data is worth
+ *   nothing sitting in a quota.
+ * - **The daily cap is a runaway guard, not budgeting.** It exists so that a
+ *   loop that gets stuck — a bad effect dependency, a cron that fires in a
+ *   tight retry, a tab left open re-searching — cannot drain a month between
+ *   two glances at the dashboard. It was 150/day, which is not a runaway
+ *   threshold, it is a budget in disguise: an ordinary afternoon of moving the
+ *   date strip across a fourteen-origin search reaches it, and the user hit it
+ *   in a day and read the resulting silent fallback as *the data doesn't work*.
+ *   At 500 a genuine runaway still cannot burn the month in under four days,
+ *   which is the only job this number has.
+ *
+ * Whichever one refuses a call, the fetch falls back to stored history or the
+ * research band. That fallback is correct and it is also invisible, so this
+ * module reports *which gate is shut* alongside the counter, and the Flights
+ * page says it in plain words next to the meter. The site's rule everywhere
+ * else — inform, never block, and never let a rule read as the world being
+ * that shape (docs/CONTEXT.md, Constraint) — applies to its own metered API.
+ */
+
 import type { KvClient } from "@/lib/store/kv";
+
 export const MONTHLY_CALL_BUDGET = 2_000;
-export const DAILY_CALL_CAP = 150;
+
+/**
+ * Runaway protection, deliberately loose.
+ *
+ * Read the module comment before lowering it: this is not a spending control,
+ * and using it as one is what produced a page that silently stopped pricing
+ * things halfway through an afternoon.
+ */
+export const DAILY_CALL_CAP = 500;
+
 const MONTH_TTL_SECONDS = 35 * 24 * 60 * 60;
 const DAY_TTL_SECONDS = 2 * 24 * 60 * 60;
 const dateParts = (now: Date) => now.toISOString().slice(0, 10);
@@ -8,21 +45,70 @@ const monthOf = (now: Date) => dateParts(now).slice(0, 7);
 const monthKey = (now: Date) => `quota:${monthOf(now)}`;
 const dayKey = (now: Date) => `quota:day:${dateParts(now)}`;
 
-export interface FareQuota { used: number; budget: number; month: string }
+/**
+ * Which ceiling, if either, is currently refusing live calls.
+ *
+ * `"monthly"` wins when both are reached, because it is the one that does not
+ * clear overnight — telling someone to come back tomorrow when the budget is
+ * spent until the 1st would be the wrong sentence.
+ */
+export type QuotaGate = "open" | "daily" | "monthly";
+
+export interface FareQuota {
+  used: number;
+  budget: number;
+  month: string;
+  /** Calls made today, against the runaway guard. */
+  usedToday: number;
+  dailyCap: number;
+  gate: QuotaGate;
+}
+
+export const gateOf = (monthly: number, daily: number): QuotaGate =>
+  monthly >= MONTHLY_CALL_BUDGET
+    ? "monthly"
+    : daily >= DAILY_CALL_CAP
+      ? "daily"
+      : "open";
+
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * When the monthly budget refills, as a date a person would say: `"1 Sep"`.
+ *
+ * Here rather than in the component because it is arithmetic on the same
+ * `"2026-08"` this module produces, and a page should not have to know how the
+ * counter's key is shaped to say when it resets.
+ */
+export function monthlyResetLabel(month: string): string {
+  const [year, index] = month.split("-").map(Number);
+  if (!Number.isFinite(year) || !Number.isFinite(index)) return "next month";
+  // December rolls to January of the next year; the year is not printed, so
+  // only the wrap matters.
+  return `1 ${MONTH_NAMES[index % 12]}`;
+}
 
 export async function readFareQuota(kv: KvClient, now = new Date()): Promise<FareQuota> {
+  const used = (await kv.getJson<number>(monthKey(now))) ?? 0;
+  const usedToday = (await kv.getJson<number>(dayKey(now))) ?? 0;
   return {
-    used: (await kv.getJson<number>(monthKey(now))) ?? 0,
+    used,
     budget: MONTHLY_CALL_BUDGET,
     month: monthOf(now),
+    usedToday,
+    dailyCap: DAILY_CALL_CAP,
+    gate: gateOf(used, usedToday),
   };
 }
+
 /** Reserve one outbound SearchAPI request, or refuse it at either quota cap. */
 export async function reserveFareCall(kv: KvClient, now = new Date()): Promise<boolean> {
   const monthly = (await kv.getJson<number>(monthKey(now))) ?? 0;
-  if (monthly >= MONTHLY_CALL_BUDGET) return false;
   const daily = (await kv.getJson<number>(dayKey(now))) ?? 0;
-  if (daily >= DAILY_CALL_CAP) return false;
+  if (gateOf(monthly, daily) !== "open") return false;
   // Hobby-site stakes: this check/increment pair may race by a few calls, which
   // costs quota but cannot corrupt user data and does not justify locking.
   await kv.incrementWithTtl(monthKey(now), MONTH_TTL_SECONDS);
