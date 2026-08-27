@@ -11,11 +11,13 @@
  *
  * ## Boot
  *
- * Two things happen once, at module load, before any component renders:
- * the edit key is lifted out of the URL fragment and stored, and the Scenario
- * store is swapped for the server-synced wrapper. Doing it here rather than in
- * an effect means the first paint already knows which mode it is in — a view-mode
- * visitor never sees an edit affordance flash and disappear.
+ * Two things happen once, at module load, before any component renders: the
+ * edit key is lifted out of the URL fragment and stored, and the Scenario store
+ * is swapped for the server-synced wrapper. Doing it here rather than in an
+ * effect means the first paint already knows which mode it is in — a view-mode
+ * visitor never sees an edit affordance flash and disappear. (Tidying the key
+ * back out of the address bar has to wait for an effect; `edit-key.ts` says
+ * why.)
  *
  * Both are no-ops on the server and when the Plan has not been bootstrapped,
  * which is what keeps `npm run dev` working on a fresh clone with no store.
@@ -30,7 +32,12 @@ import {
   FORK_QUERY_PARAM,
   forkShareUrl,
 } from "@/lib/store/canonical-plan";
-import { captureEditKey, readEditKey } from "@/lib/store/edit-key";
+import {
+  captureEditKey,
+  readEditKey,
+  stripEditKeyFromUrl,
+  subscribeEditKey,
+} from "@/lib/store/edit-key";
 import { EDIT_KEY_HEADER } from "@/lib/store/guards";
 import {
   readSyncStatus,
@@ -55,17 +62,16 @@ export type ShareMode = "local" | "view" | "edit";
 /* Boot                                                                */
 /* ------------------------------------------------------------------ */
 
-let editKey: string | null = null;
-
 if (typeof window !== "undefined") {
-  editKey = captureEditKey();
+  captureEditKey();
   if (CANONICAL_PLAN_ID) {
     installScenarioStore((local) =>
       remoteScenarioStore(local, {
         planId: CANONICAL_PLAN_ID,
-        // Read through rather than captured: the key is already in hand here,
-        // but a tab that stores it later should start saving without a reload.
-        getEditKey: () => editKey ?? readEditKey(),
+        // Read through rather than captured once: a tab handed the key later —
+        // pasted into the address bar of an open window — starts saving without
+        // needing a reload.
+        getEditKey: readEditKey,
       }),
     );
   }
@@ -73,10 +79,10 @@ if (typeof window !== "undefined") {
 
 /** Whether this tab holds the edit link. Safe to call during render. */
 export function isEditor(): boolean {
-  return Boolean(CANONICAL_PLAN_ID) && Boolean(editKey);
+  return Boolean(CANONICAL_PLAN_ID) && Boolean(readEditKey());
 }
 
-/** Nothing to subscribe to: these facts are fixed for the life of the tab. */
+/** The origin never changes for the life of the tab, so there is no store. */
 const subscribeNever = () => () => undefined;
 const readOrigin = () => window.location.origin;
 const readNoOrigin = () => "";
@@ -121,13 +127,31 @@ export function useSharing(): SharingApi {
   );
 
   // Two client-only facts, read through `useSyncExternalStore` rather than set
-  // in an effect. Neither ever changes after boot, so there is nothing to
-  // subscribe to — but the server snapshot is what keeps the markup React
-  // renders on the server identical to the markup it hydrates, and an effect
-  // that called `setState` would be a cascading render for a constant.
+  // in an effect. The server snapshot is what keeps the markup React renders on
+  // the server identical to the markup it hydrates, and an effect calling
+  // `setState` for a value known at boot would be a cascading render for free.
   const origin = useSyncExternalStore(subscribeNever, readOrigin, readNoOrigin);
-  const editing = useSyncExternalStore(subscribeNever, isEditor, readNotEditor);
+  const editing = useSyncExternalStore(
+    subscribeEditKey,
+    isEditor,
+    readNotEditor,
+  );
   const [visiting, setVisiting] = useState<ForkView | null>(null);
+
+  // The address bar is tidied here rather than at boot: Next's router rewrites
+  // the URL as it hydrates and undoes a `replaceState` fired any earlier. The
+  // `hashchange` listener covers the couple pasting their edit link into a tab
+  // that is already open, which is a same-document navigation and runs no
+  // module code of its own.
+  useEffect(() => {
+    stripEditKeyFromUrl();
+    const onHashChange = () => {
+      captureEditKey();
+      stripEditKeyFromUrl();
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   // Fetch the Fork this tab was opened on, once. A Fork that has been deleted
   // or was never real leaves `visiting` null and the page behaves as a plain

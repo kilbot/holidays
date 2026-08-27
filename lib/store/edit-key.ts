@@ -14,13 +14,21 @@
  *    so the key appears in no access log, no `Referer` header and nothing
  *    Vercel records. A `?edit=` would have been in the request line of every
  *    proxy between the couple and the site.
- * 2. **Stripped immediately.** `history.replaceState` takes it out of the
- *    address bar before anything can screenshot it, share it, or leave it in
- *    the tab title of a screen-shared browser. The URL that remains is the view
- *    link — which is exactly what should be copied out of that address bar.
+ * 2. **Stripped from the address bar.** What remains is the view link — which is
+ *    exactly what should be copied out of that address bar, and what a
+ *    screen-share or a screenshot then shows.
  * 3. **Stored, not held in memory.** A reload must not drop the couple back to
  *    read-only, and asking them to re-open the edit link every time would push
  *    them to keep it somewhere they screenshot.
+ *
+ * ## Why capture and strip are two functions
+ *
+ * Capture runs at module load, so the first paint already knows the tab is in
+ * edit mode. Stripping cannot: Next's App Router patches `history` and rewrites
+ * the URL as it hydrates, so a `replaceState` fired before hydration is simply
+ * undone — measured, not assumed. The strip therefore runs from an effect, one
+ * tick later, which is after the router has settled and still long before
+ * anybody could have read the address bar.
  */
 
 import {
@@ -28,37 +36,64 @@ import {
   EDIT_KEY_STORAGE_KEY,
 } from "@/lib/store/canonical-plan";
 
+let current: string | null = null;
+const listeners = new Set<() => void>();
+
 /**
  * Take the key out of the URL if it is there, and remember it.
  *
- * Idempotent and safe to call on every boot: with no fragment it simply reads
- * back whatever was stored last time. Returns the key this tab is holding, or
- * null for a plain visitor — which is the common case and not an error.
+ * Idempotent and safe to call on every boot and on every `hashchange`: with no
+ * fragment it reads back whatever was stored last time. Returns the key this tab
+ * is holding, or null for a plain visitor — which is the common case and not an
+ * error.
  */
 export function captureEditKey(): string | null {
   if (typeof window === "undefined") return null;
 
   const fragment = window.location.hash.replace(/^#/, "");
   const found = new URLSearchParams(fragment).get(EDIT_KEY_FRAGMENT);
+  const next = found || readStored();
 
-  if (found) {
-    store(found);
-    // Everything else in the fragment survives; only the secret is removed.
-    const rest = new URLSearchParams(fragment);
-    rest.delete(EDIT_KEY_FRAGMENT);
-    const tail = rest.toString();
-    window.history.replaceState(
-      null,
-      "",
-      `${window.location.pathname}${window.location.search}${tail ? `#${tail}` : ""}`,
-    );
-    return found;
+  if (found) persist(found);
+  if (next !== current) {
+    current = next;
+    for (const listener of listeners) listener();
   }
-
-  return readEditKey();
+  return current;
 }
 
+/**
+ * Remove `#edit=` from the address bar, keeping everything else in the URL.
+ *
+ * Call from an effect, never at module load — see the note above about the
+ * router rewriting the URL during hydration.
+ */
+export function stripEditKeyFromUrl(): void {
+  if (typeof window === "undefined") return;
+  const fragment = window.location.hash.replace(/^#/, "");
+  const rest = new URLSearchParams(fragment);
+  if (!rest.has(EDIT_KEY_FRAGMENT)) return;
+
+  rest.delete(EDIT_KEY_FRAGMENT);
+  const tail = rest.toString();
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${window.location.pathname}${window.location.search}${tail ? `#${tail}` : ""}`,
+  );
+}
+
+/** The key this tab holds, without re-reading the URL. */
 export function readEditKey(): string | null {
+  return current ?? readStored();
+}
+
+export function subscribeEditKey(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function readStored(): string | null {
   try {
     return window.localStorage.getItem(EDIT_KEY_STORAGE_KEY);
   } catch {
@@ -68,20 +103,22 @@ export function readEditKey(): string | null {
   }
 }
 
-function store(key: string): void {
+function persist(key: string): void {
   try {
     window.localStorage.setItem(EDIT_KEY_STORAGE_KEY, key);
   } catch {
     // Nothing to do — this tab stays in edit mode for as long as it lives,
-    // because `captureEditKey` returned the key regardless.
+    // because the key is held in `current` regardless.
   }
 }
 
 /** Hand the tab back to view mode. The couple's "not on this browser" button. */
 export function forgetEditKey(): void {
+  current = null;
   try {
     window.localStorage.removeItem(EDIT_KEY_STORAGE_KEY);
   } catch {
     // Already unreachable; there is nothing stored to forget.
   }
+  for (const listener of listeners) listener();
 }

@@ -303,8 +303,13 @@ export function CostHud() {
     <section className="pointer-events-auto absolute top-4 right-4 left-32 z-30 sm:left-auto sm:w-[264px]">
       {/* Expanded, the panel carries splits, four honesty rows and up to three
           Warnings — more than a short viewport holds. It scrolls inside itself
-          rather than running off the bottom of the globe. */}
-      <div className="sb-panel sb-scroll max-h-[calc(100dvh-2rem)] overflow-y-auto p-3">
+          rather than running off the bottom of the globe.
+
+          The floor is the share pill's top edge, not the viewport's: both live
+          in the right-hand column, and a HUD that ran the full height would
+          print its warnings over the one control that says whether the Plan is
+          even being saved. */}
+      <div className="sb-panel sb-scroll max-h-[calc(100dvh-var(--sb-strip-h)-7.5rem)] overflow-y-auto p-3">
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
