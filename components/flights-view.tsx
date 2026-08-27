@@ -36,6 +36,13 @@
  *   to be able to tell why the list looks the way it does, and change it.
  *   Nothing is blocked or deleted here either, which is the site's own
  *   philosophy applied to the site's own rules.
+ * - **The score says how much of itself is evidence, and hands over the part
+ *   that is not.** After the audit (kilbot/holidays#69) every component in a
+ *   row's derivation is labelled measured, rated or judgment — and the one
+ *   number the literature genuinely does not settle, the weight between the
+ *   airline and the aeroplane, is a third control up here beside the other two.
+ *   It moves inside the published 0.30–0.70 bracket and re-ranks live, and the
+ *   sentence under it says whether the top of the list actually depends on it.
  */
 
 import { ChevronDown, Zap } from "lucide-react";
@@ -65,7 +72,14 @@ import {
   type OptionPrice,
 } from "@/lib/flights/pricing";
 import { excludedByDefault, RETURN_A380_TIP, type SearchOption } from "@/lib/flights/search-plan";
-import { MIDDLE_EAST_TRANSIT_HUBS } from "@/lib/flights/comfort";
+import {
+  DEFAULT_AIRLINE_WEIGHT,
+  MIDDLE_EAST_TRANSIT_HUBS,
+  reweigh,
+  topPickAcrossBracket,
+  WEIGHT_BRACKET,
+  WEIGHT_EVIDENCE,
+} from "@/lib/flights/comfort";
 import type { FareQuota } from "@/lib/flights/quota";
 import { formatEur } from "@/lib/engine";
 import { formatDayYear } from "@/lib/trip-dates";
@@ -332,6 +346,57 @@ function PriceCap({ value, onChange }: { value: number; onChange: (value: number
 }
 
 /**
+ * The one number in the formula nobody can defend, put under the reader's hand.
+ *
+ * The evidence audit (kilbot/holidays#69) went looking for the study that sets
+ * the airline-versus-aircraft weight and found two literatures pointing in
+ * opposite directions: Vink et al. (2012) put legroom at the top of physical
+ * comfort, which argues 0.30/0.70; Ban & Kim (2019, n=9,632) put seat comfort
+ * near the bottom of *satisfaction*, which argues the reverse. Both are
+ * measuring the same spectrum, so the honest answer is a bracket — 0.30 to
+ * 0.70 — with 0.55 sitting inside it as a judgment call and nothing more.
+ *
+ * A judgment call inside a published bracket is exactly the shape of thing the
+ * Constraint principle says to hand over (docs/CONTEXT.md): visible, adjustable,
+ * stated in words. So this is a slider rather than a constant, it says which
+ * way is which as a percentage rather than a decimal nobody reads, and the
+ * ranking moves under it while the thumb is still down.
+ */
+function WeightSlider({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+  const id = useId();
+  const airline = Math.round(value * 100);
+
+  return (
+    <div className="min-w-0">
+      <label htmlFor={id} className="sb-label block cursor-pointer text-[9px]">
+        Airline vs seat
+        <span className="sb-num ml-1.5 tracking-normal text-[var(--sb-text)] normal-case">
+          {airline} / {100 - airline}
+        </span>
+      </label>
+      <div className="mt-1 flex h-8 items-center gap-2 rounded-lg border border-[var(--sb-line)] bg-[var(--sb-panel)] px-2.5">
+        <input
+          id={id}
+          type="range"
+          min={WEIGHT_BRACKET.min}
+          max={WEIGHT_BRACKET.max}
+          step={WEIGHT_BRACKET.step}
+          value={value}
+          onChange={(event) => onChange(Number(event.target.value))}
+          aria-label="How much of the comfort score is the airline's ratings and how much is the seat this itinerary flies"
+          aria-valuetext={`${airline}% airline ratings, ${100 - airline}% seat`}
+          title={WEIGHT_EVIDENCE.note}
+          className="h-4 w-[112px] cursor-pointer accent-[var(--sb-accent)]"
+        />
+        <span className="text-[10px] whitespace-nowrap text-[var(--sb-faint)]">
+          re-ranks live
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
  * The routing rule, as a thing you can turn off.
  *
  * It reads as a sentence in the on state — "Avoiding Middle East transits" —
@@ -426,6 +491,86 @@ function ActiveRules({
               ? "1 more is greyed out below, with the reason on it."
               : `${heldBack} more are greyed out below, each saying which rule caught it.`}
           </span>
+        </>
+      )}
+    </p>
+  );
+}
+
+/**
+ * What the weight is set to, and whether it changes the answer.
+ *
+ * The sentence is the sibling of `ActiveRules`: the slider says what *can* be
+ * true, this says what is true right now, in the words a person would use.
+ *
+ * The second half is the reassuring part, and it is computed rather than
+ * quoted. Moving a weight that decides a ranking invites the obvious worry —
+ * *so the answer depends on a number you made up?* — and for this search it
+ * demonstrably does not: the audit found Singapore wins at every point in the
+ * bracket because it leads on both axes, and the same check runs here against
+ * the rows actually on screen. Saying so from a hardcoded string would be the
+ * one claim on this page nobody could check, which is the opposite of the
+ * point; if a fare, a date or a corrected dataset ever makes it untrue, this
+ * paragraph says the true thing instead.
+ */
+function WeightNote({
+  airlineWeight,
+  rows,
+}: {
+  airlineWeight: number;
+  /** Every priced row in the search, rules off — the same set the floor reads. */
+  rows: readonly { option: SearchOption }[];
+}) {
+  const airline = Math.round(airlineWeight * 100);
+  const verdict = useMemo(
+    () => topPickAcrossBracket(rows.map((row) => ({ id: row.option.id, comfort: row.option.comfort }))),
+    [rows],
+  );
+  const winner = verdict.winner
+    ? (rows.find((row) => row.option.id === verdict.winner?.id)?.option ?? null)
+    : null;
+
+  return (
+    <p aria-live="polite" className="mt-1.5 max-w-[80ch] text-[12px] leading-snug text-[var(--sb-dim)]">
+      The score is{" "}
+      <span className="font-semibold text-[var(--sb-text)]">
+        {airline}% the airline&rsquo;s ratings
+      </span>{" "}
+      and {100 - airline}% the seat this itinerary actually flies
+      {airline === Math.round(DEFAULT_AIRLINE_WEIGHT * 100) && (
+        <span className="text-[var(--sb-faint)]"> (the research&rsquo;s own setting)</span>
+      )}
+      . That split is a judgment, not a finding: the published work brackets it
+      anywhere between {Math.round(WEIGHT_BRACKET.min * 100)} and{" "}
+      {Math.round(WEIGHT_BRACKET.max * 100)} and points both ways inside that —
+      physical-comfort studies put the aeroplane first, satisfaction studies put
+      the airline first, and they are measuring the same thing.
+      {winner && verdict.stable && verdict.atMin !== null && verdict.atMax !== null && (
+        <>
+          {" "}
+          {/* The carrier, not the hub: several of its rows tie at the top and
+              naming one of them would invent a distinction the score does not
+              make. Which hub to leave from is the question the list answers. */}
+          <span className="text-[var(--sb-text)]">
+            It does not change the recommendation: across this whole search, every
+            rule switched off, {winner.carrier} holds the best comfort score at every
+            setting in the bracket
+          </span>{" "}
+          <span className="sb-num text-[var(--sb-faint)]">
+            ({verdict.atMin.toFixed(1)} seat-heavy → {verdict.atMax.toFixed(1)} airline-heavy)
+          </span>
+          , because it leads on both halves at once. What the slider rearranges is
+          the middle of the table — which is where the disagreement actually is.
+        </>
+      )}
+      {winner && !verdict.stable && (
+        <>
+          {" "}
+          <span className="text-[var(--sb-text)]">
+            The best comfort score in this search does change inside the bracket
+          </span>{" "}
+          — {winner.carrier} leads at this setting, but not at all of them. Worth
+          looking at both ends before deciding.
         </>
       )}
     </p>
@@ -711,6 +856,12 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
    * say so in words; nothing here is applied without being visible.
    */
   const [rules, setRules] = useState<DefaultRules>(DEFAULT_RULES);
+  /**
+   * How much of the score is the airline. Starts at the research's 0.55 and
+   * moves inside the evidence bracket; every row re-scores from the sector
+   * scores it already carries, so this costs no fetch and no server round trip.
+   */
+  const [airlineWeight, setAirlineWeight] = useState<number>(DEFAULT_AIRLINE_WEIGHT);
   /** Which held-back band is open. Both closed on every search. */
   const [peek, setPeek] = useState<{ middleEast: boolean; overCap: boolean }>({
     middleEast: false,
@@ -975,7 +1126,15 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   const pickDate = leg === "outbound" ? setOutboundDate : setReturnDate;
 
   const rows = useMemo(() => {
-    const priced = options.map((option) => ({ option, price: priceFor(option) }));
+    // Every row is re-scored at the current weight before anything is sorted,
+    // priced against or compared — the slider has to move the ranking, the
+    // badges, the floor and each row's own derivation together or it is
+    // showing one number and ranking by another.
+    const weighted = options.map((option) => ({
+      ...option,
+      comfort: reweigh(option.comfort, airlineWeight),
+    }));
+    const priced = weighted.map((option) => ({ option, price: priceFor(option) }));
     const reference = barcelonaReference(priced);
 
     const sorted = [...priced].sort((a, b) => {
@@ -995,7 +1154,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
         entry.option.searchable &&
         !quotes.has(keyOf(entry.option.origin, entry.option.destination, date)),
     }));
-  }, [options, priceFor, sort, date, quotes]);
+  }, [options, priceFor, sort, date, quotes, airlineWeight]);
 
   /**
    * The ranking, and what each rule holds back from it.
@@ -1068,9 +1227,20 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
             value={sort}
             onChange={setSort}
             options={[
-              { value: "comfort", label: "Comfort", hint: "0.55 × airline + 0.45 × seat, block-hour weighted" },
+              {
+                value: "comfort",
+                label: "Comfort",
+                hint: `${airlineWeight.toFixed(2)} × airline + ${(1 - airlineWeight).toFixed(2)} × seat, block-hour weighted`,
+              },
               { value: "price", label: "Cheapest", hint: "Total for two, everything included" },
             ]}
+          />
+          <WeightSlider
+            value={airlineWeight}
+            onChange={(weight) => {
+              setAirlineWeight(weight);
+              resetPeek();
+            }}
           />
           <PriceCap
             value={rules.maxEurPP}
@@ -1094,6 +1264,8 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
           sort={sort}
           heldBack={viaMiddleEast.length + overCap.length}
         />
+
+        <WeightNote airlineWeight={airlineWeight} rows={rows} />
 
         {!answered ? (
           <ColdDateCost
@@ -1238,9 +1410,34 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
             </li>
             <li>
               <span className="font-semibold text-[var(--sb-text)]">The score is the sort.</span>{" "}
-              0.55 × airline + 0.45 × seat, weighted by block hours, minus 1.0 for a Gulf transit,
-              0.75 for metal that is a schedule intention rather than a booking, and 0.25 for every
-              sector past the second. Open a row to see all of it.
+              {airlineWeight.toFixed(2)} × airline + {(1 - airlineWeight).toFixed(2)} × seat, weighted by
+              block hours, minus 1.0 for a Gulf transit, 0.75 for metal that is a schedule intention
+              rather than a booking, 0.25 for every sector past the second, and 0.25 for each sector of
+              six hours or more in a cabin pressurised to 8,000 ft rather than 6,000. Open a row to see
+              all of it.
+            </li>
+            <li>
+              <span className="font-semibold text-[var(--sb-text)]">
+                Every part of that score says how much of it is evidence.
+              </span>{" "}
+              Open a row and each component carries a label —{" "}
+              <span className="font-semibold text-[var(--sb-text)]">measured</span> (a controlled study
+              found it),{" "}
+              <span className="text-[var(--sb-dim)]">rated</span> (somebody else&rsquo;s rating, not a
+              measurement of comfort) or{" "}
+              <span className="text-[var(--sb-faint)]">judgment</span> (no literature; our call, said
+              out loud). Hover one for the reason. The seat&rsquo;s inches are measured and the cabin
+              altitude is the best-evidenced thing here; the airline ratings are ratings, and the weight
+              between them is the least evidenced number on the page — which is why it is a slider.
+            </li>
+            <li>
+              <span className="font-semibold text-[var(--sb-text)]">
+                Airline honours are fleet-wide; the seat is this itinerary&rsquo;s.
+              </span>{" "}
+              A row&rsquo;s expansion prints what its carrier has actually won — five Skytrax stars,
+              second in the world, best economy class of 2025 — and then, separately, the aeroplane
+              each sector flies with its width, pitch and layout. The first is awarded across a whole
+              fleet and every cabin; only the second is what the couple sits in.
             </li>
             <li>
               <span className="font-semibold text-[var(--sb-text)]">
