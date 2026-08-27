@@ -19,7 +19,7 @@
  */
 
 /** The canonical Plan's id, from the bootstrap. Empty means "not bootstrapped". */
-export const CANONICAL_PLAN_ID = "";
+export const CANONICAL_PLAN_ID = "FSDbvbyx6QBccgoc";
 
 /**
  * Where the site lives, for links the bootstrap prints.
