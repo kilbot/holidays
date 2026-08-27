@@ -50,6 +50,12 @@ export { LOCATIONS, locationById } from "@/lib/engine/locations";
 
 export { buildPlan, EMPTY_INPUT } from "@/lib/engine/plan";
 export { buildLedger, dayHeadline, TIER_LABEL } from "@/lib/engine/ledger";
+export {
+  burnDown,
+  type BurnDown,
+  type BurnPoint,
+  type Crossing,
+} from "@/lib/engine/burn-down";
 export { intoBlocks, type BlockPeak, type LedgerBlock } from "@/lib/engine/blocks";
 export { schedule, lockAllows } from "@/lib/engine/scheduler";
 export { deriveLegs, legIsOnGrid } from "@/lib/engine/legs";
