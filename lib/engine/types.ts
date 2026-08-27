@@ -215,6 +215,15 @@ export interface DayLine {
   living: boolean;
   /** One line of provenance, shown on drill-in. */
   note: string;
+  /**
+   * How the journey was made — `transport` lines only.
+   *
+   * On the line rather than looked up from the Leg because a Day can carry more
+   * than one journey and every surface that draws an icon for one needs to know
+   * which: Boxing Day is a 370 km drive *and* a red-eye, and a row that drew a
+   * plane beside both was the second half of kilbot/holidays#101.
+   */
+  mode?: LegMode;
 }
 
 /** One calendar day of the Plan, priced individually. docs/CONTEXT.md, Day. */
@@ -289,11 +298,12 @@ export interface Leg {
   eur: number;
   bandEur: [number, number];
   /**
-   * Where the figure came from. `snapshot` is a stored research estimate for
-   * the route, `band` the research's own range for that kind of journey,
+   * Where the figure came from. `pinned` is a quote the couple actually holds
+   * for the itinerary they are booking, `snapshot` a stored research estimate
+   * for the route, `band` the research's own range for that kind of journey,
    * `computed` a drive priced from distance and fuel.
    */
-  pricing: "snapshot" | "band" | "computed";
+  pricing: "pinned" | "snapshot" | "band" | "computed";
   /**
    * Whether `lib/flights/grid.ts` covers this route on this date, so
    * `/api/fares` has a real answer and whatever is above is a placeholder the

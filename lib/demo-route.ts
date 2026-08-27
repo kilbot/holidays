@@ -13,6 +13,12 @@
  * It is a skeleton, not a claim: nothing is priced off it, nothing is clicked
  * on it, and it is replaced the moment the store is read.
  *
+ * It still has to be the *same shape* as what replaces it, or the first frame
+ * is a flicker of a different trip. The hubs are therefore the couple's own
+ * pinned inbound routing — train to Madrid, Cathay to Hong Kong, Hong Kong to
+ * Perth (`lib/engine/legs.ts`, `INBOUND`) — and not the Barcelona–Singapore
+ * pair the research once defaulted to.
+ *
  * Coordinates are the real airport / city coordinates, [lon, lat].
  */
 
@@ -27,15 +33,15 @@ export const ROUTE_POINTS: readonly SkeletonPoint[] = [
     modeOut: "train",
   },
   {
-    code: "BCN",
-    name: "Barcelona",
-    coordinates: [2.0785, 41.2971],
+    code: "MAD",
+    name: "Madrid",
+    coordinates: [-3.5676, 40.4722],
     kind: "hub",
   },
   {
-    code: "SIN",
-    name: "Singapore",
-    coordinates: [103.9915, 1.3644],
+    code: "HKG",
+    name: "Hong Kong",
+    coordinates: [113.9185, 22.308],
     kind: "hub",
   },
   {
@@ -99,7 +105,7 @@ export const SKELETON_ROUTE = routeFromPoints(ROUTE_POINTS);
  *   north  −10.69°   Cape York, QLD
  *   south  −43.65°   South East Cape, Tasmania
  *
- * The arcs run off-view at this zoom, Singapore and Valencia with them. That
+ * The arcs run off-view at this zoom, Hong Kong and Valencia with them. That
  * is the trade the frame is making, not a bug in it.
  */
 export const AUSTRALIA_BOUNDS: [[number, number], [number, number]] = [

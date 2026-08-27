@@ -366,8 +366,51 @@ test("the crossings are long-haul and the hops are not", () => {
       f.properties.longHaul,
     ]),
   );
-  assert.equal(byPair.get("VLC>PER"), true);
+  // The crossings are sector pairs since #107, so the long-haul weight belongs
+  // on the ocean-spanning sectors and not on the feeder train that starts one
+  // of them: Valencia → Madrid is 300 km and reads as a hop, correctly.
+  assert.equal(byPair.get("MAD>HKG"), true);
+  assert.equal(byPair.get("SIN>BCN"), true);
+  assert.equal(byPair.get("VLC>MAD"), false);
   assert.equal(byPair.get("PER>SYD"), false);
+});
+
+test("the crossings draw the chain that is on the ticket", () => {
+  // kilbot/holidays#107: the couple's own booking is Madrid → Hong Kong → Perth
+  // in and Melbourne → Singapore → Barcelona out, and the globe used to draw a
+  // single ruler line over the Indian Ocean with neither hub on it.
+  const plan = referencePlan();
+  const route = buildRoute(plan.legs, plan.days);
+  const pairs = route.arcs.features.map(
+    (feature) => `${feature.properties.from}>${feature.properties.to}`,
+  );
+
+  assert.deepEqual(pairs.slice(0, 3), ["VLC>MAD", "MAD>HKG", "HKG>PER"]);
+  assert.deepEqual(pairs.slice(-3), ["MEL>SIN", "SIN>BCN", "BCN>VLC"]);
+
+  // Each hub is a labelled stop with a name a reader recognises, and no nights
+  // in it — a connection is a place the trip goes through, not one it stays in.
+  const stops = new Map(
+    route.stops.features.map((feature) => [feature.properties.code, feature.properties]),
+  );
+  for (const code of ["MAD", "HKG", "SIN", "BCN"]) {
+    const stop = stops.get(code);
+    assert.ok(stop, `${code} is on the map`);
+    assert.equal(stop.kind, "hub");
+    assert.equal(stop.nights, 0);
+    assert.notEqual(stop.name, code, `${code} is labelled by its city`);
+  }
+
+  assert.equal(stops.get("HKG")?.name, "Hong Kong");
+  assert.equal(stops.get("SIN")?.name, "Singapore");
+
+  // The finish is the last place the trip *stays*, not the last airport it
+  // touches: Barcelona is an hour between a plane and a train.
+  const finish = route.stops.features.filter(
+    (feature) => feature.properties.kind === "finish",
+  );
+  assert.equal(finish.length, 1);
+  assert.equal(finish[0].properties.code, "MEL");
 });
 
 test("stops are Locations in flown order, deduplicated", () => {

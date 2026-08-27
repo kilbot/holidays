@@ -1467,8 +1467,16 @@ const ROTTNEST: DeepCapsule = {
   // Recalibrated on #64: the ferry, bikes and snorkel gear itemised at A$243
   // rather than a A$352 blend. There is no cheaper rung — the couple sleeps at
   // the Perth Home base either side, so the day carries no lodging at all.
+  //
+  // The plan-on rung is what the day costs **ashore** (#101). The A$114 SeaLink
+  // return is a Leg now rather than an Event, because you cannot drive to an
+  // island and the ledger was pricing the crossing as €27 of petrol; it is
+  // charged on the two transit rows either side of the block, where every other
+  // fare on this Plan is. "As published" is the whole day including the boat,
+  // which is what the research quotes and what a reader comparing it with a
+  // free Perth beach day needs.
   cost: {
-    ideal: { aud: 318, eur: 194, band: null, days: 1, label: "Plan on" },
+    ideal: { aud: 205, eur: 125, band: null, days: 1, label: "Plan on, ashore" },
     max: { aud: 352, eur: 215, band: [140, 340], days: 1, label: "As published" },
   },
   window: "Mid-week. Weekends and the first ferry sell out.",

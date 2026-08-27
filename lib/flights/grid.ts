@@ -182,6 +182,18 @@ export const RETURN_ARRIVALS: Readonly<Record<string, readonly string[]>> = {
 export const EUROPEAN_AIRPORTS: readonly string[] = ["VLC", ...OUTBOUND_HUBS];
 
 /**
+ * Airports on neither continent: the hubs the crossings connect through.
+ *
+ * Empty of grid routes today, and named anyway, because `lib/engine/legs.ts`
+ * works out what is *Australian* by subtracting Europe from this grid. That was
+ * a true definition only for as long as the grid had two continents on it, and
+ * the crossings now route through Hong Kong and Singapore
+ * (`lib/engine/legs.ts`, `CROSSINGS`). Adding either pair here without listing
+ * the hub below would quietly price Madrid → Hong Kong as a domestic hop.
+ */
+export const STOPOVER_AIRPORTS: readonly string[] = ["SIN", "HKG"];
+
+/**
  * Dates the demo Plan's own Leg popups price against, which are *not* the
  * search dates: `lib/demo-route.ts` puts the Barcelona crossing on 13 December
  * and the Australian departure in mid-February. They ride on the same route

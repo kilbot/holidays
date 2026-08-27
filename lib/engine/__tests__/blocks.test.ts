@@ -134,14 +134,24 @@ test("a block costs the sum of its Days' own spend", () => {
 test("the arriving Leg is a transit row above the block, not a line inside it", () => {
   const rows = intoLedger(PLAN.days, PLAN.warnings, PLAN.legs);
 
-  // The trip opens with a crossing from home, and it sits above the first
-  // block rather than inside it — the whole point of #53.
+  // The trip opens with the crossing from home, and it sits above the first
+  // block rather than inside it — the whole point of #53. It is a chain of
+  // sectors since #107, so what leads the page is the first of them.
   assert.equal(rows[0]?.kind, "transit", "the outbound crossing leads the page");
-  assert.equal(rows[1]?.kind, "block");
-  if (rows[0].kind !== "transit" || rows[1].kind !== "block") return;
+  if (rows[0].kind !== "transit") return;
   assert.equal(rows[0].transit.fromLocationId, "origin");
-  assert.equal(rows[0].transit.toLocationId, rows[1].block.locationId);
-  assert.equal(rows[0].transit.date, rows[1].block.startDate);
+
+  const firstBlock = rows.findIndex((row) => row.kind === "block");
+  assert.ok(firstBlock > 0, "every row before the first block is a journey");
+  const arrival = rows[firstBlock];
+  if (arrival.kind !== "block") return;
+
+  // The last sector before that block is the one that reaches it, and it is
+  // dated no later than the day the block opens.
+  const reaching = rows[firstBlock - 1];
+  assert.equal(reaching.kind, "transit");
+  if (reaching.kind !== "transit") return;
+  assert.ok(reaching.transit.date <= arrival.block.startDate);
 
   // And the homeward crossing trails the last block: it arrives nowhere here.
   const last = rows[rows.length - 1];

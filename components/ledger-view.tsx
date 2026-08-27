@@ -198,23 +198,27 @@ function WarningLine({ warning }: { warning: Warning }) {
  */
 function whatOf(day: Day, capsule: CapsuleSpec | undefined) {
   const anchor = anchorOn(day.date);
-  const transport = day.lines.find((line) => line.kind === "transport");
+  // Every journey travelled today, not the first of them. Boxing Day is 370 km
+  // down the Midlands road *and* the 23:55 red-eye east, and a row that named
+  // only the drive was hiding the more consequential half of the day.
+  const journeys = day.lines.filter((line) => line.kind === "transport");
   const event = day.lines.find((line) => line.kind === "event");
 
   const text = anchor
     ? anchor.label
-    : (transport?.label ??
-      event?.label ??
-      (day.buffer
-        ? "Buffer — nothing booked"
-        : (day.capsuleName ?? day.locationName)));
+    : journeys.length > 0
+      ? journeys.map((line) => line.label).join(", then ")
+      : (event?.label ??
+        (day.buffer
+          ? "Buffer — nothing booked"
+          : (day.capsuleName ?? day.locationName)));
 
   const of =
     day.capsuleDay && capsule && capsule.days > 1
       ? `day ${day.capsuleDay} of ${capsule.days}`
       : null;
 
-  return { text, of, anchor, transport, event };
+  return { text, of, anchor, journeys, event };
 }
 
 function DayRow({
@@ -236,17 +240,7 @@ function DayRow({
   legModes: ReadonlyMap<string, LegMode>;
 }) {
   const { day } = entry;
-  const { text, of, anchor, transport } = whatOf(day, capsule);
-  // The row's own icon, not a stand-in for "travel" (#101). The transit rows
-  // between blocks have always drawn the Leg's mode; the day rows inside them
-  // drew a plane whatever the Leg was, so "Margaret River → Rottnest Island by
-  // drive" carried the same aeroplane as the Valencia long-haul above it. Leg
-  // mode is a first-class thing here — the whole point of the per-Leg override
-  // is that the journey can *be* the experience — and an icon that ignores it
-  // is the row disagreeing with its own sentence.
-  const TransportIcon = transport
-    ? MODE_ICON[legModes.get(transport.id) ?? "flight"]
-    : null;
+  const { text, of, anchor, journeys } = whatOf(day, capsule);
   const overCap = day.livingEur > capEur;
   // The fare left for the transit row above, so the row shows what the day cost
   // in this place. Saying so on hover is the difference between a figure that
@@ -324,12 +318,19 @@ function DayRow({
               className="size-3 shrink-0 text-[var(--sb-accent)]"
             />
           )}
-          {TransportIcon && (
-            <TransportIcon
-              aria-hidden
-              className="size-3 shrink-0 text-[var(--sb-sea)]"
-            />
-          )}
+          {/* One icon per journey, each drawn as what it is. A plane beside
+              "Rottnest Island → Perth by ferry" was the second half of
+              kilbot/holidays#101; a Day with two journeys gets two icons. */}
+          {journeys.map((line) => {
+            const Mode = MODE_ICON[line.mode ?? "flight"];
+            return (
+              <Mode
+                key={line.id}
+                aria-hidden
+                className="size-3 shrink-0 text-[var(--sb-sea)]"
+              />
+            );
+          })}
           <span
             className={cn(
               "truncate text-[11.5px] leading-snug sm:text-[12.5px]",
@@ -637,6 +638,7 @@ const MODE_LABEL: Record<LegMode, string> = {
  * about to book on it.
  */
 const PRICING_LABEL: Record<LedgerTransit["pricing"], string> = {
+  pinned: "pinned fare",
   snapshot: "snapshot",
   band: "estimate",
   computed: "fuel",

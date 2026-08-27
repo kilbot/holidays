@@ -41,7 +41,7 @@
 import type { Day, DayLine, Leg, LegMode, Warning } from "@/lib/engine/types";
 import { cents } from "@/lib/engine/ledger";
 import { locationById } from "@/lib/engine/locations";
-import { formatSpan } from "@/lib/trip-dates";
+import { addDays, formatSpan } from "@/lib/trip-dates";
 
 /** A peak rule that bit somewhere in a block, named once however many Days it covered. */
 export interface BlockPeak {
@@ -243,11 +243,26 @@ export function intoBlocks(
  * The whole Ledger in reading order — every block, with a transit row before the
  * block each Leg arrives in.
  *
- * A Leg is filed against the block that **starts** on the day it is travelled,
- * because that is what arriving means: the Perth → Sydney flight on 28 December
- * is the thing that opens the Sydney block, and it belongs above its band rather
- * than buried in its first day. The homeward crossing arrives nowhere on this
- * trip, so it trails the last block, which is exactly where it happens.
+ * A Leg is filed against the block it **opens**, because that is what arriving
+ * means: the Perth → Sydney flight is the thing that starts the Sydney block,
+ * and it belongs above its band rather than buried in its first day.
+ *
+ * Three ways a Leg finds that block, in order:
+ *
+ * 1. A block in the Leg's destination that starts on the day it is travelled.
+ * 2. A block in the Leg's destination that starts the day **after** — the
+ *    red-eye case. The Perth → Sydney flight leaves at 23:55 on Boxing Day and
+ *    lands at 06:15 on the 27th, so the fare is dated the 26th and the block it
+ *    opens starts the 27th. Without this the arrival row filed itself against
+ *    the Perth block it was leaving, which reads as a flight to nowhere.
+ * 3. Failing both, the block holding the day it is travelled — but only where
+ *    the Plan actually stays at the destination. A Leg that arrives somewhere
+ *    nobody sleeps is a connection: Madrid and Hong Kong on the way out,
+ *    Singapore and Barcelona on the way home.
+ *
+ * A Leg with no block at all is filed before the next block to start after it,
+ * and trails the Ledger if there is none — which is where the journey home
+ * happens, and where it is read.
  */
 export function intoLedger(
   days: readonly Day[],
@@ -260,25 +275,37 @@ export function intoLedger(
     lineByDate.set(day.date, new Map(day.lines.map((line) => [line.id, line])));
   }
 
+  // Where the Plan actually sleeps. A destination missing from this is a
+  // connection, and a connection never opens a block.
+  const stays = new Set(days.map((day) => day.locationId));
+
   const before = new Map<string, LedgerTransit[]>();
   const trailing: LedgerTransit[] = [];
 
   for (const leg of legs) {
     const transit = toTransit(leg, lineByDate.get(leg.date)?.get(lineIdOf(leg)));
 
-    // The block this Leg opens. Falling back to the block merely *holding* the
-    // day covers the shapes the Scheduler does not currently produce (a Leg on
-    // a day that is not a boundary) without ever dropping a fare.
-    const opened =
+    const startsOn = (date: string) =>
       blocks.find(
         (block) =>
-          block.startDate === leg.date && block.locationId === leg.toLocationId,
-      ) ??
-      (leg.toLocationId === "origin"
-        ? undefined
-        : blocks.find((block) =>
+          block.startDate === date && block.locationId === leg.toLocationId,
+      );
+
+    const opened =
+      startsOn(leg.date) ??
+      // The red-eye: it leaves the evening before the block it opens.
+      startsOn(addDays(leg.date, 1)) ??
+      // Falling back to the block merely *holding* the day covers the shapes
+      // the Scheduler does not currently produce (a Leg on a day that is not a
+      // boundary) without ever dropping a fare.
+      (stays.has(leg.toLocationId)
+        ? blocks.find((block) =>
             block.days.some((entry) => entry.day.date === leg.date),
-          ));
+          )
+        : undefined) ??
+      // A connection, then. It still has to be read somewhere, and the honest
+      // place is in front of whatever the trip does next.
+      blocks.find((block) => block.startDate >= leg.date);
 
     if (!opened) {
       trailing.push(transit);

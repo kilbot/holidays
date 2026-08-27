@@ -522,7 +522,19 @@ export function routeStops(
   }
 
   const stops = [...seen.values()];
-  const lastIndex = stops.length - 1;
+  /**
+   * The last place the trip **stays**, which is not the last place it touches.
+   *
+   * Since the crossings became sector pairs the final endpoint on the list is
+   * Barcelona, a connection the couple spends an hour in before the train home
+   * — and calling that the finish of a ten-week trip is a sentence about the
+   * wrong place. The finish is Melbourne: the last stop that has nights in it.
+   */
+  const lastIndex = stops.reduce(
+    (last, stop, index) =>
+      (nightsByLocation.get(stop.locationId) ?? 0) > 0 ? index : last,
+    -1,
+  );
 
   // One always-on label per gateway: the longest stay wins it.
   const majorByCode = new Map<string, string>();

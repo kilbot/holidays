@@ -58,12 +58,15 @@ const MODE_LABEL: Record<LegMode, string> = {
  * one claim about its money, wherever it is read.
  */
 const PRICING_LABEL: Record<Leg["pricing"], string> = {
+  pinned: "pinned fare",
   snapshot: "fare snapshot",
   band: "estimate",
   computed: "fuel only",
 };
 
 const PRICING_TOKEN: Record<Leg["pricing"], string> = {
+  // A quote the couple holds is as good as a live one, and reads like it.
+  pinned: "--sb-good",
   snapshot: "--sb-sea",
   band: "--sb-faint",
   computed: "--sb-faint",
