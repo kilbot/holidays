@@ -856,9 +856,26 @@ export function CapsuleCardHost({ overMap = false }: { overMap?: boolean }) {
 
           {capsule ? <DeepBody capsule={capsule} /> : idea ? <IdeaBody idea={idea} /> : null}
 
+          {/* What *this* card's picture is (#102).
+              The line used to say "a placeholder, not a photograph" on every
+              card, printed directly under a captioned, CC BY-SA credited
+              photograph on most of them. The card already knows which of the
+              three it drew above, so it says that instead. */}
           <p className="border-t border-[var(--sb-line)] px-4 py-3 text-[10px] leading-snug text-[var(--sb-faint)]">
-            The picture is generated from this entry&rsquo;s own region and
-            facets — a placeholder, not a photograph of the place.
+            {(chrome.images && chrome.images.length > 0) || chrome.photo ? (
+              <>
+                The picture is a real photograph of the place, downloaded and
+                served from this site rather than hotlinked. Every credit is
+                listed under Photography on Resources.
+              </>
+            ) : (
+              <>
+                No photograph is mapped to this region, so the picture is
+                generated from this entry&rsquo;s own region and facets — a
+                cover, not a photograph of the place, and it does not pretend
+                to be one.
+              </>
+            )}
           </p>
         </div>
       </div>
