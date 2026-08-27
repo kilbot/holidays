@@ -375,12 +375,25 @@ export function FareDateField({
           <span className="hidden sm:inline">All 90 days</span>
         </button>
 
+        {/* Wide enough for the numbers it is drawn for (#97).
+
+            A price in a cell is the calendar's whole argument — it means the
+            day is stored and free to look at — and three months across a 30rem
+            popover left each cell 20px for a 22px price. On any run of
+            consecutive priced days the labels butted into each other, and the
+            17–22 Feb row read as `€4296468632961686467`.
+
+            So the months are laid out at whatever width the popover can
+            actually give them: one across on a phone, where 343px of popover
+            was always fine, two while the popover is 30rem, three only once it
+            is wide enough for three. Every arrangement leaves a cell ≥30px,
+            which is the 22px price plus its padding and border. */}
         {open && (
           <div
             id={panelId}
-            className="sb-panel absolute top-[calc(100%+6px)] left-0 z-40 w-[min(30rem,calc(100vw-2rem))] p-3"
+            className="sb-panel absolute top-[calc(100%+6px)] left-0 z-40 w-[min(30rem,calc(100vw-2rem))] p-3 lg:w-[min(44rem,calc(100vw-2rem))]"
           >
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {MONTHS.map((month) => (
                 <MonthGrid
                   key={month.prefix}
