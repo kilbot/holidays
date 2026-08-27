@@ -410,9 +410,10 @@ export function CapsuleImageStrip({
       )}
     >
       {images.map((src, index) => (
-        // eslint-disable-next-line @next/next/no-img-element -- sources are
-        // arbitrary remote URLs; next/image would need a host allowlist per
-        // photo, and there is no photography in the Plan yet to configure for.
+        // Plain <img>: sources are arbitrary remote URLs, next/image would
+        // need a host allowlist per photo, and there is no photography in the
+        // Plan yet to configure one for.
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           key={src}
           src={src}

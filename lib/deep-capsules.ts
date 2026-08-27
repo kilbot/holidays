@@ -1714,6 +1714,19 @@ export function deepCapsuleById(id: string): DeepCapsule | undefined {
   return BY_ID.get(id);
 }
 
+/**
+ * The researched Capsules that name a given Catalog idea in their `related`
+ * list — the reverse of that link.
+ *
+ * Worth having because it is the honest answer to a question the shallow card
+ * would otherwise leave hanging: "has anyone actually looked into this?" Being
+ * named in a deep Capsule's argument is not the same as being researched, and
+ * the card says so — but it does mean there is somewhere to go and read.
+ */
+export function deepCapsulesMentioning(catalogId: string): DeepCapsule[] {
+  return DEEP_CAPSULES.filter((capsule) => capsule.related.includes(catalogId));
+}
+
 /** "TAS", "QLD", "Cross-state" — the bit before the em dash, as in the Catalog. */
 export function capsuleState(capsule: DeepCapsule): string {
   const dash = capsule.region.indexOf(" — ");

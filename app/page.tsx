@@ -1,3 +1,4 @@
+import { CapsuleCardHost } from "@/components/capsule-card";
 import { CatalogDrawer } from "@/components/catalog-drawer";
 import { CostHud } from "@/components/cost-hud";
 import { DateStrip } from "@/components/date-strip";
@@ -27,6 +28,12 @@ export default function Home() {
       <CatalogDrawer />
       <CostHud />
       <DateStrip />
+
+      {/* Mounted once, above everything. The three places that open a Capsule
+          — a Catalog row, the researched strip, a marker on the globe — are in
+          three different subtrees, so the card reads a module-level store
+          rather than being handed down as props. */}
+      <CapsuleCardHost />
     </main>
   );
 }

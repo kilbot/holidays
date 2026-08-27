@@ -131,6 +131,13 @@ export const CATALOG: readonly CatalogIdea[] = file.entries.map(derive);
 
 export const CATALOG_GENERATED = file.generated;
 
+const CATALOG_BY_ID = new Map(CATALOG.map((idea) => [idea.id, idea]));
+
+/** One idea by id. The detail card and the cross-links between ideas need it. */
+export function catalogIdeaById(id: string): CatalogIdea | undefined {
+  return CATALOG_BY_ID.get(id);
+}
+
 /** The states, most-entries first, for the region chips. */
 export const CATALOG_STATES: readonly string[] = (() => {
   const counts = new Map<string, number>();
