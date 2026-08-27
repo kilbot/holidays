@@ -173,6 +173,40 @@ export function parseScenarioState(raw: unknown): ScenarioState {
   return { scenarios, currentId };
 }
 
+/* ------------------------------------------------------------------ */
+/* The Plan as a stored document                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A `ScenarioState` with the one field storage adds: when it last changed.
+ *
+ * It lives here rather than in `lib/store/` because both ends of the wire need
+ * it and only one of them may import a Redis client — keeping the shape and its
+ * parser in the pure module is what stops a client bundle reaching for
+ * `@upstash/redis` to find out what a Plan looks like.
+ */
+export interface PlanDoc extends ScenarioState {
+  /** ISO instant of the last accepted write. The client syncs against it. */
+  updatedAt: string;
+}
+
+/**
+ * Repair whatever came back into a `PlanDoc`.
+ *
+ * Same rule as everything above: never reject, always repair. A Plan document
+ * written by an older build is missing whichever knobs have been added since,
+ * and the couple losing their itinerary to a schema change is a far worse
+ * outcome than a defaulted toggle.
+ */
+export function toPlanDoc(raw: unknown): PlanDoc {
+  const state = parseScenarioState(raw);
+  const updatedAt =
+    isRecord(raw) && typeof raw.updatedAt === "string"
+      ? raw.updatedAt
+      : new Date(0).toISOString();
+  return { ...state, updatedAt };
+}
+
 /** A slug that is not already taken, so two "Doof NYE" forks can coexist. */
 export function nextScenarioId(
   name: string,

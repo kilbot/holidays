@@ -141,44 +141,41 @@ export function localScenarioStore(): ScenarioStore {
 /* ------------------------------------------------------------------ */
 
 /**
- * The store, built on first use.
+ * The store this tab reads through — local until the sharing layer says
+ * otherwise.
  *
- * Lazy because the choice needs `window`: on the server there is no
- * localStorage and no fetch worth making, and `useSyncExternalStore`'s server
- * snapshot covers that render. The first *client* call is what picks.
+ * Local is the default and not a placeholder: the engine knows nothing about a
+ * network, which is how `node --test` imports this file and how the site keeps
+ * working when there is no server to reach.
  *
- * A function per method rather than `STORE.read` passed directly, because
- * `useSyncExternalStore` holds onto the references it is given and these have
- * to stay stable across the swap from "not built yet" to "built".
+ * The swap is safe at any moment, including after the first render, because
+ * `remoteScenarioStore` *wraps* this same local store rather than replacing it:
+ * both delegate `read` and `subscribe` to the one module-level cache above, so
+ * a component that subscribed a millisecond too early is subscribed to exactly
+ * the right thing.
  */
-let STORE: ScenarioStore | null = null;
+const LOCAL = localScenarioStore();
+let STORE: ScenarioStore = LOCAL;
+let installed = false;
 
-function store(): ScenarioStore {
-  if (!STORE) STORE = chooseScenarioStore(localScenarioStore());
-  return STORE;
-}
+const store = (): ScenarioStore => STORE;
 
-const subscribeToStore = (listener: () => void) => store().subscribe(listener);
-const readStore = () => store().read();
+// `useSyncExternalStore` holds onto the references it is handed, so these are
+// stable wrappers rather than `STORE.read` passed directly.
+const subscribeToStore = (listener: () => void) => STORE.subscribe(listener);
+const readStore = () => STORE.read();
 const getServerSnapshot = (): ScenarioState => INITIAL_STATE;
 
 /**
- * Decides local-only or server-synced. Replaced at boot by
- * `lib/store/plan-client.ts`; the default keeps the engine free of any
- * knowledge of the network, which is how `node --test` can import this file.
- */
-let chooseScenarioStore: (local: ScenarioStore) => ScenarioStore = (local) =>
-  local;
-
-/**
- * Install the store the app boots with. Called once, before the first render,
- * by the sharing layer — the only place that knows there is a server at all.
+ * Install the store the app boots with. Called once, by the sharing layer —
+ * the only place that knows there is a server at all.
  */
 export function installScenarioStore(
   choose: (local: ScenarioStore) => ScenarioStore,
 ): void {
-  if (STORE) return;
-  chooseScenarioStore = choose;
+  if (installed) return;
+  installed = true;
+  STORE = choose(LOCAL);
 }
 
 export interface ScenarioApi extends ScenarioState {

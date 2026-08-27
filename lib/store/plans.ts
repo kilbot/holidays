@@ -30,10 +30,11 @@
  */
 
 import {
-  parseInput,
-  parseScenarioState,
   isRecord,
   nextScenarioId,
+  parseInput,
+  toPlanDoc,
+  type PlanDoc,
   type Scenario,
   type ScenarioState,
 } from "@/lib/engine/scenario-doc";
@@ -44,12 +45,6 @@ import { newId } from "@/lib/store/ids";
 /* ------------------------------------------------------------------ */
 /* Documents                                                           */
 /* ------------------------------------------------------------------ */
-
-/** The canonical Plan, as stored. */
-export interface PlanDoc extends ScenarioState {
-  /** ISO instant of the last accepted write. The client syncs against it. */
-  updatedAt: string;
-}
 
 /** The half of the Plan that never leaves the server. */
 export interface PlanMeta {
@@ -74,6 +69,10 @@ export interface ForkDoc {
   forkedFrom: string;
 }
 
+// Both live in `lib/engine/scenario-doc.ts` — the shape of a stored Plan is
+// shared with the browser, and only this side may see a Redis client.
+export { toPlanDoc, type PlanDoc };
+
 const planKey = (planId: string) => `plan:${planId}`;
 const planMetaKey = (planId: string) => `plan:${planId}:meta`;
 const forkKey = (forkId: string) => `fork:${forkId}`;
@@ -94,23 +93,6 @@ export async function readPlan(
   const raw = await kv.getJson<unknown>(planKey(planId));
   if (raw === null) return null;
   return toPlanDoc(raw);
-}
-
-/**
- * Repair whatever came back into a `PlanDoc`.
- *
- * Same rule as the client's parser: never reject, always repair. A Plan
- * document written by an older build is missing whichever knobs have been added
- * since, and the couple losing their itinerary to a schema change is a far worse
- * outcome than a defaulted toggle.
- */
-export function toPlanDoc(raw: unknown): PlanDoc {
-  const state = parseScenarioState(raw);
-  const updatedAt =
-    isRecord(raw) && typeof raw.updatedAt === "string"
-      ? raw.updatedAt
-      : new Date(0).toISOString();
-  return { ...state, updatedAt };
 }
 
 export async function writePlan(
