@@ -91,22 +91,30 @@ const AUDIT_EUR = { comfortable: 17_914, aggressive: 15_530 };
 
 /**
  * The one adjustment the audit needs, because it is older than the arithmetic:
- * kilbot/holidays#90's fare re-basis.
+ * the fare re-basis, twice over.
  *
  * Every waterfall in `savings-menu-draft.md` was computed while the two ocean
  * crossings were charged as a single €1,900-per-person **return** on the
- * outbound Leg, with the homecoming carrying nothing. They are now priced per
- * crossing — five-eighths of that snapshot out, and the homeward Leg from its
- * own source, which is `longhaul-comfort.md`'s band rather than a snapshot
- * because no MEL–VLC snapshot exists. That is €300 off plan-on, €330 with the
- * 10% contingency on top, and it is the **same** €330 for all three Scenarios
- * because all three fly the same two crossings — which is its own test, below.
+ * outbound Leg, with the homecoming carrying nothing — €3,800 for the couple,
+ * all of it out.
+ *
+ * kilbot/holidays#90 split that per crossing. kilbot/holidays#107 then replaced
+ * the modelled outbound entirely: the couple has **pinned** Madrid → Hong Kong
+ * → Perth on Cathay at €872 per person one-way, and the journey home is the
+ * three-eighths share of the €1,500 MEL–BCN return snapshot, split across its
+ * own two Singapore Airlines sectors. Add the two feeder trains the airline
+ * ticket does not cover and the crossings now come to **€2,935** for the
+ * couple, against the audit's €3,800: €865 off plan-on, €951 with the 10%
+ * contingency on top.
+ *
+ * It is the **same** €951 for all three Scenarios because all three fly the
+ * same two crossings — which is its own test, below.
  *
  * Named rather than folded into a wider tolerance: the €150 band is what says
  * "the engine and the spreadsheet agree", and widening it to swallow a known,
  * explainable change would retire the only test that can catch an unknown one.
  */
-const FARE_REBASIS_EUR = 330;
+const FARE_REBASIS_EUR = 951;
 
 test("Aggressive still lands within €150 of the audit's €15,530, less the fare re-basis", () => {
   // The one waterfall the re-plan left standing, and it is not luck: Aggressive
@@ -168,10 +176,21 @@ test("all three Scenarios fly the same two crossings, priced the same way", () =
   // ladder rather than a per-Scenario correction, because every Scenario pays
   // for the same journey out and the same journey home. If one ever changes
   // where it flies home from, this is what says so.
+  // Every sector of either crossing, hubs included — since #107 the ocean is
+  // not on the Leg that touches home.
+  const CROSSING_ENDS = new Set([
+    "origin",
+    "madrid",
+    "hong-kong",
+    "singapore",
+    "barcelona",
+  ]);
   const crossings = (plan: Plan) =>
     plan.legs
       .filter(
-        (leg) => leg.fromLocationId === "origin" || leg.toLocationId === "origin",
+        (leg) =>
+          CROSSING_ENDS.has(leg.fromLocationId) ||
+          CROSSING_ENDS.has(leg.toLocationId),
       )
       .map((leg) => Math.round(leg.eur));
 
@@ -317,12 +336,22 @@ test("Comfortable re-homes the post-NYE gap without teleporting", () => {
     return held ? total + (placement.days - held.days) : total;
   }, 0);
 
+  // …and a Day the ceiling double-books is a Day its placements claim twice.
+  // The reference trip's pinned crossing takes two days rather than one (#107),
+  // which leaves the WA sequence one day short and puts the Fremantle evening
+  // on top of the arrival block. The ledger prices that Day once, so it is one
+  // fewer claimed Day than the placements add up to.
+  const doubleBooked =
+    base.placements.reduce((total, placement) => total + placement.days, 0) -
+    base.days.filter((day) => !day.buffer).length;
+
   assert.equal(
     comfortable.days.filter((day) => day.buffer).length,
     base.days.filter((day) => day.buffer).length +
       handedBack -
       bought -
-      stretched,
+      stretched -
+      doubleBooked,
     "the Perth block, the blocks Comfortable does not buy and the lengths that differ account for all of it",
   );
 });

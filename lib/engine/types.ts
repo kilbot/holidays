@@ -289,11 +289,12 @@ export interface Leg {
   eur: number;
   bandEur: [number, number];
   /**
-   * Where the figure came from. `snapshot` is a stored research estimate for
-   * the route, `band` the research's own range for that kind of journey,
+   * Where the figure came from. `pinned` is a quote the couple actually holds
+   * for the itinerary they are booking, `snapshot` a stored research estimate
+   * for the route, `band` the research's own range for that kind of journey,
    * `computed` a drive priced from distance and fuel.
    */
-  pricing: "snapshot" | "band" | "computed";
+  pricing: "pinned" | "snapshot" | "band" | "computed";
   /**
    * Whether `lib/flights/grid.ts` covers this route on this date, so
    * `/api/fares` has a real answer and whatever is above is a placeholder the

@@ -637,6 +637,7 @@ const MODE_LABEL: Record<LegMode, string> = {
  * about to book on it.
  */
 const PRICING_LABEL: Record<LedgerTransit["pricing"], string> = {
+  pinned: "pinned fare",
   snapshot: "snapshot",
   band: "estimate",
   computed: "fuel",

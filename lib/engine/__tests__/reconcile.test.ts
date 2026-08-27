@@ -39,9 +39,43 @@ test("the default Scenario places every Adventure it is given", () => {
   assert.equal(plan.placements.length, DEFAULT_SCENARIO.input.toggled.length);
   assert.equal(plan.placements.length, 16);
   assert.deepEqual(plan.unplaced, []);
-  for (const placement of plan.placements) {
-    assert.deepEqual(placement.overlaps, [], placement.capsuleId);
-  }
+});
+
+/**
+ * The second thing the reference trip knowingly gets wrong, and keeps.
+ *
+ * The couple's pinned crossing is Madrid → Hong Kong → Perth, which takes two
+ * days rather than one (#107). The WA leg between landing and Boxing Day is
+ * therefore ten days long and the sequence the couple asked for wants eleven:
+ * the arrival block's two-day minimum, the Fremantle evening, the Northbridge
+ * Friday, Margaret River's three nights, a mid-week Rottnest ferry and the
+ * three-day Christmas run. There is no arrangement of those that fits, and the
+ * Scheduler does not refuse — it places the Fremantle evening on the arrival
+ * block's second day and reports the overlap.
+ *
+ * That is the honest outcome and it costs nothing: both blocks are Home-base
+ * days at the same rates, and the couple sleeps at Paul's dad's either way. The
+ * jet-lag block is the thing that gets squeezed, the Warning says so, and a
+ * reader can drag it back and see what it displaces.
+ */
+test("the extra day in the air comes out of the jet-lag block, out loud", () => {
+  const overlapping = plan.placements.filter(
+    (placement) => placement.overlaps.length > 0,
+  );
+  assert.deepEqual(
+    overlapping.map((placement) => placement.capsuleId),
+    ["fremantle-fish-and-chips"],
+    "one squeezed block, and only one",
+  );
+  assert.deepEqual(overlapping[0].overlaps, ["mundaring-arrival"]);
+  assert.ok(
+    plan.warnings.some(
+      (warning) =>
+        warning.kind === "overlap" &&
+        warning.capsuleId === "fremantle-fish-and-chips",
+    ),
+    "and the Plan says so",
+  );
 });
 
 /**
@@ -162,21 +196,31 @@ test("the two hard Anchors are honoured out of the box", () => {
 test("the arrival block leads the calendar, and nothing else can", () => {
   const first = plan.placements[0];
   assert.equal(first.capsuleId, "mundaring-arrival");
-  // The day the couple *lands*, which is the day after they leave: Valencia to
-  // Perth is twenty-odd hours with the Changi overnight.
-  assert.equal(first.startDate, addDays(plan.startDate, 1));
-  assert.equal(plan.days[0].locationId, "transit", "a night over the ocean");
-  assert.equal(plan.days[1].locationId, "mundaring");
-  assert.equal(plan.days[1].homeBase, true, "free lodging, borrowed car");
+  // The day the couple *lands*, which is two days after they leave: the pinned
+  // Cathay routing is a train to Madrid, the 22:30 to Hong Kong, a connection,
+  // and a dawn arrival in Perth about twenty-five hours later (#107).
+  assert.equal(first.startDate, addDays(plan.startDate, 2));
+  assert.equal(plan.days[0].locationId, "transit", "a night over Asia");
+  assert.equal(plan.days[1].locationId, "transit", "and the day that follows it");
+  assert.equal(plan.days[2].locationId, "mundaring");
+  assert.equal(plan.days[2].homeBase, true, "free lodging, borrowed car");
 });
 
-test("the outbound crossing is one Leg, dated the day they leave", () => {
-  const crossings = plan.legs.filter(
-    (leg) => leg.fromLocationId === "origin" || leg.toLocationId === "origin",
+test("the outbound crossing starts the day they leave and ends where they land", () => {
+  const [first, second, third] = plan.legs;
+
+  // The chain on the couple's ticket, in order, and the first of it leaves home
+  // on the trip's own first day.
+  assert.equal(first.fromLocationId, "origin");
+  assert.equal(first.date, plan.startDate);
+  assert.deepEqual(
+    [first, second, third].map((leg) => `${leg.from}>${leg.to}`),
+    ["VLC>MAD", "MAD>HKG", "HKG>PER"],
   );
-  assert.equal(crossings.length, 2, "out and back, and no transit stub");
-  assert.equal(crossings[0].date, plan.startDate);
-  assert.equal(crossings[0].toLocationId, "mundaring", "not `transit`");
+
+  // The last sector is aimed at the first real Location the Plan holds, not at
+  // `transit` — the crossing lands somewhere, and "In transit" is not a place.
+  assert.equal(third.toLocationId, "mundaring");
   assert.ok(
     !plan.legs.some(
       (leg) =>
@@ -184,6 +228,10 @@ test("the outbound crossing is one Leg, dated the day they leave", () => {
     ),
     "`transit` is a state, not a destination",
   );
+
+  // And a connection is dated on the day it *leaves*: Hong Kong is left on the
+  // evening of day two and Perth is reached at dawn on day three.
+  assert.equal(third.date, addDays(plan.startDate, 1));
 });
 
 test("the Perth music night is on a Friday or a Saturday", () => {
@@ -317,38 +365,61 @@ test("no block is charged for the Leg that reached it (#53)", () => {
   const first = rows[0];
   assert.equal(first.kind, "transit", "the outbound crossing leads the Ledger");
   if (first.kind !== "transit") return;
+  assert.equal(first.transit.fromLocationId, "origin");
 
-  const arrival = rows[1];
-  assert.equal(arrival.kind, "block");
-  if (arrival.kind !== "block") return;
+  const crossing = rows
+    .filter((row) => row.kind === "transit")
+    .slice(0, 3)
+    .reduce(
+      (total, row) => total + (row.kind === "transit" ? row.transit.costEur : 0),
+      0,
+    );
+  assert.ok(crossing > 1_000, "the crossing is the big number");
 
-  assert.ok(first.transit.costEur > 1_000, "the crossing is the big number");
+  const firstBlock = rows.find((row) => row.kind === "block");
+  assert.ok(firstBlock);
+  if (firstBlock.kind !== "block") return;
   assert.ok(
-    arrival.block.costEur < first.transit.costEur,
-    `${arrival.block.locationName} should not out-cost the flight that reaches it`,
+    firstBlock.block.costEur < crossing,
+    `${firstBlock.block.locationName} should not out-cost the journey that reaches it`,
   );
 });
 
-test("both crossings are priced, and the ticket is not spent twice", () => {
-  const crossings = plan.legs.filter(
-    (leg) => leg.fromLocationId === "origin" || leg.toLocationId === "origin",
-  );
-  assert.equal(crossings.length, 2, "out and back");
+test("both crossings are priced, and neither ticket is spent twice", () => {
+  const spent = (...pairs: string[]) =>
+    cents(
+      plan.legs
+        .filter((leg) => pairs.includes(`${leg.from}>${leg.to}`))
+        .reduce((total, leg) => total + leg.eur, 0),
+    );
 
-  const [outbound, homeward] = crossings;
-  assert.ok(outbound.eur > 0, "the outbound crossing is priced");
+  const outbound = spent("VLC>MAD", "MAD>HKG", "HKG>PER");
+  const homeward = spent("MEL>SIN", "SIN>BCN", "BCN>VLC");
+
+  assert.ok(outbound > 0, "the outbound crossing is priced");
   // The #90 regression, as an assertion. This used to be zero, on the grounds
   // that the research band is a return — which stopped being true of the
   // figure on the outbound Leg the instant a live one-way fare replaced it.
-  assert.ok(homeward.eur > 0, "and so is the journey home");
+  assert.ok(homeward > 0, "and so is the journey home");
   assert.ok(
-    outbound.eur > homeward.eur,
+    outbound > homeward,
     "December out is the peak; February home is the cheapest month of the year",
   );
 
-  // Neither is a quote of its own yet, and the Leg says so: both are this
-  // crossing's share of a figure that covers the pair.
-  for (const leg of crossings) {
+  // The journey home is still a share of one return figure and says so; the
+  // journey out is a pinned one-way quote, which is a better claim than a share
+  // of anything (#107).
+  const sectorsHome = plan.legs.filter((leg) =>
+    ["MEL>SIN", "SIN>BCN"].includes(`${leg.from}>${leg.to}`),
+  );
+  assert.equal(sectorsHome.length, 2);
+  for (const leg of sectorsHome) {
     assert.equal(leg.fareBasis, "return-share", leg.id);
+  }
+  for (const leg of plan.legs.filter((entry) =>
+    ["MAD>HKG", "HKG>PER"].includes(`${entry.from}>${entry.to}`),
+  )) {
+    assert.equal(leg.pricing, "pinned", leg.id);
+    assert.equal(leg.fareBasis, "one-way", leg.id);
   }
 });

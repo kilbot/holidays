@@ -24,6 +24,27 @@
  * through `fareOverrides`. A placeholder that is labelled is honest; a blank is
  * not.
  *
+ * ## A crossing is one ticket and several sectors
+ *
+ * Valencia to Perth is not a flight; it is a train and two flights on one
+ * Cathay ticket, and the couple has pinned it. Modelling it as a single
+ * `VLC → PER` Leg drew a 13,000 km ruler line over the Indian Ocean and hid
+ * both connections, which is a map of a journey nobody is taking.
+ *
+ * So `CROSSINGS` holds the two long journeys as the couple has actually booked
+ * them — sector by sector, each with the day it departs and its scheduled block
+ * hours — and `deriveLegs` expands them into real Legs. Hong Kong and Singapore
+ * become Locations the trip visibly goes through (`lib/engine/locations.ts`),
+ * each sector can carry its own metal and comfort later, and the globe draws
+ * the chain that is on the ticket.
+ *
+ * Pricing does **not** follow the sectors, because the fare does not: one fare
+ * buys the whole journey. Each sector is priced from the *journey's* provenance
+ * — the pinned quote, or the research snapshot, or the band — and carries the
+ * share of it its block hours are worth. The sectors therefore always add back
+ * up to the figure the journey was quoted at, which is the only property that
+ * keeps the roll-up honest.
+ *
  * ## One-way, return, and why it is not a display detail
  *
  * Every live quote is a **one-way**: `lib/flights/searchapi.ts` asks for
@@ -71,7 +92,13 @@ import { cents, retotal } from "@/lib/engine/ledger";
 import { ORIGIN_AIRPORT, distanceKm, locationById } from "@/lib/engine/locations";
 import type { Day, FareBasis, Leg, LegMode } from "@/lib/engine/types";
 import { FARE_SNAPSHOTS } from "@/lib/flights/snapshots";
-import { EUROPEAN_AIRPORTS, ROUTE_GRID, resolveRoute } from "@/lib/flights/grid";
+import {
+  EUROPEAN_AIRPORTS,
+  ROUTE_GRID,
+  STOPOVER_AIRPORTS,
+  resolveRoute,
+} from "@/lib/flights/grid";
+import { addDays } from "@/lib/trip-dates";
 
 /**
  * Research bands for routes the snapshots do not carry, EUR **per person,
@@ -119,6 +146,7 @@ const LONGHAUL_RETURN_BAND: readonly [number, number] = [1_500, 2_300];
  */
 const OUTBOUND_SHARE = 0.625;
 
+
 /**
  * Anything crossing an ocean prices off the long-haul band, not a domestic row.
  *
@@ -129,11 +157,192 @@ const OUTBOUND_SHARE = 0.625;
  */
 const EUROPEAN: readonly string[] = EUROPEAN_AIRPORTS;
 
+/**
+ * Everything on the grid that is neither Europe nor Australia is subtracted
+ * too, and `STOPOVER_AIRPORTS` is that list.
+ *
+ * Nothing on the grid is a stopover hub today, so this subtracts nothing — and
+ * that is exactly why it is here. The set below is "the grid, minus Europe",
+ * which was a true definition of *Australian* only for as long as the grid had
+ * two continents on it. Now that the crossings route through Hong Kong and
+ * Singapore, adding either to the grid without this line would price
+ * Madrid → Hong Kong as an Australian domestic hop at €90.
+ */
 const AUSTRALIAN = new Set<string>(
   ROUTE_GRID.flatMap((entry): string[] => [entry.from, entry.to]).filter(
-    (code) => !EUROPEAN.includes(code),
+    (code) => !EUROPEAN.includes(code) && !STOPOVER_AIRPORTS.includes(code),
   ),
 );
+/* ------------------------------------------------------------------ */
+/* The two crossings, as the couple has booked them                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * One sector of a crossing: a train ride or a flight, and where it ends.
+ *
+ * The near end is always the far end of the sector before it, so a crossing is
+ * a chain and cannot have a gap in it.
+ */
+interface CrossingSector {
+  /**
+   * The Location this sector ends at. `null` means "wherever this crossing's
+   * own far end is" — the first place the Plan lands, which the Scheduler
+   * decides and this table may not.
+   */
+  locationId: string | null;
+  mode: LegMode;
+  /**
+   * Scheduled block hours, and the only thing that decides how the journey's
+   * one fare is divided. `null` where the sector is bought separately — the
+   * feeder trains are not on the airline ticket and carry their own price.
+   */
+  hours: number | null;
+  /** EUR for the couple, `[plan, low, high]`, for a sector bought separately. */
+  ownEur: readonly [number, number, number] | null;
+  /** Days after the crossing starts that this sector departs. */
+  departsOn: number;
+  note: string;
+}
+
+interface Crossing {
+  sectors: readonly CrossingSector[];
+  /** The route the one ticket is quoted for — what `priceFlight` prices. */
+  journey: { from: string; to: string };
+}
+
+/**
+ * **Valencia → Madrid → Hong Kong → Perth.** The couple's own booking.
+ *
+ * `docs/research/longhaul-comfort.md` §"The Value-Comfort Line" is this exact
+ * routing: *"Train Valencia → Madrid (1h56, ~25 trains/day)… MAD → HKG daily
+ * from 25 October 2026. HKG → PER twice daily, 7h40… A350 on both sectors."*
+ * `flight-hubs.md` adds the reason Madrid is the hub rather than Barcelona:
+ * one of Cathay's two rotations departs **MAD 22:30**, *"the only long-haul in
+ * the grid a same-day 1h56 train can safely feed"*, so there is no hotel night
+ * on the European side.
+ *
+ * Departure days: the train and the 22:30 flight both go on day 0; Hong Kong is
+ * reached late on day 1 and left the same evening, so the second flight departs
+ * on day 1 and lands in Perth at dawn on day 2. That is the `landsAfter: 2` on
+ * `mundaring-arrival`, and it is why the two Days in between are Buffer days at
+ * the transit market rather than a hotel anywhere.
+ */
+const INBOUND: Crossing = {
+  journey: { from: "MAD", to: "PER" },
+  sectors: [
+    {
+      locationId: "madrid",
+      mode: "train",
+      hours: null,
+      // flight-hubs.md, the positioning table: "Madrid by train, same day
+      // (feeding the 22:30 Cathay) — €16–110 train, no hotel", for the couple.
+      ownEur: [16, 16, 110],
+      departsOn: 0,
+      note: "The feeder. 1h56 and ~25 trains a day, and it is the reason the hub is Madrid: it is the only long-haul in the grid a same-day train can safely feed, so there is no hotel night in Europe. Not on the airline ticket — flight-hubs.md is explicit that a train feed is unprotected, and Iberia on the same oneworld PNR is the €90–240 upgrade that buys the protection.",
+    },
+    {
+      locationId: "hong-kong",
+      mode: "flight",
+      // ~13h. The published pair is MAD 22:30 and HKG–PER at 7h40, and the
+      // couple's own ~25h door-to-door leaves about four hours at Chek Lap Kok.
+      hours: 13,
+      ownEur: null,
+      departsOn: 0,
+      note: "Cathay Pacific, MAD 22:30, A350 — daily from 25 October 2026, longhaul-comfort.md §5.",
+    },
+    {
+      locationId: null,
+      mode: "flight",
+      // CX171 is the A350-900 at 7h40; the couple is on the later rotation of
+      // the two dailies, which is what makes Hong Kong a connection and not a
+      // night. longhaul-comfort.md §4.
+      hours: 7 + 40 / 60,
+      ownEur: null,
+      departsOn: 1,
+      note: "Cathay Pacific HKG→PER, A350-900, 7h40 — a same-ticket connection rather than a stopover, landing in Perth at dawn. No hotel night at either end of the crossing.",
+    },
+  ],
+};
+
+/**
+ * **Melbourne → Singapore → Barcelona → Valencia.** The couple's own booking.
+ *
+ * Singapore Airlines, and the A380 sector out of Melbourne:
+ * `longhaul-comfort.md` §"A380s that actually exist" has *"SIN–MEL daily A380,
+ * restored, running through late March 2027"*, and §5 has the westbound tag
+ * this rides — **SQ388, SIN 23:30 → BCN 06:40+1** — as part of the SIN–BCN–MAD
+ * service that opens on 26 October 2026. Barcelona has no flight to Valencia on
+ * any carrier (`flight-hubs.md`: *"it is train or bus, unprotected, always"*),
+ * so the last two hours home are a train.
+ *
+ * Every sector departs on the trip's last Day. The couple leaves Melbourne in
+ * the morning, leaves Changi at 23:30 and reaches Barcelona the following
+ * dawn — which is the day after the Plan ends, so the ledger has no Day for it
+ * and the whole crossing is dated the day it starts.
+ */
+const HOMEWARD: Crossing = {
+  journey: { from: "MEL", to: "BCN" },
+  sectors: [
+    {
+      locationId: "singapore",
+      mode: "flight",
+      hours: 7 + 55 / 60, // SQ's MEL–SIN A380, scheduled 7h55
+      ownEur: null,
+      departsOn: 0,
+      note: "Singapore Airlines, the daily A380 out of Melbourne — the one upper-deck sector on the whole trip, and the reason the return routes through Changi rather than a Gulf hub. longhaul-comfort.md.",
+    },
+    {
+      locationId: "barcelona",
+      mode: "flight",
+      // SQ388, SIN 23:30 → BCN 06:40+1: 7h10 on the clock across seven hours
+      // of time zones.
+      hours: 14 + 10 / 60,
+      ownEur: null,
+      departsOn: 0,
+      note: "SQ388, SIN 23:30 → BCN 06:40+1, A350-900 — the Barcelona service Singapore Airlines opens on 26 October 2026. February is the cheapest month of the year out of Australia, which is why this crossing is the smaller half of the ticket.",
+    },
+    {
+      locationId: "origin",
+      mode: "train",
+      hours: null,
+      // flight-hubs.md's positioning table: the Barcelona train is €50–120 for
+      // the couple. The hotel night that table pairs with it is an outbound
+      // cost — arriving at 06:40 there is nothing to sleep through.
+      ownEur: [50, 50, 120],
+      departsOn: 0,
+      note: "The last two hours. Barcelona has no flight to Valencia on any carrier — train or bus, unprotected, always — so this is a Renfe ticket bought separately and the one unprotected link in the journey home. flight-hubs.md.",
+    },
+  ],
+};
+
+/**
+ * Fares the couple has actually pinned: a real quote for a real routing, held
+ * rather than modelled.
+ *
+ * This is a fourth tier above the three at the top of this file, and it outranks
+ * all of them — a snapshot is what the research thought the route costs, and
+ * this is what the couple was quoted for the itinerary they are booking. It
+ * collapses onto itself rather than carrying a band, for the same reason a
+ * swapped Event figure does in `ledger.ts`: a decision is not a range.
+ *
+ * It is deliberately *not* `fareOverrides`. Those are live quotes fetched per
+ * tab and thrown away; this is part of the Plan.
+ */
+interface PinnedFare {
+  /** EUR per person, one-way, for the whole journey. */
+  priceEur: number;
+  carrier: string;
+  /** The date the quote is for. Kept for the note, not matched on. */
+  quotedFor: string;
+}
+
+const PINNED_FARES: Readonly<Record<string, PinnedFare>> = {
+  "MAD-PER": {
+    priceEur: 872,
+    carrier: "Cathay Pacific",
+    quotedFor: "14 Dec 2026",
+  },
+};
 
 export interface LegInput {
   days: Day[];
@@ -177,17 +386,19 @@ export function deriveLegs(input: LegInput): LegResult {
    * arrivals at anything.
    */
   const landed = days.find((day) => day.locationId !== "transit") ?? days[0];
+  const landIndex = Math.max(0, days.indexOf(landed));
 
-  const first = days[0];
   legs.push(
-    buildLeg({
-      date: first.date,
-      fromLocationId: "origin",
-      toLocationId: landed.locationId,
-      from: ORIGIN_AIRPORT,
-      to: locationById(landed.locationId).airport,
+    ...crossingLegs({
+      crossing: INBOUND,
       input,
-      note: "The outbound crossing. Comfort-first, not cheapest — docs/CONTEXT.md names aircraft type, layover quality and an overnight stopover as the criteria.",
+      startDate: days[0].date,
+      fromLocationId: "origin",
+      endLocationId: landed.locationId,
+      // A sector may not be dated past the day the couple lands: a Scenario
+      // with no transit Days at all is one where the whole crossing happens on
+      // the trip's first Day, whatever the timetable says about it.
+      lastOffset: landIndex,
     }),
   );
 
@@ -227,14 +438,15 @@ export function deriveLegs(input: LegInput): LegResult {
   // whole, which needs no special case here at all.
   const last = days[days.length - 1];
   legs.push(
-    buildLeg({
-      date: last.date,
-      fromLocationId: last.locationId,
-      toLocationId: "origin",
-      from: locationById(last.locationId).airport,
-      to: ORIGIN_AIRPORT,
+    ...crossingLegs({
+      crossing: HOMEWARD,
       input,
-      note: "The homeward crossing. February is the cheapest month of the year out of Australia — longhaul-comfort.md — which is why it is the smaller half of the ticket.",
+      startDate: last.date,
+      fromLocationId: last.locationId,
+      endLocationId: "origin",
+      // The trip has no Days left to spread this over: everything after the
+      // couple leaves Melbourne happens off the end of the Plan.
+      lastOffset: 0,
     }),
   );
 
@@ -269,6 +481,102 @@ function legEndName(locationId: string, iata: string): string {
   return locationId === "origin" ? iata : locationById(locationId).name;
 }
 
+interface CrossingArgs {
+  crossing: Crossing;
+  input: LegInput;
+  /** The Day the crossing starts from. */
+  startDate: string;
+  /** The Location it leaves. */
+  fromLocationId: string;
+  /** Where its last sector ends, which the table writes as `null`. */
+  endLocationId: string;
+  /** The furthest a sector may be dated past `startDate`. */
+  lastOffset: number;
+}
+
+/**
+ * One booked crossing, expanded into the Legs it is actually flown as.
+ *
+ * The chain is walked once: each sector leaves where the last one arrived, so
+ * there is no way to write a crossing with a gap in it. Every flown sector is
+ * priced from the *journey* — one ticket, one provenance — and carries the
+ * share of that fare its block hours are worth; a sector with its own price
+ * (the feeder trains, which are not on the airline ticket) carries that
+ * instead and takes no share.
+ */
+function crossingLegs(args: CrossingArgs): Leg[] {
+  const { crossing, input, startDate, endLocationId, lastOffset } = args;
+
+  const ticketed = crossing.sectors.filter((sector) => sector.hours !== null);
+  const blockHours = ticketed.reduce(
+    (total, sector) => total + (sector.hours ?? 0),
+    0,
+  );
+
+  const legs: Leg[] = [];
+  let fromLocationId = args.fromLocationId;
+
+  for (const sector of crossing.sectors) {
+    const toLocationId = sector.locationId ?? endLocationId;
+    const date = addDays(
+      startDate,
+      Math.min(sector.departsOn, Math.max(0, lastOffset)),
+    );
+
+    legs.push(
+      buildLeg({
+        date,
+        fromLocationId,
+        toLocationId,
+        from: legEndAirport(fromLocationId),
+        to: legEndAirport(toLocationId),
+        input,
+        mode: sector.mode,
+        note: sector.note,
+        quoted: sector.ownEur ? ownPrice(sector) : undefined,
+        share:
+          sector.hours !== null && blockHours > 0
+            ? { of: crossing.journey, fraction: sector.hours / blockHours }
+            : undefined,
+      }),
+    );
+
+    fromLocationId = toLocationId;
+  }
+
+  return legs;
+}
+
+/** The gateway a Location is reached through; home is an airport already. */
+function legEndAirport(locationId: string): string {
+  return locationId === "origin"
+    ? ORIGIN_AIRPORT
+    : locationById(locationId).airport;
+}
+
+/** A sector bought separately, priced at the figure the research gives it. */
+function ownPrice(sector: CrossingSector): Priced {
+  const [plan, low, high] = sector.ownEur ?? [0, 0, 0];
+  return {
+    eur: cents(plan),
+    bandEur: [cents(low), cents(high)],
+    pricing: "band",
+    onGrid: false,
+    // A ticket for one journey. Nothing about a Renfe seat is a return.
+    fareBasis: "one-way",
+    carrier: null,
+    note: `${sector.note} Bought separately from the airline ticket — flight-hubs.md's positioning table, €${low}–${high} for the couple.`,
+  };
+}
+
+/** This Leg's slice of a fare quoted for a longer journey. */
+interface FareShare {
+  /** The route the fare is quoted for. */
+  of: { from: string; to: string };
+  /** Block hours of this sector over block hours of the whole journey. */
+  fraction: number;
+}
+
 interface BuildLegArgs {
   date: string;
   fromLocationId: string;
@@ -277,6 +585,12 @@ interface BuildLegArgs {
   to: string;
   input: LegInput;
   note: string;
+  /** Set where the itinerary decides the mode rather than the geography. */
+  mode?: LegMode;
+  /** A figure this Leg carries in its own right, instead of a route's. */
+  quoted?: Priced;
+  /** Set where this Leg is one sector of a journey bought as a whole. */
+  share?: FareShare;
 }
 
 function buildLeg(args: BuildLegArgs): Leg {
@@ -286,12 +600,12 @@ function buildLeg(args: BuildLegArgs): Leg {
   // Two places reached through the same airport are a drive, not a flight:
   // nobody flies Perth → Margaret River, and pricing it as a fare would invent
   // several hundred euro out of a three-hour highway run.
-  const mode: LegMode = override ?? (from === to ? "drive" : "flight");
+  const mode: LegMode =
+    override ?? args.mode ?? (from === to ? "drive" : "flight");
 
   const priced =
-    mode === "drive"
-      ? priceDrive(args)
-      : priceFlight({ ...args, id });
+    args.quoted ??
+    (mode === "drive" ? priceDrive(args) : priceFlight({ ...args, id }));
 
   const live = input.fareOverrides[id];
   const hydrated = typeof live === "number" && Number.isFinite(live);
@@ -354,26 +668,42 @@ export function legIsOnGrid(from: string, to: string, date: string): boolean {
 /**
  * The fraction of a return-basis figure this Leg carries.
  *
- * Only the two ocean crossings are ever priced from a return figure — the
- * research quotes nothing else that way — and they are also the only Legs with
- * an `origin` end, so the direction reads straight off the Leg.
+ * Only the two long crossings are ever priced from a return figure — the
+ * research quotes nothing else that way — and the direction reads off the
+ * journey the fare is quoted for, not off the sector: every sector of the way
+ * home carries a share of the homeward half, whatever its own two ends are.
  */
 function returnShare(args: BuildLegArgs): number {
-  return args.toLocationId === "origin" ? 1 - OUTBOUND_SHARE : OUTBOUND_SHARE;
+  const heading = args.share?.of.to ?? args.to;
+  return AUSTRALIAN.has(heading) ? OUTBOUND_SHARE : 1 - OUTBOUND_SHARE;
 }
 
 /** Why a crossing carries part of a figure rather than all of it. */
 function splitNote(args: BuildLegArgs): string {
-  return args.toLocationId === "origin"
-    ? " That is a return figure per person, so this crossing carries three-eighths of it — February home is the cheapest month of the year, against a December peak out."
-    : " That is a return figure per person, so this crossing carries five-eighths of it — December out is the peak, against the cheapest month of the year coming home.";
+  return returnShare(args) === OUTBOUND_SHARE
+    ? " That is a return figure per person, so this crossing carries five-eighths of it — December out is the peak, against the cheapest month of the year coming home."
+    : " That is a return figure per person, so this crossing carries three-eighths of it — February home is the cheapest month of the year, against a December peak out.";
+}
+
+/** Why a sector carries part of the crossing rather than all of it. */
+function sectorNote(share: FareShare): string {
+  return ` One ticket, ${share.of.from}–${share.of.to}, split across its sectors by scheduled block hours — this one is ${Math.round(share.fraction * 100)}% of the time in the air.`;
 }
 
 function priceFlight(args: BuildLegArgs & { id: string }): Priced {
-  const { from, to, date, note } = args;
+  const { date, note, share } = args;
+  // A sector is priced from the journey it belongs to, because that is what the
+  // fare was quoted for. Only `onGrid` stays a question about the sector: it
+  // asks whether `/api/fares` can price *this* pair, and it cannot price a
+  // connection out of a through-fare.
+  const from = share?.of.from ?? args.from;
+  const to = share?.of.to ?? args.to;
+  const fraction = share?.fraction ?? 1;
+
   const key = `${from}-${to}`;
+  const pinned = PINNED_FARES[key] ?? PINNED_FARES[`${to}-${from}`];
   const snapshot = FARE_SNAPSHOTS[key] ?? FARE_SNAPSHOTS[`${to}-${from}`];
-  const onGrid = legIsOnGrid(from, to, date);
+  const onGrid = legIsOnGrid(args.from, args.to, date);
 
   const domestic = AUSTRALIAN.has(from) && AUSTRALIAN.has(to);
   const published = RESEARCH_BANDS[key] ?? RESEARCH_BANDS[`${to}-${from}`];
@@ -387,11 +717,33 @@ function priceFlight(args: BuildLegArgs & { id: string }): Priced {
   // route's: a snapshot and a band can disagree about what they are prices for,
   // and guessing from the route is how the fare home went missing.
   const perCouple = (value: number, basis: FareBasis) =>
-    cents((basis === "return" ? value * returnShare(args) : value) * TRAVELLERS);
+    cents(
+      (basis === "return" ? value * returnShare(args) : value) *
+        TRAVELLERS *
+        fraction,
+    );
   const bandEur: [number, number] = [
     perCouple(band[0], bandBasis),
     perCouple(band[1], bandBasis),
   ];
+
+  // A pinned quote outranks everything: it is what the couple was actually
+  // offered for the itinerary they are booking, and it collapses onto itself
+  // rather than carrying a band — a decision is not a range.
+  if (pinned) {
+    const eur = perCouple(pinned.priceEur, "one-way");
+    return {
+      eur,
+      bandEur: [eur, eur],
+      pricing: "pinned",
+      onGrid,
+      fareBasis: "one-way",
+      carrier: pinned.carrier,
+      note:
+        `${note} Pinned fare: €${pinned.priceEur} per person one-way on ${pinned.carrier}, quoted for ${pinned.quotedFor} — the couple's own quote, not a modelled band.` +
+        (share ? sectorNote(share) : ""),
+    };
+  }
 
   if (snapshot) {
     return {
@@ -405,7 +757,8 @@ function priceFlight(args: BuildLegArgs & { id: string }): Priced {
         (onGrid
           ? `${note} Fare snapshot standing in until the live fare loads — this route and date are on the fares grid.`
           : `${note} Stored research estimate, ${snapshot.fetchedAt}.`) +
-        (snapshot.basis === "return" ? splitNote(args) : ""),
+        (snapshot.basis === "return" ? splitNote(args) : "") +
+        (share ? sectorNote(share) : ""),
     };
   }
 
@@ -419,9 +772,11 @@ function priceFlight(args: BuildLegArgs & { id: string }): Priced {
     note:
       `${note} No snapshot for this route — priced from the research band, ${domestic ? "domestic-flights.md §2" : "longhaul-comfort.md"}.` +
       (bandBasis === "return" ? splitNote(args) : "") +
+      (share ? sectorNote(share) : "") +
       (onGrid ? " The live fare replaces it when it loads." : ""),
   };
 }
+
 
 /**
  * A drive, priced as fuel only.

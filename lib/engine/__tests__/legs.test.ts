@@ -31,12 +31,17 @@ const priced = (fareOverrides: Record<string, number> = {}): Plan =>
   buildPlan({ ...DEFAULT_SCENARIO.input, fareOverrides }, catalogue);
 
 /**
- * The two ocean crossings, found by their `origin` end rather than by id — the
- * dates move whenever the Scheduler does, and this file is not about dates.
+ * The two ocean crossings, found by their route rather than by id — the dates
+ * move whenever the Scheduler does, and this file is not about dates.
+ *
+ * Since #107 each crossing is a chain of sectors and the ocean is only on one
+ * of them: the flight out of Europe and the flight back into it. Those are the
+ * Legs the provenance rules are about, and they are found by asking which
+ * sector leaves a European gateway for somewhere that is not one.
  */
 function crossings(plan: Plan): { out: Leg; home: Leg } {
-  const out = plan.legs.find((leg) => leg.fromLocationId === "origin");
-  const home = plan.legs.find((leg) => leg.toLocationId === "origin");
+  const out = plan.legs.find((leg) => leg.from === "MAD" && leg.to === "HKG");
+  const home = plan.legs.find((leg) => leg.from === "SIN" && leg.to === "BCN");
   assert.ok(out, "the Plan flies out");
   assert.ok(home, "and home again");
   return { out, home };
@@ -49,21 +54,63 @@ const flightsEur = (plan: Plan) =>
 /* The research band is a return, and it is split                      */
 /* ------------------------------------------------------------------ */
 
-test("both crossings carry a share of the return figure, and say that they do", () => {
+test("the journey home carries a share of the return figure, and says that it does", () => {
   const { out, home } = crossings(priced());
 
-  assert.equal(out.fareBasis, "return-share");
   assert.equal(home.fareBasis, "return-share");
   assert.ok(home.eur > 0, "the journey home is not free");
 
-  // Five-eighths of the €1,900-per-person return snapshot for VLC–PER, for
-  // two. The other three-eighths is not on this Leg — it belongs to a crossing
-  // that happens ten weeks later.
-  assert.equal(out.eur, cents(1_900 * 0.625 * TRAVELLERS));
+  // The outbound is no longer a share of anything: the couple has pinned it,
+  // and a quote you hold outranks a band somebody modelled (#107). €872 per
+  // person one-way, for two, split across the two Cathay sectors by their
+  // block hours — this one is the 13-hour leg out of Madrid.
+  assert.equal(out.fareBasis, "one-way");
+  assert.equal(out.pricing, "pinned");
+  assert.equal(out.eur, cents(872 * TRAVELLERS * (13 / (13 + 7 + 40 / 60))));
   assert.ok(
     out.eur > home.eur,
     "December out is the peak; February home is the cheapest month",
   );
+});
+
+test("a crossing's sectors add back up to the fare it was quoted at", () => {
+  // The property the block-hour split exists to preserve. One ticket buys the
+  // whole journey, so however it is divided for display the pieces have to sum
+  // to what the journey costs — otherwise the roll-up is inventing or losing
+  // money every time somebody re-times a connection.
+  const plan = priced();
+  const sectorsOf = (...ids: string[]) =>
+    cents(
+      plan.legs
+        .filter((leg) => ids.includes(`${leg.from}>${leg.to}`))
+        .reduce((total, leg) => total + leg.eur, 0),
+    );
+
+  // The pinned Cathay ticket, €872 per person one-way.
+  assert.equal(sectorsOf("MAD>HKG", "HKG>PER"), cents(872 * TRAVELLERS));
+
+  // Three-eighths of the €1,500-per-person MEL–BCN return snapshot, for two —
+  // the homeward half of one ticket, split across its own two sectors.
+  assert.equal(
+    sectorsOf("MEL>SIN", "SIN>BCN"),
+    cents(1_500 * 0.375 * TRAVELLERS),
+  );
+});
+
+test("the feeder trains are bought separately and say so", () => {
+  // `flight-hubs.md` is emphatic that neither train is on the airline ticket:
+  // Madrid is fed by an unprotected 1h56 Renfe run, and Barcelona has no flight
+  // to Valencia on any carrier at all. They carry their own price and take no
+  // share of the fare.
+  const plan = priced();
+  for (const pair of ["VLC>MAD", "BCN>VLC"]) {
+    const leg = plan.legs.find((entry) => `${entry.from}>${entry.to}` === pair);
+    assert.ok(leg, pair);
+    assert.equal(leg.mode, "train");
+    assert.equal(leg.fareBasis, "one-way");
+    assert.equal(leg.modeOverridden, false, "a train by itinerary, not by knob");
+    assert.ok(leg.eur > 0 && leg.eur < 100, `€${leg.eur} is a train fare`);
+  }
 });
 
 test("a domestic band is a one-way and is charged whole", () => {
@@ -121,17 +168,26 @@ test("two live one-way fares are both charged, and both reach the roll-up", () =
 /* …which requires the homeward crossing to be able to ask             */
 /* ------------------------------------------------------------------ */
 
-test("the homeward crossing is on the fares grid, so it can be hydrated at all", () => {
+test("a crossing sector is not pretended to be a route the grid can price", () => {
   const { out, home } = crossings(priced());
-  assert.equal(out.onGrid, true);
 
-  // Two separate things used to hide this Leg from the live fare it is
-  // entitled to. It has no snapshot of its own, so it was labelled `band` —
-  // and `use-plan.ts` only hydrated Legs labelled `grid`. And `legIsOnGrid`
-  // compared the date against the set the cron *warms*, three days wide, which
-  // the homecoming has now fallen outside of twice, once per re-plan.
-  assert.equal(home.pricing, "band", "no MEL–VLC snapshot exists to stand in");
-  assert.equal(home.onGrid, true, "and yet /api/fares can price it");
+  // `onGrid` is a claim about `/api/fares`, and `/api/fares` prices routes on
+  // the grid — a whitelist, because an open origin/destination on a metered API
+  // is a proxy somebody else can spend. Neither MAD–HKG nor SIN–BCN is on it:
+  // they are connections inside a through-fare, not routes anyone searches.
+  //
+  // Losing the live quote costs the outbound nothing, because it is priced from
+  // a fare the couple actually holds. The homeward is a research figure and
+  // would still take a live one; hydrating it means asking about the journey
+  // (MEL–BCN, which *is* on the grid) rather than about a sector of it, and
+  // that is follow-up work rather than something to fake here.
+  assert.equal(out.onGrid, false);
+  assert.equal(home.onGrid, false);
+  assert.equal(
+    home.pricing,
+    "snapshot",
+    "the MEL–BCN return snapshot is what the journey home is priced from",
+  );
 });
 
 test("a route the grid has never heard of is not pretended to be priceable", () => {

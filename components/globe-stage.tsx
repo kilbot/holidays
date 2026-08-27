@@ -524,8 +524,8 @@ export function GlobeStage() {
     };
 
     // `keepLegsInView` is the closing card's escape hatch: an anchored Leg
-    // popup is context the restored frame has to hold, and the Barcelona and
-    // Singapore arcs are not in the Australia frame. It borrows the route
+    // popup is context the restored frame has to hold, and the Madrid and
+    // Hong Kong arcs are not in the Australia frame. It borrows the route
     // frame for that one call without taking the seat.
     frameRestingRef.current = (animate: boolean, keepLegsInView = false) => {
       if (keepLegsInView || resting === "route") frameRoute(animate);
@@ -940,8 +940,9 @@ export function GlobeStage() {
         // days spent there, so this is a lookup rather than a
         // nearest-neighbour search, and it is right for a Catalog idea toggled
         // onto the Plan as well as for the eight researched ones. A stop with
-        // nothing behind it (the skeleton's Barcelona and Singapore, a Buffer
-        // stretch) stays inert, cursor and all.
+        // nothing behind it (the crossings' hubs — Madrid, Hong Kong,
+        // Singapore, Barcelona — or a Buffer stretch) stays inert, cursor and
+        // all.
         const stop = hit.routePoint?.properties;
         if (stop) {
           const opened = openStop(stop, capsulesRef.current);
@@ -951,7 +952,7 @@ export function GlobeStage() {
         const legId = hit.leg?.properties?.id;
         if (typeof legId === "string" && legsRef.current.has(legId)) {
           // Anchored where it was clicked, not at the arc's midpoint: the
-          // midpoint of a Barcelona→Singapore great circle is over Iran, and
+          // midpoint of a Madrid→Hong Kong great circle is over Siberia, and
           // a popup that jumps 4,000km from the pointer reads as a bug.
           const at: Coordinates = [event.lngLat.lng, event.lngLat.lat];
           setAnchored({ kind: "leg", id: legId, at, screen: map.project(at) });
@@ -1075,7 +1076,7 @@ export function GlobeStage() {
       //
       // An anchored popup is the one piece of context that outranks the
       // resting frame: it is still pointing at a Leg, and the Leg it points
-      // at may be a Barcelona–Singapore arc the Australia frame does not
+      // at may be a Madrid–Hong Kong arc the Australia frame does not
       // hold. With one open, the restore borrows the whole-route frame so the
       // popup comes back where it was, still on its arc.
       if (flownRef.current) {

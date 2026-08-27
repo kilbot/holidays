@@ -165,28 +165,35 @@ const BYRON_AT_ITS_MINIMUM: Readonly<Record<string, number>> = {
  *
  * The user's order is *Mundaring — Perth and Fremantle days from it — Margaret
  * River — Rottnest — Morawa for Christmas — back to Perth — fly east*, and the
- * couple lands on 15 December. That is **eleven days to Christmas Day** and
- * twelve wanting one: the arrival block, the two city evenings, Margaret
- * River's three nights, a mid-week Rottnest ferry, and the Christmas run. The
- * order is the couple's; the lengths are what pays for it, and every figure
- * below is a rung the research itself publishes.
+ * couple lands on 16 December. That is **ten days to Christmas Day** and eleven
+ * wanting one: the arrival block, the two city evenings, Margaret River's three
+ * nights, a mid-week Rottnest ferry, and the Christmas run. The order is the
+ * couple's; the lengths are what pays for it, and every figure below is a rung
+ * the research itself publishes.
  *
  * - **The arrival block takes its two-day minimum.** Which is what the
- *   sequence already says: days three and four of the trip are the Fremantle
- *   evening and the Northbridge gig, driven in from the Hills. The stretch is
- *   still four days based at Paul's dad's — two of them are just spent in
- *   town.
+ *   sequence already says: the Fremantle evening and the Northbridge gig are
+ *   driven in from the Hills. The stretch is still four days based at Paul's
+ *   dad's — two of them are just spent in town.
  * - **Christmas takes three days instead of four**, the `Three days` rung in
  *   `capsule-christmas-morawa`'s own cost ladder: up the Midlands road on the
  *   23rd, Christmas Eve, Christmas Day. The fourth day was the drive home, and
  *   the drive home is now Boxing Day and a Leg of its own.
- * - **Sydney takes seven nights instead of six**, which moves the flight east
- *   to the 27th — the morning after the 370 km drive down from Morawa, rather
- *   than an idle Perth day later. The couple asked to leave WA on Boxing Day
- *   itself; the engine gives a Day to exactly one place, so a 26 December
- *   flight would mean no Perth Day at all and the drive home would stop being
- *   a Leg — priced, drawn, and the whole point of #95's third item. The drive
- *   keeps Boxing Day and the aeroplane takes the morning after it.
+ * - **Sydney takes seven nights instead of six.** It used to be what moved the
+ *   flight east to the 27th; since #107 the flight is the 23:55 red-eye on
+ *   Boxing Day itself — `domestic-flights.md` grades 27–29 December the worst
+ *   days of the Australian year — and it lands at 06:15 on the 27th, which is
+ *   the day the Sydney block still opens on. Boxing Day carries the 370 km
+ *   drive *and* the fare, which is one travelling day where there were two.
+ *
+ * **It no longer quite fits, and the Plan says so.** The couple's pinned
+ * crossing is Madrid → Hong Kong → Perth and takes two days rather than one, so
+ * the leg above is eleven days of sequence in ten days of calendar. The
+ * Scheduler does not refuse: it puts the Fremantle evening on the arrival
+ * block's second day and raises an overlap Warning. Nothing is lost — both are
+ * Home-base days at the same rates and the couple sleeps at Paul's dad's either
+ * way — but the jet-lag block is a day shorter than its own minimum asks for,
+ * and that is on the page rather than quietly absorbed.
  */
 const WA_SEQUENCE_LENGTHS: Readonly<Record<string, number>> = {
   "mundaring-arrival": 2,

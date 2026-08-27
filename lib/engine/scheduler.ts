@@ -160,6 +160,34 @@ function anchorsFree(lock: Lock, start: string, days: number): boolean {
   return true;
 }
 
+/**
+ * The first day the couple is on the ground, which is not the first day of the
+ * trip.
+ *
+ * The arrival Lock's `landsAfter` says how many days the crossing eats, and
+ * until #107 that was worth exactly one Day — so the only day nobody could be
+ * standing in Australia was day 0, and no Lock's window opened that early
+ * anyway. The couple's actual booking is Madrid → Hong Kong → Perth and takes
+ * **two**, which uncovered the gap: 15 December was suddenly free, Rottnest's
+ * mid-week window opened on it, and the Scheduler proposed a ferry to an island
+ * off Fremantle for a couple who were somewhere over the South China Sea.
+ *
+ * So a *proposal* may not start before the trip has landed. Like `anchorsFree`,
+ * this is deliberately not a refusal — the fallback path below ignores it, so a
+ * block with nowhere else to go still lands and still reports its overlap — and
+ * deliberately not a veto on a drag, because `placementOverrides` are applied
+ * before any of this.
+ */
+function landingDay(input: ScheduleInput): string {
+  let landing = input.startDate;
+  for (const capsule of input.capsules) {
+    if (capsule.lock.kind !== "arrival") continue;
+    const lands = addDays(input.startDate, capsule.lock.landsAfter);
+    if (lands > landing) landing = lands;
+  }
+  return landing;
+}
+
 /** Where a Lock would like to start, when nothing else constrains it. */
 function preferredStart(lock: Lock, startDate: string): string {
   if (lock.kind === "window" || lock.kind === "date") {
@@ -244,6 +272,8 @@ export function schedule(input: ScheduleInput): ScheduleResult {
   }
 
   // ---- 2. Propose the rest. ---------------------------------------------
+  const landing = landingDay(input);
+
   for (const capsule of ordered(input.capsules)) {
     if (overridden.has(capsule.id)) continue;
 
@@ -259,6 +289,8 @@ export function schedule(input: ScheduleInput): ScheduleResult {
 
     for (let offset = 0; offset <= lastStart; offset += 1) {
       const start = addDays(startDate, offset);
+      // Nothing is proposed before the plane lands.
+      if (start < landing) continue;
       if (!lockAllows(capsule.lock, start, days, startDate)) continue;
       if (!free(start, days)) continue;
       if (!anchorsFree(capsule.lock, start, days)) continue;

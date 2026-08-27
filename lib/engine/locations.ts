@@ -20,6 +20,67 @@ import type { Location } from "@/lib/engine/types";
 /** Where the couple leaves from and returns to. */
 export const ORIGIN_AIRPORT = "VLC";
 
+/**
+ * The hubs the two crossings are flown through, as Locations.
+ *
+ * They are Locations rather than bare airport codes for one reason: every
+ * surface that names an end of a Leg — the Ledger's transit rows, the day
+ * lines, the globe's stop labels — reads `locationById(...).name`, and an id
+ * nothing recognises comes back named "HKG". A connection the couple spends
+ * five hours in is still a place they go, and the map should say Hong Kong.
+ *
+ * No Day is ever spent at one. `landsAfter` puts the couple in Perth the
+ * morning after the second sector leaves, and the research's own routing has
+ * no hotel night at either hub — so these carry the `transit` regime, which is
+ * the ledger's name for "the trip has started and has not landed", and price
+ * nothing because nothing is placed here.
+ *
+ * The coordinates are the terminals, and that is exact rather than
+ * approximate: unlike Port Douglas, a connection genuinely *is* its airport.
+ */
+const STOPOVER_LOCATIONS: readonly Location[] = [
+  {
+    id: "madrid",
+    name: "Madrid",
+    market: "transit",
+    airport: "MAD",
+    coords: [-3.5676, 40.4722], // Barajas T4, where the 22:30 Cathay leaves from
+    homeBase: false,
+    weather: null,
+    regions: [],
+  },
+  {
+    id: "hong-kong",
+    name: "Hong Kong",
+    market: "transit",
+    airport: "HKG",
+    coords: [113.9185, 22.308], // Chek Lap Kok
+    homeBase: false,
+    weather: null,
+    regions: [],
+  },
+  {
+    id: "singapore",
+    name: "Singapore",
+    market: "transit",
+    airport: "SIN",
+    coords: [103.9915, 1.3644], // Changi
+    homeBase: false,
+    weather: null,
+    regions: [],
+  },
+  {
+    id: "barcelona",
+    name: "Barcelona",
+    market: "transit",
+    airport: "BCN",
+    coords: [2.0785, 41.2971], // El Prat, where the train home starts
+    homeBase: false,
+    weather: null,
+    regions: [],
+  },
+];
+
 export const LOCATIONS: readonly Location[] = [
   {
     id: "transit",
@@ -31,6 +92,7 @@ export const LOCATIONS: readonly Location[] = [
     weather: null,
     regions: [],
   },
+  ...STOPOVER_LOCATIONS,
   {
     id: "perth",
     name: "Perth",
