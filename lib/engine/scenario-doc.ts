@@ -18,6 +18,7 @@
 import { isLodgingTier } from "@/lib/engine/constants";
 import { EMPTY_INPUT } from "@/lib/engine/plan";
 import type { PlanInput } from "@/lib/engine/types";
+import { parsePins, type FlightPin } from "@/lib/flights/watchlist";
 
 export interface Scenario {
   id: string;
@@ -55,6 +56,26 @@ export interface ScenarioState {
   scenarios: Scenario[];
   /** Exactly one Scenario is the current Plan. */
   currentId: string;
+  /**
+   * Flights the couple is watching (kilbot/holidays#68).
+   *
+   * **Plan-level, not per Scenario**, and that is the whole decision. A pin is a
+   * dated observation of what an airline was charging — a fact about the world,
+   * not about a calendar variant — so it must not appear and disappear as the
+   * couple flips between "Fireworks NYE" and "Aggressive". The alternative was
+   * a `pins` field on `PlanInput`, and it would have meant a Fork carrying
+   * somebody else's watchlist and an adopt merging two of them.
+   *
+   * It sits in this document rather than in a browser because the trip has two
+   * travellers and two phones: a fare pinned on one has to be there on the
+   * other, which is the same reason the Scenarios are here.
+   *
+   * Required rather than optional on purpose. Every writer that builds a
+   * `ScenarioState` by hand — fork, duplicate, remove, the hydrate — is a place
+   * the watchlist could silently be dropped, and a compiler error at each of
+   * them is cheaper than the bug report.
+   */
+  pins: FlightPin[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -245,6 +266,9 @@ export const AGGRESSIVE_SCENARIO: Scenario = {
 export const INITIAL_STATE: ScenarioState = {
   scenarios: [DEFAULT_SCENARIO, COMFORTABLE_SCENARIO, AGGRESSIVE_SCENARIO],
   currentId: DEFAULT_SCENARIO.id,
+  // Nothing is watched until somebody watches something. Seeding a pin would be
+  // the site pretending to have found a fare it never fetched.
+  pins: [],
 };
 
 /* ------------------------------------------------------------------ */
@@ -343,13 +367,21 @@ export function lastEditedAt(scenario: Scenario): string {
  * with no Plan at all.
  */
 export function parseScenarioState(raw: unknown): ScenarioState {
-  if (!isRecord(raw) || !Array.isArray(raw.scenarios)) return INITIAL_STATE;
+  if (!isRecord(raw)) return INITIAL_STATE;
+
+  // Parsed before the Scenarios and carried through both fallbacks below: the
+  // watchlist and the calendar fail independently, and a document whose
+  // Scenarios were unreadable should still hand back the flights the couple
+  // pinned rather than take them down with it.
+  const pins = parsePins(raw.pins);
+
+  if (!Array.isArray(raw.scenarios)) return { ...INITIAL_STATE, pins };
 
   const scenarios = raw.scenarios
     .map(parseScenario)
     .filter((scenario): scenario is Scenario => scenario !== null);
 
-  if (scenarios.length === 0) return INITIAL_STATE;
+  if (scenarios.length === 0) return { ...INITIAL_STATE, pins };
 
   const currentId =
     typeof raw.currentId === "string" &&
@@ -357,7 +389,7 @@ export function parseScenarioState(raw: unknown): ScenarioState {
       ? raw.currentId
       : scenarios[0].id;
 
-  return { scenarios, currentId };
+  return { scenarios, currentId, pins };
 }
 
 /* ------------------------------------------------------------------ */

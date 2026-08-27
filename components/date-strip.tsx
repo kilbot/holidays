@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Link from "next/link";
 import { AlarmClock, ChevronDown, TriangleAlert } from "lucide-react";
 
 import { daysUntil, useToday } from "@/lib/countdown";
@@ -18,6 +19,7 @@ import {
   type PlanWeek,
 } from "@/lib/engine";
 import { eventDaysOf, weatherOf } from "@/lib/engine/plan";
+import { useWatchlist } from "@/lib/engine/scenarios";
 import { usePlan } from "@/lib/engine/use-plan";
 import { TripRail } from "@/components/trip-rail";
 import { WeekZoom, weekCostTitle } from "@/components/week-zoom";
@@ -121,6 +123,16 @@ function ClocksTicking() {
   const [open, setOpen] = useState(false);
   const [shownId, setShownId] = useState<string | null>(null);
   const today = useToday();
+  /**
+   * The watchlist, counted (kilbot/holidays#68).
+   *
+   * The flights the couple pinned are the same kind of fact as the deadlines
+   * beside them — a clock ticking on a decision nobody has made yet — and this
+   * chip is the only place on the site that says "here is what is waiting on
+   * you". Zero pins says nothing at all: a permanent "0 watched flights" would
+   * be chrome advertising a feature rather than a trip telling you something.
+   */
+  const { pins } = useWatchlist();
 
   // Soonest first, so the chip counts down to the one that bites next.
   const ranked = useMemo(
@@ -140,7 +152,11 @@ function ClocksTicking() {
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
-        title={`${ranked.length} booking deadlines before the trip window opens`}
+        title={
+          pins.length > 0
+            ? `${ranked.length} booking deadlines before the trip window opens · ${pins.length} watched flights`
+            : `${ranked.length} booking deadlines before the trip window opens`
+        }
         className="flex cursor-pointer items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,var(--sb-warn)_14%,transparent)] px-2 py-[3px] transition-colors hover:bg-[color-mix(in_srgb,var(--sb-warn)_22%,transparent)] motion-reduce:transition-none"
       >
         <AlarmClock className="size-3 shrink-0 text-[var(--sb-warn)]" />
@@ -154,6 +170,12 @@ function ClocksTicking() {
             </>
           ) : (
             <>{ranked.length} clocks ticking</>
+          )}
+          {pins.length > 0 && (
+            <span className="text-[var(--sb-faint)]">
+              {" "}
+              <span aria-hidden>·</span> {pins.length} watched
+            </span>
           )}
         </span>
         <ChevronDown
@@ -207,6 +229,18 @@ function ClocksTicking() {
               <span className="sb-num text-[var(--sb-faint)]">
                 {shown.source}
               </span>
+            </p>
+          )}
+          {pins.length > 0 && (
+            <p className="mt-1.5 border-t border-[var(--sb-line)] pt-1.5 text-[10px] leading-snug text-[var(--sb-dim)]">
+              <Link
+                href="/flights"
+                className="font-semibold text-[var(--sb-text)] underline decoration-dotted underline-offset-[3px] hover:text-[var(--sb-accent)]"
+              >
+                {pins.length} watched {pins.length === 1 ? "flight" : "flights"}
+              </Link>{" "}
+              on the Flights page, each with what its price has done since you
+              pinned it.
             </p>
           )}
         </div>

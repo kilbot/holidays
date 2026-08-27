@@ -50,6 +50,7 @@ const AFTER_DEBOUNCE = SAVE_DEBOUNCE_MS + 150;
 function withoutTasmania(): ScenarioState {
   return {
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
     scenarios: [
       {
         ...DEFAULT_SCENARIO,
@@ -155,11 +156,13 @@ test("edit mode: a toggle changes this tab and reaches the server", async () => 
   const server = fakeServer({
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
     updatedAt: "2026-08-27T00:00:00.000Z",
   });
   const local = fakeLocal({
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
   });
 
   const store = remoteScenarioStore(local, {
@@ -195,11 +198,13 @@ test("edit mode: a burst of knob-twiddling is one save", async () => {
   const server = fakeServer({
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
     updatedAt: "2026-08-27T00:00:00.000Z",
   });
   const local = fakeLocal({
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
   });
 
   const store = remoteScenarioStore(local, {
@@ -223,6 +228,7 @@ test("view mode: a toggle previews, says so, and never touches the server", asyn
   const pristine: ScenarioState = {
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
   };
   const server = fakeServer({ ...pristine, updatedAt: "2026-08-27T00:00:00.000Z" });
   const local = fakeLocal(pristine);
@@ -266,6 +272,7 @@ test("view mode: discarding the preview puts the couple's Plan back", async () =
   const pristine: ScenarioState = {
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
   };
   const server = fakeServer({ ...pristine, updatedAt: "2026-08-27T00:00:00.000Z" });
   const local = fakeLocal(pristine);
@@ -296,6 +303,7 @@ test("view mode: a discard that cannot reach the store leaves the preview standi
   const pristine: ScenarioState = {
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
   };
   const server = fakeServer({ ...pristine, updatedAt: "2026-08-27T00:00:00.000Z" });
   const local = fakeLocal(pristine);
@@ -337,10 +345,12 @@ test("view mode: a Fork carries the previewed input, not the shared one", async 
   const local = fakeLocal({
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
   });
   const server = fakeServer({
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
+    pins: [],
     updatedAt: "2026-08-27T00:00:00.000Z",
   });
 

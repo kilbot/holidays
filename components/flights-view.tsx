@@ -45,7 +45,7 @@
  *   sentence under it says whether the top of the list actually depends on it.
  */
 
-import { ChevronDown, Zap } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import type { CoverageReport } from "@/lib/flights/coverage";
@@ -80,11 +80,20 @@ import {
   WEIGHT_BRACKET,
   WEIGHT_EVIDENCE,
 } from "@/lib/flights/comfort";
-import type { FareQuota } from "@/lib/flights/quota";
+import { monthlyResetLabel, type FareQuota } from "@/lib/flights/quota";
+import type { FareSeries } from "@/lib/flights/history";
+import {
+  isPinned,
+  pinIdOf,
+  pinOf,
+  type FlightPin,
+} from "@/lib/flights/watchlist";
 import { formatEur } from "@/lib/engine";
+import { useWatchlist } from "@/lib/engine/scenarios";
 import { formatDayYear } from "@/lib/trip-dates";
 import { FareDateField, type CoverageByDate, type DayCoverage } from "@/components/fare-dates";
-import { FlightOptionRow } from "@/components/flight-option";
+import { FlightOptionRow, rowElementId } from "@/components/flight-option";
+import { FlightWatchlist, seriesKeyOf } from "@/components/flight-watchlist";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
@@ -128,11 +137,9 @@ async function fetchQuote(
   to: string,
   date: string,
   signal: AbortSignal,
-  storedOnly: boolean,
 ): Promise<LiveQuote | null> {
   try {
-    const stored = storedOnly ? "&stored=1" : "";
-    const response = await fetch(`/api/fares?from=${from}&to=${to}&date=${date}${stored}`, { signal });
+    const response = await fetch(`/api/fares?from=${from}&to=${to}&date=${date}`, { signal });
     if (!response.ok) return null;
     const body = (await response.json()) as Record<string, unknown>;
     const price = body.priceEur;
@@ -153,55 +160,88 @@ async function fetchQuote(
   }
 }
 
+/**
+ * The meter, and — when one of the two ceilings is shut — the sentence that
+ * used to be missing.
+ *
+ * The counter alone could not explain what the couple was seeing. Hitting the
+ * daily guard at 151 calls of a 2,000-call month looks, in a meter, like
+ * plenty of headroom; every row after it quietly showed a stored price, and the
+ * honest reading of that was *the data doesn't work*. So the gate is stated
+ * where the degrading happens, in the words for the ceiling that is actually
+ * shut: one clears overnight and the other does not.
+ *
+ * Loud enough to find, quiet enough not to shout: the numbers stay folded away,
+ * and the gate line is the only part that comes out of the disclosure.
+ */
 function QuotaMeter({ quota }: { quota: FareQuota | null }) {
+  const gated = quota && quota.gate !== "open";
+
   return (
-    <details className="mt-2 w-fit text-[10px] text-[var(--sb-faint)]">
-      <summary className="cursor-pointer">
-        live quota: {quota ? `${quota.used}/${quota.budget} this month` : "checking…"}
-      </summary>
-      {quota && <p className="mt-1">{quota.month} · soft stop at 150 calls per day</p>}
-    </details>
+    <div className="mt-2">
+      <details className="w-fit text-[10px] text-[var(--sb-faint)]">
+        <summary className="cursor-pointer">
+          live quota: {quota ? `${quota.used}/${quota.budget} this month` : "checking…"}
+        </summary>
+        {quota && (
+          <p className="mt-1">
+            {quota.month} · {quota.usedToday}/{quota.dailyCap} today, a runaway guard
+            rather than a budget
+          </p>
+        )}
+      </details>
+
+      {gated && (
+        <p className="mt-1.5 flex items-start gap-1.5 text-[11px] leading-snug text-[var(--sb-dim)]">
+          <span aria-hidden className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--sb-warn)]" />
+          <span>
+            <span className="font-semibold text-[var(--sb-warn)]">
+              {quota.gate === "daily"
+                ? "Daily live-quota guard reached — fresh prices resume tomorrow."
+                : `Monthly budget spent — stored prices until ${monthlyResetLabel(quota.month)}.`}
+            </span>{" "}
+            Rows are showing the newest stored fare or the research band, labelled as
+            such. Nothing is blocked: the ranking, the comfort scores and the
+            watchlist all work on what is already here.
+          </span>
+        </p>
+      )}
+    </div>
   );
 }
 
 /**
- * What this day costs, before it costs it.
+ * What this day is doing, while it does it.
  *
- * The other half of date freedom (#61). Every day in the window is now
- * choosable, and most of them have never been priced — so a page that just went
- * and fetched on selection would turn a calendar into a quota bill nobody
- * agreed to. The transparency principle the Constraints already follow
- * (docs/CONTEXT.md) applies just as well to the site's own metered API: state
- * the cost in the same words a person would use, then let them decide.
+ * This used to be a gate. #61 gave every day in the window a click, most of
+ * them had never been priced, and the answer then was to quote the cost in
+ * calls and wait for a *Spend ~14 calls on this day* button — the transparency
+ * principle the Constraints follow (docs/CONTEXT.md), applied to the site's own
+ * metered API.
  *
- * Three things this panel is careful about:
+ * The user has since settled the question the gate was hedging: *"just make the
+ * calls; we're going to use the data until it is gone."* A quota that is never
+ * spent is not a saving, it is a subscription paid for nothing, and asking
+ * permission before every cold day taxed the one interaction the page exists
+ * for — moving the date and seeing what happens.
  *
- * - **The number is the real one.** It counts the origins in *this* search that
- *   have nothing stored on this day, capped at the same fan-out ceiling the
- *   fetch itself obeys — not a guess, and not the full grid.
- * - **A free day says so.** When everything is already stored, there is no
- *   button and no decision, because there is nothing to decide.
- * - **Nothing is blocked.** Declining costs the couple the live quotes, not the
- *   day: the research bands and the stored history are already on the rows, and
- *   the page keeps ranking them.
+ * So the friction is gone and the honesty stays. A cold day fetches on
+ * selection like any other, and this line says what is being spent while it is
+ * being spent rather than before. The real ceilings are still ceilings: the
+ * monthly budget, the daily runaway guard (both reported by the meter above,
+ * in words, when either one is what is holding prices back) and the per-search
+ * fan-out cap.
  */
-function ColdDateCost({
+function LiveDayNote({
   date,
   calls,
   origins,
-  quota,
-  onFetch,
 }: {
   date: string;
   calls: number;
   /** How many origins this search asks about, so a partly-known day says so. */
   origins: number;
-  quota: FareQuota | null;
-  onFetch: () => void;
 }) {
-  const left = quota ? Math.max(0, quota.budget - quota.used) : null;
-  const exhausted = left !== null && left < calls;
-
   if (calls === 0) {
     return (
       <p className="mt-3 flex items-center gap-1.5 text-[11px] leading-snug text-[var(--sb-dim)]">
@@ -213,44 +253,19 @@ function ColdDateCost({
   }
 
   return (
-    <section className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-dashed border-[color-mix(in_srgb,var(--sb-warn)_40%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-warn)_6%,transparent)] p-2.5">
-      <p className="min-w-0 flex-1 text-[11px] leading-snug text-[var(--sb-dim)]">
+    <p className="mt-3 flex items-start gap-1.5 text-[11px] leading-snug text-[var(--sb-dim)]">
+      <span aria-hidden className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--sb-accent)]" />
+      <span>
         <span className="font-semibold text-[var(--sb-text)]">
           {calls >= origins
-            ? `${formatDayYear(date)} has not been priced yet.`
-            : `${formatDayYear(date)} is priced for ${origins - calls} of ${origins} origins.`}
+            ? `${formatDayYear(date)} had not been priced.`
+            : `${formatDayYear(date)} was priced for ${origins - calls} of ${origins} origins.`}
         </span>{" "}
-        The rest of the rows are showing the research bands. Filling the gaps with live
-        fares costs{" "}
-        <span className="sb-num font-semibold text-[var(--sb-warn)]">~{calls} calls</span>
-        {left !== null && (
-          <>
-            {" "}
-            <span aria-hidden>·</span>{" "}
-            <span className="sb-num">{left.toLocaleString("en-GB")} left this month</span>
-          </>
-        )}
-        .{" "}
-        {exhausted
-          ? "There is not enough monthly quota left for that, so the bands stay."
-          : "Nothing is spent until you say so."}
-      </p>
-      <button
-        type="button"
-        onClick={onFetch}
-        disabled={exhausted}
-        className={cn(
-          "flex min-h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-[11.5px] font-semibold transition-colors motion-reduce:transition-none",
-          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
-          "border-[color-mix(in_srgb,var(--sb-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--sb-accent)_14%,transparent)] text-[var(--sb-accent)]",
-          "hover:bg-[color-mix(in_srgb,var(--sb-accent)_22%,transparent)]",
-          "disabled:cursor-default disabled:opacity-45 disabled:hover:bg-[color-mix(in_srgb,var(--sb-accent)_14%,transparent)]",
-        )}
-      >
-        <Zap className="size-3.5 shrink-0" aria-hidden />
-        Spend ~{calls} calls on this day
-      </button>
-    </section>
+        Pricing <span className="sb-num">{calls}</span>{" "}
+        {calls === 1 ? "origin" : "origins"} live now. Whatever lands is stored, so this
+        day is free from here on — and it will carry a price in the calendar above.
+      </span>
+    </p>
   );
 }
 
@@ -880,30 +895,40 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   /** Which route-days already hold a fare. One read per origin, no fare calls. */
   const [coverage, setCoverage] = useState<CoverageReport | null>(null);
   /**
-   * What the visitor has said yes to spending live calls on.
+   * The stored price line behind each pin, keyed `"BCN-PER:2026-12-12"`.
    *
-   * Two sets, because they answer two different questions. `approvedKeys` holds
-   * the exact origin/day pairs the fetch loop may spend on — *only* the ones
-   * that had nothing stored when the button was pressed, so the "~4 calls" the
-   * panel quoted is the number of calls the click actually makes rather than a
-   * number followed by a re-fetch of all thirteen origins. `approvedDates` is
-   * the same decision at the granularity the copy speaks in, so the panel knows
-   * it has been answered.
-   *
-   * The warmed default day stays live without being asked about, because it is
-   * a cache hit and asking permission for a cache hit is theatre.
+   * Read once per watchlist shape from `/api/fares/history`, which cannot reach
+   * the fare API — pinning twenty flights must not turn a page load into twenty
+   * metered calls (kilbot/holidays#68).
    */
-  const [approvedKeys, setApprovedKeys] = useState<ReadonlySet<string>>(() => new Set());
-  const [approvedDates, setApprovedDates] = useState<ReadonlySet<string>>(() => new Set());
+  /**
+   * The answer, stamped with the question it answers.
+   *
+   * One piece of state rather than a map plus a loading flag: "still reading"
+   * is exactly "the watchlist has changed since this answer came back", and
+   * deriving it from the stamp keeps every write to this state inside the
+   * fetch's own callback, where a `setState` belongs.
+   */
+  const [watch, setWatch] = useState<{
+    query: string;
+    series: ReadonlyMap<string, FareSeries>;
+  }>(() => ({ query: "", series: new Map() }));
+  /**
+   * The row the couple jumped to from the watchlist.
+   *
+   * A ring on the row, not just a scroll: arriving in the middle of ninety rows
+   * with no idea which one was meant is the failure this exists to prevent. The
+   * counter is what makes jumping to the same pin twice do something the second
+   * time.
+   */
+  const [jump, setJump] = useState<{ optionId: string; seq: number } | null>(null);
+
+  const { pins, pin, unpin, full: watchlistFull } = useWatchlist();
 
   const options = leg === "outbound" ? outbound : returns;
   const date = leg === "outbound" ? outboundDate : returnDate;
   const defaultDate = leg === "outbound" ? OUTBOUND_DEFAULT_DATE : RETURN_DEFAULT_DATE;
   const warmedDates = leg === "outbound" ? OUTBOUND_SEARCH_DATES : RETURN_SEARCH_DATES;
-  const approvalKey = `${leg}|${date}`;
-  /** The warmed day the search starts on is fetched live without being asked. */
-  const isDefaultDate = date === defaultDate;
-  const answered = isDefaultDate || approvedDates.has(approvalKey);
 
   const refreshQuota = useCallback(() => {
     void fetch("/api/fares/quota")
@@ -1029,8 +1054,12 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   }, [warmedDates, pricesByRoute, knownRoutes]);
 
   /**
-   * What pricing this day live would cost: one call per origin with nothing
-   * stored, under the same fan-out ceiling the fetch itself obeys.
+   * The origins this day has nothing stored for — the ones the fetch will spend
+   * on, under the same fan-out ceiling the fetch itself obeys.
+   *
+   * It used to be the quote on a permission panel. It is now a report: the
+   * calls happen on selection, and this is what the line under the controls
+   * counts while they are in flight.
    */
   const coldPairs = useMemo(
     () =>
@@ -1040,50 +1069,25 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     [pairs, pricesByRoute, date],
   );
 
-  /**
-   * Say yes to spending on this day.
-   *
-   * Only the origins the panel counted are approved and re-asked: the ones with
-   * a stored fare keep reading it, because paying again for a number already in
-   * hand is exactly the thing the coverage index exists to stop. The stored-only
-   * answers for the cold ones have to be dropped from the cache or the fetch
-   * loop would skip them as already-known and the click would do nothing — so
-   * those rows blink back to "checking fares", which is what is happening.
-   */
-  const fetchLive = useCallback(() => {
-    for (const pair of coldPairs) QUOTE_CACHE.delete(pair.key);
-    setQuotes(new Map(QUOTE_CACHE));
-    setApprovedKeys((current) => {
-      const next = new Set(current);
-      for (const pair of coldPairs) next.add(pair.key);
-      return next;
-    });
-    setApprovedDates((current) => new Set(current).add(approvalKey));
-  }, [coldPairs, approvalKey]);
-
   /* One fetch per origin, four at a time, abandoned if the search changes. */
   useEffect(() => {
     const controller = new AbortController();
     const pending = pairs
       .filter((pair) => !QUOTE_CACHE.has(pair.key))
       .slice(0, MAX_INTERACTIVE_FARE_CALLS);
-    // Live is per origin-day, not per search: the warmed default is live for
-    // everything, and a cold day is live only for the origins that were
-    // counted and approved. Everything else asks the store and spends nothing.
-    const goesLive = (key: string) => isDefaultDate || approvedKeys.has(key);
-    const spends = pending.some((pair) => goesLive(pair.key));
+    // Read before the workers drain it: `pending` is the queue they shift from,
+    // so by the time the batch settles it is empty either way.
+    const attempted = pending.length;
 
     async function worker() {
       for (;;) {
         const pair = pending.shift();
         if (!pair || controller.signal.aborted) return;
-        const quote = await fetchQuote(
-          pair.from,
-          pair.to,
-          date,
-          controller.signal,
-          !goesLive(pair.key),
-        );
+        // Every day is asked the same way now — no stored-only mode, no
+        // approval set. The route answers from its cache first and falls back
+        // to history when a gate refuses the call, so this spends a call only
+        // if there is one to spend and something left to spend it on.
+        const quote = await fetchQuote(pair.from, pair.to, date, controller.signal);
         if (controller.signal.aborted) return;
         QUOTE_CACHE.set(pair.key, quote);
         setQuotes(new Map(QUOTE_CACHE));
@@ -1092,14 +1096,99 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
 
     const workers = Array.from({ length: Math.min(SEARCH_CONCURRENCY, pending.length) }, worker);
     void Promise.all(workers).then(() => {
-      // A live run may have spent quota, and the cold-day panel quotes what is
-      // left. Re-read it once the batch settles rather than counting locally:
-      // a call the server refused is not a call, and the meter knows.
-      if (spends && !controller.signal.aborted) refreshQuota();
+      // The batch may have spent quota, and the meter is what says whether a
+      // gate has since closed. Re-read it once the batch settles rather than
+      // counting locally: a call the server refused is not a call, and only the
+      // meter knows which of the two ceilings stopped it.
+      if (attempted > 0 && !controller.signal.aborted) refreshQuota();
     });
 
     return () => controller.abort();
-  }, [pairs, date, isDefaultDate, approvedKeys, refreshQuota]);
+  }, [pairs, date, refreshQuota]);
+
+  /* ---------------------------------------------------------------- */
+  /* The watchlist                                                     */
+  /* ---------------------------------------------------------------- */
+
+  /**
+   * One request for the whole watchlist, re-read only when the watchlist
+   * changes.
+   *
+   * Deliberately not keyed on the searched date: a pin is about *its own* day,
+   * and re-reading twenty price lines every time somebody steps the date strip
+   * would be a page that got slower the more the couple used it. The endpoint
+   * cannot spend a fare call, so this is KV reads and an edge cache.
+   */
+  const watchQuery = useMemo(() => pins.map(seriesKeyOf).join(","), [pins]);
+  const watchLoading = watchQuery !== "" && watch.query !== watchQuery;
+
+  useEffect(() => {
+    if (!watchQuery) return;
+
+    const controller = new AbortController();
+    const settle = (series: ReadonlyMap<string, FareSeries>) => {
+      if (!controller.signal.aborted) setWatch({ query: watchQuery, series });
+    };
+
+    void fetch(`/api/fares/history?pin=${watchQuery}`, { signal: controller.signal })
+      .then((response) =>
+        response.ok ? (response.json() as Promise<{ series?: FareSeries[] }>) : null,
+      )
+      .then((body) =>
+        settle(new Map((body?.series ?? []).map((line) => [`${line.route}:${line.date}`, line]))),
+      )
+      // Unreachable store, offline tab, deployment protection. The rows fall
+      // back to "nothing stored", which is what the page can honestly say —
+      // and the query is still stamped, so they stop saying "reading history".
+      .catch(() => settle(new Map()));
+
+    return () => controller.abort();
+  }, [watchQuery]);
+
+  /**
+   * Pin this row as it stands, or unpin it.
+   *
+   * The whole quote is copied — fare, source, total, comfort — because the pin
+   * is a record of what the couple was looking at when they decided it was
+   * worth remembering. Re-deriving any of it later, at a different weight or a
+   * different fare, would answer a different question.
+   */
+  const togglePin = useCallback(
+    (option: SearchOption, price: OptionPrice) => {
+      const id = pinIdOf(leg, option.id, date);
+      if (isPinned(pins, id)) {
+        unpin(id);
+        return;
+      }
+      pin(
+        pinOf({
+          leg,
+          optionId: option.id,
+          from: option.origin,
+          to: option.destination,
+          date,
+          carrier: option.carrier,
+          // The low end of the band: identical to the quote when there is one,
+          // and the research's "from" price when there is not — with
+          // `fareSource` saying which, so the drift knows not to compare them.
+          fareEurPP: price.fareEurPP[0],
+          fareSource: price.fareSource,
+          totalEurCouple: price.totalEurCouple[0],
+          comfort: option.comfort.score,
+          pinnedAt: new Date().toISOString(),
+        }),
+      );
+    },
+    [leg, date, pins, pin, unpin],
+  );
+
+  /** Re-anchor the whole search on a pin's leg and day, and point at its row. */
+  const jumpToPin = useCallback((entry: FlightPin) => {
+    setLeg(entry.leg);
+    if (entry.leg === "outbound") setOutboundDate(entry.date);
+    else setReturnDate(entry.date);
+    setJump((current) => ({ optionId: entry.optionId, seq: (current?.seq ?? 0) + 1 }));
+  }, []);
 
   const priceFor = useCallback(
     (option: SearchOption): OptionPrice => {
@@ -1180,6 +1269,38 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     Number.POSITIVE_INFINITY,
   );
 
+  /**
+   * A pin whose row is in a held-back band opens the band on the way there.
+   *
+   * Watching a Gulf routing or something over the price cap is an entirely
+   * reasonable thing to do — that is what the bands are *for* — and a jump
+   * button that scrolled to a row hidden behind a collapsed disclosure would be
+   * a dead button.
+   *
+   * Adjusted during render rather than in an effect: React's own guidance for
+   * state that follows a changing input, and the pattern `PreviewNotice` uses.
+   * It fires once per jump, so the couple can still close the band afterwards
+   * without the page arguing with them.
+   */
+  const [jumpHandled, setJumpHandled] = useState(0);
+  if (jump && jump.seq !== jumpHandled) {
+    setJumpHandled(jump.seq);
+    const band = viaMiddleEast.some((row) => row.option.id === jump.optionId)
+      ? "middleEast"
+      : overCap.some((row) => row.option.id === jump.optionId)
+        ? "overCap"
+        : null;
+    if (band && !peek[band]) setPeek({ ...peek, [band]: true });
+  }
+
+  /* And the scroll, once that row is actually in the document. */
+  useEffect(() => {
+    if (!jump) return;
+    document
+      .getElementById(rowElementId(jump.optionId))
+      ?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [jump, peek]);
+
   /** Every control change is a new search as far as the bands are concerned. */
   const resetPeek = () => setPeek({ middleEast: false, overCap: false });
 
@@ -1201,6 +1322,14 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
           </p>
           <QuotaMeter quota={quota} />
         </header>
+
+        <FlightWatchlist
+          pins={pins}
+          series={watch.series}
+          loading={watchLoading}
+          onJump={jumpToPin}
+          onUnpin={unpin}
+        />
 
         <div className="mt-5 flex flex-wrap items-start gap-x-6 gap-y-3">
           <Segmented<Leg>
@@ -1267,23 +1396,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
 
         <WeightNote airlineWeight={airlineWeight} rows={rows} />
 
-        {!answered ? (
-          <ColdDateCost
-            date={date}
-            calls={coldPairs.length}
-            origins={pairs.length}
-            quota={quota}
-            onFetch={fetchLive}
-          />
-        ) : (
-          approvedDates.has(approvalKey) && (
-            <p className="mt-3 flex items-center gap-1.5 text-[11px] leading-snug text-[var(--sb-dim)]">
-              <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[var(--sb-accent)]" />
-              Pricing {formatDayYear(date)} live. Whatever lands is stored, so this day is
-              free from here on — and it will carry a price in the calendar above.
-            </p>
-          )
-        )}
+        <LiveDayNote date={date} calls={coldPairs.length} origins={pairs.length} />
 
         <OriginStrip pairs={pairs} quotes={quotes} />
 
@@ -1310,6 +1423,10 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               date={date}
               datePrices={pricesFor(row.option)}
               onPickDate={pickDate}
+              pinned={isPinned(pins, pinIdOf(leg, row.option.id, date))}
+              watchlistFull={watchlistFull}
+              onTogglePin={() => togglePin(row.option, row.price)}
+              highlighted={jump?.optionId === row.option.id}
             />
           ))}
           {ranked.length === 0 && (
@@ -1350,6 +1467,10 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 date={date}
                 datePrices={pricesFor(row.option)}
                 onPickDate={pickDate}
+                pinned={isPinned(pins, pinIdOf(leg, row.option.id, date))}
+                watchlistFull={watchlistFull}
+                onTogglePin={() => togglePin(row.option, row.price)}
+                highlighted={jump?.optionId === row.option.id}
               />
             ))}
           </HeldBackBand>
@@ -1384,6 +1505,10 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 date={date}
                 datePrices={pricesFor(row.option)}
                 onPickDate={pickDate}
+                pinned={isPinned(pins, pinIdOf(leg, row.option.id, date))}
+                watchlistFull={watchlistFull}
+                onTogglePin={() => togglePin(row.option, row.price)}
+                highlighted={jump?.optionId === row.option.id}
               />
             ))}
           </HeldBackBand>
@@ -1469,15 +1594,27 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
             </li>
             <li>
               <span className="font-semibold text-[var(--sb-text)]">
-                Every day in the window is choosable, and says what it costs.
+                Every day in the window is choosable, and prices itself when you choose it.
               </span>{" "}
               Any date from 1 December to 28 February, on either search. A day carrying a
-              price in the strip or the calendar is already stored — free to look at and
-              instant. A day with nothing on it has never been priced, and the panel above
-              the results says how many live calls filling it would spend, and how many are
-              left this month, before a single one is made. Nothing is fetched without being
-              asked for; the fan-out is capped either way. Opening a row compares the days
-              either side of the one you are on, from stored history alone.
+              price in the strip or the calendar is already stored — instant. A day with
+              nothing on it has never been priced, and choosing it prices the origins that
+              are missing, live, then keeps what lands, so it is only ever cold once. The
+              fan-out is capped per search, and the two ceilings that can refuse a call —
+              the monthly budget and the daily runaway guard — say so in words up by the
+              meter rather than quietly handing back a stored price. Opening a row compares
+              the days either side of the one you are on, from stored history alone.
+            </li>
+            <li>
+              <span className="font-semibold text-[var(--sb-text)]">
+                A pin remembers a quote; the watchlist watches it.
+              </span>{" "}
+              The pin on any row keeps that itinerary as it stands — day, carrier, price,
+              comfort — and puts it at the top of this page with what its price has done
+              since. The comparison is read from stored fares only: pinning twenty flights
+              never costs a call, and a pinned day nobody has priced since says exactly
+              that instead of inventing a change. Twenty pins, shared with whoever holds
+              the plan.
             </li>
             <li>
               <span className="font-semibold text-[var(--sb-text)]">One fetch per origin, cached a week.</span>{" "}

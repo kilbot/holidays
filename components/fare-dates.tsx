@@ -17,13 +17,13 @@
  * - **A month popover** covering December, January and February, for the jump
  *   the strip cannot make in one click.
  *
- * Both are dotted with what is already known, which is the part that keeps the
- * quota honest. A day carrying a stored fare shows its cheapest price in the
- * cell: looking at it costs nothing and returns instantly. A day the cron warms
- * shows a hollow mark — on the list, not necessarily priced. Everything else is
- * plain, and the panel above the results says what fetching one would spend
- * before a single call is made. Cached days are free candy; cold days are a
- * visible, chosen spend.
+ * Both are dotted with what is already known, and the dots outlived the gate
+ * they were built beside. A day carrying a stored fare shows its cheapest price
+ * in the cell: looking at it costs nothing and returns instantly. A day the cron
+ * warms shows a hollow mark — on the list, not necessarily priced. Everything
+ * else is plain, and choosing one prices it live there and then (#68: *"just
+ * make the calls"*). What the dots are for now is knowing which days are
+ * instant and which take a moment, rather than which ones need permission.
  */
 
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
@@ -96,7 +96,7 @@ function describeDay(date: string, coverage: DayCoverage | undefined, isDefault:
       isDefault ? " and this search's default" : ""
     }, so it is normally a cache hit. No stored price yet.`;
   }
-  return `${day} — nothing stored. Choosing it shows the research bands; fetching live fares for it spends calls, and the panel below says how many first.`;
+  return `${day} — nothing stored yet. Choosing it prices the origins that have nothing on this day, live, and stores what lands.`;
 }
 
 /**
@@ -386,8 +386,9 @@ export function FareDateField({
                 aria-hidden
                 className="mx-0.5 inline-block size-1.5 translate-y-[-1px] rounded-full border border-[var(--sb-dim)] align-middle"
               />
-              means the weekly warm covers it. A plain day has nothing stored yet, and
-              the search says what fetching it would cost before it spends anything.
+              means the weekly warm covers it. A plain day has nothing stored yet:
+              choosing it prices the missing origins live and keeps what lands, so it
+              is only ever cold once.
             </p>
           </div>
         )}

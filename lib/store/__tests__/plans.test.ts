@@ -203,6 +203,7 @@ test("a missing fork reads as absent", async () => {
 const state = (): ScenarioState => ({
   scenarios: [DEFAULT_SCENARIO],
   currentId: DEFAULT_SCENARIO.id,
+  pins: [],
 });
 
 test("adopt appends the fork's input as a new Scenario", () => {
