@@ -26,6 +26,7 @@ export const LOCATIONS: readonly Location[] = [
     name: "In transit",
     market: "transit",
     airport: ORIGIN_AIRPORT,
+    coords: null,
     homeBase: false,
     weather: null,
     regions: [],
@@ -35,6 +36,7 @@ export const LOCATIONS: readonly Location[] = [
     name: "Perth",
     market: "home-base-city",
     airport: "PER",
+    coords: [115.8613, -31.9523], // Perth CBD, not the airport
     homeBase: true,
     weather: "perth",
     regions: ["WA"],
@@ -45,6 +47,7 @@ export const LOCATIONS: readonly Location[] = [
     // Paid nights, but the car is the family's — the Capsule carries no hire.
     market: "regional",
     airport: "PER",
+    coords: [115.0750, -33.9550], // Margaret River township
     homeBase: false,
     weather: "margaret_river",
     regions: ["WA"],
@@ -55,7 +58,11 @@ export const LOCATIONS: readonly Location[] = [
     name: "Rottnest Island",
     market: "home-base-city",
     airport: "PER",
+    coords: [115.5200, -32.0060], // Thomson Bay settlement
     homeBase: true,
+    // Summer accommodation on the island is allocated by ballot; the day ends
+    // on the last ferry back, and the Buffer days after it are Perth days.
+    returnsTo: "perth",
     weather: "perth",
     regions: ["WA"],
   },
@@ -64,6 +71,7 @@ export const LOCATIONS: readonly Location[] = [
     name: "Sydney",
     market: "sydney",
     airport: "SYD",
+    coords: [151.2093, -33.8688],
     homeBase: false,
     weather: "sydney",
     regions: ["NSW"],
@@ -73,6 +81,7 @@ export const LOCATIONS: readonly Location[] = [
     name: "Port Douglas",
     market: "cairns",
     airport: "CNS",
+    coords: [145.4650, -16.4840], // 60 km north of the Cairns airport
     homeBase: false,
     weather: "port_douglas",
     regions: ["QLD"],
@@ -82,6 +91,7 @@ export const LOCATIONS: readonly Location[] = [
     name: "Byron Bay",
     market: "regional",
     airport: "OOL",
+    coords: [153.6120, -28.6434], // the Cape Byron end
     homeBase: false,
     weather: "byron_bay",
     regions: ["NSW-Northern-Rivers"],
@@ -91,6 +101,7 @@ export const LOCATIONS: readonly Location[] = [
     name: "Tasmania",
     market: "hobart",
     airport: "HBA",
+    coords: [147.3272, -42.8821], // Hobart, where the arc starts
     homeBase: false,
     weather: "hobart",
     regions: ["TAS"],
@@ -100,6 +111,7 @@ export const LOCATIONS: readonly Location[] = [
     name: "Melbourne",
     market: "melbourne",
     airport: "MEL",
+    coords: [144.9800, -37.7980], // Fitzroy / Collingwood, not the CBD
     homeBase: false,
     weather: "melbourne",
     regions: ["VIC"],
@@ -124,6 +136,9 @@ export function locationById(id: string): Location {
     name: iata,
     market: marketForAirport(iata),
     airport: iata,
+    // Only the airport is known — which is the honest resolution for a Catalog
+    // idea whose sweep recorded a `nearest_airport` and nothing else.
+    coords: AIRPORT_COORDINATES[iata] ?? null,
     homeBase: false,
     weather: null,
     regions: [],
@@ -152,10 +167,15 @@ function marketForAirport(iata: string): MarketId {
   return "regional";
 }
 
-/** Where a Location is, for pricing a drive. Null where the airport is unknown. */
+/**
+ * Where a Location is, for pricing a drive — the place itself, falling back to
+ * its gateway airport. Port Douglas is 60 km from the airport it flies into and
+ * Margaret River is three hours from Perth's; a drive priced off the airports
+ * would cost nothing at all.
+ */
 export function coordinatesOf(locationId: string): Coordinates | null {
   const location = locationById(locationId);
-  return AIRPORT_COORDINATES[location.airport] ?? null;
+  return location.coords ?? AIRPORT_COORDINATES[location.airport] ?? null;
 }
 
 const EARTH_RADIUS_KM = 6371;

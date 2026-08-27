@@ -66,7 +66,9 @@ const RESEARCH_BANDS: Readonly<Record<string, [number, number]>> = {
   "SYD-MEL": [67, 110], // row 15
   "OOL-HBA": [67, 134], // no published row; Gold Coast → Hobart, one-stop
   "CNS-OOL": [90, 160], // Cairns → Gold Coast, Jetstar
-  LONGHAUL: [1_500, 2_300], // longhaul-comfort.md, premium-comfort band
+  // longhaul-comfort.md, premium-comfort band — a **return** per person, which
+  // is why only the outbound crossing carries a fare. December is the top of it.
+  LONGHAUL: [1_500, 2_300],
 };
 
 /** Anything crossing an ocean prices off the long-haul band, not a domestic row. */
@@ -135,17 +137,27 @@ export function deriveLegs(input: LegInput): LegResult {
     );
   }
 
+  // The homeward crossing is the second half of the same ticket.
+  //
+  // `longhaul-comfort.md` prices the crossing as one **return** — €1,500–2,300
+  // per person, comfort-first — and argues for an open jaw (out to Perth, home
+  // from the east coast) as a variant of that one ticket rather than two
+  // one-ways. So the outbound Leg above carries the whole fare and this one
+  // carries nothing. Charging both would double the largest line in the Plan.
   const last = days[days.length - 1];
+  const homeward = buildLeg({
+    date: last.date,
+    fromLocationId: last.locationId,
+    toLocationId: "origin",
+    from: locationById(last.locationId).airport,
+    to: ORIGIN_AIRPORT,
+    input,
+    note: "The homeward crossing — the return half of the outbound ticket, so the fare is carried there.",
+  });
   legs.push(
-    buildLeg({
-      date: last.date,
-      fromLocationId: last.locationId,
-      toLocationId: "origin",
-      from: locationById(last.locationId).airport,
-      to: ORIGIN_AIRPORT,
-      input,
-      note: "The homeward crossing.",
-    }),
+    homeward.modeOverridden
+      ? homeward
+      : { ...homeward, eur: 0, bandEur: [0, 0] as [number, number] },
   );
 
   // Charge each Leg to its Day. Two Legs on one Day (a same-day connection) is
@@ -157,7 +169,9 @@ export function deriveLegs(input: LegInput): LegResult {
     day.lines.push({
       id: `${leg.date}:${leg.id}`,
       kind: "transport",
-      label: `${leg.from} → ${leg.to}${leg.mode === "flight" ? "" : ` by ${leg.mode}`}`,
+      // Places, not airport codes: two Locations can share a gateway, and
+      // "PER → PER" is not a sentence about a journey.
+      label: `${legEndName(leg.fromLocationId, leg.from)} → ${legEndName(leg.toLocationId, leg.to)}${leg.mode === "flight" ? "" : ` by ${leg.mode}`}`,
       aud: null,
       eur: leg.eur,
       bandEur: leg.bandEur,
@@ -170,6 +184,11 @@ export function deriveLegs(input: LegInput): LegResult {
   }
 
   return { legs, days };
+}
+
+/** "Margaret River", or the IATA code where the end is home rather than a place. */
+function legEndName(locationId: string, iata: string): string {
+  return locationId === "origin" ? iata : locationById(locationId).name;
 }
 
 interface BuildLegArgs {
@@ -186,7 +205,10 @@ function buildLeg(args: BuildLegArgs): Leg {
   const { date, from, to, input } = args;
   const id = `${from}>${to}@${date}`;
   const override = input.legModeOverrides[id];
-  const mode: LegMode = override ?? "flight";
+  // Two places reached through the same airport are a drive, not a flight:
+  // nobody flies Perth → Margaret River, and pricing it as a fare would invent
+  // several hundred euro out of a three-hour highway run.
+  const mode: LegMode = override ?? (from === to ? "drive" : "flight");
 
   const priced =
     mode === "drive"

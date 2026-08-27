@@ -32,8 +32,20 @@ export interface Location {
   market: MarketId;
   /** IATA of the airport a Leg to here flies into. */
   airport: string;
+  /**
+   * Where the place actually is, [longitude, latitude] — not its gateway.
+   * Margaret River is three hours from the Perth airport it is reached
+   * through, so a drive priced off the airport would cost nothing.
+   */
+  coords: [number, number] | null;
   /** Free lodging and a borrowed car. docs/CONTEXT.md, Home base. */
   homeBase: boolean;
+  /**
+   * Where the couple sleeps after a day here. Set on day-trip Locations
+   * (Rottnest) so a Buffer day following one falls back to the base rather
+   * than parking eleven unscheduled days on an island with no beds.
+   */
+  returnsTo?: string;
   /** Which normals the weather layers read. Null in transit. */
   weather: string | null;
   /** Region prefixes the events layer filters on. */

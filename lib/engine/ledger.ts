@@ -147,7 +147,9 @@ export function buildLedger(input: LedgerInput): Day[] {
 
     const locationId = capsule ? capsule.locationId : lastLocationId;
     const location = locationById(locationId);
-    lastLocationId = locationId;
+    // A Buffer day after a day trip is spent back at the base — `returnsTo` is
+    // where the last ferry goes.
+    lastLocationId = location.returnsTo ?? locationId;
 
     const market = MARKETS[location.market];
     const tierKey = capsule ? capsule.id : locationId;
