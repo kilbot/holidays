@@ -1,0 +1,469 @@
+{
+  "meta": {
+    "id": "flight-hubs",
+    "purpose": "Multi-origin search grid for the Flights page. Outbound: Western European hubs with credible one-stop service to Perth (PER) for departures ~12-20 Dec 2026, plus the Valencia positioning feed into each. Return: east-Australian airports with credible one-stop service to Spain for ~mid-late Feb 2027, plus the last-leg feed home to Valencia.",
+    "issue": "kilbot/holidays#48",
+    "researched": "2026-08-27",
+    "builds_on": "docs/research/longhaul-comfort.md (comfort, aircraft, stopover strategy, booking urgency). This file is the machine-readable route/price grid only; do not duplicate the comfort argument here.",
+    "currency": "EUR",
+    "confidence_legend": {
+      "VERIFIED": "confirmed against an airline schedule/press release, airport route table, or schedule-tracking outlet",
+      "ESTIMATE": "fare band synthesised from aggregator route averages and seasonality multipliers, NOT a live quote",
+      "LORE": "practitioner consensus, not documented by a primary source",
+      "CHECK": "must be re-verified at booking time"
+    },
+    "fare_band_basis": "typicalDecBandEurPP is per person, return, economy, open-jaw (into PER, out of SYD/MEL/BNE), bought ~3.5-4 months ahead for a mid-December departure. All bands are [ESTIMATE] anchored on the aggregator numbers in longhaul-comfort.md section 7 (MAD-PER typical EUR 1,263-5,709; BCN-PER typical EUR 954-3,672) adjusted for origin-market price level. Treat as ranking signal, not quotes.",
+    "positioning_band_basis": "typicalFareEur is one-way per person for the positioning leg on the stated carrier, booked ~3.5 months out. Low end = a quiet day in early/mid December, high end = 18-22 Dec peak. LCC bands EXCLUDE checked baggage (Ryanair/Wizz 20kg hold bag adds roughly EUR 35-60 each way on peak dates) - for two people with two 23kg cases this is material and the site must add it before comparing.",
+    "structural_findings": [
+      "There is NO flight between Valencia and Barcelona - none, on any carrier. Barcelona positioning is train (2h55-3h10 AVE/Euromed) or bus only. Every other hub in this grid has at least one nonstop from VLC.",
+      "Alliance membership of the feeder decides whether the positioning leg is PROTECTED. VLC has Star (LH to FRA/MUC, LX to ZRH, OS to VIE, TK to IST), oneworld (BA to LHR, IB to MAD) and SkyTeam (AF to CDG, KL to AMS) feed. That means a single-PNR ticket from Valencia itself exists for Singapore Airlines (via FRA/MUC/ZRH/MXP/CDG/AMS/IST), Cathay (via MAD or LHR), Qatar (via MAD or LHR), China Southern (via CDG/AMS/MAD) and Thai (via FRA/MUC/ZRH/MXP). LCC positioning (Ryanair/Wizz/easyJet/Transavia/Vueling) is NEVER protected and is a separate ticket by construction.",
+      "Emirates is the one major Perth carrier with no Valencia feed and no alliance: EK always requires an unprotected self-connect or the train.",
+      "The Singapore Airlines Barcelona service is only 5x weekly (Mon-pattern [CHECK]) and departs BCN at 12:35 - a midday departure that a same-day positioning move cannot safely feed. Barcelona is a night-before hub by construction.",
+      "Correction to longhaul-comfort.md section 5: Milan does NOT lose its Singapore connection. The 3x weekly SIN-MXP-BCN tag (SQ377/378) is cancelled from 27 Oct 2026, but the SIN-MXP NONSTOP (SQ355/356) goes from 4x weekly to DAILY on 25 Oct 2026. Milan Malpensa keeps 7 weekly SQ A350-900 nonstops all winter, and also has Cathay year-round and Thai. Milan is a first-rank hub for this trip, not a discarded one. Also corrected: SQ Munich is an increase from 7 to 10 weekly (except Feb 2027), not a new 3x weekly route.",
+      "Turkish Airlines does not serve Perth, so Istanbul is not a TK one-stop outbound - but Singapore Airlines, Qatar and China Southern all serve IST, so IST does sell one-stop itineraries to PER on other metal. IST matters mainly for the RETURN, where TK sells SYD/MEL-SIN-IST-VLC ending at Valencia's own airport.",
+      "Qatar Airways restores Canberra (via Melbourne, same aircraft) from 9 Dec 2026, 4x weekly 777-300ER. CBR therefore IS a credible return origin for Feb 2027 - it was not one a year ago.",
+      "Singapore Airlines starts Western Sydney International (WSI) daily on 23 Nov 2026 with a 2-class medium-haul A350-900 (40J/263Y, no premium economy). It is a second Sydney return option, but SQ202 lands SIN 05:05 and the SIN-BCN departure is 23:30, so it forces a ~18h Singapore layover unless a different SIN-Europe flight is used.",
+      "Gold Coast (OOL) is excluded: its only long-haul is AirAsia X to Kuala Lumpur, which has no European network. There is no credible OOL one-stop to Spain."
+    ]
+  },
+
+  "outbound": [
+    {
+      "airport": "BCN",
+      "city": "Barcelona",
+      "iata": "BCN",
+      "rank": 1,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1500-2300", "confidence": "VERIFIED", "note": "SQ387 BCN 12:35 -> SIN 08:25+1, A350-900 Long Haul (42J/24W/187Y), 5x weekly from 26 Oct 2026 as the SIN-BCN-MAD tag. Then SIN-PER (A350-900 or 787-10). Midday departure - night-before positioning mandatory." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED", "note": "DOH-PER is the 777-300ER 3-4-3, not the A380. Gulf reliability caveat (longhaul-comfort.md section 1)." },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED", "note": "BCN-DXB downgraded A380 -> 777 in Jul 2026; DXB-PER cut to 1x daily on the 777. No Valencia feed, no alliance - unprotected positioning only." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": null, "confidence": "VERIFIED", "note": "NOT AVAILABLE in December. CX Barcelona is summer-seasonal and is suspended for winter." }
+      ],
+      "positioningFromVLC": [],
+      "groundOption": { "mode": "train", "operators": ["Renfe AVE", "Euromed", "Alvia", "Ouigo", "iryo"], "duration": "2h55-3h10", "typicalFareEur": "13-60", "frequency": "multiple daily", "onwardToTerminal": "Sants -> BCN airport ~20 min (R2 Nord train or Aerobus)", "note": "The ONLY way to position to Barcelona. Renfe's stated baggage rule is 3 items / 25kg total per passenger - two people with two 23kg cases are over it on paper; book AVE/iryo/Ouigo standard, never Avlo." },
+      "overnightPracticality": "ok",
+      "overnightNote": "Forced, not optional: the SQ departure is 12:35 and there is no flight from VLC. Night before in Barcelona city (cheaper and nicer than the airport) then a 20-min train, or an airport hotel. Airport hotel supply at El Prat is thin compared with MAD/FRA/CDG.",
+      "notes": "The comfort-optimal hub per longhaul-comfort.md, and the only Spanish city with a nonstop to Singapore. Weakness: 5x weekly only, so the date has to bend to the airline, and every route in has an unprotected 3h train."
+    },
+    {
+      "airport": "MAD",
+      "city": "Madrid",
+      "iata": "MAD",
+      "rank": 2,
+      "carriers": [
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED", "note": "Daily from 25 Oct 2026 (up from 4x weekly). Two rotations run: CX372 MAD 11:25 -> HKG 06:50+1 and CX298 MAD 22:30 -> HKG 18:15+1, A350-900 [CHECK aircraft confirmed by Sep 2026]. Then HKG-PER 2x daily, CX171 A350-900. The 22:30 departure is the best same-day-positioning slot in the whole grid." },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "typicalDecBandEurPP": "900-1300", "confidence": "VERIFIED", "note": "China Southern's first-ever Spain route. The value floor with a real one-stop through-ticket. 24-30h door to door." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED", "note": "MAD-DOH ~24x weekly. oneworld, so IB VLC-MAD can be on the same PNR." },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED", "note": "MAD-DXB multiple daily; DXB-PER 1x daily 777." },
+        { "carrier": "Singapore Airlines", "via": "BCN + SIN", "stops": 2, "typicalDecBandEurPP": "1500-2300", "confidence": "VERIFIED", "note": "SQ387 originates MAD 10:00 and through-stops BCN. Boarding at MAD adds a stop to a 24h journey for no gain - board at BCN instead." }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Iberia", "typicalFareEur": "45-120", "frequency": "several daily (VLC-MAD ~168 flights/month all carriers)", "protected": true, "note": "oneworld - can be ticketed onto the Cathay or Qatar long-haul as a single PNR. This is the single most useful positioning leg in the grid." },
+        { "carrier": "Air Europa", "typicalFareEur": "40-110", "frequency": "daily", "protected": true, "note": "SkyTeam - pairs with China Southern (also SkyTeam) on one ticket." }
+      ],
+      "groundOption": { "mode": "train", "operators": ["Renfe AVE", "Avlo", "Ouigo", "iryo"], "duration": "1h56 fastest", "typicalFareEur": "8-55", "frequency": "~25 trains/day", "onwardToTerminal": "Atocha -> T4 in 30-40 min (Cercanias C-1)", "note": "25 trains/day makes a missed train a 40-minute problem, not a day. With the 22:30 Cathay departure a same-day train has 5h+ of margin." },
+      "overnightPracticality": "good",
+      "overnightNote": "Barajas has a deep airport-hotel supply and T4 is where both Cathay and Qatar operate. But with the CX298 22:30 departure an overnight is often unnecessary - the same-day 1h56 train works with margin.",
+      "notes": "The most OPTIONS of any European hub for Perth, the only hub with a protected flight feed from Valencia, and the only one where same-day positioning is genuinely safe. Loses to BCN on comfort (extra stop or an inferior carrier), wins on flexibility and price floor."
+    },
+    {
+      "airport": "MXP",
+      "city": "Milan",
+      "iata": "MXP",
+      "rank": 3,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1400-2150", "confidence": "VERIFIED", "note": "SQ355/356 SIN-MXP nonstop goes DAILY from 25 Oct 2026 (was 4x weekly), A350-900. Seven weekly A350 nonstops vs Barcelona's five - and Italy prices below Spain. Departure time [CHECK] - the old MXP tag flight left 12:25." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1150-1650", "confidence": "VERIFIED", "note": "MXP is a year-round Cathay destination (unlike Rome and Barcelona, which are summer-seasonal). A350 both sectors." },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1000-1500", "confidence": "VERIFIED", "note": "TG BKK-PER is daily on the 787-9 (TG481 BKK 07:20 -> PER 15:05). Star Alliance, so a LH/LX-fed VLC ticket is possible - but not from MXP itself, which has no VLC Star feed." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1050-1600", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1050-1600", "confidence": "VERIFIED" }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Ryanair", "airport": "MXP", "typicalFareEur": "25-110", "frequency": "several weekly", "protected": false, "note": "VLC-Milan Malpensa is a listed Ryanair route. Lands in the SAME airport as the SQ/CX/QR/EK long-hauls - this is the cleanest LCC positioning move in the grid." },
+        { "carrier": "Wizz Air", "airport": "MXP", "typicalFareEur": "20-100", "frequency": "several weekly", "protected": false, "note": "Wizz VLC-Milan Malpensa. Same-airport arrival." },
+        { "carrier": "Ryanair", "airport": "BGY", "typicalFareEur": "19-95", "frequency": "~16x weekly, ~2 daily", "protected": false, "note": "Bergamo is the highest-frequency and cheapest VLC-Milan option (fares seen from EUR 19) but it is the WRONG airport: BGY -> MXP is a ~50-70 min coach transfer with a change at Milano Centrale, or a direct shuttle. Adds cost, time and a failure point." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "ok",
+      "overnightNote": "Malpensa has real airport hotels (Sheraton Milan Malpensa is inside T1) but far fewer than FRA/CDG/LHR, and T1 is where the long-hauls go. Positioning into MXP: good. Positioning into BGY and transferring: poor - don't do the transfer on the same day.",
+      "notes": "The sleeper hub. Daily SQ A350 nonstops to Changi, year-round Cathay, a cheaper origin market than Spain (deal-fare anchors put Milan-PER around EUR 667-689 in shoulder season vs Spain's higher floor), and a same-airport Ryanair/Wizz feed from Valencia. The one thing it cannot offer is a protected positioning leg."
+    },
+    {
+      "airport": "CDG",
+      "city": "Paris",
+      "iata": "CDG",
+      "rank": 4,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1500-2300", "confidence": "VERIFIED", "note": "11x weekly SIN-CDG." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED" },
+        { "carrier": "Malaysia Airlines", "via": "KUL", "stops": 1, "typicalDecBandEurPP": "1100-1600", "confidence": "VERIFIED", "note": "CDG and LHR are Malaysia Airlines' ONLY two European destinations. A350-900 to KUL, then KUL-PER." },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "typicalDecBandEurPP": "900-1350", "confidence": "VERIFIED", "note": "SkyTeam - AF VLC-CDG can be on the same ticket. This is the protected version of the budget option." },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1000-1550", "confidence": "VERIFIED" },
+        { "carrier": "Vietnam Airlines", "via": "SGN", "stops": 1, "typicalDecBandEurPP": "900-1350", "confidence": "CHECK", "note": "VN serves CDG and flies SGN-PER 3x weekly (Mon/Thu/Sat). Whether the Europe flight and the Perth flight connect through SGN rather than HAN on the days needed must be checked - it can silently become a 2-stop." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Air France", "airport": "CDG", "typicalFareEur": "70-160", "frequency": "daily+", "protected": true, "note": "SkyTeam - single PNR with China Southern or Vietnam Airlines. Same-airport." },
+        { "carrier": "Transavia", "airport": "ORY", "typicalFareEur": "35-115", "frequency": "several weekly", "protected": false, "note": "Wrong airport. ORY -> CDG is ~70-90 min by Orlyval+RER or the Le Bus Direct coach." },
+        { "carrier": "Vueling", "airport": "ORY", "typicalFareEur": "35-115", "frequency": "several weekly", "protected": false, "note": "Wrong airport, as above." },
+        { "carrier": "Ryanair", "airport": "BVA", "typicalFareEur": "25-90", "frequency": "~2x weekly (14 flights/month)", "protected": false, "note": "Beauvais is not Paris. BVA -> Porte Maillot coach ~1h15 plus RER B to CDG ~1h. Two-and-a-half hours and two transfers - unusable as a same-day feed and barely worth it overnight." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "CDG has the largest in-terminal and shuttle hotel cluster in continental Europe and CDGVAL links the terminals. Only true if you position into CDG itself - ORY and BVA arrivals turn a night-before into a cross-Paris evening.",
+      "notes": "The widest carrier set on the continent - eight credible one-stops including the only continental Malaysia Airlines option - but nothing here beats Madrid or Barcelona on comfort, and the cheap positioning lands at the wrong airports. Include for price discovery, not as a favourite."
+    },
+    {
+      "airport": "LHR",
+      "city": "London",
+      "iata": "LHR",
+      "rank": 5,
+      "carriers": [
+        { "carrier": "Qantas", "via": "nonstop", "stops": 0, "typicalDecBandEurPP": "1700-2400", "confidence": "VERIFIED", "note": "QF9/QF10 LHR-PER, 787-9, 17h+, 17.2\" seat width. The only nonstop from Europe to Perth. Fewest segments, worst seat geometry." },
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1550-2350", "confidence": "VERIFIED", "note": "LHR 4x daily plus LGW going to 2x daily from 26 Oct 2026 (10 weekly 18 Jan - 14 Feb 2027) - up to 6 daily London-Singapore combined." },
+        { "carrier": "British Airways + Qantas", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1500-2300", "confidence": "VERIFIED", "note": "The BA A380 upper-deck-economy play (2-4-2) - the only routing on this trip that delivers a private pair. Retrofit roulette applies; see longhaul-comfort.md section 4." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1300-1900", "confidence": "VERIFIED" },
+        { "carrier": "Malaysia Airlines", "via": "KUL", "stops": 1, "typicalDecBandEurPP": "1150-1650", "confidence": "VERIFIED" },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1100-1600", "confidence": "VERIFIED" },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED" },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "typicalDecBandEurPP": "950-1400", "confidence": "VERIFIED" }
+      ],
+      "taxPenaltyEurPP": 124,
+      "taxPenaltyNote": "UK Air Passenger Duty, ultra-long-haul economy, GBP 106 pp from 1 Apr 2026 (~EUR 124 pp, ~EUR 248 for the couple) - a tax no Spanish, Italian or German origin pays. It rises again in April 2027. This must be added to every LHR band before comparing.",
+      "positioningFromVLC": [
+        { "carrier": "British Airways", "airport": "LHR", "typicalFareEur": "80-200", "frequency": "daily, ~2h20", "protected": true, "note": "oneworld - single PNR with Qantas, Cathay, Malaysia or Qatar. Same-airport. The only protected feed into London." },
+        { "carrier": "easyJet", "airport": "LGW", "typicalFareEur": "40-125", "frequency": "several weekly", "protected": false, "note": "LGW -> LHR is ~1h15 by National Express coach or ~1h30 via the rail change at Clapham/Paddington." },
+        { "carrier": "Vueling", "airport": "LGW", "typicalFareEur": "40-125", "frequency": "several weekly", "protected": false },
+        { "carrier": "Wizz Air", "airport": "LGW / LTN", "typicalFareEur": "25-105", "frequency": "several weekly", "protected": false, "note": "Wizz VLC-Gatwick and VLC-Luton. LTN -> LHR ~1h30." },
+        { "carrier": "Ryanair", "airport": "STN", "typicalFareEur": "25-100", "frequency": "several weekly", "protected": false, "note": "STN -> LHR ~1h30-2h by coach. Cheapest fare, worst transfer." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "Heathrow has the deepest airport-hotel market in Europe at every price point, and a night before is easy. But a cross-London transfer from STN/LGW/LTN eats the LCC saving in coach fares and adds a second failure point on top of the APD penalty.",
+      "notes": "Unlocks the Qantas nonstop and the BA A380 upper deck, and nothing else does. Pays roughly EUR 248 of APD for the couple plus either an expensive BA feeder or a cross-London transfer. Only worth searching if the A380 upper deck or the single-sector nonstop is specifically wanted."
+    },
+    {
+      "airport": "FRA",
+      "city": "Frankfurt",
+      "iata": "FRA",
+      "rank": 6,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1450-2250", "confidence": "VERIFIED", "note": "14x weekly SIN-FRA - the densest SQ service in continental Europe. With the LH feeder this is a single-PNR Star ticket from Valencia to Perth on the comfort-winning carrier." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED" },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1000-1550", "confidence": "VERIFIED", "note": "Star Alliance, so LH VLC-FRA is on the same ticket. The reliable A380-upper-deck route in longhaul-comfort.md section 4 runs LH FRA/MUC -> BKK -> PER on Thai." },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "typicalDecBandEurPP": "900-1350", "confidence": "VERIFIED" },
+        { "carrier": "Vietnam Airlines", "via": "SGN", "stops": 1, "typicalDecBandEurPP": "900-1350", "confidence": "CHECK", "note": "Same SGN-vs-HAN caveat as CDG." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Lufthansa", "airport": "FRA", "typicalFareEur": "80-190", "frequency": "daily (~81 flights/month VLC-FRA)", "protected": true, "note": "Star Alliance - single PNR with Singapore Airlines or Thai, same airport, bags checked through. The best protected route to a top-tier carrier that exists from Valencia." },
+        { "carrier": "Ryanair", "airport": "HHN", "typicalFareEur": null, "frequency": "SEASONAL - summer only", "protected": false, "note": "Frankfurt-Hahn is a Ryanair seasonal route from VLC and does NOT operate in December. Even if it did, HHN is 120 km from Frankfurt. Exclude." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "Sheraton is attached to T1 and a Hilton pair sits in The Squaire above the long-distance station. Trivially easy - but with a protected same-ticket LH feeder the overnight is usually unnecessary.",
+      "notes": "The best PROTECTED path from Valencia to a Changi routing: VLC-FRA on Lufthansa, FRA-SIN on Singapore Airlines, SIN-PER on Singapore Airlines, one ticket, one alliance, bags through. It costs more than the Barcelona train and adds a sector, but it deletes the connection risk that longhaul-comfort.md section 5 says is the real danger."
+    },
+    {
+      "airport": "MUC",
+      "city": "Munich",
+      "iata": "MUC",
+      "rank": 7,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1450-2250", "confidence": "VERIFIED", "note": "SIN-MUC increases from 7 to 10 weekly on 26 Oct 2026 - except February 2027, when it drops back [CHECK for the return]. A350-900." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED", "note": "Munich is Cathay's 11th and newest European destination." },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1000-1550", "confidence": "VERIFIED" },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Lufthansa / Lufthansa City Airlines", "airport": "MUC", "typicalFareEur": "80-190", "frequency": "daily (~39 flights/month)", "protected": true, "note": "Star Alliance single PNR with SQ or Thai. Half the frequency of the FRA feed, so less resilient if a rotation goes wrong." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "Hilton Munich Airport sits in the MAC forum between the terminals; MUC is consistently the least stressful large hub in this grid to overnight at.",
+      "notes": "FRA's smaller twin. Same Star-protected logic, nicer airport, thinner feed frequency, and the SQ frequency bump does not apply in February - relevant if this hub is used for the return as well."
+    },
+    {
+      "airport": "FCO",
+      "city": "Rome",
+      "iata": "FCO",
+      "rank": 8,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1400-2150", "confidence": "VERIFIED", "note": "Rome is one of SQ's 15 winter-2026 European cities. Frequency [CHECK]." },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "typicalDecBandEurPP": "900-1300", "confidence": "VERIFIED", "note": "Rome is on China Southern's Guangzhou-Europe list." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1050-1600", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1050-1600", "confidence": "VERIFIED" },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": null, "confidence": "VERIFIED", "note": "NOT AVAILABLE in December - CX Rome is summer-seasonal and suspended for winter, same as Barcelona." }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Ryanair", "airport": "FCO", "typicalFareEur": "30-110", "frequency": "several weekly", "protected": false, "note": "Ryanair flies VLC to Fiumicino ITSELF, not Ciampino - same airport as every long-haul. Rare and valuable for an LCC." },
+        { "carrier": "Vueling", "airport": "FCO", "typicalFareEur": "35-115", "frequency": "several weekly", "protected": false },
+        { "carrier": "Wizz Air", "airport": "FCO", "typicalFareEur": "25-105", "frequency": "several weekly", "protected": false },
+        { "carrier": "ITA Airways", "airport": "FCO", "typicalFareEur": null, "frequency": "SEASONAL - not December", "protected": false, "note": "ITA's VLC-FCO is seasonal; do not count on it in December. If it did run, ITA is now Lufthansa Group / Star-adjacent [CHECK] which would make it a protected feed to SQ." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "Hilton Rome Airport connects to T3 by covered walkway and there is a second cluster at Fiumicino town. Three different LCCs land at FCO itself, so no transfer risk.",
+      "notes": "The cheapest same-airport LCC positioning in the grid (three carriers into FCO itself) attached to a decent one-stop set. Weaker than Milan because Cathay is not available in winter and the SQ frequency is unconfirmed."
+    },
+    {
+      "airport": "AMS",
+      "city": "Amsterdam",
+      "iata": "AMS",
+      "rank": 9,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1450-2250", "confidence": "VERIFIED" },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED" },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "typicalDecBandEurPP": "900-1350", "confidence": "VERIFIED", "note": "SkyTeam with KLM - protected single PNR from VLC." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1000-1550", "confidence": "CHECK", "note": "Thai resumes Amsterdam in late 2026 - confirm it is flying by mid-December before relying on it." }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "KLM", "airport": "AMS", "typicalFareEur": "80-180", "frequency": "daily", "protected": true, "note": "SkyTeam single PNR with China Southern." },
+        { "carrier": "easyJet", "airport": "AMS", "typicalFareEur": "35-115", "frequency": "several weekly", "protected": false },
+        { "carrier": "Transavia", "airport": "AMS", "typicalFareEur": "30-110", "frequency": "several weekly", "protected": false, "note": "Transavia also flies VLC-EIN and VLC-RTM - both wrong airports, 1h30+ to Schiphol by train." },
+        { "carrier": "Vueling", "airport": "AMS", "typicalFareEur": "40-120", "frequency": "several weekly", "protected": false }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "Sheraton and citizenM are at the terminal, the rail station is under it, and Amsterdam is the easiest hub in the grid to reach from Valencia (~213 VLC-AMS flights/month across four carriers - the densest link Valencia has to any hub in this grid).",
+      "notes": "Valencia's best-connected hub by raw frequency, with four carriers competing on the feeder. The Perth one-stops are solid but nothing here is unavailable at Frankfurt or Madrid. Search it for the fare, not the routing."
+    },
+    {
+      "airport": "ZRH",
+      "city": "Zurich",
+      "iata": "ZRH",
+      "rank": 10,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1550-2350", "confidence": "VERIFIED", "note": "7x weekly SIN-ZRH." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1250-1800", "confidence": "VERIFIED" },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1050-1600", "confidence": "VERIFIED" },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED" }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Swiss", "airport": "ZRH", "typicalFareEur": "90-200", "frequency": "daily (~86 flights/month)", "protected": true, "note": "Star Alliance single PNR with SQ or Thai. Swiss also flies VLC-GVA, which is no use here." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "Radisson Blu is at the airport and ZRH is small and efficient - but Swiss hotel prices are the highest in the grid, roughly double a Milan or Rome airport night.",
+      "notes": "A Star-protected alternative to FRA/MUC with the same carriers. Loses on cost at every step - feeder fare, hotel, and a Swiss-origin fare basis. Include for completeness."
+    },
+    {
+      "airport": "VIE",
+      "city": "Vienna",
+      "iata": "VIE",
+      "rank": 11,
+      "carriers": [
+        { "carrier": "Scoot", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "650-1100", "confidence": "VERIFIED", "note": "THE BUDGET FLOOR. Scoot VIE-SIN 4x weekly (787), then Scoot TR28 SIN 23:00 -> PER 04:15 daily from 25 Oct 2026 (787-8). One airline, one ticket, but low-cost long-haul: no meals, no seat selection, no free bags, 3-3-3 at 31\" and a 04:15 arrival. Include it so the site can show the honest floor, not because it should win." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1000-1550", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1000-1550", "confidence": "VERIFIED" },
+        { "carrier": "Singapore Airlines", "via": null, "stops": null, "typicalDecBandEurPP": null, "confidence": "VERIFIED", "note": "NOT AVAILABLE - Vienna is not one of SQ's 15 European cities." },
+        { "carrier": "Thai Airways", "via": null, "stops": null, "typicalDecBandEurPP": null, "confidence": "VERIFIED", "note": "NOT AVAILABLE - Thai terminated Vienna." }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Ryanair", "airport": "VIE", "typicalFareEur": "20-90", "frequency": "several weekly", "protected": false, "note": "Ryanair flies VLC to Vienna's MAIN airport, not a secondary field. Pairs naturally with Scoot - two LCC tickets, zero protection, lowest total cost in the entire grid." },
+        { "carrier": "Austrian Airlines", "airport": "VIE", "typicalFareEur": "80-180", "frequency": "daily (~49 flights/month)", "protected": true, "note": "Star Alliance - but with no SQ or Thai at Vienna there is nothing Star-protected to connect TO for Perth. The protection is wasted here." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "NH Vienna Airport is attached to the terminal and Austrian airport hotels are cheap by Western European standards. Vienna is the best-value overnight in the grid.",
+      "notes": "Vienna exists in this grid for exactly one reason: Ryanair from Valencia plus Scoot to Perth is the cheapest way two people can physically get from Valencia to Perth, and the site should be able to price it honestly. Deal-fare anchors put VIE-PER around EUR 626-630 in shoulder season - the lowest European origin seen. Everything about it contradicts longhaul-comfort.md's comfort-first ranking."
+    },
+    {
+      "airport": "IST",
+      "city": "Istanbul",
+      "iata": "IST",
+      "rank": 12,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1250-1900", "confidence": "VERIFIED", "note": "IST is one of SQ's 15 European cities. TK and SQ are both Star Alliance, so VLC-IST (TK) + IST-SIN-PER (SQ) is theoretically a single Star ticket originating at Valencia airport with no train and no LCC. [CHECK] whether it actually constructs and prices - this is the most interesting unverified item in the grid." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1000-1500", "confidence": "VERIFIED" },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "typicalDecBandEurPP": "850-1300", "confidence": "VERIFIED", "note": "Istanbul is on China Southern's Guangzhou-Europe list." },
+        { "carrier": "Turkish Airlines", "via": null, "stops": null, "typicalDecBandEurPP": null, "confidence": "VERIFIED", "note": "TK DOES NOT SERVE PERTH. Turkish can only reach Perth as a 2-stop with a change of airline. Istanbul is a return hub, not an outbound one." }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Turkish Airlines", "airport": "IST", "typicalFareEur": "90-200", "frequency": "11x weekly (~62 flights/month)", "protected": "partial", "note": "Protected only if the onward long-haul is on a Star partner (SQ) on the same ticket. Turkish's own metal cannot complete the journey to Perth." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "IST has YOTELAIR airside and a large Hilton/Marriott cluster landside, and it is 24-hour. As a long DAYTIME layover longhaul-comfort.md rates it well below Changi, but as a night-before positioning stop it is easy and cheap.",
+      "notes": "Marginal outbound (SQ or CZ only, and the SQ Star construction is unproven), essential on the return. Keep it in the outbound search purely to test the single-PNR-from-Valencia hypothesis."
+    },
+    {
+      "airport": "BRU",
+      "city": "Brussels",
+      "iata": "BRU",
+      "rank": 13,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "typicalDecBandEurPP": "1400-2150", "confidence": "VERIFIED" },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "typicalDecBandEurPP": "1200-1750", "confidence": "VERIFIED", "note": "BRU resumed summer 2025 and now runs year-round." },
+        { "carrier": "Thai Airways", "via": "BKK", "stops": 1, "typicalDecBandEurPP": "1000-1550", "confidence": "VERIFIED" },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "typicalDecBandEurPP": "1150-1700", "confidence": "VERIFIED" }
+      ],
+      "positioningFromVLC": [
+        { "carrier": "Brussels Airlines", "airport": "BRU", "typicalFareEur": "70-170", "frequency": "daily", "protected": true, "note": "Star Alliance (Lufthansa Group) - single PNR with SQ or Thai." },
+        { "carrier": "Vueling", "airport": "BRU", "typicalFareEur": "35-115", "frequency": "several weekly", "protected": false },
+        { "carrier": "Ryanair", "airport": "CRL", "typicalFareEur": "20-90", "frequency": "several weekly", "protected": false, "note": "Charleroi is 55 km south of Brussels - ~1h by shuttle to Brussels-Midi then ~20 min train to BRU. Wrong airport." }
+      ],
+      "groundOption": null,
+      "overnightPracticality": "good",
+      "overnightNote": "Sheraton is opposite the terminal; BRU is small and easy.",
+      "notes": "A complete but unremarkable hub: same Star-protected structure as FRA with less frequency. Included because it is genuinely searchable, ranked low because it never wins."
+    }
+  ],
+
+  "return": [
+    {
+      "airport": "SYD",
+      "city": "Sydney",
+      "iata": "SYD",
+      "rank": 1,
+      "carriers": [
+        { "carrier": "Turkish Airlines", "via": "SIN + IST", "stops": 2, "arrivesAt": "VLC", "typicalFebBandEurPP": "750-1150", "confidence": "VERIFIED", "note": "THE ONLY SINGLE-CARRIER ITINERARY THAT ENDS AT VALENCIA AIRPORT. TK23 SYD 21:35 -> SIN 02:50, continuing to IST, then TK IST-VLC (11x weekly). All A350-900 on the long sectors, 5x weekly from 26 Oct 2026 to 27 Mar 2027 (flight numbers changed from TK174/175 to TK22/23). Two stops, but one ticket, one airline, bags through, no train, no positioning flight." },
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "arrivesAt": "BCN", "typicalFebBandEurPP": "950-1500", "confidence": "VERIFIED", "note": "SYD-SIN then SQ388 SIN 23:30 -> BCN 06:40+1. BCN is a nonstop terminus so this is a true 1-stop. 5x weekly on the BCN leg - date-constrained." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "arrivesAt": "MAD", "typicalFebBandEurPP": "850-1350", "confidence": "VERIFIED", "note": "Daily HKG-MAD from 25 Oct 2026, A350-900. oneworld means the IB MAD-VLC hop can be on the same ticket - a fully protected door-to-Valencia return." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "800-1300", "confidence": "VERIFIED", "note": "oneworld - IB MAD-VLC can be added. Gulf reliability caveat is lower risk in February than December." },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "800-1300", "confidence": "VERIFIED", "note": "No Valencia feed and no alliance - always ends with a train or a separate ticket." },
+        { "carrier": "Etihad", "via": "AUH", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "750-1250", "confidence": "VERIFIED", "note": "SYD-AUH is 2x daily on the A350-1000. Etihad has no Perth service so it is return-only - and longhaul-comfort.md section 7 found six of eight Etihad open-jaw combinations priced BELOW a plain London return." },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "arrivesAt": "MAD", "typicalFebBandEurPP": "650-1050", "confidence": "VERIFIED", "note": "The value floor on the return too. SkyTeam - Air Europa MAD-VLC can be on the same ticket." },
+        { "carrier": "Malaysia Airlines", "via": "KUL", "stops": 1, "arrivesAt": "LHR or CDG", "typicalFebBandEurPP": "800-1300", "confidence": "VERIFIED", "note": "Ends in London or Paris, not Spain - needs a separate BA/AF/LCC hop to VLC. LHR-VLC on BA is oneworld-protected." }
+      ],
+      "toVLCorNearby": {
+        "fromBCN": { "flight": null, "train": "BCN Sants -> VLC, 2h55-3h10, EUR 13-45, multiple daily", "note": "No flight exists. Train or bus only. Unprotected by construction." },
+        "fromMAD": { "flight": "Iberia or Air Europa, ~1h, EUR 40-110, several daily", "train": "Atocha -> VLC 1h56, EUR 8-55, ~25/day", "note": "The flight can be on the SAME TICKET as Cathay/Qatar (oneworld via Iberia) or China Southern (SkyTeam via Air Europa). Madrid is the only European arrival point that can be through-ticketed to Valencia." },
+        "fromIST": { "flight": "Turkish, 11x weekly, on the same ticket", "note": "Ends at Valencia. No onward leg needed at all." },
+        "fromLHR": { "flight": "British Airways ~2h20, EUR 70-180; or easyJet/Vueling/Wizz/Ryanair from LGW/STN/LTN, EUR 30-110", "note": "BA is oneworld-protected; the LCCs are not and land at the wrong London airport." }
+      },
+      "overnightPracticality": "good",
+      "notes": "The densest departure point on the east coast and the only one with the Turkish end-to-Valencia option. February is the cheapest month of the year ex-Australia (aggregator average SYD-Spain EUR 804 in Feb vs EUR 1,344 in Dec), so the return is where the search grid should be most aggressive."
+    },
+    {
+      "airport": "WSI",
+      "city": "Western Sydney (Nancy-Bird Walton)",
+      "iata": "WSI",
+      "rank": 5,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "arrivesAt": "BCN", "typicalFebBandEurPP": "950-1500", "confidence": "VERIFIED", "note": "Daily from 23 Nov 2026. SQ202 WSI 23:55 -> SIN 05:05. A350-900 MEDIUM-HAUL config: 40 Business / 263 Economy, TWO cabins, no premium economy. The 05:05 arrival vs the 23:30 SIN-BCN departure means an ~18h Singapore layover - a stopover day, or use a different SIN-Europe flight." }
+      ],
+      "toVLCorNearby": { "fromBCN": { "flight": null, "train": "BCN Sants -> VLC 2h55-3h10, EUR 13-45" } },
+      "overnightPracticality": "good",
+      "notes": "New airport, one international carrier, worth searching only if they are staying in western Sydney - the ground transfer from central Sydney to WSI is longer than to Kingsford Smith and the rail link is new. Include in the grid so the site does not silently miss a cheaper fare basis at a brand-new airport."
+    },
+    {
+      "airport": "MEL",
+      "city": "Melbourne",
+      "iata": "MEL",
+      "rank": 2,
+      "carriers": [
+        { "carrier": "Turkish Airlines", "via": "SIN + IST", "stops": 2, "arrivesAt": "VLC", "typicalFebBandEurPP": "750-1150", "confidence": "VERIFIED", "note": "TK168/169 IST-SIN-MEL, 3x weekly, A350-900. Same end-at-Valencia advantage as Sydney but half the frequency." },
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "arrivesAt": "BCN", "typicalFebBandEurPP": "950-1500", "confidence": "VERIFIED" },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "arrivesAt": "MAD", "typicalFebBandEurPP": "850-1350", "confidence": "VERIFIED" },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "800-1300", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "800-1300", "confidence": "VERIFIED" },
+        { "carrier": "Etihad", "via": "AUH", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "750-1250", "confidence": "VERIFIED", "note": "MEL-AUH 1x daily, 787-9. The MEL->LON...MAD/BCN->MEL open-jaw fares in longhaul-comfort.md section 7 were Etihad." },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "arrivesAt": "MAD", "typicalFebBandEurPP": "650-1050", "confidence": "VERIFIED" }
+      ],
+      "toVLCorNearby": { "sameAs": "SYD" },
+      "overnightPracticality": "good",
+      "notes": "Near-parity with Sydney on carriers and usually a shade cheaper. The Turkish frequency drops to 3x weekly, which matters if the return date is fixed."
+    },
+    {
+      "airport": "BNE",
+      "city": "Brisbane",
+      "iata": "BNE",
+      "rank": 3,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "arrivesAt": "BCN", "typicalFebBandEurPP": "1000-1550", "confidence": "VERIFIED" },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "arrivesAt": "MAD", "typicalFebBandEurPP": "900-1400", "confidence": "VERIFIED", "note": "Cathay added 33% Brisbane-Hong Kong capacity for the 2026 Lunar New Year period." },
+        { "carrier": "Qatar Airways", "via": "DOH", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "850-1350", "confidence": "VERIFIED" },
+        { "carrier": "Emirates", "via": "DXB", "stops": 1, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "850-1350", "confidence": "VERIFIED" },
+        { "carrier": "China Southern", "via": "CAN", "stops": 1, "arrivesAt": "MAD", "typicalFebBandEurPP": "700-1100", "confidence": "VERIFIED", "note": "China Southern grew Brisbane seats 66.9% year on year." },
+        { "carrier": "Turkish Airlines", "via": null, "stops": null, "arrivesAt": null, "typicalFebBandEurPP": null, "confidence": "VERIFIED", "note": "NOT AVAILABLE - Turkish does not serve Brisbane. The end-at-Valencia trick is Sydney and Melbourne only." },
+        { "carrier": "Etihad", "via": null, "stops": null, "arrivesAt": null, "typicalFebBandEurPP": null, "confidence": "VERIFIED", "note": "NOT AVAILABLE - Etihad serves Sydney and Melbourne only." }
+      ],
+      "toVLCorNearby": { "sameAs": "SYD", "note": "No Turkish option, so a Brisbane return always ends at BCN or MAD (or London) and needs the last leg." },
+      "overnightPracticality": "good",
+      "notes": "Fully credible: five one-stop carriers to Spain. Typically prices EUR 50-100 pp above Sydney/Melbourne and loses the two best structural options (Turkish to Valencia, Etihad's cheap open-jaws)."
+    },
+    {
+      "airport": "ADL",
+      "city": "Adelaide",
+      "iata": "ADL",
+      "rank": 4,
+      "carriers": [
+        { "carrier": "Singapore Airlines", "via": "SIN", "stops": 1, "arrivesAt": "BCN", "typicalFebBandEurPP": "1000-1550", "confidence": "VERIFIED", "note": "ADL-SIN is year-round." },
+        { "carrier": "Cathay Pacific", "via": "HKG", "stops": 1, "arrivesAt": "MAD", "typicalFebBandEurPP": "900-1450", "confidence": "VERIFIED", "note": "SEASONAL BUT IN WINDOW: ADL-HKG runs 11 Nov - 27 Mar, Wed/Fri/Sun, A350-900. February 2027 is inside the season [CHECK the 2026-27 season dates repeat]." },
+        { "carrier": "Malaysia Airlines", "via": "KUL", "stops": 1, "arrivesAt": "LHR or CDG", "typicalFebBandEurPP": "900-1400", "confidence": "VERIFIED" },
+        { "carrier": "Qatar Airways", "via": null, "stops": null, "arrivesAt": null, "typicalFebBandEurPP": null, "confidence": "VERIFIED", "note": "NOT AVAILABLE IN FEBRUARY. Qatar's Adelaide-Doha service is seasonal, 16 Jun - 14 Sep 2026 only. Do not let an aggregator sell this." }
+      ],
+      "toVLCorNearby": { "sameAs": "SYD" },
+      "overnightPracticality": "good",
+      "notes": "Only worth searching if the itinerary already ends in South Australia. Two credible one-stops to Spain (SQ via SIN, CX via HKG in season), and the obvious-looking Qatar option is a trap - it does not fly in February."
+    },
+    {
+      "airport": "CBR",
+      "city": "Canberra",
+      "iata": "CBR",
+      "rank": 6,
+      "carriers": [
+        { "carrier": "Qatar Airways", "via": "MEL + DOH", "stops": 2, "arrivesAt": "BCN or MAD", "typicalFebBandEurPP": "850-1400", "confidence": "VERIFIED", "note": "NEW: from 9 Dec 2026, 4x weekly CBR-MEL-DOH on the 777-300ER, same aircraft through Melbourne (a tag, not a connection), going daily from late Mar 2027. This is Canberra's only long-haul. oneworld, so IB MAD-VLC can be added." }
+      ],
+      "toVLCorNearby": { "sameAs": "SYD" },
+      "overnightPracticality": "good",
+      "notes": "Credible for the first time in years, and worth searching only if they end the trip in Canberra. Four weekly departures means almost no date flexibility."
+    },
+    {
+      "airport": "OOL",
+      "city": "Gold Coast",
+      "iata": "OOL",
+      "rank": null,
+      "excluded": true,
+      "carriers": [
+        { "carrier": "AirAsia X", "via": "KUL", "stops": 1, "arrivesAt": null, "typicalFebBandEurPP": null, "confidence": "VERIFIED", "note": "AirAsia X has no European network, so KUL is a dead end. Scoot's Gold Coast-Singapore service ended in 2023." }
+      ],
+      "toVLCorNearby": null,
+      "overnightPracticality": "poor",
+      "notes": "EXCLUDED from the search grid. No credible one-stop or two-stop single-ticket path to Spain. If they are on the Gold Coast, the answer is the 80-minute drive or the train to Brisbane."
+    }
+  ],
+
+  "sources": [
+    { "url": "https://en.wikipedia.org/wiki/Valencia_Airport", "accessed": "2026-08-27", "used_for": "Valencia airline-and-destination table: which carriers fly VLC to each hub, seasonal markers, confirmation that no VLC-BCN service exists" },
+    { "url": "https://www.flightconnections.com/flights-from-valencia-vlc", "accessed": "2026-08-27", "used_for": "VLC monthly frequency per destination; BCN showing zero flights" },
+    { "url": "https://www.aena.es/en/valencia/airlines/ryanair.html", "accessed": "2026-08-27", "used_for": "Ryanair Valencia route list (airport operator, primary source)" },
+    { "url": "https://www.flightsfrom.com/VLC/FR", "accessed": "2026-08-27", "used_for": "Ryanair VLC destination count and weekly departures" },
+    { "url": "https://www.aeroroutes.com/eng/260508-sqnw26eu", "accessed": "2026-08-27", "used_for": "Singapore Airlines NW26 Europe changes: Madrid 5x weekly from 26 Oct, Milan nonstop 4->7 weekly from 25 Oct, Munich 7->10 weekly except Feb 2027, Gatwick 1->2 daily" },
+    { "url": "https://www.singaporeair.com/en_UK/gb/corporate/newsroom/press-release/2026/april---june-2026/Europe_Madrid_October/", "accessed": "2026-08-27", "used_for": "Singapore Airlines Madrid/Barcelona launch press release" },
+    { "url": "https://www.aeroroutes.com/eng/260629-cxnw26mad", "accessed": "2026-08-27", "used_for": "Cathay Madrid NW26: daily from 25 Oct 2026, CX372 MAD 11:25 and CX298 MAD 22:30, A350-900 pending confirmation" },
+    { "url": "https://news.cathaypacific.com/cathay-pacific-expands-its-latin-america-coverage-via-madrid-with-new-iberia-codeshares", "accessed": "2026-08-27", "used_for": "Cathay Madrid daily upgrade and Iberia codeshare (airline primary source)" },
+    { "url": "https://en.wikipedia.org/wiki/List_of_Cathay_Pacific_destinations", "accessed": "2026-08-27", "used_for": "Cathay European network incl. Milan year-round, Rome and Barcelona seasonal, Munich new, Brussels year-round; Perth served" },
+    { "url": "https://simpleflying.com/cathay-pacific-flights-new-european-destination-munich/", "accessed": "2026-08-27", "used_for": "Cathay Munich as 11th European destination; 10 year-round European destinations with Rome and Barcelona suspended for winter" },
+    { "url": "https://en.wikipedia.org/wiki/List_of_Thai_Airways_International_destinations", "accessed": "2026-08-27", "used_for": "Thai European network (FRA, MUC, ZRH, MXP, BRU, LHR, CDG, IST, CPH, ARN, OSL; AMS resuming late 2026) and Perth service" },
+    { "url": "https://www.executivetraveller.com/news/thai-airways-perth-bangkok-flights", "accessed": "2026-08-27", "used_for": "Thai BKK-PER daily, TG481 BKK 07:20 -> PER 15:05, 787-9" },
+    { "url": "https://malaysiaaviationgroup.com.my/en/MAG-media-centre/news-releases/2026/additional-europe-flights-march-2026.html", "accessed": "2026-08-27", "used_for": "Malaysia Airlines' European network is London Heathrow and Paris CDG only (airline primary source)" },
+    { "url": "https://www.businesstraveller.com/news/turkish-airlines-sydney-singapore-route/", "accessed": "2026-08-27", "used_for": "Turkish IST-SIN-SYD 5x weekly A350-900 from 26 Oct 2026, TK22 SIN 08:30 -> SYD 19:25, TK23 SYD 21:35 -> SIN 02:50; separate 3x weekly IST-SIN-MEL as TK168/169" },
+    { "url": "https://mainlymiles.com/2026/08/06/turkish-airlines-launching-singapore-sydney-flights/", "accessed": "2026-08-27", "used_for": "Turkish Singapore-Sydney route confirmation and 26 Oct 2026 - 27 Mar 2027 season" },
+    { "url": "https://milelion.com/2026/03/25/singapore-airlines-launching-flights-to-western-sydney-airport-from-november-2026/", "accessed": "2026-08-27", "used_for": "SQ Western Sydney International daily from 23 Nov 2026, SQ201/202, 2-class A350-900 (40J/263Y), SQ202 WSI 23:55 -> SIN 05:05" },
+    { "url": "https://www.nomadlawyer.org/qatar-airways-canberra-boeing-777-300er-melbourne-doha-route-2026", "accessed": "2026-08-27", "used_for": "Qatar Canberra via Melbourne from 9 Dec 2026, 4x weekly 777-300ER, daily from late Mar 2027" },
+    { "url": "https://samove.raa.com.au/direct-international-flights-from-adelaide/", "accessed": "2026-08-27", "used_for": "Adelaide international network; Cathay ADL-HKG seasonal 11 Nov - 27 Mar, Wed/Fri/Sun, A350-900" },
+    { "url": "https://www.travelandtourworld.com/news/article/qatar-airways-resumes-direct-flights-from-adelaide-to-doha-in-june-2026-a-comprehensive-guide-to-what-australian-travelers-need-to-know-about-the-return-of-this-key-air-route-connecting-australia-and/", "accessed": "2026-08-27", "used_for": "Qatar ADL-DOH is seasonal 16 Jun - 14 Sep 2026 only - NOT available in February" },
+    { "url": "https://en.wikipedia.org/wiki/Brisbane_Airport", "accessed": "2026-08-27", "used_for": "Brisbane long-haul carriers: Emirates, Qatar, Singapore Airlines, Cathay, China Southern, China Eastern; no Etihad, no Turkish" },
+    { "url": "https://karryon.com.au/industry-news/airline/brisbane-airport-lunar-new-year-2026/", "accessed": "2026-08-27", "used_for": "Brisbane capacity growth by carrier: China Southern +66.9%, Cathay +33.3%" },
+    { "url": "https://simpleflying.com/australia-middle-east-routes-23-daily-flights-2026/", "accessed": "2026-08-27", "used_for": "Etihad Australia: Sydney 2x daily A350-1000, Melbourne 1x daily 787-9, no Brisbane" },
+    { "url": "https://simpleflying.com/scoot-cut-gold-coast-singapore-flights/", "accessed": "2026-08-27", "used_for": "Scoot Gold Coast-Singapore terminated; OOL exclusion" },
+    { "url": "https://www.flightradar24.com/blog/aviation-news/airline-news/airline-routes/scoot-connects-vienna-and-singapore/", "accessed": "2026-08-27", "used_for": "Scoot Vienna-Singapore, Vienna as Scoot's second European destination" },
+    { "url": "https://www.flightconnections.com/flights-from-vie-to-sin", "accessed": "2026-08-27", "used_for": "Scoot VIE-SIN 4x weekly, sole operator, still running as of Aug 2026" },
+    { "url": "https://info.flightmapper.net/route/Scoot_TR_SIN_PER", "accessed": "2026-08-27", "used_for": "Scoot TR28 SIN 23:00 -> PER 04:15 daily from 25 Oct 2026, 787-8" },
+    { "url": "https://www.emirates.com/english/destinations/dxb/per/flights-from-dubai-to-perth/", "accessed": "2026-08-27", "used_for": "Emirates DXB-PER 7x weekly on the 777, not the A380 (airline primary source)" },
+    { "url": "https://www.secretflying.com/posts/european-cities-to-perth-australia-from-only-e626-roundtrip/", "accessed": "2026-08-27", "used_for": "Deal-fare anchors by European origin: Vienna EUR 626-630, Milan EUR 667-689, Rome EUR 690-693 - shoulder-season deals, not December quotes" },
+    { "url": "https://www.omio.com/flights/valencia/bergamo-m6sln", "accessed": "2026-08-27", "used_for": "Ryanair VLC-BGY fares from ~EUR 19; route frequency ~16x weekly" },
+    { "url": "https://travelweekly.com.au/uncovering-china-as-a-gateway-to-europe-with-china-southern-airlines/", "accessed": "2026-08-27", "used_for": "China Southern Guangzhou-Europe network: London, Amsterdam, Madrid, Paris, Rome, Frankfurt, Istanbul, Budapest, Belgrade on single ticket" },
+    { "url": "https://www.vietnamairlines.com/en-vn/flights-from-ho-chi-minh-city-to-perth", "accessed": "2026-08-27", "used_for": "Vietnam Airlines SGN-PER 3x weekly Mon/Thu/Sat (airline primary source)" }
+  ]
+}
