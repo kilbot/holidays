@@ -1,28 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowRight, Plane, TrainFront, X } from "lucide-react";
+import type { ComponentType } from "react";
+import { ArrowRight, Car, Plane, Ship, TrainFront, X } from "lucide-react";
 
 import { formatEur } from "@/lib/engine";
-import { LEG_FACTS, routePointOf } from "@/lib/demo-route";
-import {
-  FARE_SOURCE_LABEL,
-  fetchLegFare,
-  formatDuration,
-  legEstimate,
-  legIsPriced,
-  type LegFare,
-} from "@/lib/leg-fare";
+import type { Leg, LegMode } from "@/lib/engine/types";
 import { cn } from "@/lib/utils";
 
 /**
- * What a Leg says when you click it.
+ * What a Leg says when you click its arc.
  *
- * A Leg is derived, not placed (docs/CONTEXT.md), so everything here is
- * read-only: where it goes, when, how long it takes, what it costs and who
- * flies it. The one live thing is the money — the four Legs whose route and
- * date are both in the fare grid go and ask `/api/fares` when the popup opens,
- * and the rest quote the demo Plan.
+ * Everything here is the **Leg's own line** — the same object the Ledger's
+ * transit rows read, priced by `lib/engine/legs.ts` and charged to the Day it
+ * is travelled. Nothing on this popup is fetched, computed or estimated
+ * separately: a popup with its own pricing path is a second opinion about the
+ * money, and two surfaces quoting different fares for the same flight is worse
+ * than either of them being wrong on its own.
+ *
+ * The live fare still lands here, by the only route it has ever taken —
+ * `usePlan` hydrates the Legs the fares grid covers and the Plan re-derives, so
+ * this reads a Leg whose `hydrated` flag is already true.
  *
  * The provenance label is not decoration. "Live fare" and "estimate" are
  * different claims about the same number and the traveller is about to make
@@ -40,59 +37,57 @@ function formatLegDate(iso: string): string {
   return DATE_FORMAT.format(new Date(`${iso}T12:00:00Z`));
 }
 
-/** "fetched 14:20 today", "fetched 27 Aug" — how stale the number is. */
-function formatFetchedAt(iso: string): string {
-  const when = new Date(iso);
-  if (Number.isNaN(when.getTime())) return iso;
-  const sameDay = when.toDateString() === new Date().toDateString();
-  return sameDay
-    ? `fetched ${when.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`
-    : `fetched ${when.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`;
-}
+const MODE_ICON: Record<LegMode, ComponentType<{ className?: string }>> = {
+  flight: Plane,
+  drive: Car,
+  train: TrainFront,
+  ferry: Ship,
+};
 
-const SOURCE_TOKEN: Record<LegFare["source"], string> = {
-  live: "--sb-good",
+const MODE_LABEL: Record<LegMode, string> = {
+  flight: "Flight leg",
+  drive: "Drive leg",
+  train: "Train leg",
+  ferry: "Ferry leg",
+};
+
+/**
+ * Where the fare is quoted from, in the two words a badge has space for.
+ *
+ * The same vocabulary the Ledger's transit rows use, deliberately: one Leg,
+ * one claim about its money, wherever it is read.
+ */
+const PRICING_LABEL: Record<Leg["pricing"], string> = {
+  grid: "fare snapshot",
+  snapshot: "fare snapshot",
+  band: "estimate",
+  computed: "fuel only",
+};
+
+const PRICING_TOKEN: Record<Leg["pricing"], string> = {
+  grid: "--sb-sea",
   snapshot: "--sb-sea",
-  estimate: "--sb-faint",
+  band: "--sb-faint",
+  computed: "--sb-faint",
 };
 
 export function LegPopup({
-  legId,
+  leg,
+  fromName,
+  toName,
+  /** Why this arc is drawn straight, when it is. Null on a placed pair. */
+  approximateNote,
   onClose,
 }: {
-  legId: string;
+  leg: Leg;
+  fromName: string;
+  toName: string;
+  approximateNote?: string | null;
   onClose: () => void;
 }) {
-  const facts = LEG_FACTS[legId];
-  const [from, to] = legId.split(">");
-  const origin = routePointOf(from);
-  const destination = routePointOf(to);
-
-  // Mounted with `key={legId}` by the stage, so the initial state is always
-  // this Leg's own estimate and the effect never has to reset it.
-  const priced = legIsPriced(legId);
-  const [fare, setFare] = useState<LegFare>(() => legEstimate(legId));
-  const [loading, setLoading] = useState(priced);
-
-  useEffect(() => {
-    if (!priced) return;
-    const controller = new AbortController();
-    let live = true;
-    fetchLegFare(legId, controller.signal).then((result) => {
-      if (!live) return;
-      setFare(result);
-      setLoading(false);
-    });
-    return () => {
-      live = false;
-      controller.abort();
-    };
-  }, [legId, priced]);
-
-  if (!facts || !origin || !destination) return null;
-
-  const Mode = facts.mode === "train" ? TrainFront : Plane;
-  const duration = fare.durationMin ?? facts.durationMin;
+  const Mode = MODE_ICON[leg.mode];
+  const banded = leg.bandEur[0] !== leg.bandEur[1];
+  const free = leg.eur === 0;
 
   return (
     <div className="sb-panel relative w-[268px] p-3">
@@ -107,43 +102,41 @@ export function LegPopup({
 
       <p className="sb-label flex items-center gap-1.5 pr-6">
         <Mode className="size-3 text-[var(--sb-sea)]" />
-        {facts.mode === "train" ? "Train leg" : "Flight leg"}
+        {MODE_LABEL[leg.mode]}
+        {leg.modeOverridden && (
+          <span className="text-[var(--sb-faint)] normal-case">· your call</span>
+        )}
       </p>
 
       <p className="sb-num mt-1.5 flex items-center gap-1.5 text-[15px] font-semibold">
-        {origin.code}
+        {leg.from}
         <ArrowRight className="size-3.5 text-[var(--sb-faint)]" />
-        {destination.code}
+        {leg.to}
       </p>
       <p className="mt-0.5 truncate text-[11px] text-[var(--sb-dim)]">
-        {origin.name} → {destination.name}
+        {fromName} → {toName}
       </p>
 
       <dl className="mt-2.5 grid grid-cols-2 gap-x-2 gap-y-1.5 border-t border-[var(--sb-line)] pt-2.5">
         <div>
           <dt className="sb-label text-[9px]">Date</dt>
           <dd className="sb-num mt-0.5 text-[11px] text-[var(--sb-text)]">
-            {formatLegDate(facts.date)}
+            {formatLegDate(leg.date)}
           </dd>
         </div>
         <div>
-          <dt className="sb-label text-[9px]">Duration</dt>
+          <dt className="sb-label text-[9px]">Band</dt>
           <dd className="sb-num mt-0.5 text-[11px] text-[var(--sb-text)]">
-            {formatDuration(duration)}
-            {fare.stops !== null && (
-              <span className="ml-1 text-[var(--sb-faint)]">
-                {fare.stops === 0 ? "direct" : `${fare.stops} stop`}
-              </span>
-            )}
+            {banded
+              ? `${formatEur(leg.bandEur[0])}–${formatEur(leg.bandEur[1])}`
+              : "—"}
           </dd>
         </div>
         <div className="col-span-2">
           <dt className="sb-label text-[9px]">Carrier</dt>
           <dd className="mt-0.5 truncate text-[11px] text-[var(--sb-text)]">
-            {loading ? (
-              <span className="text-[var(--sb-faint)]">…</span>
-            ) : (
-              fare.carrier
+            {leg.carrier ?? (
+              <span className="text-[var(--sb-faint)]">Not booked</span>
             )}
           </dd>
         </div>
@@ -155,29 +148,25 @@ export function LegPopup({
           <p
             className={cn(
               "sb-num mt-0.5 text-[19px] leading-none font-semibold tracking-tight",
-              loading && "animate-pulse text-[var(--sb-faint)] motion-reduce:animate-none",
+              free && "text-[var(--sb-faint)]",
             )}
           >
-            {formatEur(fare.totalEur)}
+            {formatEur(leg.eur)}
           </p>
         </div>
         <span
           className="shrink-0 rounded-full px-1.5 py-px text-[9px] font-semibold tracking-[0.08em] uppercase"
           style={{
-            background: `color-mix(in srgb, var(${SOURCE_TOKEN[fare.source]}) 18%, transparent)`,
-            color: `var(${SOURCE_TOKEN[fare.source]})`,
+            background: `color-mix(in srgb, var(${leg.hydrated ? "--sb-good" : PRICING_TOKEN[leg.pricing]}) 18%, transparent)`,
+            color: `var(${leg.hydrated ? "--sb-good" : PRICING_TOKEN[leg.pricing]})`,
           }}
         >
-          {loading ? "checking…" : FARE_SOURCE_LABEL[fare.source]}
+          {leg.hydrated ? "live fare" : PRICING_LABEL[leg.pricing]}
         </span>
       </div>
 
-      <p className="mt-1.5 text-[9.5px] leading-snug text-[var(--sb-faint)]">
-        {fare.source === "estimate"
-          ? "Demo Plan figure — this pair is not in the fare grid."
-          : fare.fetchedAt
-            ? `Cheapest one-way for two, ${formatFetchedAt(fare.fetchedAt)}.`
-            : "Cheapest one-way for two."}
+      <p className="mt-1.5 line-clamp-4 text-[9.5px] leading-snug text-[var(--sb-faint)]">
+        {approximateNote ?? leg.note}
       </p>
     </div>
   );
