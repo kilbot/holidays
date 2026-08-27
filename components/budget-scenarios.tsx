@@ -40,7 +40,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const ROW = 30;
-const PAD = { top: 10, right: 14, bottom: 24 };
+const PAD = { top: 10, bottom: 24 };
 
 export function ScenarioCompare({
   totals,
@@ -54,9 +54,13 @@ export function ScenarioCompare({
   const [hovered, setHovered] = useState<number | null>(null);
   const tableId = useId();
 
-  // Narrow screens give the names less room; the axis needs what is left.
-  const labelWidth = width > 0 && width < 420 ? 84 : 116;
-  const plotWidth = Math.max(0, width - labelWidth - PAD.right);
+  // Narrow screens give the names less room; the axis needs what is left. The
+  // right gutter is reserved for the tip labels rather than discovered after
+  // the fact, so a value never has to be measured against the card's edge.
+  const narrow = width > 0 && width < 420;
+  const labelWidth = narrow ? 80 : 116;
+  const gutter = narrow ? 58 : 84;
+  const plotWidth = Math.max(0, width - labelWidth - gutter);
   const height = PAD.top + totals.length * ROW + PAD.bottom;
 
   const max = Math.max(
@@ -74,6 +78,13 @@ export function ScenarioCompare({
   ];
 
   const active = hovered === null ? null : totals[hovered];
+
+  // One side for every label, decided by the longest tail. Choosing per row
+  // puts some values left of the dot and some right of the tail, and a column
+  // of figures that zig-zags is harder to compare than one that does not —
+  // which is the entire job of this chart.
+  const labelsAfterTail =
+    totals.every((total) => x(total.worstCaseEur) + gutter <= width);
 
   return (
     <ChartCard
@@ -142,8 +153,8 @@ export function ScenarioCompare({
                         : "fill-[var(--sb-dim)]",
                     )}
                   >
-                    {total.name.length > (labelWidth < 100 ? 11 : 16)
-                      ? `${total.name.slice(0, labelWidth < 100 ? 10 : 15)}…`
+                    {total.name.length > (narrow ? 11 : 16)
+                      ? `${total.name.slice(0, narrow ? 10 : 15)}…`
                       : total.name}
                   </text>
 
@@ -172,14 +183,12 @@ export function ScenarioCompare({
                       otherwise run it off the right edge. */}
                   <text
                     x={
-                      x(total.worstCaseEur) + 88 > width
-                        ? x(total.totalEur) - 11
-                        : x(total.worstCaseEur) + 9
+                      labelsAfterTail
+                        ? x(total.worstCaseEur) + 9
+                        : x(total.totalEur) - 11
                     }
                     y={y + 3.5}
-                    textAnchor={
-                      x(total.worstCaseEur) + 88 > width ? "end" : "start"
-                    }
+                    textAnchor={labelsAfterTail ? "start" : "end"}
                     className={cn(
                       "sb-num text-[10.5px]",
                       over
