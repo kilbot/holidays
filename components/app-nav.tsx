@@ -113,6 +113,26 @@ function ResourcesIcon(props: IconProps) {
   );
 }
 
+/**
+ * Scenarios — one track splitting into two, with a dot on each end.
+ *
+ * The section is alternate calendars of the same trip, so the mark is a
+ * divergence rather than a stack of documents: the same journey, two ways it
+ * could go. Drawn at the shared 1.75 stroke, with the ends filled so the two
+ * outcomes read as destinations rather than as loose lines.
+ */
+function ScenariosIcon(props: IconProps) {
+  return (
+    <Glyph {...props}>
+      <path d="M5.6 12h4.1c1.1 0 1.8-.5 2.4-1.3l1.5-2.1c.6-.8 1.3-1.3 2.4-1.3h1.6" />
+      <path d="M5.6 12h4.1c1.1 0 1.8.5 2.4 1.3l1.5 2.1c.6.8 1.3 1.3 2.4 1.3h1.6" />
+      <circle cx="4.2" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="19.2" cy="7.3" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="19.2" cy="16.7" r="1.5" fill="currentColor" stroke="none" />
+    </Glyph>
+  );
+}
+
 /** More — the overflow itself, drawn as the ellipsis it is. */
 function MoreIcon(props: IconProps) {
   return (
@@ -125,7 +145,14 @@ function MoreIcon(props: IconProps) {
 }
 
 type NavItem = {
-  href: "/" | "/adventures" | "/flights" | "/ledger" | "/budget" | "/resources";
+  href:
+    | "/"
+    | "/adventures"
+    | "/flights"
+    | "/ledger"
+    | "/budget"
+    | "/scenarios"
+    | "/resources";
   label: string;
   /** Said to a screen reader, and to anyone who hovers long enough. */
   hint: string;
@@ -160,10 +187,25 @@ export const NAV_ITEMS: readonly NavItem[] = [
  * the five things worth a permanent slot keep theirs, and the shelf costs one
  * extra click instead of a sixth of the rail's attention.
  *
+ * Scenarios sits here too, and it is the harder call. #59 is a *findability*
+ * bug — the couple could not tell there were alternate trips at all — and an
+ * overflow is where findable things go to be forgotten. It is here anyway,
+ * because the asymmetry above holds for it as well: it is a place you go to
+ * decide, not a view you flick between while deciding. What answers the bug is
+ * the second entrance, which is the one you cannot miss: the cost HUD's chip
+ * carries the current Scenario's name on every screen of the site and links
+ * straight here. Two doors, one of them always in shot.
+ *
  * Both form factors share this list, so the phone never grows a section the
  * desktop doesn't have.
  */
 export const OVERFLOW_ITEMS: readonly NavItem[] = [
+  {
+    href: "/scenarios",
+    label: "Scenarios",
+    hint: "Saved alternate trips — compare and switch",
+    Icon: ScenariosIcon,
+  },
   {
     href: "/resources",
     label: "Resources",
