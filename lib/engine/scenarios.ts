@@ -36,7 +36,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 
 import { buildPlan } from "@/lib/engine/plan";
-import { planMembership, type VerdictMap } from "@/lib/engine/membership";
 import {
   DEFAULT_SCENARIO,
   INITIAL_STATE,
@@ -221,6 +220,18 @@ export function setToggled(capsuleId: string, on: boolean): void {
   });
 }
 
+/**
+ * Whether a Capsule is on the current Scenario. The read half of the pair, and
+ * what lets the shortlist tell a first press of *Plan* from a second one.
+ */
+export function isToggled(capsuleId: string): boolean {
+  const now = store().read();
+  const current =
+    now.scenarios.find((scenario) => scenario.id === now.currentId) ??
+    now.scenarios[0];
+  return Boolean(current?.input.toggled.includes(capsuleId));
+}
+
 export interface ScenarioApi extends ScenarioState {
   current: Scenario;
   /** Replace the current Scenario's input. Every knob change lands here. */
@@ -338,12 +349,6 @@ export function scenarioTotals(
   state: ScenarioState,
   catalogue: readonly CapsuleSpec[],
   /**
-   * The shortlist's verdicts, applied to every Scenario the same way the
-   * current one applies them. A comparison row computed off a different
-   * membership rule from the headline above it is a comparison of nothing.
-   */
-  marks: VerdictMap = {},
-  /**
    * Live fares, keyed by Leg id. Passed through so the current Scenario's row
    * agrees with the headline figure above it — a comparison whose first row
    * disagrees with the number it sits under is worse than no comparison. Keys
@@ -355,7 +360,6 @@ export function scenarioTotals(
     const plan = buildPlan(
       {
         ...scenario.input,
-        toggled: planMembership(scenario.input.toggled, marks),
         fareOverrides: { ...scenario.input.fareOverrides, ...fareOverrides },
       },
       catalogue,

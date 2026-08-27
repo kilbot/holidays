@@ -22,12 +22,8 @@ import {
   formatCapsuleDays,
   formatEur,
 } from "@/lib/deep-capsules";
-import { usePlanMembership } from "@/lib/engine/use-plan";
-import {
-  useShortlist,
-  type MarkedState,
-  type ShortlistMap,
-} from "@/lib/shortlist";
+import { usePlanShortlist } from "@/lib/engine/use-plan";
+import type { MarkedState, ShortlistMap } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
 
 /**
@@ -81,21 +77,17 @@ interface RailEntry {
  * id that resolves to neither is a mark left behind by an entry that has since
  * been re-cut, and it is dropped rather than rendered as an empty row.
  */
-function railEntries(
-  marks: ShortlistMap,
-  onPlan: ReadonlySet<string>,
-): RailEntry[] {
+function railEntries(marks: ShortlistMap): RailEntry[] {
   const entries: RailEntry[] = [];
 
-  // Everything on the Plan, plus everything on the bench. The union is over ids
-  // rather than over verdicts because the reference Scenario puts eight
-  // Adventures on the Plan without recording a verdict for any of them, and a
-  // rail that listed only marked ideas left the traveller with no control over
-  // the eight that were actually costing money (#58).
-  for (const id of new Set([...Object.keys(marks), ...onPlan])) {
-    const state = marks[id];
-    const placed = onPlan.has(id);
-    if (!placed && state !== "interested") continue;
+  // These are `usePlanShortlist`'s reconciled verdicts, so *placed* is exactly
+  // "on the Plan" — including the eight researched Adventures the reference
+  // Scenario starts with and never recorded a verdict for. Listing only marked
+  // ideas left the traveller with no control over the eight that were actually
+  // costing money (#58).
+  for (const [id, state] of Object.entries(marks)) {
+    if (state !== "interested" && state !== "placed") continue;
+    const placed = state === "placed";
 
     const idea = catalogIdeaById(id);
     if (idea) {
@@ -241,12 +233,8 @@ function ShortlistRow({
 /* ------------------------------------------------------------------ */
 
 function ShortlistBody() {
-  const { marks, counts, toggle: mark } = useShortlist();
-  const onPlan = usePlanMembership();
-  const entries = useMemo(
-    () => railEntries(marks, onPlan),
-    [marks, onPlan],
-  );
+  const { marks, counts, mark } = usePlanShortlist();
+  const entries = useMemo(() => railEntries(marks), [marks]);
 
   return (
     <>
@@ -264,7 +252,7 @@ function ShortlistBody() {
           {counts.interested}
         </span>{" "}
         interested ·{" "}
-        <span className="sb-num text-[var(--sb-good)]">{onPlan.size}</span> on
+        <span className="sb-num text-[var(--sb-good)]">{counts.placed}</span> on
         the plan
         {counts.discarded > 0 && (
           <>
@@ -320,9 +308,8 @@ function ShortlistBody() {
 /* ------------------------------------------------------------------ */
 
 export function ShortlistRail() {
-  const { counts } = useShortlist();
-  const onPlan = usePlanMembership();
-  const benched = counts.interested + onPlan.size;
+  const { counts } = usePlanShortlist();
+  const benched = counts.interested + counts.placed;
 
   // Server-rendered collapsed, then opened by the effect on a wide viewport:
   // `matchMedia` has no answer during SSR, and collapsed is the safe first

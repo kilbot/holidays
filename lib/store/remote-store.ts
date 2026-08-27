@@ -135,7 +135,7 @@ export interface RemoteStoreOptions {
  * Null until the remote store is built, so a local-only tab calling it is a
  * no-op rather than a crash.
  */
-let refresh: (() => Promise<void>) | null = null;
+let refresh: (() => Promise<boolean>) | null = null;
 
 export async function refreshPlanFromServer(): Promise<void> {
   await refresh?.();
@@ -148,9 +148,15 @@ export async function refreshPlanFromServer(): Promise<void> {
  * button means — and the only way back, since the preview overwrote the tab's
  * localStorage on its way through. A reload would do it too; a button says so
  * out loud.
+ *
+ * Returns whether the Plan actually came back. It matters: with the store
+ * unreachable there is nothing to restore *to*, and a button that cleared the
+ * "previewing" warning without restoring anything would leave the visitor
+ * looking at their own version believing it was the couple's — which is the
+ * exact failure this whole change exists to remove.
  */
-export async function discardPreview(): Promise<void> {
-  await refresh?.();
+export async function discardPreview(): Promise<boolean> {
+  return (await refresh?.()) ?? false;
 }
 
 export function remoteScenarioStore(
@@ -160,13 +166,14 @@ export function remoteScenarioStore(
   let editedLocally = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
 
-  async function hydrate(force = false) {
+  /** Whether the server's Plan is now what this tab holds. */
+  async function hydrate(force = false): Promise<boolean> {
     setStatus("loading");
     try {
       const response = await fetch(`/api/plan/${planId}`, { cache: "no-store" });
       if (!response.ok) {
         setStatus(response.status === 404 ? "local" : "offline");
-        return;
+        return false;
       }
       const body = (await response.json()) as { plan?: unknown };
       const plan = toPlanDoc(body.plan);
@@ -175,14 +182,16 @@ export function remoteScenarioStore(
       // server's copy precisely because it now has something the tab lacks.
       if (editedLocally && !force) {
         setStatus("synced");
-        return;
+        return false;
       }
       local.write({ scenarios: plan.scenarios, currentId: plan.currentId });
       setStatus("synced", plan.updatedAt);
+      return true;
     } catch {
       // No network, or a Vercel deployment-protection redirect standing in
       // front of the API. Either way: local-only, and the site still works.
       setStatus("offline");
+      return false;
     }
   }
 
@@ -245,8 +254,17 @@ export function remoteScenarioStore(
   refresh = async () => {
     // The tab is asking for the server's copy on purpose — as an adopt, or as a
     // visitor discarding their preview — so its own edits stop counting.
+    const wasPreviewing = status === "preview";
     editedLocally = false;
-    await hydrate(true);
+    const restored = await hydrate(true);
+
+    // Nothing came back, so nothing was discarded. Put the warning back rather
+    // than leaving a preview wearing an "offline" label.
+    if (!restored && wasPreviewing) {
+      editedLocally = true;
+      setStatus("preview");
+    }
+    return restored;
   };
   void hydrate();
 

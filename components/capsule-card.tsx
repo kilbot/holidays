@@ -40,8 +40,8 @@ import {
   openDeepCapsule,
   useCapsuleFocus,
 } from "@/lib/capsule-focus";
-import { usePlanMembership } from "@/lib/engine/use-plan";
-import { useShortlist, type MarkedState, type ShortlistState } from "@/lib/shortlist";
+import { usePlanShortlist } from "@/lib/engine/use-plan";
+import type { MarkedState, ShortlistState } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
 
 /**
@@ -645,8 +645,7 @@ function chromeForIdea(idea: CatalogIdea): CardChrome {
 
 export function CapsuleCardHost() {
   const focus = useCapsuleFocus();
-  const { marks, toggle: mark } = useShortlist();
-  const onPlan = usePlanMembership();
+  const { marks, mark } = usePlanShortlist();
   const closeRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -680,10 +679,7 @@ export function CapsuleCardHost() {
   // A focus id that resolves to nothing means stale state, not a render bug.
   if (!chrome) return null;
 
-  // On the Plan beats the recorded verdict — see `usePlanMembership`.
-  const state: ShortlistState = onPlan.has(chrome.id)
-    ? "placed"
-    : (marks[chrome.id] ?? "unseen");
+  const state: ShortlistState = marks[chrome.id] ?? "unseen";
 
   return (
     <div className="fixed inset-0 z-50">

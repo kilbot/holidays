@@ -6,11 +6,12 @@
  * Three sources feed it and it is worth being explicit about which is which,
  * because they have very different lifetimes:
  *
- * 1. **The current Scenario** (`scenarios.ts`) — dates, toggles, drags, knobs.
- *    Persisted, and the thing a Fork will eventually share.
- * 2. **The Catalog shortlist** (`shortlist.ts`) — every idea marked *placed*,
- *    which is exactly docs/CONTEXT.md's "on the Plan — give it calendar days".
- *    Persisted separately, because the sift outlives any one Scenario.
+ * 1. **The current Scenario** (`scenarios.ts`) — dates, what is on the Plan,
+ *    drags, knobs. Persisted, synced, and the thing a Fork shares. Since #58
+ *    this is the *only* say in what the Scheduler places.
+ * 2. **The Catalog shortlist** (`shortlist.ts`) — the bench and the discard
+ *    pile, per browser. It no longer decides membership; it writes membership
+ *    through to the Scenario and reads back a reconciled verdict.
  * 3. **Live fares** — fetched from `/api/fares` for the Legs the fares grid
  *    covers. Deliberately **not** persisted: a fare is true for a few hours,
  *    and a stale one saved into a Scenario would be a lie with a timestamp.
@@ -22,7 +23,10 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import { capsuleCatalogue } from "@/lib/engine/capsules";
-import { planMembership } from "@/lib/engine/membership";
+import {
+  effectiveVerdicts,
+  planMembership,
+} from "@/lib/engine/membership";
 import { buildPlan } from "@/lib/engine/plan";
 import {
   scenarioTotals,
@@ -31,7 +35,13 @@ import {
   type ScenarioTotal,
 } from "@/lib/engine/scenarios";
 import type { CapsuleSpec, LegMode, Plan, PlanInput } from "@/lib/engine/types";
-import { useShortlist } from "@/lib/shortlist";
+import {
+  countMarks,
+  useShortlist,
+  type MarkedState,
+  type ShortlistCounts,
+  type ShortlistMap,
+} from "@/lib/shortlist";
 import { TRAVELLERS } from "@/lib/engine/constants";
 import { moveRangeEnd, type RangeEnd } from "@/lib/trip-dates";
 
@@ -132,44 +142,57 @@ export interface PlanApi {
   setLegMode: (legId: string, mode: LegMode) => void;
 }
 
+/** The shortlist as every sift surface should read it. */
+export interface PlanShortlist {
+  /**
+   * Verdicts reconciled against the Plan — `effectiveVerdicts` says how.
+   *
+   * Read this, never the raw `useShortlist().marks`, anywhere a verdict is
+   * *shown* or *filtered on*. The raw marks know nothing about the eight
+   * Adventures the reference Scenario starts with, and they keep a stale
+   * *placed* long after a discarded preview put the Plan back.
+   */
+  marks: ShortlistMap;
+  counts: ShortlistCounts;
+  /** Record a verdict. Membership follows it into the Scenario. */
+  mark: (id: string, state: MarkedState) => void;
+}
+
 /**
- * Which Capsules are on the Plan, without building one.
+ * The sift's view of the shortlist, without building a Plan.
  *
- * The sift pages need the answer for a pin and a pressed state, and running the
- * Scheduler and the ledger on every keystroke of a 413-row filter to find out
- * would be absurd. Membership is two reads and a set.
- *
- * It matters that they ask: the reference Scenario ships with eight researched
- * Adventures already on the Plan and no shortlist verdict recorded for any of
- * them, so a grid that read `marks` alone drew all eight as untouched — and the
- * traveller pressing *Plan* on something that was already planned is exactly the
- * gesture #58 describes as doing nothing.
+ * `/adventures` renders 413 cards and re-sifts them on every keystroke; running
+ * the Scheduler and the ledger to find out which pins to draw would be absurd.
+ * Membership is one array off the current Scenario.
  */
-export function usePlanMembership(): ReadonlySet<string> {
+export function usePlanShortlist(): PlanShortlist {
   const scenarios = useScenarios();
-  const { marks } = useShortlist();
+  const { marks, toggle: mark } = useShortlist();
   const toggled = scenarios.current.input.toggled;
-  return useMemo(
-    () => new Set(planMembership(toggled, marks)),
+
+  const effective = useMemo(
+    () => effectiveVerdicts(toggled, marks),
     [toggled, marks],
   );
+
+  return {
+    marks: effective,
+    counts: countMarks(effective),
+    mark,
+  };
 }
 
 export function usePlan(): PlanApi {
   const scenarios = useScenarios();
-  const { marks, toggle: mark } = useShortlist();
+  const { toggle: mark } = useShortlist();
   const fares = useSyncExternalStore(subscribeFares, readFares, noFares);
 
   const input = scenarios.current.input;
 
-  // What the Scheduler has to find days for: the Scenario's own list, with the
-  // shortlist's verdicts applied over it. `membership.ts` carries the rule and
-  // the bug it replaced — a union here is what pinned all eight researched
-  // Adventures permanently on (#58).
-  const onPlan = useMemo(
-    () => planMembership(input.toggled, marks),
-    [input.toggled, marks],
-  );
+  // What the Scheduler has to find days for. Just the Scenario's own list since
+  // #58: the shortlist used to be unioned in here, which could add a Capsule to
+  // the Plan and never take one off.
+  const onPlan = useMemo(() => planMembership(input.toggled), [input.toggled]);
 
   // Specs for every id any Scenario might reach for, not just this one's: the
   // comparison rows below price the alternates, and a Scenario whose Capsules
@@ -177,12 +200,10 @@ export function usePlan(): PlanApi {
   const catalogueIds = useMemo(() => {
     const ids = new Set<string>();
     for (const scenario of scenarios.scenarios) {
-      for (const id of planMembership(scenario.input.toggled, marks)) {
-        ids.add(id);
-      }
+      for (const id of scenario.input.toggled) ids.add(id);
     }
     return [...ids].sort();
-  }, [scenarios.scenarios, marks]);
+  }, [scenarios.scenarios]);
 
   const catalogue = useMemo(
     () => capsuleCatalogue(catalogueIds),
@@ -221,10 +242,9 @@ export function usePlan(): PlanApi {
       scenarioTotals(
         { scenarios: scenarios.scenarios, currentId: scenarios.currentId },
         catalogue,
-        marks,
         fares,
       ),
-    [scenarios.scenarios, scenarios.currentId, catalogue, marks, fares],
+    [scenarios.scenarios, scenarios.currentId, catalogue, fares],
   );
 
   return {

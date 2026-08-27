@@ -35,6 +35,7 @@ export function PreviewNotice() {
   const { previewing, discardPreview } = useSharing();
   const [dismissed, setDismissed] = useState(false);
   const [discarding, setDiscarding] = useState(false);
+  const [discardFailed, setDiscardFailed] = useState(false);
 
   // Armed again once the preview is gone, so a visitor who discards and then
   // starts a second preview is told a second time. The alternative — one notice
@@ -83,7 +84,11 @@ export function PreviewNotice() {
                 disabled={discarding}
                 onClick={() => {
                   setDiscarding(true);
-                  void discardPreview().finally(() => setDiscarding(false));
+                  setDiscardFailed(false);
+                  void discardPreview().then((restored) => {
+                    setDiscardFailed(!restored);
+                    setDiscarding(false);
+                  });
                 }}
                 className="flex min-h-8 cursor-pointer items-center gap-1.5 rounded-md border border-[var(--sb-line)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--sb-text)] transition-colors hover:bg-[var(--sb-panel-2)] disabled:opacity-50 motion-reduce:transition-none"
               >
@@ -99,6 +104,13 @@ export function PreviewNotice() {
                 Keep previewing
               </button>
             </div>
+
+            {discardFailed && (
+              <p className="mt-1.5 text-[10.5px] leading-snug text-[var(--sb-warn)]">
+                The shared plan is not reachable from here, so there is nothing
+                to restore yet. Your version is still exactly as you left it.
+              </p>
+            )}
           </div>
 
           <button

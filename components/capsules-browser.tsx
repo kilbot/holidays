@@ -31,8 +31,7 @@ import {
   formatEur,
   type DeepCapsule,
 } from "@/lib/deep-capsules";
-import { usePlanMembership } from "@/lib/engine/use-plan";
-import { useShortlist, type ShortlistState } from "@/lib/shortlist";
+import { usePlanShortlist } from "@/lib/engine/use-plan";
 
 /**
  * The Capsules page — the site's reading room.
@@ -167,17 +166,10 @@ export function CapsulesBrowser() {
   );
   const [refineOpen, setRefineOpen] = useState(false);
 
-  const { marks, counts, toggle: mark } = useShortlist();
-  const onPlan = usePlanMembership();
-
-  // A tile wears what is true of it: on the Plan beats whatever verdict was
-  // last recorded, because the eight researched Adventures start on the Plan
-  // with no verdict at all.
-  const tileState = useCallback(
-    (id: string): ShortlistState =>
-      onPlan.has(id) ? "placed" : (marks[id] ?? "unseen"),
-    [onPlan, marks],
-  );
+  // Reconciled against the Plan, not the raw marks: the eight researched
+  // Adventures start on the Plan with no verdict recorded, and a grid that drew
+  // them as untouched is half of what made #58 feel like nothing happened.
+  const { marks, counts, mark } = usePlanShortlist();
 
   // Both writers take the whole next filter set rather than a functional
   // updater on purpose: `writeUrl` touches the router, and a functional updater
@@ -291,7 +283,7 @@ export function CapsulesBrowser() {
                   key={tile.id}
                   tile={tile}
                   size="hero"
-                  state={tileState(tile.id)}
+                  state={marks[tile.id] ?? "unseen"}
                   onOpen={openTile}
                   onMark={mark}
                 />
@@ -315,7 +307,7 @@ export function CapsulesBrowser() {
                   key={tile.id}
                   tile={tile}
                   size="grid"
-                  state={tileState(tile.id)}
+                  state={marks[tile.id] ?? "unseen"}
                   onOpen={openTile}
                   onMark={mark}
                 />

@@ -214,6 +214,7 @@ function ForkPanel({ sharing }: { sharing: SharingApi }) {
  */
 function DiscardRow({ sharing }: { sharing: SharingApi }) {
   const [working, setWorking] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   return (
     <div className="mt-2 border-t border-[var(--sb-line)] pt-2">
@@ -233,13 +234,23 @@ function DiscardRow({ sharing }: { sharing: SharingApi }) {
         disabled={working}
         onClick={() => {
           setWorking(true);
-          void sharing.discardPreview().finally(() => setWorking(false));
+          setFailed(false);
+          void sharing.discardPreview().then((restored) => {
+            setFailed(!restored);
+            setWorking(false);
+          });
         }}
         className="mt-1.5 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border border-[var(--sb-line)] px-2 py-1.5 text-[11px] font-semibold text-[var(--sb-text)] transition-colors hover:bg-[var(--sb-panel-2)] disabled:opacity-50 motion-reduce:transition-none"
       >
         <Undo2 className="size-3.5" />
         {working ? "Restoring…" : "Discard my changes"}
       </button>
+      {failed && (
+        <p className="mt-1.5 text-[10px] leading-snug text-[var(--sb-warn)]">
+          The shared plan is not reachable, so nothing was restored. Your
+          version is still here.
+        </p>
+      )}
     </div>
   );
 }

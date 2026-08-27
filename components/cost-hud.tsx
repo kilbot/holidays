@@ -326,10 +326,10 @@ export function CostHud() {
           <span className="flex items-baseline justify-between gap-2">
             {/* The number the bug was reported against. If it is a figure only
                 this browser believes, it says so where it is read. */}
-            <span className="sb-label">
+            <span className="sb-label shrink-0 whitespace-nowrap">
               {previewing ? "Plan total · preview" : "Plan total"}
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex min-w-0 items-center gap-1.5">
               {/* The Warning, reduced to its smallest honest form. */}
               {!open && ranked.length > 0 && (
                 <span
@@ -347,7 +347,7 @@ export function CostHud() {
                   }}
                 />
               )}
-              <span className="text-[11px] font-medium text-[var(--sb-accent)]">
+              <span className="truncate text-[11px] font-medium text-[var(--sb-accent)]">
                 {scenarios.current.name}
               </span>
               <ChevronDown

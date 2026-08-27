@@ -118,8 +118,12 @@ export interface SharingApi {
    * `PreviewNotice` exists.
    */
   previewing: boolean;
-  /** Throw the preview away and re-read the couple's Plan. */
-  discardPreview: () => Promise<void>;
+  /**
+   * Throw the preview away and re-read the couple's Plan. Resolves false when
+   * the store could not be reached — in which case nothing was discarded and
+   * the preview warning stands.
+   */
+  discardPreview: () => Promise<boolean>;
   /** Save the current Scenario as a Fork and get its shareable URL. */
   saveFork: (
     name: string,

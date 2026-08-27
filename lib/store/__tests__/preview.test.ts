@@ -292,6 +292,44 @@ test("view mode: discarding the preview puts the couple's Plan back", async () =
   server.restore();
 });
 
+test("view mode: a discard that cannot reach the store leaves the preview standing", async () => {
+  const pristine: ScenarioState = {
+    scenarios: [DEFAULT_SCENARIO],
+    currentId: DEFAULT_SCENARIO.id,
+  };
+  const server = fakeServer({ ...pristine, updatedAt: "2026-08-27T00:00:00.000Z" });
+  const local = fakeLocal(pristine);
+
+  const store = remoteScenarioStore(local, {
+    planId: PLAN_ID,
+    getEditKey: () => null,
+  });
+  await delay(10);
+  store.write(withoutTasmania());
+
+  // The tunnel, the flaky café wifi, the deployment-protection redirect.
+  const reachable = globalThis.fetch;
+  globalThis.fetch = (async () => {
+    throw new Error("no network");
+  }) as typeof globalThis.fetch;
+
+  const restored = await discardPreview();
+  globalThis.fetch = reachable;
+
+  assert.equal(restored, false, "the caller has to be told it did not happen");
+  assert.ok(
+    !local.current().scenarios[0].input.toggled.includes("tasmania-arc"),
+    "nothing was restored, so the preview is still what the tab holds",
+  );
+  assert.equal(
+    readSyncStatus().status,
+    "preview",
+    "and the warning must not be cleared by a failed restore",
+  );
+
+  server.restore();
+});
+
 test("view mode: a Fork carries the previewed input, not the shared one", async () => {
   // Not a store test so much as the promise the notice makes. `saveFork` is
   // handed `usePlan().input`, which reads through this store — so whatever the
