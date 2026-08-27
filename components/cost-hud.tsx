@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { ChevronDown, TriangleAlert } from "lucide-react";
+import { ChevronDown, ChevronRight, TriangleAlert } from "lucide-react";
 
 import {
   BUDGET_CEILING_EUR,
@@ -190,7 +191,14 @@ function Scenarios({
   return (
     <div className="mt-2.5 border-t border-[var(--sb-line)] pt-2">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="sb-label text-[9px]">Scenarios</p>
+        {/* The label was the only thing on this site that said the word, and
+            it said it to nobody in particular. It is now the way in. */}
+        <Link
+          href="/scenarios"
+          className="sb-label text-[9px] hover:text-[var(--sb-accent)]"
+        >
+          Scenarios <span aria-hidden>→</span>
+        </Link>
         <button
           type="button"
           onClick={onFork}
@@ -312,24 +320,24 @@ export function CostHud() {
           print its warnings over the one control that says whether the Plan is
           even being saved. */}
       <div className="sb-panel sb-scroll-seen max-h-[calc(100dvh-var(--sb-strip-h)-7.5rem)] overflow-y-auto p-3">
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          aria-label={
-            open
-              ? "Hide the cost split and warnings"
-              : "Show the cost split and warnings"
-          }
-          className="block w-full cursor-pointer text-left"
-        >
-          <span className="flex items-baseline justify-between gap-2">
-            {/* The number the bug was reported against. If it is a figure only
-                this browser believes, it says so where it is read. */}
-            <span className="sb-label shrink-0 whitespace-nowrap">
-              {previewing ? "Plan total · preview" : "Plan total"}
-            </span>
-            <span className="flex min-w-0 items-center gap-1.5">
+        <div className="flex items-start justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-label={
+              open
+                ? "Hide the cost split and warnings"
+                : "Show the cost split and warnings"
+            }
+            className="min-w-0 flex-1 cursor-pointer text-left"
+          >
+            <span className="flex items-center gap-1.5">
+              {/* The number the bug was reported against. If it is a figure
+                  only this browser believes, it says so where it is read. */}
+              <span className="sb-label shrink-0 whitespace-nowrap">
+                {previewing ? "Plan total · preview" : "Plan total"}
+              </span>
               {/* The Warning, reduced to its smallest honest form. */}
               {!open && ranked.length > 0 && (
                 <span
@@ -338,7 +346,7 @@ export function CostHud() {
                     .slice(0, 3)
                     .map((warning) => warning.label)
                     .join(" · ")}
-                  className="size-1.5 rounded-full"
+                  className="size-1.5 shrink-0 rounded-full"
                   style={{
                     background:
                       ranked[0].tone === "over"
@@ -347,29 +355,44 @@ export function CostHud() {
                   }}
                 />
               )}
-              <span className="truncate text-[11px] font-medium text-[var(--sb-accent)]">
-                {scenarios.current.name}
-              </span>
               <ChevronDown
                 className={cn(
-                  "size-3 text-[var(--sb-faint)] transition-transform motion-reduce:transition-none",
+                  "size-3 shrink-0 text-[var(--sb-faint)] transition-transform motion-reduce:transition-none",
                   open && "rotate-180",
                 )}
               />
             </span>
-          </span>
 
-          <span
-            className={cn(
-              "sb-num mt-0.5 block text-[26px] leading-none font-semibold tracking-tight",
-              previewing && "text-[var(--sb-warn)]",
-            )}
+            <span
+              className={cn(
+                "sb-num mt-0.5 block text-[26px] leading-none font-semibold tracking-tight",
+                previewing && "text-[var(--sb-warn)]",
+              )}
+            >
+              {formatEur(rollUp.totalEur)}
+            </span>
+          </button>
+
+          {/* The second door to #59, and the one that is always in shot.
+              This corner already said which Scenario the figure belongs to;
+              until now that was inert text and the couple had no way to learn
+              there were others. It is a link, and it is deliberately still
+              tiny — the chip's job is to be *findable*, not loud, and the
+              money is what this panel is for.
+
+              A sibling of the toggle rather than a child of it: an anchor
+              inside a button is invalid, and the two do different things. */}
+          <Link
+            href="/scenarios"
+            title="All the saved Scenarios — compare, switch, fork"
+            className="mt-px flex max-w-[55%] shrink-0 items-center gap-0.5 rounded-full border border-[var(--sb-line)] py-[3px] pr-1 pl-2 text-[10px] font-medium text-[var(--sb-accent)] transition-colors hover:bg-[var(--sb-panel-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
           >
-            {formatEur(rollUp.totalEur)}
-          </span>
+            <span className="truncate">{scenarios.current.name}</span>
+            <ChevronRight aria-hidden className="size-3 shrink-0" />
+          </Link>
+        </div>
 
-          <BudgetBar rollUp={rollUp} />
-        </button>
+        <BudgetBar rollUp={rollUp} />
 
         {open && (
           <>
