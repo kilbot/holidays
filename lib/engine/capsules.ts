@@ -86,6 +86,11 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     locationId: "mundaring",
     lock: {
       kind: "arrival",
+      // Valencia to Perth is twenty-odd hours with the Singapore overnight, so
+      // the couple lands the day after they leave. `longhaul-comfort.md` is why
+      // the stopover is there at all; the Day in between prices at the transit
+      // market, which is the honest cost of a night in the air.
+      landsAfter: 1,
       why: "docs/CONTEXT.md's semi-fixed Anchor: the first days after landing are spent with Paul's dad in Mundaring Hills — jet-lag recovery and Perth acclimatisation, before anything with a ticket on it starts.",
     },
     // Home base #3. The car is Dad's, so the block hires nothing.
@@ -94,6 +99,30 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     // whose entire cost is the groceries and the fuel the ledger already
     // charges. A jet-lag block with a splurge on it is not a jet-lag block.
     events: [],
+  },
+
+  "morawa-christmas": {
+    locationId: "morawa",
+    lock: {
+      kind: "date",
+      from: "2026-12-25",
+      to: "2026-12-25",
+      why: "Christmas Day is at the sister's farm in Morawa and the date does not move. The block covers the day plus the drives either side — 370 km up the Midlands road and 370 km back. docs/CONTEXT.md",
+    },
+    // Home base #2. The car is the family's, and the fuel is a Leg.
+    needsCar: false,
+    events: [
+      {
+        id: "morawa-christmas-table",
+        label: "Christmas contribution — ham, prawns, drinks, presents",
+        aud: aud(150, 80, 350),
+        // Nailed to the day rather than the block, so dragging the block does
+        // not move Christmas lunch off Christmas.
+        dayOffset: 2,
+        date: "2026-12-25",
+        source: "docs/CONTEXT.md — the Christmas Anchor. Nobody drives four hours to a family Christmas empty-handed; A$150 is a couple's share of a farm table, and the band's top is bringing the seafood.",
+      },
+    ],
   },
 
   "margaret-river": {
@@ -135,7 +164,12 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "weekday",
       // Monday–Friday. `weekdayOf` is 0 = Sunday.
       weekdays: [1, 2, 3, 4, 5],
-      why: "mid-week — weekends and the first ferry sell out, and the first ferry is the whole strategy. capsule-wa-southwest.md",
+      // …and inside the WA leg. A ferry from Fremantle is not something the
+      // couple can take from Port Douglas, and without the corridor the
+      // Scheduler proposed exactly that once January filled up (#54).
+      from: "2026-12-15",
+      to: "2026-12-29",
+      why: "mid-week — weekends and the first ferry sell out, and the first ferry is the whole strategy — and inside the WA leg, which ends when the couple flies east for New Year's Eve. capsule-wa-southwest.md",
     },
     needsCar: false,
     events: [
@@ -220,8 +254,8 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     lock: {
       kind: "window",
       from: "2027-01-18",
-      to: "2027-01-31",
-      why: "it rides along inside the reef Adventure's own 18–31 January window. capsule-fnq-wildlife.md",
+      to: "2027-01-23",
+      why: "it rides along on the end of the reef Adventure, not merely inside its window — the Cape Tribulation overnight is bought from the reef base, and a croc cruise ten days after leaving Port Douglas is a different trip. capsule-fnq-wildlife.md",
     },
     needsCar: true,
     events: [
@@ -240,8 +274,8 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     lock: {
       kind: "window",
       from: "2027-01-28",
-      to: "2027-02-18",
-      why: "from Thursday 28 January 2027, the day NSW school holidays end — the price cliff is real and dated. capsule-byron-nimbin.md",
+      to: "2027-02-03",
+      why: "from Thursday 28 January 2027, the day NSW school holidays end — the price cliff is real and dated. The top of the window used to run to 18 February and now closes on the 3rd, which is the southbound order written down: Byron is the last stop on the way down from the reef, not a February destination. capsule-byron-nimbin.md",
     },
     needsCar: false,
     events: [
@@ -266,9 +300,9 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     locationId: "tasmania",
     lock: {
       kind: "window",
-      from: "2027-01-13",
-      to: "2027-02-20",
-      why: "from about 13 January, once the New Year fare peak is over. February is quietly better again. capsule-tasmania.md",
+      from: "2027-01-31",
+      to: "2027-02-12",
+      why: "February, which capsule-tasmania.md calls quietly better again — and Party In The Paddock, 4–7 February, sits inside it. The window used to open on 13 January, and that is what put Hobart between Sydney and the reef: the Scheduler places the longest window-locked block first and takes the earliest good week its window allows. capsule-tasmania.md",
     },
     needsCar: true,
     events: [
@@ -375,11 +409,65 @@ function fromDeep(capsule: DeepCapsule): CapsuleSpec | null {
  * absent stays flexible.
  */
 const CATALOG_LOCKS: Readonly<Record<string, Lock>> = {
+  /*
+   * The Far North Queensland stretch, #54's "way more time in North Queensland
+   * than New South Wales".
+   *
+   * These four windows are the whole mechanism. The couple leaves Sydney on
+   * about 7 January instead of idling there until the reef window opens on the
+   * 18th, and the eleven days that buys are spent on the Tablelands and the
+   * Cassowary Coast rather than on Sydney lodging at A$140 a night.
+   *
+   * **What it costs, said out loud:** `domestic-flights.md` puts SYD→CNS at
+   * A$280–400 for the couple in the 1–10 January peak against A$150–220 from
+   * about the third week, and calls a reef block placed 12–24 January
+   * "significantly cheaper" than one placed 2–10 January. Flying north on the
+   * 7th knowingly pays that. Roughly half of it comes back as living cost — a
+   * Sydney floor day is A$240 and a Port Douglas one is A$240×0.8 in the
+   * January low season — and the rest is what the directive costs. Moving these
+   * two windows to 2027-01-11 is the one-line change that takes the cheap fare
+   * and gives the days back to Sydney.
+   */
+  "atherton-tablelands-waterfall-circuit-millaa-millaa-zillie-ellinjaa": {
+    kind: "window",
+    from: "2027-01-07",
+    to: "2027-01-17",
+    why: "the Tablelands stretch sits between the Sydney block and the reef window, which is the gap the #54 directive moved north. capsule-fnq-wildlife.md puts the Tablelands at 1.5 h from Cairns and calls them a different base from the reef.",
+  },
+  "crater-lakes-lake-eacham-and-lake-barrine": {
+    kind: "window",
+    from: "2027-01-07",
+    to: "2027-01-17",
+    why: "a free Tablelands day inside the same pre-reef stretch. capsule-fnq-wildlife.md",
+  },
+  "yungaburra-curtain-fig-platypus-and-the-monthly-market": {
+    kind: "window",
+    from: "2027-01-07",
+    to: "2027-01-17",
+    why: "the platypus and tree-kangaroo half of the Tablelands, which capsule-fnq-wildlife.md says is a different capsule with a different base — and this is that base.",
+  },
+  "mission-beach-skydive-and-dunk-island": {
+    kind: "window",
+    from: "2027-01-24",
+    to: "2027-01-27",
+    why: "southbound, after the reef and the Cape Trib night and before Byron — which is the only configuration capsule-fnq-wildlife.md endorses: \"if the Plan drives or buses south down the Bruce Highway, Mission Beach is directly on the route\". Etty Bay, 40 minutes north of it, is the best wild-cassowary site in Australia. The Catalog rates the entry's own season fit poor: this is wet season and the skydive is the part that gets weathered out, not the birds.",
+  },
+
   "perth-live-music-night": {
     kind: "weekday",
     // Friday and Saturday. `weekdayOf` is 0 = Sunday.
     weekdays: [5, 6],
-    why: "Friday and Saturday are the only nights everything is on — the rest of the week is one room each, and the cheap Wed/Sun options finish early on purpose. perth-live-music.md",
+    // …and inside the WA leg, for the same reason Rottnest is: Northbridge is
+    // not reachable from Port Douglas on a January Friday.
+    from: "2026-12-15",
+    to: "2026-12-29",
+    why: "Friday and Saturday are the only nights everything is on — the rest of the week is one room each, and the cheap Wed/Sun options finish early on purpose — and it has to be a night the couple is in Perth. perth-live-music.md",
+  },
+  "fremantle-fish-and-chips": {
+    kind: "window",
+    from: "2026-12-27",
+    to: "2026-12-29",
+    why: "the last of the WA leg, after the drive down from Morawa and before the flight east. It is window-locked rather than floating because a Fishing Boat Harbour evening is a Fremantle evening, and a flexible one-day idea will otherwise score a Tuesday in January when the couple is in Queensland.",
   },
 };
 

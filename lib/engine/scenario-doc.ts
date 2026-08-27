@@ -83,18 +83,20 @@ export interface ScenarioState {
 /* ------------------------------------------------------------------ */
 
 /**
- * The nine researched Adventures, which every seeded Scenario keeps.
+ * The ten researched Adventures, which every seeded Scenario keeps.
  *
  * `mundaring-arrival` leads because the calendar does: docs/CONTEXT.md makes
  * the first days after landing a semi-fixed Anchor, and it is arrival-locked in
- * `capsules.ts` so the Scheduler puts it on the trip's own first day in every
- * Scenario, whatever the leaving date is. It is on all three seeds rather than
+ * `capsules.ts` so the Scheduler puts it on the day the couple
+ * lands, in every Scenario, whatever the leaving date is. It is on all three seeds rather than
  * just the default for the same reason Christmas is: a savings Scenario that
  * saved money by skipping Paul's dad is not a savings Scenario, and the block
- * is the cheapest three days on the calendar anyway.
+ * is the cheapest three days on the calendar anyway. `morawa-christmas` is
+ * there for the same reason with a harder edge: it *is* the Christmas Anchor.
  */
 const ADVENTURES = [
   "mundaring-arrival",
+  "morawa-christmas",
   "margaret-river",
   "rottnest-island",
   "sydney-nye",
@@ -125,6 +127,74 @@ const ADVENTURES = [
 const WA_EVENINGS = ["perth-live-music-night", "fremantle-fish-and-chips"];
 
 /**
+ * The Far North Queensland stretch — #54's *"way more time in North Queensland
+ * than New South Wales"*, expressed the only way the engine can express a taste
+ * directive: as blocks with windows on them.
+ *
+ * All four are Catalog ideas the sweep already researched, window-locked in
+ * `capsules.ts` rather than invented here. Three of them sit in the gap between
+ * the Sydney block and the reef window, which used to be eleven idle days of
+ * Sydney lodging; the fourth is the Cassowary Coast leg on the way south to
+ * Byron, which is the only shape `capsule-fnq-wildlife.md` endorses for it.
+ *
+ * They belong to the default Scenario alone, like the WA evenings and for the
+ * same reason: the savings paths exist to show what gets cut.
+ */
+const FNQ_EXTENSION = [
+  "atherton-tablelands-waterfall-circuit-millaa-millaa-zillie-ellinjaa",
+  "yungaburra-curtain-fig-platypus-and-the-monthly-market",
+  "crater-lakes-lake-eacham-and-lake-barrine",
+  "mission-beach-skydive-and-dunk-island",
+];
+
+/**
+ * The other half of the same directive, and the half that costs something.
+ *
+ * `capsule-byron-nimbin.md` publishes three nights as its floor rung — the
+ * shortest version still worth doing — and taking it is how the couple buys two
+ * more days in Queensland. The Adventure card still says five nights, because
+ * five nights is still what the research recommends; this is the Scenario
+ * disagreeing with it on purpose, which is what a Scenario is for.
+ */
+const BYRON_AT_ITS_MINIMUM: Readonly<Record<string, number>> = {
+  "byron-nimbin": 3,
+};
+
+/**
+ * When the couple comes home: **14 February 2027**, moved in from 22 February
+ * on the live Plan and brought back here so a re-seed keeps it.
+ *
+ * It costs the Melbourne finale, and the Plan says so out loud rather than
+ * quietly dropping it. `melbourne-party` is date-locked to 19–21 February —
+ * Laneway on the Friday, the free St Kilda Festival across the weekend — and
+ * there is no legal placement inside a trip that ends on the 14th. The
+ * Scheduler's "it never refuses" path puts the block at the latest start the
+ * range holds and flags `lockViolated`, `warnings.ts` turns that into a
+ * lock-violated Warning, and the Laneway Event line drops on its own because a
+ * date-pinned Event on a block that does not cover its date is not a thing you
+ * can buy. Deleting the Adventure instead would have hidden the cost of the
+ * decision, which is the one thing this site is not allowed to do.
+ *
+ * The shortened window is the ceiling for every seeded Scenario: the default is
+ * *the everything version*, and a savings path that ran eight days longer than
+ * the version it saves against would make the comparison meaningless.
+ */
+const RETURN_DATE = "2027-02-14";
+
+/**
+ * When the couple leaves Valencia: **14 December 2026**.
+ *
+ * Moved out from the 12th on the live Plan and brought back here so a re-seed
+ * keeps it. It is seed data and nothing else — the `arrival` Lock is defined
+ * against the trip rather than the calendar precisely so that moving this date
+ * moves the Mundaring block with it, and every other Lock is a real claim about
+ * the world that stays where the world put it. The user is watching a 12
+ * December Cathay fare; if it comes back level, this one line moves back and
+ * the WA sequence reflows on its own.
+ */
+const LEAVING_DATE = "2026-12-14";
+
+/**
  * "The All-Stops Tour" — the reference trip: **the everything version, the
  * ceiling the other Scenarios cut from.** All nine researched Adventures on,
  * both WA evenings booked, nothing traded away anywhere.
@@ -149,7 +219,13 @@ export const DEFAULT_SCENARIO: Scenario = {
   createdAt: "2026-08-27T00:00:00.000Z",
   input: {
     ...EMPTY_INPUT,
-    toggled: [...ADVENTURES, ...WA_EVENINGS],
+    // Stated rather than inherited from `EMPTY_INPUT`, because both are now
+    // decisions the couple made on the live Plan. See `LEAVING_DATE` and
+    // `RETURN_DATE` above.
+    startDate: LEAVING_DATE,
+    endDate: RETURN_DATE,
+    toggled: [...ADVENTURES, ...WA_EVENINGS, ...FNQ_EXTENSION],
+    dayOverrides: BYRON_AT_ITS_MINIMUM,
   },
 };
 
@@ -205,7 +281,17 @@ export const COMFORTABLE_SCENARIO: Scenario = {
   createdAt: "2026-08-27T00:00:00.000Z",
   input: {
     ...EMPTY_INPUT,
+    // The same window as the default. A savings path is a path *down* from the
+    // ceiling, and one that ran eight days longer than the version it saves
+    // against would not be comparable to it.
+    startDate: LEAVING_DATE,
+    endDate: RETURN_DATE,
     toggled: [...ADVENTURES, PERTH_CITY_DAYS],
+    // Byron at its researched floor, like the default. Not a saving so much as
+    // a consequence: Tasmania is a February block since #54 and the NSW school
+    // holidays do not end until 28 January, so a five-night Byron and a
+    // nine-night Tasmania cannot both fit between them.
+    dayOverrides: BYRON_AT_ITS_MINIMUM,
     placementOverrides: {
       // Two nights before NYE bought back as two after 1 January, when the
       // Sydney rate collapses from ×2.5 to ×1.2. The research's own rule.
@@ -263,11 +349,34 @@ export const AGGRESSIVE_SCENARIO: Scenario = {
   createdAt: "2026-08-27T00:00:00.000Z",
   input: {
     ...EMPTY_INPUT,
+    startDate: LEAVING_DATE,
     endDate: "2027-02-08",
     toggled: [...ADVENTURES],
+    /**
+     * The floor rungs, taken literally.
+     *
+     * Every researched Adventure publishes a shortest-version-still-worth-doing
+     * and this Scenario takes three of them: six nights in Tasmania instead of
+     * nine, three in Byron instead of five, three in Melbourne instead of four.
+     * That is what makes a 14 December – 8 February trip hold the whole
+     * itinerary once Tasmania became a February block (#54) — without them the
+     * tail is eighteen days of Adventure in twelve days of calendar, and the
+     * Scheduler's honest answer to that is three overlapping blocks.
+     *
+     * Nothing here goes below a `minDays` the research set. The Scheduler
+     * clamps to it, so this is the floor and not a shortcut past it.
+     */
+    dayOverrides: {
+      "tasmania-arc": 6,
+      "byron-nimbin": 3,
+      "melbourne-party": 3,
+    },
     placementOverrides: {
       "sydney-nye": "2026-12-30",
-      "melbourne-party": "2027-02-04",
+      // The Melbourne pin is gone. It used to buy a February long weekend the
+      // block could actually reach; with the return on 8 February the block is
+      // the last three days of the trip wherever it is pinned, and the
+      // Scheduler's own clamp puts it there without being told.
     },
     eventOverrides: {
       "gbr-poseidon": false,
@@ -364,6 +473,14 @@ export function parseInput(raw: unknown): PlanInput {
       typeof raw.endDate === "string" ? raw.endDate : EMPTY_INPUT.endDate,
     toggled: strings(raw.toggled),
     placementOverrides: record(raw.placementOverrides, isString),
+    // A block length is a positive whole number of days and nothing else; a
+    // zero-day or fractional Adventure is repaired to absent rather than
+    // trusted, exactly like a negative Event swap below.
+    dayOverrides: record(
+      raw.dayOverrides,
+      (item): item is number =>
+        typeof item === "number" && Number.isInteger(item) && item > 0,
+    ),
     legModeOverrides: record(
       raw.legModeOverrides,
       isString,

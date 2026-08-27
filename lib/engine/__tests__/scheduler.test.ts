@@ -188,6 +188,7 @@ test("an impossible fit is still placed, and reported as an overlap", () => {
     endDate: "2027-01-25",
     capsules: both,
     placementOverrides: {},
+    dayOverrides: {},
   });
 
   assert.equal(result.placements.length, 2, "nothing is refused");

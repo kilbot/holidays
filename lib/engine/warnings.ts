@@ -17,7 +17,7 @@
  * | `lock-violated` | a placement sits outside its Capsule's own Lock |
  * | `overlap` | two Capsules claim the same Days |
  * | `unplaced` | a toggled Capsule the range has no room for at all |
- * | `anchor-missed` | Christmas is not in Perth, NYE is not in Sydney, or an Anchor date falls outside the trip |
+ * | `anchor-missed` | Christmas is not in Morawa, NYE is not in Sydney, or an Anchor date falls outside the trip |
  * | `zero-buffer` | a relocation with no Buffer day before it |
  * | `jam-packed` | seven consecutive Days with no Buffer in them |
  * | `daily-cap` | a Day's **living** lines clear A$500 for the couple |
@@ -161,12 +161,17 @@ function lockSentence(capsule: CapsuleSpec): string {
 
 /**
  * Which Location an Anchor wants. docs/CONTEXT.md names two hard ones —
- * Christmas in Perth, New Year's Eve in Sydney — and one soft: Australia Day,
- * "be somewhere good for it, city decided by itinerary flow", which is why it
- * has no Location here and only warns if the date falls outside the trip.
+ * Christmas at the sister's farm in Morawa, New Year's Eve in Sydney — and one
+ * soft: Australia Day, "be somewhere good for it, city decided by itinerary
+ * flow", which is why it has no Location here and only warns if the date falls
+ * outside the trip.
+ *
+ * Christmas moved from `perth` to `morawa` on #54. The Anchor was always the
+ * *family*, and the family Christmas is on the farm; "Perth" was the engine
+ * quietly rounding 370 km down to nothing.
  */
 const ANCHOR_LOCATION: Readonly<Record<string, string>> = {
-  "2026-12-25": "perth",
+  "2026-12-25": "morawa",
   "2026-12-31": "sydney",
 };
 
@@ -193,8 +198,11 @@ function anchorWarnings(input: WarningInput): Warning[] {
     const wanted = ANCHOR_LOCATION[anchor.date];
     if (!wanted) continue;
     if (day.locationId === wanted) continue;
-    // Rottnest is a day trip out of the Perth home base; the couple sleeps
-    // there either side of it, so it satisfies a Perth anchor.
+    // Rottnest is a day trip out of the Perth Home base; the couple sleeps
+    // there either side of it, so it satisfies a Perth Anchor. Morawa gets no
+    // such latitude: the whole point of the #54 change is that a Christmas
+    // spent at *a* WA Home base is not a Christmas spent at the sister's farm,
+    // and rounding 370 km down to "close enough" is the bug this replaced.
     if (wanted === "perth" && day.homeBase) continue;
 
     out.push({

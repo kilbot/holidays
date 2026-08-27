@@ -58,6 +58,24 @@ export const LOCATIONS: readonly Location[] = [
     regions: ["WA"],
   },
   {
+    id: "morawa",
+    name: "Morawa",
+    // Home base #2, docs/CONTEXT.md: the sister's farm, and since #54 the place
+    // the Christmas hard Anchor actually happens. `home-base-regional` rather
+    // than `home-base-city` because it is 370 km up the Midlands road from
+    // Perth and everything is a drive — the A$30/day fuel line is the wheatbelt
+    // being the wheatbelt, not a rate-card guess.
+    market: "home-base-regional",
+    airport: "PER",
+    coords: [116.0100, -29.2100], // Morawa township, WA wheatbelt
+    homeBase: true,
+    // After Christmas the couple drives back down to Perth; the Buffer days
+    // that follow are Perth days, not four more days on the farm.
+    returnsTo: "perth",
+    weather: "perth",
+    regions: ["WA"],
+  },
+  {
     id: "margaret-river",
     name: "Margaret River",
     // Paid nights, but the car is the family's — the Capsule carries no hire.

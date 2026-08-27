@@ -202,7 +202,11 @@ const GREAT_BARRIER_REEF: DeepCapsule = {
   cost: {
     min: { aud: 1405, eur: 857, band: null, days: 3, label: "Floor" },
     cheap: { aud: 2480, eur: 1513, band: null, days: 5, label: "Camping" },
-    ideal: { aud: 2702, eur: 1648, band: null, days: 5, label: "Plan on" },
+    // Re-priced on #54: the reef block moved from 22–26 January to 18–22, the
+    // first days its own window allows, which is a different set of nights on
+    // the peak table. The card and the ledger quote one figure or neither is
+    // worth anything — `floors.test.ts` holds them to €5 of each other.
+    ideal: { aud: 2689, eur: 1640, band: null, days: 5, label: "Plan on" },
     max: { aud: 4166, eur: 2560, band: [2075, 3295], days: 5, label: "As published" },
   },
   window: "From ~18 January — the day operator off-peak pricing starts",
@@ -599,7 +603,12 @@ const TASMANIA: DeepCapsule = {
   cost: {
     min: { aud: 3223, eur: 1966, band: null, days: 6, label: "Floor" },
     cheap: { aud: 3597, eur: 2194, band: null, days: 9, label: "Camping" },
-    ideal: { aud: 4407, eur: 2688, band: null, days: 9, label: "Plan on" },
+    // Re-priced on #54, and this is the large one. The block moved out of
+    // mid-January into 31 January – 8 February, which puts every night of it
+    // past the 28 January school-return cliff and on the ×1.0 shoulder instead
+    // of the ×1.2 holiday multiplier. Same nine nights, A$446 less, and the
+    // reason is a date rather than a decision.
+    ideal: { aud: 3961, eur: 2416, band: null, days: 9, label: "Plan on" },
     max: { aud: 7261, eur: 4430, band: [3415, 6100], days: 9, label: "As published" },
   },
   window: "From about 13 January — after the New Year fare peak",
@@ -1131,6 +1140,125 @@ const MUNDARING_ARRIVAL: DeepCapsule = {
     "perth-live-music-night",
     "fremantle-fish-and-chips",
     "fremantle-markets-and-the-freo-alternative-scene",
+    "perth-city-kings-park-cottesloe-and-boola-bardip",
+  ],
+};
+
+/* ------------------------------------------------------------------ *
+ * WA — Morawa, the Christmas Anchor
+ * ------------------------------------------------------------------ */
+
+/**
+ * The second Adventure here with no research document, and the second one to
+ * say so.
+ *
+ * docs/CONTEXT.md's hard Anchor is Christmas Day **at the sister's farm in
+ * Morawa** — 370 km and four hours up the Midlands road from Perth, in the
+ * wheatbelt. The engine used to satisfy that Anchor with any WA Home base,
+ * which rounded the drive down to nothing and let the Plan claim a family
+ * Christmas it was not actually at.
+ *
+ * The block is four days for a reason the calendar makes obvious: you do not
+ * drive four hours up, have Christmas lunch, and drive four hours back. Two
+ * days either side of the 25th is one drive up, Christmas Eve, Christmas Day,
+ * and a Boxing Day drive home — and the drive home is what the ledger charges
+ * as the Leg back to Perth on the 26th.
+ *
+ * Its figures are the `home-base-regional` rate card plus one Event line for
+ * the contribution nobody arrives without. There are no operators because
+ * there is nothing to book.
+ */
+const MORAWA_CHRISTMAS: DeepCapsule = {
+  id: "morawa-christmas",
+  name: "Christmas Day in Morawa",
+  region: "WA — Wheatbelt / Morawa",
+  tagline: "Four hours up the Midlands road for Christmas at the sister's farm.",
+  facets: ["outdoors", "food"],
+  tags: ["home-base", "family", "farm", "wheatbelt", "cheap", "free", "road-trip"],
+  seasonFit: "good",
+  airport: "PER",
+  base: [116.0100, -29.2100], // Morawa township, WA wheatbelt
+  days: { min: 3, ideal: 4, max: 6, unit: "days" },
+  /**
+   * Free beds, a borrowed car, and a drive. Living is the wheatbelt Home-base
+   * card — A$45 food, A$30 fuel, A$20 day-to-day — over four days, plus the
+   * Christmas contribution. The drive itself is a Leg and is priced as one, so
+   * it is deliberately *not* in these rungs; folding it in would charge it
+   * twice.
+   */
+  cost: {
+    min: { aud: 430, eur: 262, band: null, days: 3, label: "Three days" },
+    ideal: { aud: 546, eur: 333, band: [290, 500], days: 4, label: "Plan on" },
+    max: { aud: 1100, eur: 671, band: [560, 780], days: 4, label: "If you paid for it" },
+  },
+  window: "Christmas Day, and the days either side of it.",
+  verdict: "The one date on the calendar that was never negotiable.",
+  why: "The sister's farm is the second of the three Home bases and the only one with a date attached. Christmas is the reason the whole WA leg happens in December rather than February, and a four-hour drive each way is the price of it — which is cheap, because the beds are free and the car is borrowed.",
+  durationNote:
+    "Four days is a drive up, Christmas Eve, Christmas Day, and a drive back on Boxing Day. Three is the same trip with the Eve cut and is priced as the floor. More than four starts eating the pre-Christmas WA run, which is Margaret River's and Rottnest's only clear window.",
+  budgetShare: "€333 — under 2% of the Budget for the trip's least negotiable four days.",
+  itinerary: [
+    {
+      day: "Day 1 — 23 Dec",
+      title: "Up the Midlands road",
+      body: "Mundaring to Morawa is ~370 km and about four hours through Wongan Hills and Wubin. Leave after breakfast, arrive for a late lunch. Fuel for the round trip is roughly A$120 at the cost-baselines §2.2 rate of A$0.16/km — the only real cost of getting there.",
+    },
+    {
+      day: "Day 2 — Christmas Eve",
+      title: "Farm day",
+      body: "Nothing scheduled, on purpose. December in the wheatbelt is 35–40°C by mid-afternoon, so anything outdoors is a morning, and the shops in town shut early.",
+    },
+    {
+      day: "Day 3 — Christmas Day",
+      title: "The Anchor",
+      body: "The reason the trip is in Australia in December. Everything is shut, nothing costs anything, and the contribution to lunch is already bought.",
+    },
+    {
+      day: "Day 4 — Boxing Day",
+      title: "Back down to Perth",
+      body: "Four hours south. The Leg is priced as a drive and the Buffer days after it are Perth days, not farm days. This is also the morning the Sydney NYE forecourt ballot opens at 10:00 AEDT — whoever is not driving books it from a phone.",
+    },
+  ],
+  caveats: [
+    {
+      label: "It is a hard Anchor, and the place is part of it",
+      tone: "info",
+      body: "Christmas in Perth and Christmas in Morawa are 370 km apart, and until #54 the engine treated them as the same thing. A Plan that puts 25 December anywhere else now says so as a Warning, which is what a hard Anchor is for.",
+    },
+    {
+      label: "Eight hours of driving, and it is not optional",
+      tone: "warn",
+      body: "There is no train and no useful flight; Morawa's own airstrip is a strip. The round trip is two long drives in a borrowed car, and Boxing Day is one of them. Do not stack a same-day flight on top of the drive home.",
+    },
+    {
+      label: "Wheatbelt December is hot and shut",
+      tone: "warn",
+      body: "35–40°C is an ordinary December afternoon and it is harvest-tail fire season. The town's shops keep short hours over the holiday and there is nothing open on Christmas Day, so anything the couple wants to bring is bought in Perth or in Moora on the way up.",
+    },
+  ],
+  operators: [],
+  deadlines: [
+    {
+      when: "26 December, 10:00 AEDT",
+      what: "The Sydney NYE Opera House Forecourt ballot opens on the drive home. Whoever is not driving books it from a phone.",
+    },
+  ],
+  sources: [
+    {
+      label: "docs/CONTEXT.md — Anchor, and Home base",
+      url: "https://github.com/kilbot/holidays/blob/main/docs/CONTEXT.md",
+    },
+    {
+      label: "Research: cost-baselines.md §2 — the Home-base rate card and the A$0.16/km fuel figure",
+      url: `${RESEARCH}cost-baselines.md`,
+    },
+    {
+      label: "Research: domestic-flights.md — the 26 December PER→SYD window",
+      url: `${RESEARCH}domestic-flights.md`,
+    },
+  ],
+  related: [
+    "pinnacles-desert-nambung-np-and-lancelin-sand-dunes",
     "perth-city-kings-park-cottesloe-and-boola-bardip",
   ],
 };
@@ -1920,6 +2048,7 @@ export const DEEP_CAPSULES: readonly DeepCapsule[] = [
   MUNDARING_ARRIVAL,
   MARGARET_RIVER,
   ROTTNEST,
+  MORAWA_CHRISTMAS,
   SYDNEY_NYE,
   GREAT_BARRIER_REEF,
   FNQ_WILDLIFE,

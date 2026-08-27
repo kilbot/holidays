@@ -94,7 +94,7 @@ export const ARRIVING: CapsuleSpec = {
   locationId: "mundaring",
   days: 2,
   minDays: 1,
-  lock: { kind: "arrival", why: "test: straight off the plane." },
+  lock: { kind: "arrival", landsAfter: 0, why: "test: straight off the plane." },
   needsCar: false,
   events: [],
   publishedEur: 0,

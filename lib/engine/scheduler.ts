@@ -78,6 +78,8 @@ export interface ScheduleInput {
   endDate: string;
   capsules: readonly CapsuleSpec[];
   placementOverrides: Readonly<Record<string, string>>;
+  /** Capsule id → this Scenario's own block length. `PlanInput.dayOverrides`. */
+  dayOverrides: Readonly<Record<string, number>>;
 }
 
 export interface ScheduleResult {
@@ -112,10 +114,14 @@ export function lockAllows(
       // Must cover the locked span. NYE on the 30th is not NYE.
       return startDate <= lock.from && endDate >= lock.to;
     case "weekday":
-      return lock.weekdays.includes(weekdayOf(startDate));
+      if (!lock.weekdays.includes(weekdayOf(startDate))) return false;
+      if (lock.from && startDate < lock.from) return false;
+      if (lock.to && endDate > lock.to) return false;
+      return true;
     case "arrival":
-      // The first day of the trip, and no other. Jet lag does not wait a week.
-      return startDate === tripStart;
+      // The day the couple lands, and no other. Jet lag does not wait a week,
+      // and it does not start before the plane does either.
+      return startDate === addDays(tripStart, lock.landsAfter);
   }
 }
 
@@ -159,14 +165,33 @@ function preferredStart(lock: Lock, startDate: string): string {
   if (lock.kind === "window" || lock.kind === "date") {
     return lock.from > startDate ? lock.from : startDate;
   }
-  // `arrival` and `flexible` both want the trip's own first day, which is what
-  // `startDate` already is.
+  if (lock.kind === "weekday" && lock.from && lock.from > startDate) {
+    return lock.from;
+  }
+  if (lock.kind === "arrival") return addDays(startDate, lock.landsAfter);
+  // `flexible` wants the trip's own first day, which `startDate` already is.
   return startDate;
 }
 
 export function schedule(input: ScheduleInput): ScheduleResult {
   const { startDate, endDate } = input;
   const tripDays = daysBetween(startDate, endDate);
+
+  /**
+   * How many days this block gets, in one place so the override, the
+   * Adventure's own floor and the trip's length are reconciled once.
+   *
+   * Order matters. The Scenario's wish is clamped to the Adventure's `minDays`
+   * first — the research's "shortest version still worth doing" is a floor a
+   * Scenario may not undercut, or the site would be pricing a Byron the
+   * document says is not Byron — and then to the trip, because a 9-night
+   * Tasmania in a 6-day trip is a 6-day Tasmania with a Warning, not an
+   * absence.
+   */
+  const lengthOf = (capsule: CapsuleSpec) => {
+    const wanted = input.dayOverrides[capsule.id] ?? capsule.days;
+    return Math.max(1, Math.min(Math.max(wanted, capsule.minDays), tripDays));
+  };
   const taken = new Map<string, string>(); // date → capsule id
   const placements: Placement[] = [];
   const unplaced: string[] = [];
@@ -201,7 +226,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
     if (!start) continue;
     overridden.add(capsule.id);
 
-    const days = Math.min(capsule.days, tripDays);
+    const days = lengthOf(capsule);
     // A drag can land a block off the end of the trip; it gets clamped back so
     // the ledger has Days to hang it on, and keeps its own dates otherwise.
     const latest = addDays(endDate, -(days - 1));
@@ -227,10 +252,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
       continue;
     }
 
-    // Shrink to the trip before shrinking below the Capsule's own floor: a
-    // 9-night Tasmania in a 6-day trip is a 6-day Tasmania with a Warning, not
-    // an absence.
-    const days = Math.max(1, Math.min(capsule.days, tripDays));
+    const days = lengthOf(capsule);
 
     let best: { start: string; score: number } | null = null;
     const lastStart = tripDays - days;
