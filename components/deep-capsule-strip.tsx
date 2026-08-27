@@ -24,11 +24,13 @@ import { cn } from "@/lib/utils";
  * in trip order, and the search never touches them.
  *
  * It collapses because the strip costs about 90px of a column that also has to
- * hold ten filters and a list — worth it by default for the discovery, not
- * worth it once you know they are there.
+ * hold ten filters and a list. Since #36 it is collapsed by *default*: the
+ * eight researched Capsules are also always-on markers on the globe now, so
+ * the discovery the open-by-default strip was paying for happens on the map
+ * instead, and the column gets its 90px back for the list.
  */
 export function DeepCapsuleStrip() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const { marks } = useShortlist();
 
   return (

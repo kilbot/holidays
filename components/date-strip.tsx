@@ -106,64 +106,110 @@ function useToday(): string | null {
 }
 
 /**
- * The deadlines that fall before the window opens.
+ * The deadlines that fall before the window opens, as a countdown chip.
  *
  * They have no position on a rail that starts in December — booking the
- * PER→SYD Leg is an October job — so they get a banner instead, with the
- * countdown that is the whole point of them.
+ * PER→SYD Leg is an October job — so they need chrome of their own. Until #36
+ * that chrome was a full-width banner spelling every deadline out, which cost
+ * the strip ~44px of permanent height to say something that changes once a day.
+ *
+ * The chip keeps the one number that is genuinely urgent — days to the
+ * *soonest* deadline — and puts the rest one click away. Nothing is removed:
+ * expanded, it is the same list with the same details.
  */
 function ClocksTicking() {
-  const [open, setOpen] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [shownId, setShownId] = useState<string | null>(null);
   const today = useToday();
 
-  const shown = PRE_TRIP_DEADLINES.find((deadline) => deadline.id === open);
+  // Soonest first, so the chip counts down to the one that bites next.
+  const ranked = useMemo(
+    () =>
+      [...PRE_TRIP_DEADLINES].sort((a, b) => a.date.localeCompare(b.date)),
+    [],
+  );
+  const next = ranked[0];
+  const away = today && next ? daysBetween(today, next.date) - 1 : null;
+  const shown = ranked.find((deadline) => deadline.id === shownId);
+
+  if (!next) return null;
 
   return (
-    <div className="mb-2 rounded-lg bg-[color-mix(in_srgb,var(--sb-warn)_12%,transparent)] px-2 py-1.5">
-      {/* Wraps rather than truncates: a deadline you can only half-read is
-          not doing its job, and on a phone these are two full lines. */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="flex shrink-0 items-center gap-1.5">
-          <AlarmClock className="size-3 text-[var(--sb-warn)]" />
-          <span className="sb-label text-[9px] text-[var(--sb-warn)]">
-            Clocks ticking
-          </span>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        aria-expanded={open}
+        title={`${ranked.length} booking deadlines before the trip window opens`}
+        className="flex cursor-pointer items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,var(--sb-warn)_14%,transparent)] px-2 py-[3px] transition-colors hover:bg-[color-mix(in_srgb,var(--sb-warn)_22%,transparent)] motion-reduce:transition-none"
+      >
+        <AlarmClock className="size-3 shrink-0 text-[var(--sb-warn)]" />
+        <span className="sb-num text-[10px] leading-none text-[var(--sb-dim)]">
+          {away !== null && away > 0 ? (
+            <>
+              <span className="font-semibold text-[var(--sb-warn)]">
+                {away}d
+              </span>{" "}
+              to {next.label.toLowerCase()}
+            </>
+          ) : (
+            <>{ranked.length} clocks ticking</>
+          )}
         </span>
-        <ul className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-          {PRE_TRIP_DEADLINES.map((deadline) => {
-            const away = today ? daysBetween(today, deadline.date) - 1 : null;
-            return (
-              <li key={deadline.id}>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setOpen((current) =>
-                      current === deadline.id ? null : deadline.id,
-                    )
-                  }
-                  aria-expanded={open === deadline.id}
-                  className="cursor-pointer text-left text-[10.5px] leading-tight text-[var(--sb-dim)] transition-colors hover:text-[var(--sb-text)] motion-reduce:transition-none"
-                >
-                  <span className="font-semibold text-[var(--sb-text)]">
-                    {deadline.label}
-                  </span>
-                  {away !== null && away > 0 && (
-                    <span className="sb-num ml-1.5 text-[var(--sb-faint)]">
-                      in {away} days
-                    </span>
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+        <ChevronDown
+          className={cn(
+            "size-3 shrink-0 text-[var(--sb-faint)] transition-transform motion-reduce:transition-none",
+            !open && "-rotate-90",
+          )}
+        />
+      </button>
 
-      {shown && (
-        <p className="mt-1 pl-5 text-[10px] leading-snug text-[var(--sb-dim)]">
-          {shown.detail}{" "}
-          <span className="sb-num text-[var(--sb-faint)]">{shown.source}</span>
-        </p>
+      {/* Floats above the strip rather than growing it: the resting height is
+          the whole point of the chip. */}
+      {open && (
+        <div className="sb-panel absolute bottom-[calc(100%+6px)] left-0 z-40 w-[280px] p-2.5">
+          <p className="sb-label text-[9px] text-[var(--sb-warn)]">
+            Clocks ticking
+          </p>
+          <ul className="mt-1.5 flex flex-col gap-1">
+            {ranked.map((deadline) => {
+              const days = today
+                ? daysBetween(today, deadline.date) - 1
+                : null;
+              return (
+                <li key={deadline.id}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShownId((current) =>
+                        current === deadline.id ? null : deadline.id,
+                      )
+                    }
+                    aria-expanded={shownId === deadline.id}
+                    className="flex w-full cursor-pointer items-baseline justify-between gap-2 rounded-md px-1 py-0.5 text-left text-[10.5px] leading-tight text-[var(--sb-dim)] transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)] motion-reduce:transition-none"
+                  >
+                    <span className="font-semibold text-[var(--sb-text)]">
+                      {deadline.label}
+                    </span>
+                    {days !== null && days > 0 && (
+                      <span className="sb-num shrink-0 text-[var(--sb-faint)]">
+                        in {days} days
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {shown && (
+            <p className="mt-1.5 border-t border-[var(--sb-line)] pt-1.5 text-[10px] leading-snug text-[var(--sb-dim)]">
+              {shown.detail}{" "}
+              <span className="sb-num text-[var(--sb-faint)]">
+                {shown.source}
+              </span>
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -209,8 +255,18 @@ const WEEK_ZOOM_ID = "week-zoom";
  * of the data. Colour is the temperature ramp, cool to hot; the tilt this
  * El Niño summer puts on it is in the week zoom, where there is room to say
  * how much confidence it carries.
+ *
+ * Since #36 this rides a hover/focus popover rather than sitting in every cell
+ * at rest: ten cells × three extra lines was the strip's second-largest
+ * permanent cost, and monthly normals are reference, not headline. A pointer
+ * sweep along the strip still reads the whole summer's weather without a
+ * click, and a tap gets the same numbers in the week zoom.
+ *
+ * A popover rather than an in-cell disclosure because growing the cell grows
+ * the strip: sweeping the mouse across ten weeks would have made the whole
+ * dock jump 44px and back, ten times.
  */
-function WeatherRibbon({ week, costEur }: { week: PlanWeek; costEur: number }) {
+function WeatherRibbon({ week }: { week: PlanWeek }) {
   const id = week.lead.weather;
   const month = monthKey(week.startDate);
   const normals = id ? normalsFor(id, month) : null;
@@ -219,11 +275,12 @@ function WeatherRibbon({ week, costEur }: { week: PlanWeek; costEur: number }) {
     : 0;
 
   return (
-    <div className="mt-1.5">
+    <div>
+      <p className="sb-num text-[9.5px] text-[var(--sb-faint)]">{week.label}</p>
       <span
         aria-hidden
         className={cn(
-          "block h-[3px] rounded-full",
+          "mt-1 block h-[3px] rounded-full",
           !normals && "border-t border-dashed border-[var(--sb-line)]",
         )}
         style={
@@ -234,22 +291,20 @@ function WeatherRibbon({ week, costEur }: { week: PlanWeek; costEur: number }) {
             : undefined
         }
       />
-      {/* Weather left, money right: the two numbers a week is judged on, on
-          one line, so the cell stays four lines tall however long the trip. */}
-      <p className="sb-num mt-1 flex items-baseline justify-between gap-1 text-[9.5px]">
+      <p className="sb-num mt-1 text-[10px]">
         {normals ? (
-          <span className="truncate text-[var(--sb-dim)]">
+          <span className="text-[var(--sb-dim)]">
             {normals.avg_high_c}°/{normals.avg_low_c}°
-            <span className="ml-1 hidden text-[var(--sb-faint)] xl:inline">
-              {normals.rain_days_ge_1mm} wet
+            <span className="ml-1 text-[var(--sb-faint)]">
+              {normals.rain_days_ge_1mm} wet days
             </span>
           </span>
         ) : (
-          <span className="truncate text-[var(--sb-faint)]">in transit</span>
+          <span className="text-[var(--sb-faint)]">in transit</span>
         )}
-        <span className="shrink-0 text-[11px] font-medium text-[var(--sb-text)]">
-          {formatEurCompact(costEur)}
-        </span>
+      </p>
+      <p className="mt-1 text-[10px] leading-snug text-[var(--sb-faint)]">
+        {week.handover ?? week.lead.detail}
       </p>
     </div>
   );
@@ -264,7 +319,7 @@ function EventTicks({ week }: { week: PlanWeek }) {
   const hits = eventsForDays(eventDaysOf(week));
 
   return (
-    <div className="mt-1 grid h-2 grid-cols-7 gap-px" aria-hidden>
+    <div className="mt-1 grid h-[5px] grid-cols-7 gap-px" aria-hidden>
       {week.days.map((day) => {
         const onDay = hits.filter(
           (hit) => hit.start <= day.date && hit.end >= day.date,
@@ -301,7 +356,7 @@ function WeekCell({
   const anchored = week.anchors.length > 0;
 
   return (
-    <li className="flex min-w-[136px] flex-1 lg:min-w-0">
+    <li className="relative flex min-w-[124px] flex-1 lg:min-w-0">
       <button
         type="button"
         onClick={onToggle}
@@ -309,7 +364,7 @@ function WeekCell({
         aria-controls={WEEK_ZOOM_ID}
         aria-label={`${week.label}, ${week.lead.place}. Open the day view.`}
         className={cn(
-          "flex w-full cursor-pointer flex-col rounded-lg border px-2.5 py-2 text-left transition-colors motion-reduce:transition-none",
+          "peer flex w-full cursor-pointer flex-col rounded-lg border px-2 py-1.5 text-left transition-colors motion-reduce:transition-none",
           anchored
             ? "border-[color-mix(in_srgb,var(--sb-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--sb-accent)_9%,var(--sb-panel-2))]"
             : "border-[var(--sb-line)] bg-[color-mix(in_srgb,var(--sb-panel-2)_65%,transparent)]",
@@ -319,23 +374,30 @@ function WeekCell({
             : "hover:border-[color-mix(in_srgb,var(--sb-dim)_45%,transparent)]",
         )}
       >
+        {/* Week, anchor mark and money on one line — the three things worth
+            reading at a glance across ten cells. */}
         <div className="flex items-baseline justify-between gap-1.5">
-          <span className="sb-num truncate text-[10px] text-[var(--sb-faint)]">
+          <span className="sb-num truncate text-[9.5px] text-[var(--sb-faint)]">
             {week.label}
           </span>
-          {/* The anchor mark sits out here rather than after the place name,
-              where a long place ("Margaret River + Rotto") would truncate the
-              one glyph that says this week is spoken for. */}
-          {anchored && (
-            <span
-              className="shrink-0 text-[10px] text-[var(--sb-accent)]"
-              title={week.anchors
-                .map((anchor) => `${anchor.label} — ${formatDay(anchor.date)}`)
-                .join(" · ")}
-            >
-              ✦
+          <span className="flex shrink-0 items-baseline gap-1">
+            {/* The anchor mark sits out here rather than after the place name,
+                where a long place ("Margaret River + Rotto") would truncate
+                the one glyph that says this week is spoken for. */}
+            {anchored && (
+              <span
+                className="text-[10px] text-[var(--sb-accent)]"
+                title={week.anchors
+                  .map((anchor) => `${anchor.label} — ${formatDay(anchor.date)}`)
+                  .join(" · ")}
+              >
+                ✦
+              </span>
+            )}
+            <span className="sb-num text-[10.5px] font-medium text-[var(--sb-text)]">
+              {formatEurCompact(week.costEur)}
             </span>
-          )}
+          </span>
         </div>
 
         <p
@@ -347,13 +409,17 @@ function WeekCell({
           {week.lead.place}
         </p>
 
-        <p className="mt-0.5 hidden truncate text-[10px] text-[var(--sb-faint)] xl:block">
-          {week.handover ?? week.lead.detail}
-        </p>
-
-        <WeatherRibbon week={week} costEur={week.costEur} />
         <EventTicks week={week} />
       </button>
+
+      {/* Weather and the handover note, floated over the globe on hover or
+          keyboard focus. Outside the button so it never inflates the cell. */}
+      <div
+        aria-hidden
+        className="sb-panel pointer-events-none absolute bottom-[calc(100%+8px)] left-0 z-30 w-[176px] max-w-[calc(100vw-2rem)] p-2 opacity-0 transition-opacity duration-150 peer-hover:opacity-100 peer-focus-visible:opacity-100 motion-reduce:transition-none"
+      >
+        <WeatherRibbon week={week} />
+      </div>
     </li>
   );
 }
@@ -404,10 +470,12 @@ export function DateStrip() {
 
   return (
     <section className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20">
-      <div className="sb-panel p-3">
-        <ClocksTicking />
-
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <div className="sb-panel px-3 py-2.5">
+        {/* One header line: the dates, the totals, the deadline chip and the
+            legend. Before #36 the deadlines had a banner of their own above
+            this row; folding them in is most of the height the strip gave
+            back. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <DateChip
               label="Leaving"
@@ -447,6 +515,8 @@ export function DateStrip() {
             </span>
           </p>
 
+          <ClocksTicking />
+
           <Legend />
         </div>
 
@@ -464,8 +534,10 @@ export function DateStrip() {
         )}
 
         {/* Horizontal scroll is the mobile degradation: ten weeks never fit a
-            phone, and squeezing them would cost the place names. */}
-        <ul className="sb-scroll flex gap-1.5 overflow-x-auto pb-1">
+            phone, and squeezing them would cost the place names. Above `lg`
+            they all fit, and overflow goes back to visible so the weather
+            popovers are not clipped by the scroll container. */}
+        <ul className="sb-scroll flex gap-1 overflow-x-auto pb-0.5 lg:overflow-x-visible">
           {plan.weeks.map((week) => (
             <WeekCell
               key={week.id}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Layers, X } from "lucide-react";
 
 import { CatalogSift } from "@/components/catalog-sift";
@@ -8,32 +8,68 @@ import { CATALOG } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
 /**
- * Where the Catalog lives: a docked rail on desktop, an overlay on a phone.
+ * Where the Catalog lives: a docked rail on a wide screen, a slide-out
+ * everywhere else.
  *
  * The shell only — the sift itself is `CatalogSift`, mounted once per
  * breakpoint. Two mounts means two independent sifts, which is fine: only one
  * is ever on screen, and the shortlist marks they both write are shared
  * through localStorage.
  */
+
+/**
+ * Above this width the rail is docked open by default.
+ *
+ * 1280×800 is the benchmark viewport for #36 and it is the narrowest laptop
+ * where a 280px rail, a 264px HUD and a globe worth looking at can all coexist.
+ * Below it the rail still exists — it just opens on demand, over the globe,
+ * rather than eating a fifth of a screen the traveller came to look at a map on.
+ */
+const DOCK_QUERY = "(min-width: 1280px)";
+
 export function CatalogDrawer() {
-  const [collapsed, setCollapsed] = useState(false);
+  // Server-rendered collapsed, then opened by the effect on a wide viewport:
+  // `matchMedia` has no answer during SSR, and collapsed is the safe first
+  // paint — it never covers the globe before the real width is known.
+  const [collapsed, setCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Once the traveller opens or closes the rail themselves it is theirs, and a
+  // window resize stops overruling them.
+  const chosen = useRef(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(DOCK_QUERY);
+    const apply = () => {
+      if (!chosen.current) setCollapsed(!media.matches);
+    };
+    apply();
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, []);
+
+  const choose = (next: boolean) => {
+    chosen.current = true;
+    setCollapsed(next);
+  };
 
   return (
     <>
-      {/* ---- Desktop: docked, collapsible rail ---- */}
+      {/* ---- Desktop: docked rail, or the icon tab that opens it ---- */}
       <aside
         className={cn(
-          "pointer-events-auto absolute top-4 bottom-[168px] left-4 z-20 hidden lg:flex",
-          collapsed ? "w-11" : "w-[318px]",
+          "pointer-events-auto absolute top-4 left-4 z-20 hidden lg:flex",
+          collapsed
+            ? "w-11"
+            : "w-[280px] bottom-[calc(var(--sb-strip-h)+2rem)]",
         )}
       >
         {collapsed ? (
           <button
             type="button"
-            onClick={() => setCollapsed(false)}
-            className="sb-panel flex w-full cursor-pointer flex-col items-center gap-3 py-3 transition-colors hover:bg-[var(--sb-panel-2)]"
-            aria-label="Expand the catalog"
+            onClick={() => choose(false)}
+            className="sb-panel flex w-full cursor-pointer flex-col items-center gap-2.5 py-3 transition-colors hover:bg-[var(--sb-panel-2)] motion-reduce:transition-none"
+            aria-label="Open the catalog"
           >
             <Layers className="size-4 text-[var(--sb-accent)]" />
             <span
@@ -44,12 +80,12 @@ export function CatalogDrawer() {
             </span>
           </button>
         ) : (
-          <div className="sb-panel relative flex w-full flex-col p-3.5">
+          <div className="sb-panel relative flex w-full flex-col p-3">
             <button
               type="button"
-              onClick={() => setCollapsed(true)}
+              onClick={() => choose(true)}
               aria-label="Collapse the catalog"
-              className="absolute top-3 right-3 z-10 cursor-pointer rounded-md p-1 text-[var(--sb-faint)] transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)]"
+              className="absolute top-2.5 right-2.5 z-10 cursor-pointer rounded-md p-1 text-[var(--sb-faint)] transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)] motion-reduce:transition-none"
             >
               <ChevronLeft className="size-3.5" />
             </button>
@@ -64,7 +100,7 @@ export function CatalogDrawer() {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="sb-panel pointer-events-auto absolute bottom-[150px] left-4 z-20 flex cursor-pointer items-center gap-2 px-3 py-2 lg:hidden"
+        className="sb-panel pointer-events-auto absolute bottom-[calc(var(--sb-strip-h)+1.5rem)] left-4 z-20 flex min-h-11 cursor-pointer items-center gap-2 px-3 py-2 lg:hidden"
       >
         <Layers className="size-3.5 text-[var(--sb-accent)]" />
         <span className="sb-label">Catalog</span>

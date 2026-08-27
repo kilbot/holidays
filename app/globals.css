@@ -167,6 +167,26 @@
   --sidebar-primary-foreground: #121b28;
 }
 
+/* ------------------------------------------------------------------
+   Resting height of the docked date strip, measured at its collapsed
+   default. Three pieces of chrome have to clear it — the catalog rail's
+   bottom edge, Mapbox's logo and its attribution — and before #36 each
+   carried its own hard-coded copy of the number, which drifted every
+   time the strip changed. One variable, three readers.
+
+   It is a *resting* height on purpose: opening a week zoom grows the
+   strip over the globe rather than pushing this out, which is what an
+   overlay should do.
+   ------------------------------------------------------------------ */
+:root {
+  --sb-strip-h: 212px;
+}
+@media (min-width: 1024px) {
+  :root {
+    --sb-strip-h: 140px;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -237,18 +257,11 @@
 /* The extra `.mapboxgl-map` is load-bearing: mapbox-gl.css is injected after
    this stylesheet, so a bare class selector loses the tie on source order.
 
-   The offsets are the docked strip's measured height plus its 16px inset:
-   246px at desktop widths, 317px on a phone where the deadline banner and the
-   date chips each take two lines. An opened week zoom scrolls inside its own
-   box rather than growing past these. */
+   The offset is the docked strip's resting height plus its 16px inset and a
+   8px gap. An opened week zoom scrolls inside its own box rather than growing
+   past this. */
 .mapboxgl-map .mapboxgl-ctrl-bottom-left,
 .mapboxgl-map .mapboxgl-ctrl-bottom-right {
   z-index: 1;
-  bottom: 340px;
-}
-@media (min-width: 1024px) {
-  .mapboxgl-map .mapboxgl-ctrl-bottom-left,
-  .mapboxgl-map .mapboxgl-ctrl-bottom-right {
-    bottom: 272px;
-  }
+  bottom: calc(var(--sb-strip-h) + 24px);
 }

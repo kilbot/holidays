@@ -218,8 +218,8 @@ export const ROUTE_BOUNDS: [[number, number], [number, number]] = (() => {
  * full width.
  */
 export const FRAME_PADDING = {
-  desktop: { top: 90, bottom: 180, left: 320, right: 320 },
-  compact: { top: 130, bottom: 215, left: 28, right: 28 },
+  desktop: { top: 64, bottom: 156, left: 304, right: 288 },
+  compact: { top: 110, bottom: 200, left: 28, right: 28 },
 } as const;
 
 /** Matches the `lg:` breakpoint the layout switches on. */
