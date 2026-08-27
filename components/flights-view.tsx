@@ -51,11 +51,6 @@ import { cn } from "@/lib/utils";
 type Leg = "outbound" | "return";
 type Sort = "comfort" | "price";
 
-interface QuoteState {
-  loading: boolean;
-  quote: LiveQuote | null;
-}
-
 const keyOf = (from: string, to: string, date: string) => `${from}-${to}-${date}`;
 
 /**
@@ -65,6 +60,12 @@ const keyOf = (from: string, to: string, date: string) => `${from}-${to}-${date}
  * between the two searches — or leaving for the Ledger and coming back — does
  * not re-ask the API for an answer that has not changed. The server-side cache
  * is 24 hours; this one only has to outlive a navigation.
+ *
+ * It is the store; the component holds a snapshot of it in state and re-takes
+ * that snapshot as each origin lands, which keeps the effect free of the
+ * synchronous setState that causes cascading renders. A key that is absent is
+ * exactly what "still searching" means, and a key mapped to `null` is a
+ * resolved answer: asked, and no usable live fare came back.
  */
 const QUOTE_CACHE = new Map<string, LiveQuote | null>();
 
@@ -159,10 +160,10 @@ function OriginStrip({
   quotes,
 }: {
   pairs: readonly { from: string; to: string; key: string }[];
-  quotes: Readonly<Record<string, QuoteState>>;
+  quotes: ReadonlyMap<string, LiveQuote | null>;
 }) {
-  const live = pairs.filter((pair) => quotes[pair.key]?.quote).length;
-  const pending = pairs.filter((pair) => quotes[pair.key]?.loading !== false).length;
+  const live = pairs.filter((pair) => quotes.get(pair.key)).length;
+  const pending = pairs.filter((pair) => !quotes.has(pair.key)).length;
 
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
@@ -173,16 +174,17 @@ function OriginStrip({
       </p>
       <ul className="flex flex-wrap gap-1">
         {pairs.map((pair) => {
-          const state = quotes[pair.key];
-          const ink = !state || state.loading ? "var(--sb-sea)" : state.quote ? "var(--sb-good)" : "var(--sb-faint)";
+          const searching = !quotes.has(pair.key);
+          const quote = quotes.get(pair.key) ?? null;
+          const ink = searching ? "var(--sb-sea)" : quote ? "var(--sb-good)" : "var(--sb-faint)";
           return (
             <li
               key={pair.key}
               title={
-                !state || state.loading
+                searching
                   ? `${pair.from} → ${pair.to}: searching`
-                  : state.quote
-                    ? `${pair.from} → ${pair.to}: live fare, ${state.quote.carrier}`
+                  : quote
+                    ? `${pair.from} → ${pair.to}: live fare, ${quote.carrier}`
                     : `${pair.from} → ${pair.to}: no live fare, research band`
               }
               className="sb-num inline-flex items-center gap-1 rounded-md border border-[var(--sb-line)] px-1.5 py-[1px] text-[9.5px] text-[var(--sb-dim)]"
@@ -191,7 +193,7 @@ function OriginStrip({
                 aria-hidden
                 className={cn(
                   "size-1.5 rounded-full",
-                  (!state || state.loading) && "animate-pulse motion-reduce:animate-none",
+                  searching && "animate-pulse motion-reduce:animate-none",
                 )}
                 style={{ background: ink }}
               />
@@ -219,7 +221,14 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   const [outboundDate, setOutboundDate] = useState<string>(OUTBOUND_DEFAULT_DATE);
   const [returnDate, setReturnDate] = useState<string>(RETURN_DEFAULT_DATE);
   const [sort, setSort] = useState<Sort>("comfort");
-  const [quotes, setQuotes] = useState<Record<string, QuoteState>>({});
+  /**
+   * A snapshot of the quote cache, re-taken as each origin lands. The cache is
+   * the store; this is how a render finds out it changed, without the effect
+   * having to seed a loading state synchronously.
+   */
+  const [quotes, setQuotes] = useState<ReadonlyMap<string, LiveQuote | null>>(
+    () => new Map(QUOTE_CACHE),
+  );
 
   const options = leg === "outbound" ? outbound : returns;
   const date = leg === "outbound" ? outboundDate : returnDate;
@@ -239,19 +248,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   /* One fetch per origin, four at a time, abandoned if the search changes. */
   useEffect(() => {
     const controller = new AbortController();
-    const queue = [...pairs];
-
-    setQuotes((current) => {
-      const next = { ...current };
-      for (const pair of queue) {
-        next[pair.key] = QUOTE_CACHE.has(pair.key)
-          ? { loading: false, quote: QUOTE_CACHE.get(pair.key) ?? null }
-          : { loading: true, quote: null };
-      }
-      return next;
-    });
-
-    const pending = queue.filter((pair) => !QUOTE_CACHE.has(pair.key));
+    const pending = pairs.filter((pair) => !QUOTE_CACHE.has(pair.key));
 
     async function worker() {
       for (;;) {
@@ -260,7 +257,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
         const quote = await fetchQuote(pair.from, pair.to, date, controller.signal);
         if (controller.signal.aborted) return;
         QUOTE_CACHE.set(pair.key, quote);
-        setQuotes((current) => ({ ...current, [pair.key]: { loading: false, quote } }));
+        setQuotes(new Map(QUOTE_CACHE));
       }
     }
 
@@ -272,10 +269,10 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
 
   const priceFor = useCallback(
     (option: SearchOption): OptionPrice => {
-      const state = option.searchable
-        ? quotes[keyOf(option.origin, option.destination, date)]
-        : undefined;
-      return priceOption(option, state?.quote ?? null);
+      const quote = option.searchable
+        ? (quotes.get(keyOf(option.origin, option.destination, date)) ?? null)
+        : null;
+      return priceOption(option, quote);
     },
     [quotes, date],
   );
@@ -297,11 +294,11 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     return sorted.map((entry) => ({
       ...entry,
       arbitrage: arbitrageVsBarcelona(entry.option, entry.price, reference),
-      loading: entry.option.searchable
-        ? (quotes[keyOf(entry.option.origin, entry.option.destination, date)]?.loading ?? true)
-        : false,
+      loading:
+        entry.option.searchable &&
+        !quotes.has(keyOf(entry.option.origin, entry.option.destination, date)),
     }));
-  }, [options, priceFor, sort, quotes, date]);
+  }, [options, priceFor, sort, date, quotes]);
 
   const cheapest = rows.reduce(
     (best, row) => Math.min(best, row.price.totalEurCouple[0]),
