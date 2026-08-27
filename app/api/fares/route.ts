@@ -1,14 +1,12 @@
 import { getFare } from "@/lib/flights/fares";
-import { ROUTE_GRID } from "@/lib/flights/grid";
+import { isPreWarmed, resolveRoute } from "@/lib/flights/grid";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const from = searchParams.get("from");
   const to = searchParams.get("to");
   const date = searchParams.get("date");
-  const route = ROUTE_GRID.find(
-    (entry) => entry.from === from && entry.to === to && entry.dates.some((candidate) => candidate === date),
-  );
+  const route = resolveRoute(from, to, date);
 
   if (!route || !date) {
     return Response.json({ error: "Unknown route or date" }, { status: 404 });
@@ -22,7 +20,15 @@ export async function GET(request: Request) {
   }
 
   return Response.json(
-    { from, to, date, ...fare },
-    { headers: { "Cache-Control": `public, s-maxage=${route.ttlSeconds}` } },
+    { from, to, date, warmed: isPreWarmed(route, date), ...fare },
+    // A day the cron warms can be cached for the route's full TTL. A day it
+    // does not is a one-off someone paid for by hand: still cacheable, but for
+    // a day rather than a week, so a cold date the couple came back to is not
+    // quietly seven days stale.
+    {
+      headers: {
+        "Cache-Control": `public, s-maxage=${isPreWarmed(route, date) ? route.ttlSeconds : 86_400}`,
+      },
+    },
   );
 }
