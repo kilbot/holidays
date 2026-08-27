@@ -4,6 +4,7 @@ import { useId, useMemo, type ReactElement } from "react";
 
 import { SCENE_LABEL, capsuleScene, type CapsuleScene } from "@/lib/capsule-art";
 import type { FacetId } from "@/lib/facets";
+import { needsAttribution, type Photo } from "@/lib/region-images";
 import { cn } from "@/lib/utils";
 
 /**
@@ -391,42 +392,126 @@ export function CapsuleArt({
 }
 
 /**
- * Real photography, when the Plan has any.
+ * A tile cover: the photograph, with the same type layer over it.
  *
- * The contract with the card is deliberately blunt: an entry either has
- * `images` and gets this, or it doesn't and gets the generated scene. There is
- * no half state where a photo is layered over a gradient, because that always
- * looks like a loading bug.
+ * The oversized state name is what makes a wall of 421 covers scannable by
+ * region, and that stays true when the cover is a photograph — arguably more
+ * so, because a photograph carries no palette convention the way the generated
+ * scenes do. So the picture changes and the cover does not: same lettering,
+ * same position, a heavier scrim under it because a photograph has highlights
+ * a gradient never does.
+ *
+ * No credit line here. A tile is 124px tall and a wall of them is thirty
+ * captions of noise; the licences are honoured on the detail card, which is
+ * where the picture is actually being looked at, and in full on /resources.
+ */
+export function CapsulePhotoCover({
+  photo,
+  state,
+  where,
+  className,
+}: {
+  photo: Photo;
+  state: string;
+  where?: string;
+  className?: string;
+}) {
+  return (
+    <div className={cn("relative isolate overflow-hidden", className)}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={photo.file}
+        alt={photo.caption}
+        loading="lazy"
+        className="absolute inset-0 size-full object-cover"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-[rgb(6_10_16/0.82)] via-[rgb(6_10_16/0.28)] to-[rgb(6_10_16/0.1)]"
+      />
+      <div className="relative flex size-full flex-col justify-end p-4">
+        <span className="font-display text-[52px] leading-[0.82] font-extrabold tracking-[-0.03em] text-[rgb(255_253_248/0.94)] [text-shadow:0_2px_18px_rgb(6_10_16/0.7)]">
+          {state}
+        </span>
+        {where && (
+          <span className="mt-1.5 text-[10px] font-semibold tracking-[0.16em] text-[rgb(255_253_248/0.78)] uppercase [text-shadow:0_1px_10px_rgb(6_10_16/0.8)]">
+            {where}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Real photography, when there is any.
+ *
+ * The contract with the card is deliberately blunt: an entry either has a
+ * photograph — its own `images`, or the one `lib/region-images.ts` maps to its
+ * region — and gets this, or it has none and gets the generated scene. There
+ * is no half state where a photo is layered over a gradient, because that
+ * always looks like a loading bug.
  */
 export function CapsuleImageStrip({
   images,
   alt,
+  credit,
   className,
 }: {
   images: readonly string[];
   alt: string;
+  /**
+   * The photograph's licence record, when the strip is showing a curated
+   * photo rather than something the Plan supplied by hand. Present means the
+   * caption line below is drawn.
+   */
+  credit?: Photo;
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "sb-scroll flex snap-x snap-mandatory gap-1 overflow-x-auto",
-        className,
+    <div className={cn("relative isolate", className)}>
+      <div className="sb-scroll flex size-full snap-x snap-mandatory gap-1 overflow-x-auto">
+        {images.map((src, index) => (
+          // Plain <img>: every file is committed under /public and served at
+          // its own path, so there is nothing for next/image's host allowlist
+          // to allow, and a 1200px JPEG under 120KB has nothing left to
+          // optimise away.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={src}
+            src={src}
+            alt={index === 0 ? alt : ""}
+            loading="lazy"
+            className="h-full w-[82%] shrink-0 snap-start object-cover first:w-full"
+          />
+        ))}
+      </div>
+
+      {credit && (
+        // Caption over the picture rather than under it: the hero is a fixed
+        // height the card's layout depends on, and a line of type below the
+        // image would eat into the photograph or push the title down. The
+        // scrim is on the caption alone, not the whole frame, so the picture
+        // stays a picture.
+        <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgb(6_10_16/0.78)] to-transparent px-3.5 pt-6 pb-2 text-[10px] leading-snug text-[rgb(255_253_248/0.82)]">
+          <span className="text-[rgb(255_253_248/0.95)]">{credit.caption}</span>
+          {needsAttribution(credit) && (
+            <>
+              {" · "}
+              {credit.author}
+              {" / "}
+              <a
+                href={credit.licenceUrl || credit.source}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pointer-events-auto underline decoration-[rgb(255_253_248/0.35)] underline-offset-2 hover:decoration-[rgb(255_253_248/0.8)]"
+              >
+                {credit.licence}
+              </a>
+            </>
+          )}
+        </p>
       )}
-    >
-      {images.map((src, index) => (
-        // Plain <img>: sources are arbitrary remote URLs, next/image would
-        // need a host allowlist per photo, and there is no photography in the
-        // Plan yet to configure one for.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={src}
-          src={src}
-          alt={index === 0 ? alt : ""}
-          loading="lazy"
-          className="h-full w-[82%] shrink-0 snap-start object-cover first:w-full"
-        />
-      ))}
     </div>
   );
 }

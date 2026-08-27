@@ -32,6 +32,7 @@ import {
   type DeepCapsule,
 } from "@/lib/deep-capsules";
 import { usePlanShortlist } from "@/lib/engine/use-plan";
+import { photoFor, regionPhoto } from "@/lib/region-images";
 
 /**
  * The Capsules page — the site's reading room.
@@ -82,6 +83,7 @@ function tileFromIdea(idea: CatalogIdea): CapsuleTileData {
     tags: idea.tags,
     facets: idea.facets,
     caveat: warningLabel(idea),
+    photo: regionPhoto(idea.region),
   };
 }
 
@@ -99,6 +101,7 @@ function tileFromCapsule(capsule: DeepCapsule): CapsuleTileData {
     tags: capsule.tags,
     facets: capsule.facets,
     caveat: null,
+    photo: photoFor({ id: capsule.id, region: capsule.region }),
   };
 }
 
