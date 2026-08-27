@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Frame, Minus, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -56,15 +56,32 @@ export interface GlobeControlsProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onFrameRoute: () => void;
+  /**
+   * How much of the right edge is spoken for, in px.
+   *
+   * Since #75 the detail card is a panel beside a live map rather than a
+   * curtain over a dead one, and from `lg` it slides over the very corner
+   * this stack lives in — a map you can still zoom, with the zoom buttons
+   * underneath the panel. The stack steps aside instead. Below `lg` the
+   * stack is in the top-left corner and the card is a full-width sheet, so
+   * there is nothing to clear and this is ignored.
+   */
+  clearRight?: number;
 }
 
 export function GlobeControls({
   onZoomIn,
   onZoomOut,
   onFrameRoute,
+  clearRight,
 }: GlobeControlsProps) {
   return (
     <div
+      style={
+        {
+          "--sb-controls-right": clearRight ? `${clearRight}px` : undefined,
+        } as CSSProperties
+      }
       className={cn(
         "pointer-events-auto absolute z-20 flex flex-col gap-1.5 lg:gap-2",
         // On a phone the right-hand column belongs to the cost HUD, which
@@ -76,7 +93,8 @@ export function GlobeControls({
         // instead of burying it (#56). Not centred on the stage — with a week
         // open the middle of the stage is the middle of the date strip.
         "top-4 left-3",
-        "lg:right-3 lg:bottom-[calc(var(--sb-pill-bottom)+3rem)] lg:left-auto lg:top-auto",
+        "lg:right-[var(--sb-controls-right,0.75rem)] lg:bottom-[calc(var(--sb-pill-bottom)+3rem)] lg:left-auto lg:top-auto",
+        "lg:transition-[right] lg:duration-300 motion-reduce:transition-none",
       )}
     >
       {/* Two panels, not three buttons in one: zooming is continuous and

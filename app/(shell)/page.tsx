@@ -23,8 +23,13 @@ export default function Plan() {
       {/* Mounted once, above everything. The two places that open a Capsule
           on this page — a shortlist row and a marker on the globe — are in
           different subtrees, so the card reads a module-level store rather
-          than being handed down as props. */}
-      <CapsuleCardHost />
+          than being handed down as props.
+
+          `overMap` is the one thing the card cannot read from that store:
+          what is behind it. Here it is the globe, which flies to whatever the
+          card is describing (#75), so the card drops its backdrop on desktop
+          and leaves the map live beside it. */}
+      <CapsuleCardHost overMap />
     </main>
   );
 }
