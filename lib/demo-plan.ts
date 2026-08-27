@@ -43,6 +43,32 @@ export const DEMO_PLAN = {
   } satisfies PlanWarning,
 } as const;
 
+/**
+ * What the demo Plan assumes each drawn Leg costs, per couple, in EUR.
+ *
+ * The €5,340 flights split above is a single number; a Leg popup on the globe
+ * needs it broken out, so this is that same number decomposed. It is the demo
+ * Plan's own arithmetic, not research: the eight drawn Legs sum to €3,380 and
+ * the return long-haul the route does not draw (Melbourne home via Singapore,
+ * `DEMO_RETURN_LEG_EUR`) carries the remaining €1,960.
+ *
+ * These are the figures a Leg popup labels "estimate". The four Legs that are
+ * in `lib/flights/grid.ts` fetch a real fare instead and say so.
+ */
+export const DEMO_LEG_FARES_EUR: Readonly<Record<string, number>> = {
+  "VLC>BCN": 90,
+  "BCN>SIN": 1_280,
+  "SIN>PER": 860,
+  "PER>SYD": 330,
+  "SYD>CNS": 190,
+  "CNS>OOL": 220,
+  "OOL>HBA": 290,
+  "HBA>MEL": 120,
+};
+
+/** The homeward long-haul, which the route ends before drawing. */
+export const DEMO_RETURN_LEG_EUR = 1_960;
+
 /** Where the total sits inside the Budget band, 0–1, clamped. */
 export function budgetFraction(totalEur: number): number {
   const span = BUDGET_CEILING_EUR - BUDGET_FLOOR_EUR;

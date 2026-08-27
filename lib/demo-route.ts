@@ -135,30 +135,112 @@ function greatCircle(
   return points;
 }
 
+export type LegMode = "flight" | "train";
+
+/**
+ * What the demo Plan says about each Leg beyond its geometry.
+ *
+ * Legs are derived, not placed (docs/CONTEXT.md) — the Scheduler will compute
+ * these from the Capsule sequence and price them from fare data. Until it
+ * exists, the demo sequence states them, so the Leg popup has something true
+ * to show. Dates are chosen to sit on the `lib/flights/grid.ts` sampling dates
+ * wherever the route and the grid agree on a pair, which is what lets four of
+ * the eight Legs quote a live fare rather than an estimate.
+ */
+export interface LegFacts {
+  /** Departure date, ISO. */
+  date: string;
+  mode: LegMode;
+  /** Door-to-door, in minutes. Long-hauls include the Changi stop's flying. */
+  durationMin: number;
+  /** Who the demo Plan assumes flies it. */
+  carrier: string;
+}
+
+export const LEG_FACTS: Readonly<Record<string, LegFacts>> = {
+  "VLC>BCN": {
+    date: "2026-12-12",
+    mode: "train",
+    durationMin: 190,
+    carrier: "Renfe Euromed",
+  },
+  "BCN>SIN": {
+    date: "2026-12-13",
+    mode: "flight",
+    durationMin: 815,
+    carrier: "Singapore Airlines",
+  },
+  "SIN>PER": {
+    date: "2026-12-15",
+    mode: "flight",
+    durationMin: 305,
+    carrier: "Singapore Airlines",
+  },
+  "PER>SYD": {
+    date: "2026-12-28",
+    mode: "flight",
+    durationMin: 260,
+    carrier: "Virgin Australia",
+  },
+  "SYD>CNS": {
+    date: "2027-01-16",
+    mode: "flight",
+    durationMin: 180,
+    carrier: "Jetstar",
+  },
+  "CNS>OOL": {
+    date: "2027-01-27",
+    mode: "flight",
+    durationMin: 155,
+    carrier: "Jetstar",
+  },
+  "OOL>HBA": {
+    date: "2027-02-01",
+    mode: "flight",
+    durationMin: 290,
+    carrier: "Jetstar",
+  },
+  "HBA>MEL": {
+    date: "2027-02-08",
+    mode: "flight",
+    durationMin: 80,
+    carrier: "Jetstar",
+  },
+};
+
 export interface LegProperties {
   from: string;
   to: string;
   /** Long-haul legs are drawn heavier than the domestic hops. */
   longHaul: boolean;
+  /** `${from}>${to}` — the key every other Leg table is written against. */
+  id: string;
 }
+
+/** The demo route's Legs, in order, as ids. */
+export const LEG_IDS: readonly string[] = ROUTE_POINTS.slice(0, -1).map(
+  (point, index) => `${point.code}>${ROUTE_POINTS[index + 1].code}`,
+);
+
+/** The two ocean crossings that bookend the trip; everything else is a hop. */
+const LONG_HAUL = new Set(["BCN>SIN", "SIN>PER"]);
 
 export function routeLegsGeoJSON(): GeoJSON.FeatureCollection<
   GeoJSON.LineString,
   LegProperties
 > {
-  // The two ocean crossings that bookend the trip; everything else is a hop.
-  const longHaulCodes = new Set(["BCN>SIN", "SIN>PER"]);
-
   return {
     type: "FeatureCollection",
     features: ROUTE_POINTS.slice(0, -1).map((point, index) => {
       const next = ROUTE_POINTS[index + 1];
+      const id = `${point.code}>${next.code}`;
       return {
         type: "Feature" as const,
         properties: {
+          id,
           from: point.code,
           to: next.code,
-          longHaul: longHaulCodes.has(`${point.code}>${next.code}`),
+          longHaul: LONG_HAUL.has(id),
         },
         geometry: {
           type: "LineString" as const,
@@ -167,6 +249,13 @@ export function routeLegsGeoJSON(): GeoJSON.FeatureCollection<
       };
     }),
   };
+}
+
+const POINT_BY_CODE = new Map(ROUTE_POINTS.map((point) => [point.code, point]));
+
+/** One route node by its code — the Leg popup needs both of its endpoints. */
+export function routePointOf(code: string): RoutePoint | undefined {
+  return POINT_BY_CODE.get(code);
 }
 
 export interface PointProperties {

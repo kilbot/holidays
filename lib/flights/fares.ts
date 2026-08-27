@@ -10,6 +10,11 @@ export async function getFare(route: RouteGridEntry, date: string) {
     return {
       priceEur: live.priceEur,
       carrier: live.carrier,
+      // Passed through for the globe's Leg popup: a live fare that cannot say
+      // how long the flight is, or how many times it stops, is half an answer
+      // on a trip whose long-hauls are chosen comfort-first.
+      durationMin: live.durationMin,
+      stops: live.stops,
       source: "live" as const,
       fetchedAt: new Date().toISOString(),
     };
