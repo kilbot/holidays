@@ -79,6 +79,78 @@ export function readFareHistory(
 ): Promise<FareHistoryEntry[]> {
   return kv.listRange<FareHistoryEntry>(fareHistoryKey(from, to, date), 0, MAX_FARE_HISTORY - 1);
 }
+/* ------------------------------------------------------------------ */
+/* One route-day, over time                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * How many observations of one route-day travel to the browser.
+ *
+ * The stored list holds up to `MAX_FARE_HISTORY`; a sparkline 96px wide cannot
+ * show two hundred points, and twenty pins × two hundred points is a payload
+ * out of all proportion to a chart the size of a word. Thirty is more than the
+ * weekly cron will produce in half a year and still small enough that the whole
+ * watchlist fits in one modest response.
+ */
+export const WATCH_SERIES_POINTS = 30;
+
+/** One dot on a pin's sparkline. The carrier is on the current quote, not here. */
+export interface FareSeriesPoint {
+  ts: string;
+  priceEur: number;
+}
+
+/**
+ * Everything the watchlist needs about one pinned route-day — from the store,
+ * and only from the store.
+ *
+ * kilbot/holidays#68 is explicit that **pins never trigger API calls**: twenty
+ * watched flights refreshing themselves on every page load would be twenty
+ * metered calls a visit, which is the couple's month gone in a week of
+ * browsing. So a pin with nothing stored comes back with `current: null` and no
+ * points, and the page says nobody has looked since — which is true, and more
+ * useful than a number that cost €0.02 to invent.
+ */
+export interface FareSeries {
+  /** `"BCN-PER"`, as the request asked for it. */
+  route: string;
+  from: string;
+  to: string;
+  date: string;
+  /** Oldest first — the order a line is drawn in. */
+  points: FareSeriesPoint[];
+  /** The newest observation, or null when this route-day has never been priced. */
+  current: { priceEur: number; carrier: string; ts: string } | null;
+  /** Computed from the whole stored list, not from the truncated points. */
+  trend: FareTrend | null;
+}
+
+export async function readFareSeries(
+  kv: KvClient,
+  from: string,
+  to: string,
+  date: string,
+): Promise<FareSeries> {
+  // Newest first, which is how the list is written and how `fareTrend` reads it.
+  const history = await readFareHistory(kv, from, to, date);
+  const latest = history[0] ?? null;
+
+  return {
+    route: `${from}-${to}`,
+    from,
+    to,
+    date,
+    points: history
+      .slice(0, WATCH_SERIES_POINTS)
+      .map((entry) => ({ ts: entry.ts, priceEur: entry.priceEur }))
+      .reverse(),
+    current: latest
+      ? { priceEur: latest.priceEur, carrier: latest.carrier, ts: latest.ts }
+      : null,
+    trend: history.length > 0 ? fareTrend(history) : null,
+  };
+}
+
 /** Compare the newest observation with the median of all earlier observations. */
 export function fareTrend(history: readonly FareHistoryEntry[]): FareTrend {
   if (history.length < 2) return "flat";
