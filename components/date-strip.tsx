@@ -1,6 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { AlarmClock, ChevronDown, TriangleAlert } from "lucide-react";
 
 import { daysUntil, useToday } from "@/lib/countdown";
@@ -22,6 +29,7 @@ import {
   formatDayYear,
   monthKey,
   anchorOn,
+  describeAnchor,
   type Anchor,
   type RangeEnd,
 } from "@/lib/trip-dates";
@@ -397,12 +405,12 @@ function WeekCell({
             {/* The anchor mark sits out here rather than after the place name,
                 where a long place ("Margaret River") would truncate the one
                 glyph that says this week is spoken for. */}
+            {/* The mark says a week is spoken for; the hover says by what, how
+                hard, and why — an active constraint never hides (#56). */}
             {anchored && (
               <span
                 className="text-[10px] text-[var(--sb-accent)]"
-                title={anchors
-                  .map((anchor) => `${anchor.label} — ${formatDay(anchor.date)}`)
-                  .join(" · ")}
+                title={anchors.map(describeAnchor).join("\n\n")}
               >
                 ✦
               </span>
@@ -458,8 +466,10 @@ function WeekCell({
  * the sum of the Plan's Days.
  */
 export function DateStrip() {
-  const { plan, moveRange } = usePlan();
+  const { plan, capsules, moveRange } = usePlan();
   const [openWeek, setOpenWeek] = useState<string | null>(null);
+  const strip = useRef<HTMLElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
 
   const range = { start: plan.startDate, end: plan.endDate };
   // Week ids are positional, so a range change can leave the open one pointing
@@ -469,6 +479,68 @@ export function DateStrip() {
 
   const change = (end: RangeEnd, date: string) => moveRange(end, date);
 
+  /**
+   * Publish how tall the strip actually is.
+   *
+   * `--sb-strip-h` used to be a hand-maintained constant standing for the
+   * strip's *resting* height, and four pieces of chrome cleared it by
+   * arithmetic: the shortlist rail, the cost HUD, the share pill and Mapbox's
+   * attribution. Two things were wrong with that. The constant had drifted 22px
+   * from the real resting height, and — the bug #56 was filed for — opening a
+   * week grows the strip by two hundred-odd pixels that the constant knew
+   * nothing about, so the share pill printed itself over the week's weather
+   * column.
+   *
+   * Measuring is the fix rather than a bigger constant: nothing that reads the
+   * variable feeds back into the strip's own height, so one observer keeps all
+   * four readers honest at every breakpoint and in every state. The CSS value
+   * stays as the first-paint fallback, and is restored on unmount for the pages
+   * that have no strip at all.
+   */
+  const publish = useCallback(() => {
+    const node = strip.current;
+    if (!node) return;
+    document.documentElement.style.setProperty(
+      "--sb-strip-h",
+      `${Math.round(node.getBoundingClientRect().height)}px`,
+    );
+  }, []);
+
+  // After every render, before paint: opening or closing a week is a render of
+  // this component, so this is the path that actually matters and it is
+  // synchronous with the change. A ResizeObserver alone was not enough — the
+  // strip is `position: absolute` with only a bottom edge pinned, and the
+  // observer did not see it grow upwards.
+  useLayoutEffect(publish);
+
+  // And for the resizes no render of ours causes: the window, a font settling,
+  // the trip rail rewrapping. Observed on the panel rather than the positioned
+  // section, because that is an ordinary in-flow box.
+  useEffect(() => {
+    const node = panel.current;
+    if (!node) return;
+    const observer = new ResizeObserver(publish);
+    observer.observe(node);
+    window.addEventListener("resize", publish);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", publish);
+      document.documentElement.style.removeProperty("--sb-strip-h");
+    };
+  }, [publish]);
+
+  // Escape closes the week, as it does the Capsule card and the globe popups.
+  // The close control shrank to a chip in #56, so the keyboard way out matters
+  // more than it did when it was a full-width bar.
+  useEffect(() => {
+    if (!zoomed) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenWeek(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoomed]);
+
   // Warnings with no Day of their own — the ones about the Plan as a whole.
   // Everything dated is a dot on its week and a badge in the day view.
   const warnings = plan.warnings.filter(
@@ -476,13 +548,28 @@ export function DateStrip() {
   );
 
   return (
-    <section className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20">
-      <div className="sb-panel px-3 py-2.5">
+    // The strip grows upwards when a week opens, and `--sb-strip-max` is
+    // where it stops: the band above it belongs to the cost HUD, the globe's
+    // controls and the corner pills, and below that the globe keeps the rest.
+    // Past the ceiling the week zoom is the part that gives — it is the one
+    // piece here that already scrolls inside itself.
+    <section
+      ref={strip}
+      className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20 flex max-h-[var(--sb-strip-max)]"
+    >
+      <div
+        ref={panel}
+        className="sb-panel flex min-h-0 w-full flex-col px-3 py-2.5"
+      >
         {/* One header line: the dates, the totals, the deadline chip and the
             legend. Before #36 the deadlines had a banner of their own above
             this row; folding them in is most of the height the strip gave
             back. */}
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+        {/* Everything but the week zoom is `shrink-0`: the zoom is the only
+            part of the strip that scrolls inside itself, so it is the only
+            part that may give when the strip hits its ceiling. Without this a
+            short screen sliced the week cells in half instead. */}
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <DateChip
               label="Leaving"
@@ -530,16 +617,18 @@ export function DateStrip() {
           <Legend />
         </div>
 
-        <TripRail
-          startDate={range.start}
-          endDate={range.end}
-          onChange={change}
-        />
+        <div className="shrink-0">
+          <TripRail
+            startDate={range.start}
+            endDate={range.end}
+            onChange={change}
+          />
+        </div>
 
         {warnings.length > 0 && (
           <p
             className={cn(
-              "mb-2 flex items-start gap-1.5 text-[10px] leading-snug",
+              "mb-2 flex shrink-0 items-start gap-1.5 text-[10px] leading-snug",
               warnings.some((warning) => warning.tone === "over")
                 ? "text-[var(--sb-over)]"
                 : "text-[var(--sb-warn)]",
@@ -556,7 +645,7 @@ export function DateStrip() {
             phone, and squeezing them would cost the place names. Above `lg`
             they all fit, and overflow goes back to visible so the weather
             popovers are not clipped by the scroll container. */}
-        <ul className="sb-scroll flex gap-1 overflow-x-auto pb-0.5 lg:overflow-x-visible">
+        <ul className="sb-scroll flex shrink-0 gap-1 overflow-x-auto pb-0.5 lg:overflow-x-visible">
           {plan.weeks.map((week) => (
             <WeekCell
               key={week.id}
@@ -574,18 +663,9 @@ export function DateStrip() {
             week={zoomed}
             id={WEEK_ZOOM_ID}
             capEur={DAILY_CAP_AUD * plan.rollUp.fxRate}
+            capsules={capsules}
+            onClose={() => setOpenWeek(null)}
           />
-        )}
-
-        {zoomed && (
-          <button
-            type="button"
-            onClick={() => setOpenWeek(null)}
-            className="mt-1.5 flex w-full cursor-pointer items-center justify-center gap-1 rounded-md py-1 text-[10px] font-semibold tracking-[0.13em] text-[var(--sb-dim)] uppercase transition-colors hover:text-[var(--sb-text)] motion-reduce:transition-none"
-          >
-            Close week
-            <ChevronDown className="size-3 rotate-180" />
-          </button>
         )}
       </div>
     </section>

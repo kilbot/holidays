@@ -346,12 +346,18 @@ export function ShareBar() {
   const tone = toneFor(sharing);
 
   return (
-    // Bottom-right, clear of the date strip *and* of Mapbox's attribution —
-    // which sits at strip height + 24px and has to stay visible under Mapbox's
-    // terms, so this clears it rather than covering it.
+    // Bottom-right, on the shared pill line — clear of the date strip and of
+    // Mapbox's logo and attribution, which have to stay visible under Mapbox's
+    // terms (`--sb-pill-bottom` in globals.css does that arithmetic once).
+    //
+    // Since #56 the strip publishes its *live* height, so this rides up out of
+    // the way when a week is opened instead of printing itself over the week's
+    // weather column. The offset holds for every state of the pill: the panel
+    // grows upwards from this edge, so *Viewing*, *Previewing* and the opened
+    // panel all clear the strip by the same margin.
     <section
       ref={panel}
-      className="pointer-events-auto absolute right-4 bottom-[calc(var(--sb-strip-h)+3.5rem)] z-30 w-[248px] max-w-[calc(100vw-2rem)] print:hidden"
+      className="pointer-events-auto absolute right-4 bottom-[var(--sb-pill-bottom)] z-30 w-[248px] max-w-[calc(100vw-2rem)] print:hidden"
     >
       <div className={cn("sb-panel", open ? "p-3" : "p-0")}>
         <button

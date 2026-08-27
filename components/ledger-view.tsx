@@ -32,6 +32,7 @@ import { ChevronRight, Pin, Plane, TriangleAlert } from "lucide-react";
 
 import {
   DAILY_CAP_AUD,
+  describeLock,
   formatEur,
   intoBlocks,
   TIER_LABEL,
@@ -39,12 +40,17 @@ import {
   type Day,
   type DayLine,
   type LedgerBlock,
-  type Lock,
   type Warning,
   type WarningKind,
 } from "@/lib/engine";
 import { usePlan } from "@/lib/engine/use-plan";
-import { anchorOn, formatDay, formatDayYear, weekdayOf } from "@/lib/trip-dates";
+import {
+  anchorOn,
+  describeAnchor,
+  formatDay,
+  formatDayYear,
+  weekdayOf,
+} from "@/lib/trip-dates";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -112,29 +118,6 @@ function Chip({
       {children}
     </span>
   );
-}
-
-/** A Lock, in the two words a chip holds. docs/CONTEXT.md, Lock. */
-function lockChip(lock: Lock): { label: string; title: string } | null {
-  switch (lock.kind) {
-    case "flexible":
-      return null;
-    case "window":
-      return {
-        label: "window-lock",
-        title: `Best between ${formatDay(lock.from)} and ${formatDay(lock.to)}. ${lock.why}`,
-      };
-    case "date":
-      return {
-        label: "date-lock",
-        title: `Has to cover ${formatDay(lock.from)}–${formatDay(lock.to)}. ${lock.why}`,
-      };
-    case "weekday":
-      return {
-        label: "weekday-lock",
-        title: lock.why,
-      };
-  }
 }
 
 function WarningLine({ warning }: { warning: Warning }) {
@@ -274,7 +257,13 @@ function DayRow({
           {day.locationName}
         </span>
 
-        <span className="flex min-w-0 items-center gap-1.5">
+        {/* An Anchor's own sentence sits on the words it pins, so "Christmas"
+            can say what it means to a stranger: fixed, where, and why the rest
+            of the trip bends round it (#56). */}
+        <span
+          className="flex min-w-0 items-center gap-1.5"
+          title={anchor ? describeAnchor(anchor) : undefined}
+        >
           {anchor && (
             <Pin
               aria-label="pinned anchor"
@@ -466,17 +455,17 @@ function BlockBand({
   const locks: { label: string; title: string; breached: boolean }[] = [];
   for (const id of block.capsuleIds) {
     const capsule = capsules.get(id);
-    const chip = capsule && lockChip(capsule.lock);
+    const chip = capsule && describeLock(capsule.lock);
     if (!capsule || !chip) continue;
     const breached = violated.has(id);
-    const reason = `${capsule.name}: ${chip.title}${breached ? " This placement sits outside it." : ""}`;
-    const existing = locks.find((lock) => lock.label === chip.label);
+    const reason = `${capsule.name}: ${chip.sentence}${breached ? ". This placement sits outside it." : ""}`;
+    const existing = locks.find((lock) => lock.label === chip.chip);
     if (existing) {
       existing.title += `\n\n${reason}`;
       existing.breached ||= breached;
       continue;
     }
-    locks.push({ label: chip.label, title: reason, breached });
+    locks.push({ label: chip.chip, title: reason, breached });
   }
 
   return (

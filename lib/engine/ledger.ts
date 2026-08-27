@@ -42,9 +42,16 @@ import type {
   CapsuleSpec,
   Day,
   DayLine,
+  Lock,
   Placement,
 } from "@/lib/engine/types";
-import { addDays, anchorOn, daysBetween } from "@/lib/trip-dates";
+import {
+  addDays,
+  anchorOn,
+  daysBetween,
+  formatDay,
+  formatSpan,
+} from "@/lib/trip-dates";
 
 /** Money is rounded to cents at the line, so a total never drifts on floats. */
 export function cents(value: number): number {
@@ -299,6 +306,44 @@ const TIER_LABEL: Record<LodgingTier, string> = {
 };
 
 export { TIER_LABEL };
+
+/**
+ * A Lock, in words a stranger can read.
+ *
+ * The chip is the shortest true phrase; the sentence is the whole claim with
+ * the research's own reason on the end. Both are here rather than in a
+ * component because three surfaces say the same thing — the Ledger's place
+ * bands, the week zoom's Capsule bands, and the day drill-in — and a constraint
+ * that is worded differently in three places is three constraints to a reader.
+ *
+ * The chips used to read "window-lock" and "date-lock", which are this
+ * codebase's words for it and nobody else's. An active constraint is the one
+ * thing on the page that may never hide behind jargon: information hides,
+ * constraints do not.
+ */
+export function describeLock(
+  lock: Lock,
+): { chip: string; sentence: string } | null {
+  switch (lock.kind) {
+    case "flexible":
+      return null;
+    case "window":
+      return {
+        chip: `best ${formatSpan(lock.from, lock.to)}`,
+        sentence: `Best between ${formatDay(lock.from)} and ${formatDay(lock.to)} — ${lock.why}`,
+      };
+    case "date":
+      return {
+        chip: `fixed ${formatSpan(lock.from, lock.to)}`,
+        sentence: `Has to cover ${formatSpan(lock.from, lock.to)} — ${lock.why}`,
+      };
+    case "weekday":
+      return {
+        chip: "certain days only",
+        sentence: `Only runs on certain days — ${lock.why}`,
+      };
+  }
+}
 
 /** What a Day is for, in the few words a 90px column holds. */
 export function dayHeadline(day: Day): string {

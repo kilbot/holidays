@@ -42,6 +42,7 @@ import type {
   RollUp,
   Warning,
 } from "@/lib/engine/types";
+import { describeLock } from "@/lib/engine/ledger";
 import { ANCHORS, formatDay } from "@/lib/trip-dates";
 
 /** How many Days without a Buffer counts as jam-packed. One full week. */
@@ -85,8 +86,8 @@ function lockWarnings(input: WarningInput): Warning[] {
         id: `lock:${placement.capsuleId}`,
         kind: "lock-violated",
         tone: "warn",
-        label: `${capsule.name} is outside its window`,
-        detail: `${lockSentence(capsule)} It is placed ${formatDay(placement.startDate)}–${formatDay(placement.endDate)}${placement.origin === "override" ? ", where it was dragged" : ""}. Nothing is blocked — the research's reason for the window is the thing to weigh.`,
+        label: lockBreachLabel(capsule),
+        detail: `${lockSentence(capsule)} It is placed ${formatDay(placement.startDate)}–${formatDay(placement.endDate)}${placement.origin === "override" ? ", where it was dragged" : ""}. Nothing is blocked — the research's reason for the dates is the thing to weigh.`,
         dates: datesOf(placement),
         capsuleId: capsule.id,
       });
@@ -101,7 +102,7 @@ function lockWarnings(input: WarningInput): Warning[] {
         kind: "overlap",
         tone: "over",
         label: `${capsule.name} overlaps ${placement.overlaps.length} block${placement.overlaps.length === 1 ? "" : "s"}`,
-        detail: `There was no free run of ${placement.days} days its Lock allows, so it is placed on top of ${names}. Those Days are priced once, at ${capsule.name}'s rates. Drag something, or drop a Adventure.`,
+        detail: `There was no free run of ${placement.days} days its Lock allows, so it is placed on top of ${names}. Those Days are priced once, at ${capsule.name}'s rates. Drag something, or drop an Adventure.`,
         dates: datesOf(placement),
         capsuleId: capsule.id,
       });
@@ -124,18 +125,32 @@ function lockWarnings(input: WarningInput): Warning[] {
   return out;
 }
 
-function lockSentence(capsule: CapsuleSpec): string {
-  const { lock } = capsule;
-  switch (lock.kind) {
+/**
+ * The headline for a breached Lock, in the words that Lock actually uses.
+ *
+ * "Outside its window" was said of every kind, including the date-locks that
+ * have no window — NYE is on 31 December or it is not NYE. Since #56 the three
+ * kinds are described in one place (`describeLock`) so the Ledger's chip, the
+ * week zoom's band and this sentence cannot drift apart.
+ */
+function lockBreachLabel(capsule: CapsuleSpec): string {
+  switch (capsule.lock.kind) {
     case "window":
-      return `The research puts ${capsule.name} between ${formatDay(lock.from)} and ${formatDay(lock.to)}: ${lock.why}`;
+      return `${capsule.name} is outside its best dates`;
     case "date":
-      return `${capsule.name} has to cover ${formatDay(lock.from)}–${formatDay(lock.to)}: ${lock.why}`;
+      return `${capsule.name} misses the dates it has to cover`;
     case "weekday":
-      return `${capsule.name} only works on certain days: ${lock.why}`;
+      return `${capsule.name} is on the wrong days`;
     case "flexible":
-      return `${capsule.name} floats — this should not have fired.`;
+      return `${capsule.name} is out of place`;
   }
+}
+
+function lockSentence(capsule: CapsuleSpec): string {
+  const described = describeLock(capsule.lock);
+  return described
+    ? `${capsule.name}: ${described.sentence}.`
+    : `${capsule.name} floats — this should not have fired.`;
 }
 
 /* ------------------------------------------------------------------ */

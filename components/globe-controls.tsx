@@ -1,24 +1,27 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Compass, Frame, Minus, Plus } from "lucide-react";
+import { Frame, Minus, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 /**
- * The globe's own chrome: zoom, reset-north, frame-the-route.
+ * The globe's own chrome: zoom, and frame-the-route.
  *
- * Hand-rolled rather than Mapbox's `NavigationControl` for two reasons that
- * both come out of #36. Its buttons are 29px, which is well under the 44px a
- * thumb needs and the site holds itself to elsewhere (the trip rail's handles
- * are 44px for the same reason). And its compass is a `<button>` with a
- * background image, so the arrow cannot be told to point north in a way a
- * screen reader can read — here the bearing is in the label, in degrees.
+ * Hand-rolled rather than Mapbox's `NavigationControl`, whose buttons are 29px
+ * — well under the 44px a thumb needs and the site holds itself to elsewhere
+ * (the trip rail's handles are 44px for the same reason). These are 48px since
+ * #56, because zoom is now the main thing anyone does to this map and the pair
+ * should be the easiest target on the stage.
  *
- * Reset-north exists because a globe you can spin is a globe you can get lost
- * on: two drags and north is somewhere off to the left, and nothing on screen
- * says so. Frame-the-route is the other half of the same problem — it puts the
- * camera back on the Plan from wherever the traveller wandered to.
+ * There is no compass any more. It existed to undo drag-rotation, and #56 took
+ * drag-rotation away instead: north is up, always, so a button that puts it
+ * back is chrome with nothing left to do. Frame-the-route stays — that is the
+ * other half of getting lost, and the only one still reachable.
+ *
+ * The buttons themselves are the *deliberate* path. The effortless one is the
+ * gesture: plain scroll wheel, pinch, or double-click, none of which need a
+ * modifier key. See `components/globe-stage.tsx`.
  */
 
 function ControlButton({
@@ -37,7 +40,7 @@ function ControlButton({
       aria-label={label}
       title={label}
       className={cn(
-        "flex size-11 cursor-pointer items-center justify-center text-[var(--sb-dim)]",
+        "flex size-11 cursor-pointer items-center justify-center text-[var(--sb-dim)] lg:size-12",
         "transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)]",
         "focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px]",
         "focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none",
@@ -50,49 +53,43 @@ function ControlButton({
 }
 
 export interface GlobeControlsProps {
-  /** Degrees clockwise from north, as the map currently sits. */
-  bearing: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
-  onResetNorth: () => void;
   onFrameRoute: () => void;
 }
 
 export function GlobeControls({
-  bearing,
   onZoomIn,
   onZoomOut,
-  onResetNorth,
   onFrameRoute,
 }: GlobeControlsProps) {
-  // −0 is a real number in JS and reads as "-0°" once rounded.
-  const off = Math.round(bearing) === 0 ? 0 : Math.round(bearing);
-
   return (
-    <div className="pointer-events-auto absolute top-1/2 right-3 z-20 -translate-y-1/2">
+    <div
+      className={cn(
+        "pointer-events-auto absolute z-20 flex flex-col gap-1.5 lg:gap-2",
+        // On a phone the right-hand column belongs to the cost HUD, which
+        // spans most of the width at the top, so the stack takes the free
+        // top-left corner. From `lg` it rejoins the right-hand column and
+        // rides the share pill: the strip publishes its live height, the pill
+        // clears the strip and Mapbox's chrome, and this clears the pill. One
+        // chain, so an opened week slides the whole column up together
+        // instead of burying it (#56). Not centred on the stage — with a week
+        // open the middle of the stage is the middle of the date strip.
+        "top-4 left-3",
+        "lg:right-3 lg:bottom-[calc(var(--sb-pill-bottom)+3rem)] lg:left-auto lg:top-auto",
+      )}
+    >
+      {/* Two panels, not three buttons in one: zooming is continuous and
+          framing is a jump, and the gap says so without a caption. */}
       <div className="sb-panel flex flex-col divide-y divide-[var(--sb-line)] overflow-hidden">
         <ControlButton onClick={onZoomIn} label="Zoom in">
-          <Plus className="size-4" />
+          <Plus className="size-5" />
         </ControlButton>
         <ControlButton onClick={onZoomOut} label="Zoom out">
-          <Minus className="size-4" />
+          <Minus className="size-5" />
         </ControlButton>
-        <ControlButton
-          onClick={onResetNorth}
-          label={
-            off === 0
-              ? "North is up"
-              : `Reset north — the globe is turned ${Math.abs(off)}° ${off > 0 ? "clockwise" : "anticlockwise"}`
-          }
-        >
-          <Compass
-            className={cn(
-              "size-4 transition-transform duration-200 motion-reduce:transition-none",
-              off !== 0 && "text-[var(--sb-accent)]",
-            )}
-            style={{ transform: `rotate(${-bearing}deg)` }}
-          />
-        </ControlButton>
+      </div>
+      <div className="sb-panel overflow-hidden">
         <ControlButton onClick={onFrameRoute} label="Frame the whole route">
           <Frame className="size-4" />
         </ControlButton>

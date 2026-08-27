@@ -118,6 +118,17 @@ export function formatWeekdayDay(iso: string): string {
   return `${WEEKDAYS[weekdayOf(iso)]} ${Number(iso.slice(8, 10))}`;
 }
 
+/** "Fri" — for a band that spans days the column headings already date. */
+export function weekdayName(iso: string): string {
+  return WEEKDAYS[weekdayOf(iso)];
+}
+
+/** "Mon–Fri", or just "Mon" for a single day. */
+export function formatWeekdaySpan(startIso: string, endIso: string): string {
+  const from = weekdayName(startIso);
+  return startIso === endIso ? from : `${from}–${weekdayName(endIso)}`;
+}
+
 /** "12–18 Dec", collapsing the month when both ends share one. */
 export function formatSpan(startIso: string, endIso: string): string {
   if (startIso === endIso) return formatDay(startIso);
@@ -178,6 +189,21 @@ export const ANCHORS: Anchor[] = [
 
 export function anchorOn(iso: string): Anchor | undefined {
   return ANCHORS.find((anchor) => anchor.date === iso);
+}
+
+/**
+ * An Anchor, in words a stranger can read.
+ *
+ * A pin on a day says *something* is fixed; it does not say what, or how hard,
+ * or why the rest of the trip is bending around it. Wherever the pin shows, the
+ * sentence has to be one hover or one tap away — an active constraint is the
+ * one thing on this page that may never hide (#56).
+ */
+export function describeAnchor(anchor: Anchor): string {
+  const when = formatDay(anchor.date);
+  return anchor.hard
+    ? `${anchor.label} — fixed to ${when} in ${anchor.place}. It does not move; the trip slides around it. ${anchor.note}`
+    : `${anchor.label} — wants ${when} somewhere good, but no fixed place. ${anchor.note}`;
 }
 
 /* ------------------------------------------------------------------ */

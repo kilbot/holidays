@@ -226,7 +226,12 @@ function Scrim({ onClose }: { onClose: () => void }) {
       aria-hidden
       tabIndex={-1}
       onClick={onClose}
-      className="fixed inset-0 z-40 cursor-default"
+      // Below the section links deliberately. It used to sit at the same layer
+      // as the rest of the nav and, being later in the DOM, painted over every
+      // icon in it: with the menu open, a click on Flights hit the scrim and
+      // the page did not change. A dismiss target should catch the *page*, not
+      // the navigation it is attached to.
+      className="fixed inset-0 z-30 cursor-default"
     />
   );
 }
@@ -284,8 +289,12 @@ export function AppRail() {
             href={href}
             aria-label={`${label} — ${hint}`}
             aria-current={current ? "page" : undefined}
+            // Clicking a section closes the overflow as well as navigating —
+            // including on the page you are already on, where there is no
+            // pathname change for `useOverflowMenu` to notice.
+            onClick={close}
             className={cn(
-              "group relative flex size-11 items-center justify-center rounded-xl transition-colors motion-reduce:transition-none",
+              "group relative z-40 flex size-11 items-center justify-center rounded-xl transition-colors motion-reduce:transition-none",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
               current
                 ? "bg-[color-mix(in_srgb,var(--sb-accent)_16%,transparent)] text-[var(--sb-accent)]"
@@ -306,11 +315,17 @@ export function AppRail() {
 
             {/* The label, held back until a pointer or the keyboard asks for
                 it. `aria-hidden` because the link already carries both words as
-                its accessible name; `pointer-events-none` so it can never eat a
-                click meant for the globe behind it. */}
+                its accessible name.
+
+                Pointer events follow the opacity. At rest it is invisible glass
+                lying across the globe, so it must not eat a click meant for the
+                map; while it is showing it is part of the link it belongs to,
+                and a click on the words should go where the words say. It is a
+                child of the `<a>`, so letting it take the pointer *is* the
+                navigation — nothing here handles the click itself. */}
             <span
               aria-hidden
-              className="sb-panel pointer-events-none absolute left-full z-50 ml-2 whitespace-nowrap px-2.5 py-1.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+              className="sb-panel pointer-events-none absolute left-full z-50 ml-2 whitespace-nowrap px-2.5 py-1.5 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-visible:pointer-events-auto group-focus-visible:opacity-100 motion-reduce:transition-none"
             >
               <span className="block text-[11.5px] font-semibold text-[var(--sb-text)]">
                 {label}
@@ -387,8 +402,9 @@ export function AppTabBar() {
             key={href}
             href={href}
             aria-current={current ? "page" : undefined}
+            onClick={close}
             className={cn(
-              "flex min-h-14 flex-1 flex-col items-center justify-center gap-[3px] transition-colors motion-reduce:transition-none",
+              "relative z-40 flex min-h-14 flex-1 flex-col items-center justify-center gap-[3px] transition-colors motion-reduce:transition-none",
               "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
               current
                 ? "text-[var(--sb-accent)]"

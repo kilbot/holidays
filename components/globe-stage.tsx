@@ -126,7 +126,6 @@ export function GlobeStage() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [ready, setReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [bearing, setBearing] = useState(0);
   const [anchored, setAnchored] = useState<Anchored | null>(null);
 
   const { marks } = useShortlist();
@@ -138,14 +137,6 @@ export function GlobeStage() {
 
   /** Set by the map effect so the React controls can drive the camera. */
   const frameRouteRef = useRef<(animate: boolean) => void>(() => {});
-
-  const resetNorth = useCallback(() => {
-    mapRef.current?.easeTo({
-      bearing: 0,
-      pitch: 0,
-      duration: prefersReducedMotion() ? 0 : 600,
-    });
-  }, []);
 
   const zoomBy = useCallback((delta: number) => {
     const map = mapRef.current;
@@ -183,11 +174,40 @@ export function GlobeStage() {
       // the right. The zoom buttons are ours now (see GlobeControls).
       logoPosition: "bottom-right",
       // Low enough that a phone-width viewport can still fit the whole route:
-      // clamping at 0.8 pushed the Australian end off the right edge.
+      // clamping at 0.8 pushed the Australian end off the right edge. The
+      // ceiling is street level, so a scroll into Fremantle or Port Douglas
+      // keeps rewarding the traveller instead of stopping at the metro area.
       minZoom: 0.3,
-      maxZoom: 8,
+      maxZoom: 12,
+      /* ---- North is up, always (#56) ----
+         A globe you can spin is a globe you can get lost on: two drags and
+         north is off to the left with nothing on screen saying so. The old
+         answer was a compass button to put it back, which is chrome that
+         exists only to undo a gesture nobody asked for. Taking the gesture
+         away is the smaller surface and the better map — this is a route
+         across the world, not a 3D scene, and every mental model the
+         traveller has of Australia has north at the top.
+
+         Pitch goes with it: a pitched globe is what makes a drag feel like
+         rotation in the first place, and none of the route's markers or
+         labels gain anything from it. */
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      // Effortless zoom (#56): plain wheel, no modifier key. The Plan page's
+      // shell is a fixed-height `overflow-hidden` stage, so there is no page
+      // scroll for the map to fight; the panels floating over it are separate
+      // scroll containers that never chain into the canvas.
+      scrollZoom: true,
+      doubleClickZoom: true,
     });
     mapRef.current = map;
+
+    // The two rotation gestures that survive the constructor flags: two-finger
+    // twist on a touch screen, and shift+arrow on the keyboard. Zoom and pan
+    // keep working on both — it is only the bearing that is nailed down.
+    map.touchZoomRotate.disableRotation();
+    map.keyboard.disableRotation();
 
     const frameRoute = (animate: boolean) => {
       const width = container.clientWidth;
@@ -223,10 +243,6 @@ export function GlobeStage() {
       new mapboxgl.AttributionControl({ compact: true }),
       "bottom-right",
     );
-    map.scrollZoom.disable(); // page scroll should not fight the globe on mobile
-
-    // The compass has to know which way is up.
-    map.on("rotate", () => setBearing(map.getBearing()));
 
     map.on("error", (event) => {
       setMapError(event.error?.message ?? "Mapbox failed to load.");
@@ -574,7 +590,6 @@ export function GlobeStage() {
       });
 
       frameRoute(false);
-      setBearing(map.getBearing());
       setReady(true);
     });
 
@@ -682,10 +697,8 @@ export function GlobeStage() {
 
       {ready && (
         <GlobeControls
-          bearing={bearing}
           onZoomIn={() => zoomBy(1)}
           onZoomOut={() => zoomBy(-1)}
-          onResetNorth={resetNorth}
           onFrameRoute={() => frameRouteRef.current(true)}
         />
       )}

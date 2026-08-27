@@ -67,7 +67,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "window",
       from: "2026-12-01",
       to: "2026-12-23",
-      why: "capsule-wa-southwest.md: mid-week, and avoid 26 Dec – 3 Jan entirely. The WA leg's only clear run is before Christmas.",
+      why: "mid-week, and clear of 26 Dec – 3 Jan entirely — the WA leg's only free run is before Christmas. capsule-wa-southwest.md",
     },
     // A Home-base excursion: the family car makes the drive, so no hire.
     needsCar: false,
@@ -102,7 +102,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "weekday",
       // Monday–Friday. `weekdayOf` is 0 = Sunday.
       weekdays: [1, 2, 3, 4, 5],
-      why: "capsule-wa-southwest.md: mid-week. Weekends and the first ferry sell out, and the first ferry is the whole strategy.",
+      why: "mid-week — weekends and the first ferry sell out, and the first ferry is the whole strategy. capsule-wa-southwest.md",
     },
     needsCar: false,
     events: [
@@ -122,7 +122,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "date",
       from: "2026-12-30",
       to: "2027-01-02",
-      why: "docs/CONTEXT.md hard Anchor: New Year's Eve in Sydney. The research's rule is to buy the minimum nights before 31 Dec and all the extra days after it, so the block has to cover 30 Dec – 2 Jan.",
+      why: "New Year's Eve is in Sydney and the date does not move. Sydney charges most for the nights before it, so the block buys the fewest it can before 31 Dec and takes its extra days after. docs/CONTEXT.md",
     },
     // cost-baselines §3.2: do not rent in the Sydney CBD at all. Good transit,
     // and parking is A$50–80/day on top.
@@ -151,7 +151,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "window",
       from: "2027-01-18",
       to: "2027-01-31",
-      why: "capsule-great-barrier-reef.md: from ~18 January, the day operator off-peak pricing starts. January is also Cairns' low season.",
+      why: "from about 18 January the day boats drop to off-peak prices, and January is Cairns' low season anyway. capsule-great-barrier-reef.md",
     },
     needsCar: true,
     events: [
@@ -185,7 +185,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "window",
       from: "2027-01-18",
       to: "2027-01-31",
-      why: "capsule-fnq-wildlife.md: inside the reef Adventure's 18–31 January window.",
+      why: "it rides along inside the reef Adventure's own 18–31 January window. capsule-fnq-wildlife.md",
     },
     needsCar: true,
     events: [
@@ -205,7 +205,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "window",
       from: "2027-01-28",
       to: "2027-02-18",
-      why: "capsule-byron-nimbin.md: from Thursday 28 January 2027, the day NSW school holidays end. The price cliff is real and dated.",
+      why: "from Thursday 28 January 2027, the day NSW school holidays end — the price cliff is real and dated. capsule-byron-nimbin.md",
     },
     needsCar: false,
     events: [
@@ -232,7 +232,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "window",
       from: "2027-01-13",
       to: "2027-02-20",
-      why: "capsule-tasmania.md: from about 13 January, after the New Year fare peak. February is quietly better.",
+      why: "from about 13 January, once the New Year fare peak is over. February is quietly better again. capsule-tasmania.md",
     },
     needsCar: true,
     events: [
@@ -273,7 +273,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "date",
       from: "2027-02-19",
       to: "2027-02-21",
-      why: "capsule-melbourne.md: Laneway lands on the Friday and the free two-day St Kilda Festival on the Saturday and Sunday. Both are dated.",
+      why: "Laneway lands on the Friday and the free two-day St Kilda Festival on the Saturday and Sunday. Both are fixed dates. capsule-melbourne.md",
     },
     needsCar: false,
     events: [
