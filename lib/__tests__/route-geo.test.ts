@@ -166,15 +166,22 @@ test("the arcs are the current Plan's Legs, in the Plan's order", () => {
     plan.legs.map((leg) => leg.id),
   );
 
-  // The bug this whole module exists for: the itinerary flies Sydney → Hobart
-  // → Cairns and the static route drew Sydney → Cairns.
+  // The bug this whole module exists for: the map must draw the Plan's own
+  // sequence, never a hardcoded one. The Plan's order has changed once already
+  // (the zigzag fix in #92 made these assertions stale) — so derive the
+  // expected pairs from the engine's Legs rather than naming any pair here.
   const pairs = route.arcs.features.map(
     (feature) => `${feature.properties.from}>${feature.properties.to}`,
   );
-  assert.ok(pairs.includes("SYD>HBA"), "SYD→HBA is on the map");
-  assert.ok(pairs.includes("HBA>CNS"), "HBA→CNS is on the map");
-  assert.ok(!pairs.includes("SYD>CNS"), "the old fixed sequence is gone");
-  assert.ok(!pairs.includes("OOL>HBA"), "the old fixed sequence is gone");
+  const planPairs = plan.legs.map((leg) => `${leg.from}>${leg.to}`);
+  assert.deepEqual(pairs, planPairs, "arcs mirror the Plan's leg pairs exactly");
+  // And the retired static demo sequence must not leak back in unless the
+  // Plan itself contains it.
+  for (const stale of ["SYD>CNS", "OOL>HBA"]) {
+    if (!planPairs.includes(stale)) {
+      assert.ok(!pairs.includes(stale), `${stale} is not resurrected`);
+    }
+  }
 });
 
 test("modes carry through, so a drive can be drawn as a drive", () => {
