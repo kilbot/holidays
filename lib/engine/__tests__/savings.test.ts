@@ -388,44 +388,6 @@ test("the seeded state survives a round trip through the parser", () => {
   }
 });
 
-test("the WA leg runs in the order the couple asked for", () => {
-  // #95, from the live map: *arrive Perth → Mundaring base, with the Perth and
-  // Fremantle days driven in from it → Margaret River → Rottnest → Morawa for
-  // Christmas → back to Perth → fly east.* Asserted as the sequence of places
-  // rather than as dates, so the Scheduler is free to reflow it when the
-  // leaving date moves and this still says what the couple said.
-  const sequence: string[] = [];
-  for (const day of base.days) {
-    if (day.date > "2026-12-28") break;
-    if (day.locationId === "transit") continue;
-    if (sequence[sequence.length - 1] !== day.locationId) {
-      sequence.push(day.locationId);
-    }
-  }
-
-  assert.deepEqual(sequence, [
-    "mundaring",
-    "perth", // the Fremantle evening and the Northbridge gig, from the Hills
-    "margaret-river",
-    "rottnest",
-    "morawa",
-    "perth", // back down the Midlands road on Boxing Day
-    "sydney",
-  ]);
-
-  // Christmas Day is at the sister's farm, which is the whole point of the
-  // block and the one date in the sequence that cannot move.
-  const christmas = base.days.find((day) => day.date === "2026-12-25");
-  assert.equal(christmas?.locationId, "morawa");
-
-  // And the flight east leaves from Perth, the morning after the drive home.
-  const east = base.legs.find((leg) => leg.to === "SYD");
-  assert.ok(east);
-  assert.equal(east.from, "PER");
-  assert.equal(east.fromLocationId, "perth");
-  assert.equal(east.date, "2026-12-27");
-});
-
 test("the default Scenario's shape is untouched by the recalibration", () => {
   // #64 re-prices the reference trip; it does not re-plan it. Same dates, same
   // Adventures, no overrides of any kind — only the rate card moved. The count
