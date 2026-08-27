@@ -255,7 +255,10 @@ const LONGHAUL_METAL: Readonly<Record<string, MetalSpec>> = {
   "TR|SIN": { aircraft: ["787-9", "787-8"], confirmedAt: ["VIE"] },
 
   /* --- Return, Australia → Europe --- */
-  "TK|SIN + IST": { aircraft: ["A350-900", "A350-900", "A350-900"], confirmedAt: ["SYD", "MEL"] },
+  "TK|SIN + IST|return": {
+    aircraft: ["A350-900", "A350-900", "A350-900"],
+    confirmedAt: ["SYD", "MEL"],
+  },
   "SQ|SIN|return": { aircraft: ["A380-800", "A350-900"], confirmedAt: ["SYD", "MEL"] },
   "CX|HKG|return": { aircraft: ["A350-900", "A350-900"], confirmedAt: ["SYD", "MEL", "BNE"] },
   "QR|DOH|return": { aircraft: ["777-300ER", "A350-1000"], confirmedAt: ["SYD", "MEL", "BNE"] },
@@ -291,6 +294,16 @@ function parseBand(value: string | null | undefined): Band | null {
   const match = /(\d+)\s*-\s*(\d+)/.exec(value.replace(/,/g, ""));
   if (!match) return null;
   return [Number(match[1]), Number(match[2])];
+}
+
+/**
+ * The research files are written in plain ASCII — `->` for arrows and a hyphen
+ * where a dash belongs. The notes are quoted verbatim on the page, so they are
+ * typeset on the way through rather than edited at the source.
+ */
+function tidy(text: string | undefined | null): string | null {
+  if (!text) return null;
+  return text.replace(/\s->\s/g, " → ").replace(/(\S) - (\S)/g, "$1 — $2");
 }
 
 /** `"BCN + SIN"` → `["BCN", "SIN"]`; `"nonstop"` and `null` → `[]`. */
@@ -421,8 +434,10 @@ function positioningFor(hub: OutboundHub): PositioningOption[] {
       hotelEurCouple: hotelCost,
       transferEurCouple: transfer,
       totalEurCouple: sum([[fare[0] * 2, fare[1] * 2], holdBags, transfer, hotelCost]),
-      note: entry.note ?? null,
-      transferNote: sameAirport ? null : (entry.note ?? `Lands at ${arrivesAt}, not ${hub.airport}.`),
+      note: tidy(entry.note),
+      transferNote: sameAirport
+        ? null
+        : (tidy(entry.note) ?? `Lands at ${arrivesAt}, not ${hub.airport}.`),
     });
   }
 
@@ -449,8 +464,8 @@ function positioningFor(hub: OutboundHub): PositioningOption[] {
         // Atocha → T4) is a city ticket, not a coach fare: inside the noise.
         transferEurCouple: null,
         totalEurCouple: sum([[fare[0] * 2, fare[1] * 2], hotelCost]),
-        note: hub.groundOption.note ?? null,
-        transferNote: hub.groundOption.onwardToTerminal ?? null,
+        note: tidy(hub.groundOption.note),
+        transferNote: tidy(hub.groundOption.onwardToTerminal),
       });
     }
   }
@@ -638,7 +653,7 @@ function flagsFor(
     flags.push({
       kind: "check",
       label: "Verify at booking",
-      detail: hubNote ?? "The research could not confirm this routing constructs as advertised.",
+      detail: tidy(hubNote) ?? "The research could not confirm this routing constructs as advertised.",
     });
   }
 
@@ -684,13 +699,13 @@ export function outboundOptions(): SearchOption[] {
               {
                 label: "UK APD",
                 eur: hub.taxPenaltyEurPP * 2,
-                detail: hub.taxPenaltyNote ?? "",
+                detail: tidy(hub.taxPenaltyNote) ?? "",
               },
             ]
           : [],
         positioning,
         homeLeg: null,
-        note: carrier.note ?? null,
+        note: tidy(carrier.note),
         confidence: carrier.confidence,
         searchable: SEARCHABLE_HUBS.has(hub.airport),
       };
@@ -767,7 +782,7 @@ export function returnOptions(): SearchOption[] {
             : [],
         positioning: [],
         homeLeg: HOME_LEGS[destination] ?? null,
-        note: carrier.note ?? null,
+        note: tidy(carrier.note),
         confidence: carrier.confidence,
         searchable: (RETURN_ARRIVALS[airport.airport] ?? []).includes(destination),
       };

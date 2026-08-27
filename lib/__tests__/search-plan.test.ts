@@ -62,6 +62,49 @@ describe("what the search covers", () => {
   });
 });
 
+describe("the metal each itinerary flies", () => {
+  const scoreOf = (leg: typeof outbound, origin: string, carrier: string) =>
+    leg.find((option) => option.origin === origin && option.carrier === carrier)?.comfort.score;
+
+  /**
+   * These four are the research's own published scores, and they only come out
+   * right if the metal table is being found: a missed key falls back to a
+   * generic 787 and the unconfirmed penalty, which is a silent 1.5-point drop.
+   */
+  it("reproduces the published scores for the headline itineraries", () => {
+    assert.equal(scoreOf(outbound, "BCN", "Singapore Airlines"), 9.3);
+    assert.equal(scoreOf(outbound, "MAD", "Cathay Pacific"), 9);
+    assert.equal(scoreOf(outbound, "MAD", "Qatar Airways"), 7.1);
+    assert.equal(scoreOf(outbound, "MAD", "Emirates"), 6.4);
+    assert.equal(scoreOf(returns, "SYD", "Turkish Airlines"), 7.7);
+    assert.equal(scoreOf(returns, "SYD", "Singapore Airlines"), 9.3);
+    assert.equal(scoreOf(returns, "SYD", "Cathay Pacific"), 9);
+  });
+
+  it("gives Barcelona the 777 Emirates downgraded it to, not Madrid's A380", () => {
+    const barcelona = at("BCN", "Emirates");
+    assert.ok(barcelona);
+    assert.deepEqual(
+      barcelona.comfort.sectors.map((sector) => sector.sector.aircraft),
+      ["777-300ER", "777-300ER"],
+    );
+    assert.ok((barcelona.comfort.score ?? 0) < (scoreOf(outbound, "MAD", "Emirates") ?? 0));
+  });
+
+  it("flies one sector per hop, with real block hours on each", () => {
+    for (const option of [...outbound, ...returns]) {
+      assert.equal(
+        option.comfort.sectors.length,
+        option.via.length + 1,
+        `${option.id} has ${option.comfort.sectors.length} sectors for ${option.via.length} via-points`,
+      );
+      for (const sector of option.comfort.sectors) {
+        assert.ok(sector.sector.hours > 0.5, `${option.id}: ${sector.sector.hours}h sector`);
+      }
+    }
+  });
+});
+
 describe("positioning from Valencia", () => {
   it("gives Barcelona a train and no flight, because none exists", () => {
     const bcn = at("BCN", "Singapore Airlines");

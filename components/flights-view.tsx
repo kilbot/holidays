@@ -162,30 +162,45 @@ function OriginStrip({
   pairs: readonly { from: string; to: string; key: string }[];
   quotes: ReadonlyMap<string, LiveQuote | null>;
 }) {
-  const live = pairs.filter((pair) => quotes.get(pair.key)).length;
+  // A stored snapshot is not a live fare and does not get to be counted as
+  // one: it is what `/api/fares` falls back to when the quote fails its sanity
+  // bounds or the key is absent, and it names no carrier.
+  const live = pairs.filter((pair) => quotes.get(pair.key)?.source === "live").length;
+  const stored = pairs.filter((pair) => quotes.get(pair.key)?.source === "snapshot").length;
   const pending = pairs.filter((pair) => !quotes.has(pair.key)).length;
 
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
       <p className="sb-label text-[9px]">
         {pairs.length} origins ·{" "}
-        <span className="text-[var(--sb-good)]">{live} live</span> ·{" "}
-        {pending > 0 ? `${pending} searching` : `${pairs.length - live} on research bands`}
+        <span className="text-[var(--sb-good)]">{live} live</span>
+        {stored > 0 && ` · ${stored} stored`} ·{" "}
+        {pending > 0
+          ? `${pending} searching`
+          : `${pairs.length - live - stored} on research bands`}
       </p>
       <ul className="flex flex-wrap gap-1">
         {pairs.map((pair) => {
           const searching = !quotes.has(pair.key);
           const quote = quotes.get(pair.key) ?? null;
-          const ink = searching ? "var(--sb-sea)" : quote ? "var(--sb-good)" : "var(--sb-faint)";
+          const ink = searching
+            ? "var(--sb-sea)"
+            : quote?.source === "live"
+              ? "var(--sb-good)"
+              : quote
+                ? "var(--sb-dim)"
+                : "var(--sb-faint)";
           return (
             <li
               key={pair.key}
               title={
                 searching
                   ? `${pair.from} → ${pair.to}: searching`
-                  : quote
+                  : quote?.source === "live"
                     ? `${pair.from} → ${pair.to}: live fare, ${quote.carrier}`
-                    : `${pair.from} → ${pair.to}: no live fare, research band`
+                    : quote
+                      ? `${pair.from} → ${pair.to}: stored fare snapshot, no live quote`
+                      : `${pair.from} → ${pair.to}: no fare returned, research band`
               }
               className="sb-num inline-flex items-center gap-1 rounded-md border border-[var(--sb-line)] px-1.5 py-[1px] text-[9.5px] text-[var(--sb-dim)]"
             >
