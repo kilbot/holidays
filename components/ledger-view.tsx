@@ -224,6 +224,7 @@ function DayRow({
   warnings,
   open,
   onToggle,
+  legModes,
 }: {
   entry: LedgerDay;
   capsule: CapsuleSpec | undefined;
@@ -231,9 +232,21 @@ function DayRow({
   warnings: Warning[];
   open: boolean;
   onToggle: () => void;
+  /** Transport line id → the mode of the Leg that charged it. */
+  legModes: ReadonlyMap<string, LegMode>;
 }) {
   const { day } = entry;
   const { text, of, anchor, transport } = whatOf(day, capsule);
+  // The row's own icon, not a stand-in for "travel" (#101). The transit rows
+  // between blocks have always drawn the Leg's mode; the day rows inside them
+  // drew a plane whatever the Leg was, so "Margaret River → Rottnest Island by
+  // drive" carried the same aeroplane as the Valencia long-haul above it. Leg
+  // mode is a first-class thing here — the whole point of the per-Leg override
+  // is that the journey can *be* the experience — and an icon that ignores it
+  // is the row disagreeing with its own sentence.
+  const TransportIcon = transport
+    ? MODE_ICON[legModes.get(transport.id) ?? "flight"]
+    : null;
   const overCap = day.livingEur > capEur;
   // The fare left for the transit row above, so the row shows what the day cost
   // in this place. Saying so on hover is the difference between a figure that
@@ -311,8 +324,11 @@ function DayRow({
               className="size-3 shrink-0 text-[var(--sb-accent)]"
             />
           )}
-          {transport && (
-            <Plane aria-hidden className="size-3 shrink-0 text-[var(--sb-sea)]" />
+          {TransportIcon && (
+            <TransportIcon
+              aria-hidden
+              className="size-3 shrink-0 text-[var(--sb-sea)]"
+            />
           )}
           <span
             className={cn(
@@ -717,6 +733,16 @@ export function LedgerView() {
     [plan.days, plan.warnings, plan.legs],
   );
 
+  /**
+   * The mode of the Leg behind every transport line, keyed the way `legs.ts`
+   * keys the line it charges, so a day row can draw the same icon as the
+   * transit row above it (#101).
+   */
+  const legModes = useMemo(
+    () => new Map(plan.legs.map((leg) => [`${leg.date}:${leg.id}`, leg.mode])),
+    [plan.legs],
+  );
+
   const byDate = useMemo(() => {
     const map = new Map<string, Warning[]>();
     for (const warning of plan.warnings) {
@@ -905,6 +931,7 @@ export function LedgerView() {
                     warnings={byDate.get(entry.day.date) ?? []}
                     open={allOpen || openDates.has(entry.day.date)}
                     onToggle={() => toggle(entry.day.date)}
+                    legModes={legModes}
                   />
                 ))}
               </ul>
