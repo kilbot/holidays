@@ -608,7 +608,7 @@ export function WeekZoom({
       // A ceiling rather than a height: most weeks come in well under it, and
       // the ones that do not scroll inside their own box rather than pushing
       // the globe off the screen.
-      className="sb-scroll mt-2 max-h-[min(34vh,320px)] overflow-y-auto rounded-xl border border-[color-mix(in_srgb,var(--sb-accent)_28%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-panel-2)_45%,transparent)] p-2"
+      className="sb-scroll-seen mt-2 max-h-[min(34vh,320px)] overflow-y-auto rounded-xl border border-[color-mix(in_srgb,var(--sb-accent)_28%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-panel-2)_45%,transparent)] p-2"
     >
       {/* One line of chrome for the whole panel: what week this is, what it
           costs, and the way out. Before #56 the label and a full-width CLOSE

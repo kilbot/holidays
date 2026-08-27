@@ -407,6 +407,37 @@
   overscroll-behavior: contain;
 }
 
+/* A scroll container whose bar is always drawn.
+
+   macOS hides overlay scrollbars until something moves, and on a panel
+   floating over the globe that reads as a row severed by the panel's
+   edge rather than as a list with more in it — which is exactly the
+   complaint #56 was filed with. So the three Plan-page panels that can
+   overflow use this instead of `sb-scroll`: a thin bar, drawn only when
+   there is genuinely somewhere to scroll to, saying so at rest.
+
+   It deliberately sets neither `scrollbar-width` nor `scrollbar-color`.
+   Chromium ignores the `::-webkit-scrollbar` pseudo-elements outright
+   once either standard property is set, which puts the overlay bar —
+   and the severed row — straight back. */
+@utility sb-scroll-seen {
+  overscroll-behavior: contain;
+}
+.sb-scroll-seen::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sb-scroll-seen::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sb-scroll-seen::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--sb-dim) 45%, transparent);
+  border-radius: 3px;
+}
+.sb-scroll-seen::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--sb-dim) 70%, transparent);
+}
+
 /* Mapbox's own chrome. The logo and attribution have to stay visible under
    Mapbox's terms, so they are lifted clear of the date strip rather than left
    to sit behind it. */

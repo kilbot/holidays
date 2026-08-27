@@ -311,7 +311,7 @@ export function CostHud() {
           in the right-hand column, and a HUD that ran the full height would
           print its warnings over the one control that says whether the Plan is
           even being saved. */}
-      <div className="sb-panel sb-scroll max-h-[calc(100dvh-var(--sb-strip-h)-7.5rem)] overflow-y-auto p-3">
+      <div className="sb-panel sb-scroll-seen max-h-[calc(100dvh-var(--sb-strip-h)-7.5rem)] overflow-y-auto p-3">
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
