@@ -1,46 +1,32 @@
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CatalogDrawer } from "@/components/catalog-drawer";
+import { CostHud } from "@/components/cost-hud";
+import { DateStrip } from "@/components/date-strip";
+import { GlobeStage } from "@/components/globe-stage";
 
+/**
+ * The Globe stage (layout variant A, picked in #9).
+ *
+ * The globe owns the whole viewport; everything else floats over it as glass
+ * chrome. Nothing is interactive beyond collapsing the panels — this is the
+ * shell, with the catalog sift (#26) and the interactive date strip (#27)
+ * landing on top of it.
+ */
 export default function Home() {
-  const mapboxReady = Boolean(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-start justify-center gap-6 p-8">
-      <div className="flex items-center gap-3">
-        <h1 className="font-serif text-4xl font-semibold tracking-tight">
+    <main className="relative h-dvh w-full overflow-hidden">
+      <GlobeStage />
+
+      {/* Centred over the globe on desktop; on a phone the cost HUD takes the
+          top-right, so the wordmark tucks into the free top-left corner. */}
+      <header className="pointer-events-none absolute top-5 left-4 z-10 lg:top-4 lg:left-1/2 lg:-translate-x-1/2">
+        <h1 className="font-display text-[15px] font-extrabold tracking-[0.02em] text-[var(--sb-text)] [text-shadow:0_1px_12px_rgb(7_12_20/0.9)]">
           Southbound
         </h1>
-        <Badge variant="secondary">walking skeleton</Badge>
-      </div>
-      <p className="text-muted-foreground">
-        Valencia → Australia, Dec 2026 – Feb 2027. The planner is being built —
-        this page proves the deploy pipeline. Layout direction: Globe stage.
-      </p>
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Pipeline check</CardTitle>
-          <CardDescription>What this skeleton verifies</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2 text-sm">
-          <div>Next.js App Router + Tailwind + shadcn/ui — rendering ✓</div>
-          <div>
-            Mapbox token wired — {mapboxReady ? "present ✓" : "missing ✗"}
-          </div>
-          <div>Deployed from main via Vercel ✓</div>
-        </CardContent>
-      </Card>
-      <a
-        className={buttonVariants()}
-        href="https://github.com/kilbot/holidays/issues/1"
-      >
-        Follow the map
-      </a>
+      </header>
+
+      <CatalogDrawer />
+      <CostHud />
+      <DateStrip />
     </main>
   );
 }
