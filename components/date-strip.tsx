@@ -70,6 +70,10 @@ function DateChip({
         <input
           type="date"
           autoFocus
+          // The word beside it is a sibling `<span>`, not a `<label>`, so it
+          // reaches nobody who cannot see the layout. Both states of the chip
+          // say which end of the trip they are.
+          aria-label={`${label} date`}
           defaultValue={value}
           min={WINDOW_START}
           max={WINDOW_END}
@@ -89,6 +93,7 @@ function DateChip({
         <button
           type="button"
           onClick={() => setEditing(true)}
+          aria-label={`${label} date — ${formatDayYear(value)}. Pick another.`}
           className="sb-num cursor-pointer rounded-md border border-transparent px-1 py-px text-[12px] font-semibold decoration-[var(--sb-faint)] decoration-dotted underline-offset-[3px] transition-colors hover:border-[var(--sb-line)] hover:bg-[var(--sb-panel-2)] focus-visible:border-[var(--sb-accent)] focus-visible:outline-none motion-reduce:transition-none"
         >
           <span className="underline decoration-dotted">
