@@ -40,7 +40,7 @@ const SHELF_IDS: readonly ShelfId[] = [
 const SEASON_FITS: readonly SeasonFit[] = ["good", "ok", "poor", "no"];
 
 /**
- * Slider stops rather than a linear range: 284 of the 413 are one-day ideas,
+ * Slider stops rather than a linear range: 286 of the 415 are one-day ideas,
  * so a linear 1–90 slider would spend 95% of its travel on eight entries.
  */
 export const DAY_STOPS: readonly number[] = [1, 2, 3, 4, 5, 7, 10, 14, Infinity];

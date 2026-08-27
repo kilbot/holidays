@@ -3,11 +3,11 @@
  *
  * Two layers of Capsule, matching the two tiers the site already keeps apart:
  * the nine researched Capsules are always on, at their real bases; the
- * Catalog's 413 shallow ideas appear only once a traveller marks one
+ * Catalog's 415 shallow ideas appear only once a traveller marks one
  * *interested*, and then only as a dot at the airport it is reached through.
  *
  * Shortlisting an idea putting it on the map is the point: the sift's whole
- * job is turning 413 rows into a handful worth looking at, and "worth looking
+ * job is turning 415 rows into a handful worth looking at, and "worth looking
  * at" is a geographic question — three interested ideas clustered around
  * Alice Springs is a fact about the trip that no list view can show.
  *
@@ -62,7 +62,7 @@ export interface InterestedCluster {
  * The *interested* Catalog ideas, grouped by the airport that reaches them.
  *
  * Ideas whose `nearest_airport` carries no mappable code ("varies", "n/a" —
- * twelve of the 413) are left off rather than guessed at.
+ * twelve of the 415) are left off rather than guessed at.
  */
 export function interestedClusters(marks: ShortlistMap): InterestedCluster[] {
   const byCode = new Map<string, InterestedCluster>();

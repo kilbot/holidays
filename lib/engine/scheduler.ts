@@ -36,7 +36,8 @@
  *    Placing the immovable things first is the whole trick — a flexible Capsule
  *    that got the reef's only legal week would push the reef out of its window.
  * 2. **For each, enumerate candidate start dates** inside the trip range that
- *    its Lock permits.
+ *    its Lock permits and that do not quietly take a hard Anchor's own day —
+ *    Christmas in Perth, New Year's Eve on the harbour (see `anchorsFree`).
  * 3. **Score each candidate** and take the best (see `scoreCandidate`).
  * 4. **Reserve the block plus one trailing Buffer day.** docs/CONTEXT.md:
  *    "capsules are never scheduled edge to edge". If the block only fits
@@ -50,7 +51,7 @@
  */
 
 import type { CapsuleSpec, Lock, Placement } from "@/lib/engine/types";
-import { addDays, daysBetween, weekdayOf } from "@/lib/trip-dates";
+import { ANCHORS, addDays, daysBetween, weekdayOf } from "@/lib/trip-dates";
 
 /** One Buffer day after each block, so nothing is scheduled edge to edge. */
 export const BUFFER_DAYS_AFTER_BLOCK = 1;
@@ -116,6 +117,41 @@ export function lockAllows(
       // The first day of the trip, and no other. Jet lag does not wait a week.
       return startDate === tripStart;
   }
+}
+
+/**
+ * The hard Anchors' own days, which a proposal may not quietly take.
+ *
+ * docs/CONTEXT.md: an Anchor is *"a fixed or semi-fixed date+place commitment
+ * the itinerary must honour"*, and the two hard ones are Christmas with the
+ * Perth family and New Year's Eve on the harbour. Nothing stopped an unrelated
+ * block landing on them — the Days were free, so any flexible or weekday-locked
+ * block could score them — and #54 walked straight into it: a Northbridge gig
+ * proposed for 25 December, a day on which the couple is at a family lunch and
+ * every band room in Perth is shut.
+ *
+ * So a **proposal** skips a candidate that covers a hard Anchor, unless the
+ * block's own date-Lock is what puts it there — which is how the Sydney block
+ * keeps New Year's Eve, the one thing it exists to cover.
+ *
+ * Two things this deliberately is not. It is not a refusal: the fallback path
+ * below ignores it, so a block with nowhere else to go still lands and still
+ * reports its overlap. And it is not a veto on a drag: `placementOverrides` are
+ * applied before any of this, because a drag is the answer and not a hint.
+ */
+function anchorsFree(lock: Lock, start: string, days: number): boolean {
+  const end = addDays(start, days - 1);
+  for (const anchor of ANCHORS) {
+    if (!anchor.hard) continue;
+    if (anchor.date < start || anchor.date > end) continue;
+    // The block's own dates are the reason it is here. NYE is Sydney's whole
+    // point, and a date-Lock that names the day is the itinerary honouring the
+    // Anchor rather than trampling it.
+    const owned =
+      lock.kind === "date" && lock.from <= anchor.date && lock.to >= anchor.date;
+    if (!owned) return false;
+  }
+  return true;
 }
 
 /** Where a Lock would like to start, when nothing else constrains it. */
@@ -203,6 +239,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
       const start = addDays(startDate, offset);
       if (!lockAllows(capsule.lock, start, days, startDate)) continue;
       if (!free(start, days)) continue;
+      if (!anchorsFree(capsule.lock, start, days)) continue;
 
       const score = scoreCandidate(start, days, endDate, free);
       // Strictly greater, so the earliest of equally good weeks wins.

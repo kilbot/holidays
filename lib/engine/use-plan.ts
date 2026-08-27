@@ -161,7 +161,7 @@ export interface PlanShortlist {
 /**
  * The sift's view of the shortlist, without building a Plan.
  *
- * `/adventures` renders 413 cards and re-sifts them on every keystroke; running
+ * `/adventures` renders 415 cards and re-sifts them on every keystroke; running
  * the Scheduler and the ledger to find out which pins to draw would be absurd.
  * Membership is one array off the current Scenario.
  */

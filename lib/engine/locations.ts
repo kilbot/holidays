@@ -7,7 +7,7 @@
  * city" and are not the same place).
  *
  * The table is deliberately small and hand-written rather than derived from the
- * 413-row Catalog: these are the places the researched Capsules actually
+ * 415-row Catalog: these are the places the researched Capsules actually
  * happen, and a Catalog idea that names an airport outside this list gets a
  * synthetic Location built from `lib/airports.ts` at the generic `regional`
  * rate — honest about knowing only the airport.

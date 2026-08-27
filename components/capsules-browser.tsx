@@ -38,7 +38,7 @@ import { photoFor, regionPhoto } from "@/lib/region-images";
  * The Capsules page — the site's reading room.
  *
  * Everything the Catalog is was already in the Plan page's 280px rail, and
- * that was the problem: 413 researched-ish holiday ideas rendered as 96px rows
+ * that was the problem: 415 researched-ish holiday ideas rendered as 96px rows
  * with their covers omitted and their arguments behind a click. Sifting worked;
  * *reading* did not. This page is the same data with the constraint removed —
  * a full-width grid of covers, the why on the card, and the filters spread
@@ -47,7 +47,7 @@ import { photoFor, regionPhoto } from "@/lib/region-images";
  * Three decisions worth keeping:
  *
  * **The two tiers stay apart.** The nine researched Capsules get their own row
- * at larger size, above the 413. They are a different kind of thing — day-by-day
+ * at larger size, above the 415. They are a different kind of thing — day-by-day
  * itineraries, operator prices, booking deadlines — and mixing them into one
  * grid would make the shallow tier look researched, which is the one lie the
  * whole sift exists to avoid. They *are* filtered by the same controls, though:
@@ -295,7 +295,7 @@ export function CapsulesBrowser() {
           </section>
         )}
 
-        {/* ---- The 413 ---- */}
+        {/* ---- The 415 ---- */}
         <section className="pt-9">
           <SectionHead
             label="Ideas"

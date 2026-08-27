@@ -113,9 +113,14 @@ test("Comfortable is cheaper than Fireworks NYE and keeps every day", () => {
   assert.equal(diff.datesMoved, false);
 });
 
-test("Comfortable adds the Perth city day and drops no Adventure", () => {
+test("Comfortable trades the two WA evenings for the Perth city day", () => {
   const diff = diffScenarios(comfortable, fireworks);
-  assert.deepEqual(diff.adventuresRemoved, []);
+  // The savings paths carry every researched Adventure and neither WA evening:
+  // those two are Event spend, and Event spend is what a savings path cuts.
+  assert.deepEqual(diff.adventuresRemoved, [
+    "fremantle-fish-and-chips",
+    "perth-live-music-night",
+  ]);
   assert.deepEqual(diff.adventuresAdded, [
     "perth-city-kings-park-cottesloe-and-boola-bardip",
   ]);
@@ -158,7 +163,10 @@ test("Aggressive is shorter, cheaper, and says so through its dates", () => {
 test("Aggressive keeps all nine Adventures — what it drops is February", () => {
   const diff = diffScenarios(aggressive, fireworks);
   assert.deepEqual(diff.adventuresAdded, []);
-  assert.deepEqual(diff.adventuresRemoved, []);
+  assert.deepEqual(diff.adventuresRemoved, [
+    "fremantle-fish-and-chips",
+    "perth-live-music-night",
+  ]);
   assert.ok(diff.eventsOff.includes("mel-laneway"));
   assert.ok(diff.lodgingChanged.includes("sydney-nye"));
 });

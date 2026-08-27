@@ -2,7 +2,7 @@
  * Airport coordinates, for putting Catalog ideas on the globe.
  *
  * A Catalog idea has no coordinates — the sweep recorded a `nearest_airport`
- * IATA code and nothing else, because at 413 entries a geocoding pass would
+ * IATA code and nothing else, because at 415 entries a geocoding pass would
  * have been the expensive part of a cheap tier. That code is enough to plot a
  * dot: an idea shortlisted as *interested* shows up on the map at the airport
  * you would fly into for it, which is the honest resolution of what we know.
@@ -13,7 +13,7 @@
  * serves, which for the remote ones (Ayers Rock, Kununurra) is the same place
  * anyway.
  *
- * Twelve of the 413 entries name no airport at all ("n/a", "varies",
+ * Twelve of the 415 entries name no airport at all ("n/a", "varies",
  * "varies (Sydney/Melbourne + drive)") — the Big Lap and the other ideas that
  * are a route rather than a place. Those get no dot, deliberately: a dot for
  * "varies" would be a lie about where the thing is.

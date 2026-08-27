@@ -78,6 +78,33 @@ test("the arrival block gets the first days even against a block that wants them
   assert.ok(floating!.startDate > arriving!.endDate, floating!.startDate);
 });
 
+test("a proposal never takes Christmas or New Year's Eve", () => {
+  // `floating` is two flexible days in a 44-day range: without the Anchor rule
+  // it scores the whole calendar, hard Anchors included.
+  const plan = buildPlan(input({ toggled: ["floating"] }), FIXTURES);
+  const placed = placementOf(plan, "floating");
+
+  assert.ok(placed);
+  for (const date of ["2026-12-25", "2026-12-31"]) {
+    assert.ok(
+      placed.startDate > date || placed.endDate < date,
+      `${placed.startDate}–${placed.endDate} covers ${date}`,
+    );
+  }
+});
+
+test("the block whose date-Lock names the Anchor still gets it", () => {
+  // `fixed` is date-locked to 31 December. The rule that keeps everything else
+  // off New Year's Eve must not keep off the block that exists to cover it.
+  const plan = buildPlan(input({ toggled: ["fixed"] }), FIXTURES);
+  const placed = placementOf(plan, "fixed");
+
+  assert.ok(placed);
+  assert.ok(placed.startDate <= "2026-12-31" && placed.endDate >= "2026-12-31");
+  assert.equal(placed.lockViolated, false);
+  assert.deepEqual(placed.overlaps, []);
+});
+
 test("all five Locks hold when every Capsule is on at once", () => {
   const specs = [...FIXTURES, ARRIVING];
   const plan = buildPlan(

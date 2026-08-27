@@ -120,7 +120,7 @@ interface CapsuleFiltersProps {
   onChange: (patch: Partial<CatalogFilters>) => void;
   onReset: () => void;
   counts: ShortlistCounts;
-  /** How many of the 413 survived. */
+  /** How many of the 415 survived. */
   shown: number;
   /** Whether the phone-width Refine row is open. */
   refineOpen: boolean;
@@ -281,7 +281,7 @@ export function CapsuleFilters({
           </div>
         </Axis>
 
-        {/* Stops, not a linear range: 284 of the 413 are one-day ideas and
+        {/* Stops, not a linear range: 286 of the 415 are one-day ideas and
             half the Catalog tops out under €215, so an even slider would
             spend most of its travel on the long tail. */}
         <Axis

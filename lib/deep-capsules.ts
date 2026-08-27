@@ -35,7 +35,7 @@
  * published to quote.
  *
  * These Capsules are deliberately **not** in `catalog.json`. The Catalog is the
- * shallow tier — 413 unsifted ideas — and the sweep left the marquee blocks out
+ * shallow tier — 415 unsifted ideas — and the sweep left the marquee blocks out
  * because they were already researched. `related` points the other way instead:
  * the Catalog ideas each document argues with, so the card can offer them.
  */

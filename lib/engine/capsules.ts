@@ -1,7 +1,7 @@
 /**
  * The adapter: research content in, `CapsuleSpec` out.
  *
- * The engine core is pure and knows nothing about `deep-capsules.ts` or the 413
+ * The engine core is pure and knows nothing about `deep-capsules.ts` or the 415
  * rows of `catalog.json`. This is the one module that does, and it exists so
  * that boundary holds — the scheduler and the ledger can be tested with three
  * lines of fixture rather than the whole research corpus.
@@ -360,6 +360,30 @@ function fromDeep(capsule: DeepCapsule): CapsuleSpec | null {
 }
 
 /**
+ * Locks for Catalog ideas whose research actually pinned one.
+ *
+ * A Catalog entry has no lock field — the sweep recorded thirteen columns and a
+ * weekday was not one of them — so an idea marked **Plan** floats. That is the
+ * right default for almost all 415 of them, and wrong for the handful the
+ * research went back and dated. `docs/research/perth-live-music.md` is explicit:
+ * *"Lock the Perth music night to a Friday or Saturday"*, because those are the
+ * only nights every room in the shortlist is on.
+ *
+ * This is the shallow tier's version of `SCHEDULING` above, and it is
+ * deliberately tiny: an entry here means somebody read a research document and
+ * wrote the constraint down, not that a heuristic guessed at one. Everything
+ * absent stays flexible.
+ */
+const CATALOG_LOCKS: Readonly<Record<string, Lock>> = {
+  "perth-live-music-night": {
+    kind: "weekday",
+    // Friday and Saturday. `weekdayOf` is 0 = Sunday.
+    weekdays: [5, 6],
+    why: "Friday and Saturday are the only nights everything is on — the rest of the week is one room each, and the cheap Wed/Sun options finish early on purpose. perth-live-music.md",
+  },
+};
+
+/**
  * A Catalog idea marked **Plan**, as the engine wants it.
  *
  * The Catalog quotes one all-in AUD band per idea, which covers the visit's
@@ -395,7 +419,7 @@ function fromCatalog(idea: CatalogIdea): CapsuleSpec {
     locationId,
     days,
     minDays: Math.max(1, idea.days_min || 1),
-    lock: { kind: "flexible" },
+    lock: CATALOG_LOCKS[idea.id] ?? { kind: "flexible" },
     needsCar: false,
     events:
       excessHigh > 0
@@ -424,7 +448,7 @@ const CATALOG_SPECS = new Map<string, CapsuleSpec>();
  * The Capsules the engine can place: the nine researched ones, plus whichever
  * Catalog ideas the Travellers have marked **Plan**.
  *
- * Catalog specs are built lazily and cached — 413 of them would be 413 objects
+ * Catalog specs are built lazily and cached — 415 of them would be 415 objects
  * built on every keystroke of the sift, and only the placed handful is ever
  * scheduled. docs/CONTEXT.md's shortlist state `placed` is exactly "on the
  * Plan — give it calendar days", which is what being here means.

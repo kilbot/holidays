@@ -211,10 +211,13 @@ test("Comfortable re-homes the post-NYE gap without teleporting", () => {
   );
   assert.ok(west, "the flight west is a real Leg");
   assert.ok(west.eur > 0, "and it is not free");
+  // Three Days stop being Buffers because the Perth block claims them, and two
+  // start being Buffers again because Comfortable does not buy the default's
+  // two WA evenings. Net one, and both halves are decisions rather than drift.
   assert.equal(
     comfortable.days.filter((day) => day.buffer).length,
-    base.days.filter((day) => day.buffer).length - 3,
-    "the three-day Perth block is the only thing that stopped being a Buffer",
+    base.days.filter((day) => day.buffer).length - 3 + 2,
+    "the Perth block and the two dropped WA evenings account for all of it",
   );
 });
 
@@ -285,7 +288,8 @@ test("the default Scenario's shape is untouched by the recalibration", () => {
   // is nine since #54 added the Mundaring arrival block to every seed.
   assert.equal(DEFAULT_SCENARIO.input.startDate, "2026-12-12");
   assert.equal(DEFAULT_SCENARIO.input.endDate, "2027-02-22");
-  assert.equal(DEFAULT_SCENARIO.input.toggled.length, 9);
+  // Nine researched Adventures plus the two WA evenings #54 put on the bench.
+  assert.equal(DEFAULT_SCENARIO.input.toggled.length, 11);
   assert.deepEqual(DEFAULT_SCENARIO.input.placementOverrides, {});
   assert.deepEqual(DEFAULT_SCENARIO.input.lodgingTiers, {});
   assert.deepEqual(DEFAULT_SCENARIO.input.eventOverrides, {});

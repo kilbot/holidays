@@ -106,9 +106,28 @@ const ADVENTURES = [
 ] as const;
 
 /**
- * "Fireworks NYE" — the reference trip, with all nine researched Capsules on.
- * It is a starting position, not a recommendation: everything in it can be
- * toggled off, dragged, or forked.
+ * The two WA evenings the #54 research put on the bench.
+ *
+ * Catalog ideas rather than researched Adventures, and they belong to the
+ * default Scenario alone: they are **Event spend**, and the two savings paths
+ * exist to show what Event spend gets cut. Putting them on all three would make
+ * the side-by-side say less, not more.
+ *
+ * - `perth-live-music-night` is weekday-locked to Friday or Saturday in
+ *   `capsules.ts`, off `docs/research/perth-live-music.md`. Its cost is a
+ *   transport story — A$165 driving with one person sober, A$330 by rideshare
+ *   from Mundaring — and the plan-on figure is the floor, as everywhere else.
+ * - `fremantle-fish-and-chips` contributes **no Event line at all**: A$30–70 on
+ *   the harbour is under the living floor the ledger already charges, so it is
+ *   a place to be rather than a thing to buy. It is here because a Plan whose
+ *   cheapest idea is a A$243 ferry is not describing this trip honestly.
+ */
+const WA_EVENINGS = ["perth-live-music-night", "fremantle-fish-and-chips"];
+
+/**
+ * "The All-Stops Tour" — the reference trip, with all nine researched Capsules
+ * on and both WA evenings booked. It is a starting position, not a
+ * recommendation: everything in it can be toggled off, dragged, or forked.
  */
 export const DEFAULT_SCENARIO: Scenario = {
   id: "fireworks-nye",
@@ -116,7 +135,7 @@ export const DEFAULT_SCENARIO: Scenario = {
   createdAt: "2026-08-27T00:00:00.000Z",
   input: {
     ...EMPTY_INPUT,
-    toggled: [...ADVENTURES],
+    toggled: [...ADVENTURES, ...WA_EVENINGS],
   },
 };
 

@@ -43,7 +43,7 @@ export interface CapsuleLocation {
  *   never geocoded. That is genuinely where you would land for it, so it is an
  *   honest dot, just a coarser one.
  *
- * Twelve of the Catalog's 413 entries name no airport at all — "varies",
+ * Twelve of the Catalog's 415 entries name no airport at all — "varies",
  * "n/a", the Big Lap and the other ideas that are a route rather than a place.
  * They return null and the card simply opens with the globe left where it was:
  * a flight to a guessed coordinate would be worse than no flight.

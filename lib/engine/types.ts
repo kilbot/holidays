@@ -65,7 +65,7 @@ export interface Location {
  * there). The Scheduler treats the first as immovable and the second as a
  * corridor to find the cheapest week in.
  *
- * `arrival` is the fourth kind and the only **relative** one: it names the
+ * `arrival` is the fifth kind and the only **relative** one: it names the
  * trip's own first day rather than a calendar date. docs/CONTEXT.md's
  * semi-fixed Anchor — *"the first days after landing are spent with Paul's dad
  * in Mundaring Hills"* — is a claim about landing, not about 12 December, and
@@ -114,7 +114,7 @@ export interface CapsuleEvent {
  * What the Scheduler needs to know about a Capsule to place it.
  *
  * Deliberately not `DeepCapsule` or `CatalogIdea`: the engine is pure and those
- * types drag in 413 rows of catalog JSON and 1,800 lines of research prose.
+ * types drag in 415 rows of catalog JSON and 1,800 lines of research prose.
  * `lib/engine/capsules.ts` adapts them into this.
  */
 export interface CapsuleSpec {
