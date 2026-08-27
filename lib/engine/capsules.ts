@@ -18,20 +18,43 @@
  *
  * ## Event lines
  *
- * A Capsule's published `cost.ideal` is **not** used as a cost input, and this
- * is the most important thing in the file. #10 is explicit: the published
- * figures used mid-tier lodging and restaurant food, and the model runs at the
- * floor. So the ledger prices the living lines from `constants.ts` and each
- * Capsule contributes only its **Event spend** — the reef boat days, the
- * festival tickets, the cruises — as separate visible line items, which is what
- * docs/CONTEXT.md says Event spend is. The published figure rides along on
- * `publishedEur` purely so a drill-in can show the two side by side.
+ * A Capsule's published cost is **not** used as a cost input, and this is the
+ * most important thing in the file. #10 is explicit: the published figures used
+ * mid-tier lodging and restaurant food, and the model runs at the floor. So the
+ * ledger prices the living lines from `constants.ts` and each Capsule
+ * contributes only its **Event spend** — the reef boat days, the festival
+ * tickets, the cruises — as separate visible line items, which is what
+ * docs/CONTEXT.md says Event spend is. `cost.max`, the version the research
+ * originally published, rides along on `publishedEur` purely so a drill-in can
+ * show the two side by side.
  *
  * Every Event figure below appears in `docs/research/` — the operators tables
  * in the capsule documents, or `cost-baselines.md` §3.4.
+ *
+ * ## The #64 floor ladder
+ *
+ * Recalibrated 27 August 2026 against `cost-floors-recalibrated.md` §6. Half of
+ * that table is an **operator swap the research documents already recommend** —
+ * Passions of Paradise instead of Wavelength, Grasshoppers instead of Happy
+ * Coach, Jewel Cave without Mammoth, the Manly ferry without the Opera House
+ * tour — plus one correction *upward*, the Tasmania parks pass at its published
+ * A$98.35. Those are mechanical and they live here, at the plan-on figure, with
+ * the version they replaced as the band's top.
+ *
+ * The other half — the two Pennicott cruises, the second reef boat, Laneway —
+ * is **the couple's call, not the model's**. Those lines stay here at full
+ * price and a Scenario switches them off through `eventOverrides`, which is
+ * what the savings menu is for. Plan-on is a floor, not a decision made on
+ * somebody's behalf.
  */
 
-import { AUD_TO_EUR, MARKETS, type Rate } from "@/lib/engine/constants";
+import {
+  AUD_TO_EUR,
+  DEFAULT_LODGING_TIER,
+  MARKETS,
+  lodgingRate,
+  type Rate,
+} from "@/lib/engine/constants";
 import { locationById, locationIdForAirport } from "@/lib/engine/locations";
 import type { CapsuleEvent, CapsuleSpec, Lock } from "@/lib/engine/types";
 import { CATALOG, type CatalogIdea } from "@/lib/catalog";
@@ -71,27 +94,23 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     },
     // A Home-base excursion: the family car makes the drive, so no hire.
     needsCar: false,
+    // Busselton Jetty (A$76) was benched by the #64 recalibration: it is a
+    // drive-in extra on the way down, not part of the Adventure. It is still
+    // on the card's own itinerary, where a thing you might do belongs.
     events: [
       {
-        id: "mr-busselton",
-        label: "Busselton Jetty & Underwater Observatory",
-        aud: aud(76),
-        dayOffset: 0,
-        source: `${RESEARCH}capsule-wa-southwest.md — A$38 pp, book ahead.`,
-      },
-      {
         id: "mr-wine",
-        label: "Wilyabrup cellar doors & long lunch",
-        aud: aud(300, 220, 420),
+        label: "Wilyabrup cellar doors & a shared platter",
+        aud: aud(150, 120, 300),
         dayOffset: 1,
-        source: `${RESEARCH}capsule-wa-southwest.md — Vasse Felix, Cullen, lunch at Rustico. Three cellar doors plus a long lunch.`,
+        source: `${RESEARCH}capsule-wa-southwest.md, at the cost-floors-recalibrated.md §6 floor — three tastings (often waived on a purchase) and a shared platter, not a hatted degustation. The band's top is the long lunch.`,
       },
       {
         id: "mr-caves",
-        label: "Mammoth and Jewel Caves",
-        aud: aud(120, 96, 160),
+        label: "Jewel Cave",
+        aud: aud(52, 52, 120),
         dayOffset: 2,
-        source: `${RESEARCH}capsule-wa-southwest.md — the two caves worth the entry, per couple.`,
+        source: `${RESEARCH}capsule-wa-southwest.md — A$26 pp, the document's own pick. Mammoth duplicates its register; the band's top is doing both.`,
       },
     ],
   },
@@ -109,9 +128,9 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       {
         id: "rotto-ferry",
         label: "Rottnest ferry, bikes and snorkel gear",
-        aud: aud(352, 230, 500),
+        aud: aud(243, 243, 400),
         dayOffset: 0,
-        source: `${RESEARCH}capsule-wa-southwest.md and cost-baselines §2.3 — ferry A$48–70 pp return, bikes ~A$35 pp, dynamic pricing.`,
+        source: `${RESEARCH}capsule-wa-southwest.md, itemised at the cost-floors-recalibrated.md §6 floor — SeaLink A$113, bikes A$86, snorkel gear A$44. Ferry pricing is dynamic; the band's top is a late booking.`,
       },
     ],
   },
@@ -130,16 +149,19 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     events: [
       {
         id: "nye-harbour",
-        label: "Harbour icons — Opera House and the Manly ferry",
-        aud: aud(112),
+        label: "Harbour icons — the Manly ferry",
+        aud: aud(16, 16, 112),
         dayOffset: 1,
-        source: `${RESEARCH}capsule-sydney-nye.md — Opera House tour A$48 pp, Manly ferry ~A$8 pp inside the daily Opal cap.`,
+        source: `${RESEARCH}capsule-sydney-nye.md at the cost-floors-recalibrated.md §6 floor — the Manly ferry at ~A$8 pp inside the daily Opal cap is the best-value hour in Sydney. The A$96 Opera House tour is the band's top, and a splurge.`,
       },
       {
         id: "nye-night",
         label: "New Year's Eve — vantage point and provisions",
-        aud: aud(120, 0, 600),
+        aud: aud(60, 0, 600),
+        // Date-locked. The offset used to put this on 30 December, because the
+        // Scheduler proposes the block on the 28th — #64 §7.2.
         dayOffset: 2,
+        date: "2026-12-31",
         source: `${RESEARCH}capsule-sydney-nye.md — the free ticketed vantage points cost nothing but a queue; the band's top is a ticketed NPWS site at A$100–300 pp, prices not published as of Aug 2026.`,
       },
     ],
@@ -157,10 +179,10 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     events: [
       {
         id: "gbr-wavelength",
-        label: "Reef day I — Wavelength, outer ribbon reefs",
-        aud: aud(570, 550, 630),
+        label: "Reef day I — outer ribbon reefs",
+        aud: aud(550, 550, 636),
         dayOffset: 1,
-        source: `${RESEARCH}capsule-great-barrier-reef.md and cost-baselines §3.4 — outer-reef day trip A$276–317 pp.`,
+        source: `${RESEARCH}capsule-great-barrier-reef.md at the cost-floors-recalibrated.md §6 floor — Passions of Paradise ex-Cairns is the cheapest credible boat at A$275 pp; Wavelength at A$636 is the band's top and the upgrade rung.`,
       },
       {
         id: "gbr-rainforest",
@@ -191,10 +213,10 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     events: [
       {
         id: "fnq-croc",
-        label: "Daintree croc cruise and Wildlife Habitat",
-        aud: aud(160, 120, 260),
+        label: "Daintree croc cruise",
+        aud: aud(70, 70, 260),
         dayOffset: 0,
-        source: `${RESEARCH}capsule-fnq-wildlife.md — Solar Whisper and Wildlife Habitat Port Douglas, per couple.`,
+        source: `${RESEARCH}capsule-fnq-wildlife.md at the cost-floors-recalibrated.md §6 floor — Solar Whisper, one hour, timed to a low tide, which is the document's own free lever. The band's top adds Wildlife Habitat Port Douglas.`,
       },
     ],
   },
@@ -212,16 +234,16 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       {
         id: "byron-surf",
         label: "Surf lesson, Main Beach",
-        aud: aud(150, 120, 200),
+        aud: aud(116, 116, 200),
         dayOffset: 1,
-        source: `${RESEARCH}capsule-byron-nimbin.md — per couple.`,
+        source: `${RESEARCH}capsule-byron-nimbin.md at the cost-floors-recalibrated.md §6 floor — Let's Go Surfing at A$58 pp.`,
       },
       {
         id: "byron-nimbin-day",
         label: "Nimbin day — shuttle, waterfall, country pub",
-        aud: aud(198, 158, 240),
+        aud: aud(158, 158, 240),
         dayOffset: 2,
-        source: `${RESEARCH}capsule-byron-nimbin.md — Happy Coach A$99 pp return, or Grasshoppers ~A$79 pp with lunch.`,
+        source: `${RESEARCH}capsule-byron-nimbin.md at the cost-floors-recalibrated.md §6 floor — Grasshoppers at ~A$79 pp with lunch, if it is trading; Happy Coach at A$99 pp return is the band's top.`,
       },
     ],
   },
@@ -239,9 +261,11 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       {
         id: "tas-parks",
         label: "Parks Holiday Vehicle Pass",
-        aud: aud(90),
+        // The one figure the recalibration moved **upward**: the published
+        // Holiday Vehicle Pass is A$98.35, not the A$90 this file carried.
+        aud: aud(98.35),
         dayOffset: 0,
-        source: `${RESEARCH}capsule-tasmania.md — eight weeks, all parks, per vehicle.`,
+        source: `${RESEARCH}capsule-tasmania.md, corrected in cost-floors-recalibrated.md §3.2 — the published Holiday Vehicle Pass is A$98.35: eight weeks, all parks, per vehicle.`,
       },
       {
         id: "tas-mona",
@@ -281,7 +305,10 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
         id: "mel-laneway",
         label: "Laneway Festival, two tickets",
         aud: aud(400, 340, 480),
+        // Date-locked: a festival is a date. A Melbourne block moved off the
+        // weekend is a Melbourne block without a ticket to buy.
         dayOffset: 1,
+        date: "2027-02-19",
         source: `${RESEARCH}capsule-melbourne.md — Flemington Park, the Friday.`,
       },
       {
@@ -309,7 +336,11 @@ function fromDeep(capsule: DeepCapsule): CapsuleSpec | null {
     lock: scheduling.lock,
     needsCar: scheduling.needsCar,
     events: scheduling.events,
-    publishedEur: capsule.cost.ideal.eur,
+    // The **published** figure is the ladder's ceiling now that `ideal` is the
+    // recalibrated plan-on: the drill-in's cross-check is "what the research
+    // first wrote up vs what the Plan charges", and comparing plan-on to
+    // plan-on would compare a number to itself.
+    publishedEur: capsule.cost.max.eur,
     tier: "deep",
   };
 }
@@ -335,7 +366,7 @@ function fromCatalog(idea: CatalogIdea): CapsuleSpec {
   const days = Math.max(1, idea.days_ideal || idea.days_min || 1);
 
   const floorPerDay =
-    market.lodging.airbnb.plan +
+    lodgingRate(location.market, DEFAULT_LODGING_TIER).rate.plan +
     market.food.plan +
     market.local.plan +
     market.activities.plan;

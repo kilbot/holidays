@@ -30,15 +30,18 @@
  */
 
 import {
+  DEFAULT_LODGING_TIER,
   MARKETS,
   PUBLIC_HOLIDAYS,
   PUBLIC_HOLIDAY_SURCHARGE,
+  lodgingRate,
   peakFor,
   type LodgingTier,
   type Rate,
 } from "@/lib/engine/constants";
 import { locationById } from "@/lib/engine/locations";
 import type {
+  CapsuleEvent,
   CapsuleSpec,
   Day,
   DayLine,
@@ -113,7 +116,35 @@ export interface LedgerInput {
   capsules: ReadonlyMap<string, CapsuleSpec>;
   lodgingTiers: Readonly<Record<string, LodgingTier>>;
   carOverrides: Readonly<Record<string, boolean>>;
+  /** Event id → off, or a different AUD figure. See `PlanInput`. */
+  eventOverrides?: Readonly<Record<string, boolean | number>>;
   fxRate: number;
+}
+
+/**
+ * Which day of its block an Event lands on, or `null` for "not on this Plan".
+ *
+ * Two kinds of Event, and the difference is the whole point of `date`:
+ *
+ * - **Offset Events** ride with the block. The reef day is the second day of
+ *   the reef Adventure wherever the reef Adventure is dragged to.
+ * - **Date-locked Events** do not move, because the world has already decided
+ *   when they are. They land on their own date if the block covers it, and if
+ *   the block does not cover it they do not happen — see `CapsuleEvent.date`.
+ */
+export function eventOffset(
+  event: CapsuleEvent,
+  placement: Placement,
+): number | null {
+  if (!event.date) {
+    return event.dayOffset >= 0 && event.dayOffset < placement.days
+      ? event.dayOffset
+      : null;
+  }
+  if (event.date < placement.startDate || event.date > placement.endDate) {
+    return null;
+  }
+  return daysBetween(placement.startDate, event.date) - 1;
 }
 
 /**
@@ -159,8 +190,13 @@ export function buildLedger(input: LedgerInput): Day[] {
     lastLocationId = location.returnsTo ?? locationId;
 
     const market = MARKETS[location.market];
+    // The tier is keyed by **Capsule id on an Adventure day and Location id on
+    // a Buffer day** — camping the Byron block and camping the sixteen Byron
+    // Buffer nights are two different decisions, and a Scenario says both.
     const tierKey = capsule ? capsule.id : locationId;
-    const tier: LodgingTier = input.lodgingTiers[tierKey] ?? "airbnb";
+    const asked: LodgingTier =
+      input.lodgingTiers[tierKey] ?? DEFAULT_LODGING_TIER;
+    const { tier, rate: tierRate } = lodgingRate(location.market, asked);
     const peak = peakFor(date, location.market);
     const holiday = PUBLIC_HOLIDAYS.includes(date);
     const surcharge = holiday
@@ -170,7 +206,9 @@ export function buildLedger(input: LedgerInput): Day[] {
     const lines: DayLine[] = [];
 
     if (!location.homeBase) {
-      const lodging = scale(market.lodging[tier], peak.lodging);
+      const lodging = scale(tierRate, peak.lodging);
+      const source =
+        tier === "camp" ? CAMP_SOURCE : "cost-floors-recalibrated.md §2";
       lines.push(
         line(
           `${date}:lodging`,
@@ -180,7 +218,7 @@ export function buildLedger(input: LedgerInput): Day[] {
           fxRate,
           true,
           peak.id === "none"
-            ? `${market.label} ${TIER_LABEL[tier]} rate, cost-baselines §3.1.`
+            ? `${market.label} ${TIER_LABEL[tier]} rate, ${source}.`
             : `${market.label} ${TIER_LABEL[tier]} rate ×${peak.lodging.plan} — ${peak.label}. ${peak.note}`,
         ),
       );
@@ -206,9 +244,15 @@ export function buildLedger(input: LedgerInput): Day[] {
         scale(scale(market.food, peak.food), surcharge),
         fxRate,
         true,
-        holiday
-          ? `Groceries-first basket, cost-baselines §${location.homeBase ? "2.1" : "3.3"}, plus the ${Math.round((PUBLIC_HOLIDAY_SURCHARGE.plan - 1) * 100)}% public-holiday surcharge Australian venues charge on this date.`
-          : `Groceries-first basket, cost-baselines §${location.homeBase ? "2.1" : "3.3"}.`,
+        [
+          `Groceries-first basket, cost-baselines §${location.homeBase ? "2.1" : "3.3"}.`,
+          market.foodNote,
+          holiday
+            ? `Plus the ${Math.round((PUBLIC_HOLIDAY_SURCHARGE.plan - 1) * 100)}% public-holiday surcharge Australian venues charge on this date.`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" "),
       ),
     );
 
@@ -257,16 +301,31 @@ export function buildLedger(input: LedgerInput): Day[] {
 
     if (capsule && held) {
       for (const event of capsule.events) {
-        if (event.dayOffset !== held.offset) continue;
+        const override = input.eventOverrides?.[event.id];
+        // Switched off on this Scenario: the line is not here, and the
+        // Scenario comparison is where the reader sees what that bought.
+        if (override === false) continue;
+        if (eventOffset(event, held.placement) !== held.offset) continue;
+
+        const swapped = typeof override === "number";
+        // A swapped figure is a decision, not a research band: it collapses
+        // onto itself rather than inheriting the spread of the line it
+        // replaced. A A$51 ferry does not carry a A$380 cruise's worst case.
+        const aud: Rate = swapped
+          ? { plan: override, band: [override, override] }
+          : event.aud;
+
         lines.push(
           line(
             `${date}:${event.id}`,
             "event",
             event.label,
-            event.aud,
+            aud,
             fxRate,
             false,
-            event.source,
+            swapped
+              ? `${event.source} — swapped to A$${override} on this Scenario.`
+              : event.source,
           ),
         );
       }
@@ -301,9 +360,21 @@ export function buildLedger(input: LedgerInput): Day[] {
 
 const TIER_LABEL: Record<LodgingTier, string> = {
   hostel: "hostel twin",
+  camp: "powered site",
   airbnb: "cheap Airbnb",
   hotel: "hotel",
 };
+
+/**
+ * What a camping night costs, and the dependency it carries.
+ *
+ * The gear caveat is in the line's own note rather than a footnote somewhere
+ * else, because it is the thing that decides whether the rung is available at
+ * all: the WA blocks use the family's gear and the borrowed car, and every
+ * east-coast camping night needs gear flown in or hired.
+ */
+const CAMP_SOURCE =
+  "cost-floors-recalibrated.md §3.1 — a powered caravan-park site for two. Needs gear: WA borrows the family's, and every east-coast night needs it flown in (~€30–60 a Leg in checked bags) or hired. Nothing in a caravan park is quiet at Christmas–January; the tier buys money, not calm";
 
 export { TIER_LABEL };
 

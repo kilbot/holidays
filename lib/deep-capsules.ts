@@ -45,12 +45,52 @@ export interface DaySketch {
   body: string;
 }
 
-/** A cost tier. `aud` and `eur` are the plan-on figures, per couple. */
+/** One rung of the cost ladder. `aud` and `eur` are per couple. */
 export interface CostTier {
   aud: number;
   eur: number;
   /** The honest spread in EUR. Null where the research publishes none. */
   band: [number, number] | null;
+  /** How many days this rung buys — the ladder is durations as well as prices. */
+  days: number;
+  /** The rung in two words: "Floor", "Camping", "Plan on", "As published". */
+  label: string;
+}
+
+/**
+ * Floor → plan-on → ceiling, which is what a cost ladder is for.
+ *
+ * Recalibrated on #64: the card used to read Minimum / Ideal / Maximum against
+ * the research's own **mid-tier** arithmetic, and the ledger charged something
+ * else entirely — Margaret River said €1,375 on the card and €888 in the Plan.
+ * Two numbers for the same Adventure is worse than one wrong one.
+ *
+ * So `ideal` is now **the figure the engine actually charges** for this block
+ * at its default placement: the recalibrated lodging and food floors, the
+ * corrected Event ladder, that block's own peak multipliers. `max` is the
+ * version the research originally published, kept as the ceiling it always
+ * was. `min` and `cheap` are the two rungs below — a shorter stay, and a tent
+ * or a hostel twin where the research offers one.
+ *
+ * Inter-city Legs sit outside every rung: they are their own line in the Plan,
+ * and folding a A$610 flight into "what Tasmania costs" would double-count it.
+ */
+export interface CostLadder {
+  /** The shortest version still worth doing, at the floor. */
+  min?: CostTier;
+  /** A tent, or a hostel twin. Only where the research offers one. */
+  cheap?: CostTier;
+  /** Plan-on. What the Plan charges, and what every surface shows. */
+  ideal: CostTier;
+  /** As published — the mid-tier version. A ceiling, never a target. */
+  max: CostTier;
+}
+
+/** The rungs this Adventure has, cheapest first. */
+export function costLadder(cost: CostLadder): CostTier[] {
+  return [cost.min, cost.cheap, cost.ideal, cost.max].filter(
+    (rung): rung is CostTier => rung !== undefined,
+  );
 }
 
 export interface Caveat {
@@ -106,7 +146,7 @@ export interface DeepCapsule {
   base: Coordinates;
   /** The days the research says the Capsule wants. */
   days: { min: number; ideal: number; max: number; unit: string };
-  cost: { min: CostTier; ideal: CostTier; max: CostTier };
+  cost: CostLadder;
   /** "18–31 January", "Thu 18 – Mon 22 February 2027". */
   window: string;
   /** The doc's one-line verdict on the trip's own dates. */
@@ -149,10 +189,14 @@ const GREAT_BARRIER_REEF: DeepCapsule = {
   airport: "CNS",
   base: [145.4650, -16.4840], // Port Douglas — Macrossan St, the reef town itself
   days: { min: 3, ideal: 5, max: 7, unit: "nights" },
+  // Recalibrated on #64. The published ideal — €2,560 — assumed mid-tier
+  // lodging and restaurant food; the Plan charges €1,648 for the same five
+  // nights at the Port Douglas floor, both reef days included.
   cost: {
-    min: { aud: 3020, eur: 1840, band: [1400, 2320] },
-    ideal: { aud: 4166, eur: 2560, band: [2075, 3295] },
-    max: { aud: 5916, eur: 3600, band: [2930, 4390] },
+    min: { aud: 1405, eur: 857, band: null, days: 3, label: "Floor" },
+    cheap: { aud: 2480, eur: 1513, band: null, days: 5, label: "Camping" },
+    ideal: { aud: 2702, eur: 1648, band: null, days: 5, label: "Plan on" },
+    max: { aud: 4166, eur: 2560, band: [2075, 3295], days: 5, label: "As published" },
   },
   window: "From ~18 January — the day operator off-peak pricing starts",
   verdict: "Yes — but buy buffer days, not extra reef days.",
@@ -347,10 +391,11 @@ const FNQ_WILDLIFE: DeepCapsule = {
   airport: "CNS",
   base: [145.4530, -16.0850], // Cape Tribulation, north of the Daintree ferry
   days: { min: 0, ideal: 1, max: 2, unit: "extra days" },
+  // Recalibrated on #64. There is no shorter rung: the extension *is* one day.
   cost: {
-    min: { aud: 170, eur: 105, band: [60, 200] },
-    ideal: { aud: 739, eur: 450, band: [335, 580] },
-    max: { aud: 1100, eur: 670, band: null },
+    cheap: { aud: 292, eur: 178, band: null, days: 1, label: "Camping" },
+    ideal: { aud: 334, eur: 204, band: null, days: 1, label: "Plan on" },
+    max: { aud: 739, eur: 450, band: [335, 580], days: 1, label: "As published" },
   },
   window: "Inside the reef Adventure's 18–31 January window",
   verdict:
@@ -540,10 +585,15 @@ const TASMANIA: DeepCapsule = {
   airport: "HBA",
   base: [147.3272, -42.8821], // Hobart — where the south-to-north arc starts
   days: { min: 6, ideal: 9, max: 12, unit: "nights" },
+  // Recalibrated on #64, and still the most expensive block per day — the hire
+  // car is A$85/day before the January multiplier. Both Pennicott cruises are
+  // in the plan-on figure: dropping them is the couple's call, and the savings
+  // menu prices it (−€183 and −€164).
   cost: {
-    min: { aud: 4588, eur: 2800, band: [2195, 3905] },
-    ideal: { aud: 7261, eur: 4430, band: [3415, 6100] },
-    max: { aud: 9417, eur: 5745, band: [4515, 7930] },
+    min: { aud: 3223, eur: 1966, band: null, days: 6, label: "Floor" },
+    cheap: { aud: 3597, eur: 2194, band: null, days: 9, label: "Camping" },
+    ideal: { aud: 4407, eur: 2688, band: null, days: 9, label: "Plan on" },
+    max: { aud: 7261, eur: 4430, band: [3415, 6100], days: 9, label: "As published" },
   },
   window: "From about 13 January — after the New Year fare peak",
   verdict:
@@ -763,10 +813,14 @@ const SYDNEY_NYE: DeepCapsule = {
   airport: "SYD",
   base: [151.2108, -33.8568], // Sydney Harbour, the Opera House side
   days: { min: 4, ideal: 6, max: 9, unit: "nights" },
+  // Recalibrated on #64. A suburb-on-a-train-line night is A$140, not A$180 —
+  // and at that rate the four NYE nights stop breaching the A$500 Daily cap,
+  // which was the Plan's only cap breach.
   cost: {
-    min: { aud: 2180, eur: 1330, band: [1065, 1710] },
-    ideal: { aud: 3406, eur: 2075, band: [1585, 2560] },
-    max: { aud: 4946, eur: 3010, band: [2440, 3780] },
+    min: { aud: 1916, eur: 1169, band: null, days: 4, label: "Floor" },
+    cheap: { aud: 2380, eur: 1452, band: null, days: 6, label: "Hostel twin" },
+    ideal: { aud: 2757, eur: 1682, band: null, days: 6, label: "Plan on" },
+    max: { aud: 3406, eur: 2075, band: [1585, 2560], days: 6, label: "As published" },
   },
   window: "29 Dec 2026 – 4 Jan 2027 · the anchor is Thu 31 Dec",
   verdict: "Buy the minimum number of nights before NYE and all the extra days after it.",
@@ -966,10 +1020,17 @@ const MARGARET_RIVER: DeepCapsule = {
   airport: "PER",
   base: [115.0750, -33.9550], // Margaret River township
   days: { min: 2, ideal: 3, max: 5, unit: "nights" },
+  // Recalibrated on #64 — the Adventure the ticket named. The published €1,375
+  // was four cellar doors, a hatted lunch, two caves and A$241 nights. The
+  // floor is a cheap motel at A$120, three tastings and a shared platter, and
+  // Jewel Cave alone: A$982 of Days and Events, €599. Add the borrowed car's
+  // Perth ⇄ Margaret River run (A$93) and it is the A$1,075 the research
+  // arrives at; the Plan charges that drive as a Leg, on the day it happens.
   cost: {
-    min: { aud: 1554, eur: 945, band: [700, 1525] },
-    ideal: { aud: 2259, eur: 1375, band: [1035, 2195] },
-    max: { aud: 3439, eur: 2105, band: [1585, 3170] },
+    min: { aud: 670, eur: 409, band: null, days: 2, label: "Floor" },
+    cheap: { aud: 772, eur: 471, band: null, days: 3, label: "Camping" },
+    ideal: { aud: 982, eur: 599, band: null, days: 3, label: "Plan on" },
+    max: { aud: 2259, eur: 1375, band: [1035, 2195], days: 3, label: "As published" },
   },
   window: "Mid-week, after ~5 January. Avoid 26 Dec – 3 Jan entirely.",
   verdict: "Yes — but three days is the floor, not the ideal. Four days is the honest number.",
@@ -1145,10 +1206,12 @@ const ROTTNEST: DeepCapsule = {
   airport: "PER",
   base: [115.5200, -32.0060], // Rottnest — Thomson Bay settlement
   days: { min: 1, ideal: 1, max: 2, unit: "days" },
+  // Recalibrated on #64: the ferry, bikes and snorkel gear itemised at A$243
+  // rather than a A$352 blend. There is no cheaper rung — the couple sleeps at
+  // the Perth Home base either side, so the day carries no lodging at all.
   cost: {
-    min: { aud: 230, eur: 140, band: [140, 340] },
-    ideal: { aud: 352, eur: 215, band: [140, 340] },
-    max: { aud: 952, eur: 580, band: [245, 915] },
+    ideal: { aud: 318, eur: 194, band: null, days: 1, label: "Plan on" },
+    max: { aud: 352, eur: 215, band: [140, 340], days: 1, label: "As published" },
   },
   window: "Mid-week. Weekends and the first ferry sell out.",
   verdict: "Yes, and it's the best-value day in the whole Plan.",
@@ -1332,10 +1395,14 @@ const BYRON_NIMBIN: DeepCapsule = {
   airport: "OOL",
   base: [153.6120, -28.6434], // Byron Bay — the Cape Byron end
   days: { min: 3, ideal: 5, max: 7, unit: "nights" },
+  // Recalibrated on #64. The block sits after the 28 January price cliff by
+  // design, so it pays the shoulder multiplier — the cheapest paid-city window
+  // of the whole trip.
   cost: {
-    min: { aud: 1106, eur: 670, band: [520, 1040] },
-    ideal: { aud: 1736, eur: 1070, band: [825, 1650] },
-    max: { aud: 2544, eur: 1555, band: [1220, 2380] },
+    min: { aud: 1054, eur: 643, band: null, days: 3, label: "Floor" },
+    cheap: { aud: 1225, eur: 747, band: null, days: 5, label: "Camping" },
+    ideal: { aud: 1574, eur: 960, band: null, days: 5, label: "Plan on" },
+    max: { aud: 1754, eur: 1070, band: [825, 1650], days: 5, label: "As published" },
   },
   window: "From Thursday 28 January 2027 — the day NSW school holidays end",
   verdict: "Place it 27/28 Jan – 2 Feb, heading south. The price cliff is real and dated.",
@@ -1527,10 +1594,14 @@ const MELBOURNE: DeepCapsule = {
   airport: "MEL",
   base: [144.9800, -37.7980], // Fitzroy / Collingwood, not the CBD
   days: { min: 3, ideal: 4, max: 5, unit: "nights" },
+  // Recalibrated on #64. Laneway (A$400) is inside the plan-on figure: the
+  // free St Kilda Festival and the NGV Triennial survive without it, so
+  // dropping it is a €244 lever in the savings menu rather than a floor.
+  // No camping rung — recalibrated §3.4 declines the metro holiday parks.
   cost: {
-    min: { aud: 1320, eur: 805, band: [610, 1160] },
-    ideal: { aud: 1700, eur: 1040, band: [795, 1525] },
-    max: { aud: 2310, eur: 1410, band: [1160, 2015] },
+    min: { aud: 1300, eur: 793, band: null, days: 3, label: "Floor" },
+    ideal: { aud: 1561, eur: 952, band: null, days: 4, label: "Plan on" },
+    max: { aud: 1705, eur: 1040, band: [795, 1525], days: 4, label: "As published" },
   },
   window: "Thu 18 – Mon 22 February 2027",
   verdict: "The best party weekend on Melbourne's summer calendar inside this trip's window.",

@@ -2,9 +2,28 @@
 
 Draft for [issue #65](https://github.com/kilbot/holidays/issues/65): cut **at least A$10,000
 (≈€6,100)** from the default Plan. This is the **analysis** — the levers, priced against the current
-engine, ranked by euro-saved per unit of pain. It changes no code and seeds no Scenario; a builder
-does that. The floor recalibration it leans on is
+engine, ranked by euro-saved per unit of pain. The floor recalibration it leans on is
 [`cost-floors-recalibrated.md`](./cost-floors-recalibrated.md) (issue #64).
+
+> **Status: wired, 27 August 2026** — branch `build/cost-recalibration`. The menu is
+> `lib/savings-menu.ts` and a collapsible section on the Budget page; both waterfalls are seeded
+> Scenarios in `lib/engine/scenario-doc.ts`, reconciled by `lib/engine/__tests__/savings.test.ts`.
+>
+> | | audit | engine | drift |
+> |---|---|---|---|
+> | Comfortable | €17,914 | **€18,017** | +€103 |
+> | Aggressive | €15,530 | **€15,537** | +€7 |
+>
+> **§4 needs one correction.** It lists lever 5 — re-home the post-NYE gap to Perth — among the
+> levers a Scenario can express. It cannot: `PlanInput` has no field for where a Buffer sleeps, and
+> a Buffer day inherits the place of the block before it. The seeded Scenario says it in the
+> vocabulary the model already has — a Perth Catalog day toggled on and dragged into the gap, which
+> re-homes every Buffer after it and prices the two extra flights. §4's other claim, that Event
+> lines cannot live in a Scenario, is now out of date: `PlanInput.eventOverrides` is the field §4.2
+> asks for, and levers 6, 7, 8 and 14 are expressed with it.
+>
+> **§2 lever 5's per-day figures**: a Sydney Buffer day is €188 and a Perth day is **€48**, so the
+> re-homing lever is €140/day at the rates those days actually pay. §1b's €142 stands.
 
 **Priced:** 27 August 2026. All figures **EUR, per couple, on the Plan total including the 10%
 contingency row** — that is the number the HUD shows and the number the €6,100 target is measured

@@ -15,6 +15,7 @@
  * never a discarded Scenario, never a 400, and never a crash.
  */
 
+import { isLodgingTier } from "@/lib/engine/constants";
 import { EMPTY_INPUT } from "@/lib/engine/plan";
 import type { PlanInput } from "@/lib/engine/types";
 
@@ -43,8 +44,20 @@ export interface ScenarioState {
 }
 
 /* ------------------------------------------------------------------ */
-/* The default Scenario                                                */
+/* The seeded Scenarios                                                */
 /* ------------------------------------------------------------------ */
+
+/** The eight researched Adventures, which every seeded Scenario keeps. */
+const ADVENTURES = [
+  "margaret-river",
+  "rottnest-island",
+  "sydney-nye",
+  "gbr-port-douglas",
+  "fnq-wildlife",
+  "byron-nimbin",
+  "tasmania-arc",
+  "melbourne-party",
+] as const;
 
 /**
  * "Fireworks NYE" — the reference trip, with all eight researched Capsules on.
@@ -57,21 +70,166 @@ export const DEFAULT_SCENARIO: Scenario = {
   createdAt: "2026-08-27T00:00:00.000Z",
   input: {
     ...EMPTY_INPUT,
-    toggled: [
-      "margaret-river",
-      "rottnest-island",
-      "sydney-nye",
-      "gbr-port-douglas",
-      "fnq-wildlife",
-      "byron-nimbin",
-      "tasmania-arc",
-      "melbourne-party",
-    ],
+    toggled: [...ADVENTURES],
   },
 };
 
+/**
+ * The Perth city day the re-homed January gap is built around.
+ *
+ * Kings Park, Cottesloe and Boola Bardip is a Catalog idea rather than a
+ * researched Adventure, and it is doing something specific here: **a Buffer day
+ * inherits the place of the block before it**, so parking a Perth-located block
+ * in the post-NYE gap is what turns eight idle Sydney days at €188 into eight
+ * Home-base days at €48. Its own Event line is zero — the Catalog quotes A$0–200
+ * all-in and the ledger already charges more than that in living costs, so it
+ * contributes a place to be rather than a thing to buy.
+ *
+ * This is savings-menu lever 5, and it is the one lever the audit assumed a
+ * Scenario could express and could not: `PlanInput` has no "send the Buffers
+ * home" field. Toggling a Home-base block into the gap says the same thing in
+ * the vocabulary the model already has, and says it more honestly — the couple
+ * is not teleporting, they are flying back to Perth and the two extra Legs are
+ * priced.
+ */
+const PERTH_CITY_DAYS = "perth-city-kings-park-cottesloe-and-boola-bardip";
+
+/**
+ * "Comfortable — A$10k off". `docs/research/savings-menu-draft.md` §5.
+ *
+ * Keeps all 73 days, all eight Adventures at their ideal length, **both
+ * Melbourne festivals**, both reef weather-buffer days and the whole WA family
+ * stretch. Pays for it with calendar shape, three boat lines and a tent:
+ *
+ * | lever | expressed as |
+ * |---|---|
+ * | 4 · NYE reshape, 28 Dec–2 Jan → 30 Dec–4 Jan | a placement override |
+ * | 5 · re-home the post-NYE gap to Perth | a Perth block in the gap |
+ * | 6 · drop reef day II | `eventOverrides` |
+ * | 7 · drop the Tasman Island cruise | `eventOverrides` |
+ * | 8 · Wineglass Bay cruise → the Bruny Island ferry | `eventOverrides`, A$51 |
+ * | 9 · camp on Margaret River and Tasmania | `lodgingTiers`, by Capsule id |
+ * | 12 · camp the sixteen-night Byron Buffer | `lodgingTiers`, by Location id |
+ *
+ * Levers 1–3 — the rate floors and the mechanical Event corrections — are not
+ * here because they are not choices. They are in `constants.ts` and
+ * `capsules.ts` and they apply to *every* Scenario, "Fireworks NYE" included.
+ *
+ * **Given up:** two Pennicott cruises, the second reef boat and its intro
+ * dives, and about 28 nights under canvas. **Depends on** camping gear reaching
+ * Tasmania and the Northern Rivers — `cost-floors-recalibrated.md` §3.3.
+ */
+export const COMFORTABLE_SCENARIO: Scenario = {
+  id: "comfortable-10k",
+  name: "Comfortable — A$10k off",
+  createdAt: "2026-08-27T00:00:00.000Z",
+  input: {
+    ...EMPTY_INPUT,
+    toggled: [...ADVENTURES, PERTH_CITY_DAYS],
+    placementOverrides: {
+      // Two nights before NYE bought back as two after 1 January, when the
+      // Sydney rate collapses from ×2.5 to ×1.2. The research's own rule.
+      "sydney-nye": "2026-12-30",
+      // The day after Sydney ends is a Buffer, and the flight west is the day
+      // after that — a relocation with no Buffer in front of it is a Warning,
+      // and a cheaper Plan carrying an extra Warning is not cheaper.
+      [PERTH_CITY_DAYS]: "2027-01-06",
+    },
+    eventOverrides: {
+      // The fifth reef night buys *another chance* at a reef day, not a second
+      // guaranteed one. One boat, one rainforest day, two weather buffers.
+      "gbr-poseidon": false,
+      // capsule-tasmania.md calls this "the first A$360 to cut if the Budget
+      // bites". The Budget bites.
+      "tas-tasman": false,
+      // Wineglass Bay is a free 3–11 km walk, and the document calls the cruise
+      // the alternative to the walk rather than an addition. A$51 buys the
+      // Bruny Island ferry instead, which is a different day rather than a
+      // cheaper version of the same one.
+      "tas-wineglass": 51,
+    },
+    lodgingTiers: {
+      "margaret-river": "camp",
+      "tasmania-arc": "camp",
+      // By Location, not Capsule: this is the sixteen-night February Buffer,
+      // not the five-night Byron block.
+      byron: "camp",
+    },
+  },
+};
+
+/**
+ * "Aggressive — A$15k off". `docs/research/savings-menu-draft.md` §6.
+ *
+ * The floor of the floor, and **not a recommendation**. 59 days instead of 73,
+ * no Melbourne festivals, no second reef day, no cruises, camping on every
+ * eligible block and Buffer, a hostel twin across the Sydney fortnight.
+ *
+ * Every hard Anchor survives — Christmas in Perth, New Year's Eve on the
+ * harbour, all eight Adventures still on the Plan at their researched ideal
+ * length. What goes is February: ending on the 8th costs fourteen days, the
+ * Laneway ticket and the free St Kilda weekend.
+ *
+ * The Melbourne block carries a `lock-violated` Warning on purpose. Its Lock
+ * covers 19–21 February and this trip is home by then; the block falls back to
+ * 4–7 February, which is a Melbourne long weekend without the festivals. The
+ * Warning is the Plan saying so out loud, which is exactly what a Warning is
+ * for — and the Laneway line drops on its own, because a date-locked Event on a
+ * block that does not cover its date is not a thing you can buy.
+ */
+export const AGGRESSIVE_SCENARIO: Scenario = {
+  id: "aggressive-15k",
+  name: "Aggressive — A$15k off",
+  createdAt: "2026-08-27T00:00:00.000Z",
+  input: {
+    ...EMPTY_INPUT,
+    endDate: "2027-02-08",
+    toggled: [...ADVENTURES],
+    placementOverrides: {
+      "sydney-nye": "2026-12-30",
+      "melbourne-party": "2027-02-04",
+    },
+    eventOverrides: {
+      "gbr-poseidon": false,
+      "tas-tasman": false,
+      "tas-wineglass": 51,
+      // Stated rather than left to the calendar. The block no longer covers
+      // 19 February so the line would drop anyway; saying it here records the
+      // decision instead of leaving it as an accident of the dates.
+      "mel-laneway": false,
+    },
+    lodgingTiers: {
+      // Blocks and Buffers are separate decisions and this Scenario makes both
+      // the same way: a tent everywhere the research offers one.
+      "margaret-river": "camp",
+      "tasmania-arc": "camp",
+      tasmania: "camp",
+      "gbr-port-douglas": "camp",
+      "fnq-wildlife": "camp",
+      "port-douglas": "camp",
+      "byron-nimbin": "camp",
+      byron: "camp",
+      // No tent on the harbour — recalibrated §3.4. Sydney's cheap rung is a
+      // private twin with shared facilities, across the trip's dearest
+      // fortnight.
+      "sydney-nye": "hostel",
+      sydney: "hostel",
+    },
+  },
+};
+
+/**
+ * What a browser with no saved Plan starts with, and what the canonical Plan
+ * document is seeded with: the reference trip, and the two savings paths #65
+ * priced, so the couple can flip between them and feel the difference rather
+ * than read about it.
+ *
+ * "Fireworks NYE" is the current one. The other two are alternatives sitting
+ * beside it, which is what docs/CONTEXT.md means by a Scenario — *"exactly one
+ * is marked as the current Plan"*.
+ */
 export const INITIAL_STATE: ScenarioState = {
-  scenarios: [DEFAULT_SCENARIO],
+  scenarios: [DEFAULT_SCENARIO, COMFORTABLE_SCENARIO, AGGRESSIVE_SCENARIO],
   currentId: DEFAULT_SCENARIO.id,
 };
 
@@ -110,6 +268,11 @@ export function parseInput(raw: unknown): PlanInput {
     typeof item === "number" && Number.isFinite(item);
   const isBoolean = (item: unknown): item is boolean =>
     typeof item === "boolean";
+  // An Event knob is a switch or a replacement figure, and nothing else — a
+  // negative swap would be a Scenario that earns money, so it is repaired to
+  // absent rather than trusted.
+  const isEventKnob = (item: unknown): item is boolean | number =>
+    isBoolean(item) || (isNumber(item) && item >= 0);
 
   return {
     startDate:
@@ -122,8 +285,9 @@ export function parseInput(raw: unknown): PlanInput {
       raw.legModeOverrides,
       isString,
     ) as PlanInput["legModeOverrides"],
-    lodgingTiers: record(raw.lodgingTiers, isString) as PlanInput["lodgingTiers"],
+    lodgingTiers: record(raw.lodgingTiers, isLodgingTier),
     carOverrides: record(raw.carOverrides, isBoolean),
+    eventOverrides: record(raw.eventOverrides, isEventKnob),
     fxStress: raw.fxStress === true,
     contingency: raw.contingency !== false,
     fareOverrides: record(raw.fareOverrides, isNumber),

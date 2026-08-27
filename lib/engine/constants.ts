@@ -67,8 +67,39 @@ export type MarketId =
   | "regional"
   | "transit";
 
-/** Three lodging tiers. `airbnb` is the default the whole model assumes. */
-export type LodgingTier = "hostel" | "airbnb" | "hotel";
+/**
+ * Four lodging tiers. `airbnb` is the default the whole model assumes.
+ *
+ * `camp` is a powered caravan-park site for two, added by the #64
+ * recalibration. It is the tier docs/CONTEXT.md's Daily-cap directive already
+ * named — *"a tent where it makes sense: we'll camp if we have to"* — and the
+ * one the model had been missing. It is offered only where the research offers
+ * it (`cost-floors-recalibrated.md` §3.4): the road-trip-shaped markets, not
+ * Sydney and not Melbourne, whose metropolitan holiday parks price at A$55–70
+ * and sit an hour from everything those two blocks exist for.
+ */
+export type LodgingTier = "camp" | "hostel" | "airbnb" | "hotel";
+
+/**
+ * Cheapest first — the order a tier picker offers them in, and the order the
+ * ladder reads on any surface that shows one.
+ *
+ * `camp` leads because wherever it is offered at all it undercuts the hostel
+ * twin, and no market offers both as its cheap rung by accident: a tent is the
+ * cheap rung on a road trip and a private twin with a roof is the cheap rung
+ * in a city. The markets decide which they actually carry; `floors.test.ts`
+ * asserts that each market's own ladder climbs in this order.
+ */
+export const LODGING_TIERS: readonly LodgingTier[] = [
+  "camp",
+  "hostel",
+  "airbnb",
+  "hotel",
+];
+
+export const isLodgingTier = (value: unknown): value is LodgingTier =>
+  typeof value === "string" &&
+  (LODGING_TIERS as readonly string[]).includes(value);
 
 /** A plan-on figure with the honest spread the research publishes around it. */
 export interface Rate {
@@ -83,13 +114,41 @@ const rate = (plan: number, low: number, high: number): Rate => ({
   band: [low, high],
 });
 
+/**
+ * What the A$80 food floor takes for granted, said out loud on every Day that
+ * charges it. `cost-floors-recalibrated.md` §4 gives a builder two choices —
+ * couple the food rate to the lodging tier, or state the assumption — and this
+ * is the second. The coupling would be quietly wrong the other way round on
+ * any Scenario that trades a kitchen for a cheaper bed on purpose.
+ */
+const KITCHEN_ASSUMED =
+  "Assumes a kitchen or a camp stove — the cheap-Airbnb or powered-site tier. Groceries A$29, coffees A$12, a meal out every second day, a pub meal once a week. A hostel or hotel week with no kitchen prices nearer A$110, which is where the band's top starts.";
+
 export interface Market {
   id: MarketId;
   label: string;
-  /** AUD per night, per couple, before peak multipliers. */
-  lodging: Record<LodgingTier, Rate>;
-  /** AUD per couple per day: groceries-first, one cheap meal out. §2.1, §3.3. */
+  /**
+   * AUD per night, per couple, before peak multipliers.
+   *
+   * Partial on purpose: **a tier absent here is not offered in this market**,
+   * and that is the one place the offer is stated. There is no camping rung in
+   * Sydney, so there is no Sydney camping rate to quote, and a Scenario asking
+   * for one falls back to `airbnb` rather than being priced against a number
+   * nobody researched. Read it through `lodgingRate` / `lodgingTiersFor`.
+   */
+  lodging: Readonly<Partial<Record<LodgingTier, Rate>>>;
+  /**
+   * AUD per couple per day: groceries-first, one cheap meal out. §2.1, §3.3.
+   *
+   * The #64 floor (A$80 in a paid market) **assumes a kitchen** — the `airbnb`
+   * or `camp` tier. `foodNote` carries that assumption to the drill-in, which
+   * is the resolution `cost-floors-recalibrated.md` §4 offers in place of
+   * coupling the two rates: silently charging A$80 for a hotel week would be
+   * the same sin as charging A$110 for a caravan park.
+   */
   food: Rate;
+  /** One line on what the food figure assumes. Null where nothing is assumed. */
+  foodNote?: string;
   /** AUD per couple per day: transit fares, or fuel in a borrowed car. §2.2. */
   local: Rate;
   /** AUD per couple per day, blended. Marquee spend is an Event line. §3.4. */
@@ -111,6 +170,31 @@ export interface Market {
  * user challenge: A$45/day mainland, A$85/day Tasmania in January, bare base
  * rate, no excess reduction. The band's top is the earlier all-in figure, which
  * is what it costs if the credit-card excess cover turns out not to stand up.
+ *
+ * ## Recalibrated 27 August 2026 — `docs/research/cost-floors-recalibrated.md`
+ *
+ * The `airbnb` tier means **a private room or studio for two with a kitchen**:
+ * a cheap Airbnb, a motel, a caravan-park cabin. Not a dorm, not a share
+ * house, not a "budget hotel" in the industry sense. The old figures were
+ * mid-tier numbers wearing a budget label, and the recalibration walked every
+ * market back to the observed listing floor plus a small peak buffer:
+ *
+ * | market | was | now | what the listings show |
+ * |---|---|---|---|
+ * | Sydney | A$180 | A$140 | Parramatta whole guesthouse A$82 |
+ * | Melbourne | A$150 | A$120 | the capsule's own A$180 rule is a *ceiling* |
+ * | Tasmania | A$150 | A$120 | Hobart's budget tier averages A$74 |
+ * | Cairns / Port Douglas | A$120 | A$100 | Port Douglas Motel from A$84 |
+ * | Regional | A$150 | A$120 | Surfpoint A$94, MR Motel A$129 |
+ *
+ * Food moved with them: A$110/day was two meals out a day for ten weeks, which
+ * is a ceiling. The floor with a kitchen is groceries at A$29 + coffees at A$12
+ * + a meal out every second day + a weekly pub meal = A$73; plan on A$80. The
+ * band's top is unchanged at A$220, because a week of restaurants is exactly
+ * what a band is for.
+ *
+ * Confidence on the whole card is **medium**, and the October re-snapshot can
+ * move it. Nothing here is a booked price.
  */
 export const MARKETS: Readonly<Record<MarketId, Market>> = {
   "home-base-city": {
@@ -142,12 +226,16 @@ export const MARKETS: Readonly<Record<MarketId, Market>> = {
   sydney: {
     id: "sydney",
     label: "Sydney",
+    // No camping rung: recalibrated §3.4. The metropolitan holiday parks are an
+    // hour from a block spent on foot at the harbour, and this is the trip's
+    // one date-locked anchor. The hostel twin is Sydney's cheap rung.
     lodging: {
-      hostel: rate(120, 100, 160),
-      airbnb: rate(180, 180, 230),
+      hostel: rate(110, 110, 150),
+      airbnb: rate(140, 140, 200),
       hotel: rate(350, 300, 400),
     },
-    food: rate(110, 110, 220),
+    food: rate(80, 80, 220),
+    foodNote: KITCHEN_ASSUMED,
     local: rate(20, 19, 40),
     activities: rate(40, 40, 120),
     car: rate(45, 45, 110),
@@ -155,12 +243,16 @@ export const MARKETS: Readonly<Record<MarketId, Market>> = {
   melbourne: {
     id: "melbourne",
     label: "Melbourne",
+    // No camping rung either, and for the same reason: recalibrated §3.4 prices
+    // the metro parks at A$55–70 and then declines to offer them, because they
+    // are an hour from the Smith Street spine the whole block is about.
     lodging: {
-      hostel: rate(100, 90, 140),
-      airbnb: rate(150, 150, 200),
+      hostel: rate(90, 90, 130),
+      airbnb: rate(120, 120, 170),
       hotel: rate(280, 230, 320),
     },
-    food: rate(110, 110, 220),
+    food: rate(80, 80, 220),
+    foodNote: KITCHEN_ASSUMED,
     local: rate(20, 19, 40),
     activities: rate(40, 40, 120),
     car: rate(45, 45, 110),
@@ -168,12 +260,20 @@ export const MARKETS: Readonly<Record<MarketId, Market>> = {
   hobart: {
     id: "hobart",
     label: "Tasmania",
+    // Recalibrated §2: Hobart's budget tier averages A$74 and its *high-season*
+    // budget figure is ~A$139 — A$150 was the high season quoted as the floor.
     lodging: {
-      hostel: rate(100, 90, 140),
-      airbnb: rate(150, 150, 200),
+      hostel: rate(90, 90, 130),
+      // §3.1: the Tasmanian caravan-park fleet is small and prices like it.
+      // §3.3: Freycinet's national-park sites are a **ballot**, and the ballot
+      // window (18 Dec – 10 Feb) closed on 31 July — so this rung means a
+      // caravan park, and it needs gear flown down.
+      camp: rate(45, 45, 70),
+      airbnb: rate(120, 120, 180),
       hotel: rate(250, 220, 300),
     },
-    food: rate(110, 110, 220),
+    food: rate(80, 80, 220),
+    foodNote: KITCHEN_ASSUMED,
     local: rate(20, 19, 40),
     activities: rate(40, 40, 120),
     // §3.2, corrected floor: independents A$38–43 off-peak, ~×2 for January.
@@ -182,12 +282,18 @@ export const MARKETS: Readonly<Record<MarketId, Market>> = {
   cairns: {
     id: "cairns",
     label: "Far North Queensland",
+    // Recalibrated §2: Port Douglas Motel from A$84, and the ×0.8 January
+    // multiplier lands the plan-on figure at an effective A$80.
     lodging: {
-      hostel: rate(90, 80, 120),
-      airbnb: rate(120, 120, 170),
+      hostel: rate(80, 80, 110),
+      // §3.3: wet-season camping is a genuinely different proposition —
+      // 320–345 mm across 15–19 rain days in January, plus stingers and crocs.
+      camp: rate(45, 45, 65),
+      airbnb: rate(100, 100, 150),
       hotel: rate(200, 180, 240),
     },
-    food: rate(110, 110, 220),
+    food: rate(80, 80, 220),
+    foodNote: KITCHEN_ASSUMED,
     local: rate(20, 19, 40),
     activities: rate(40, 40, 120),
     car: rate(45, 45, 120),
@@ -196,11 +302,16 @@ export const MARKETS: Readonly<Record<MarketId, Market>> = {
     id: "regional",
     label: "Regional",
     lodging: {
-      hostel: rate(100, 90, 140),
-      airbnb: rate(150, 130, 200),
+      hostel: rate(90, 90, 130),
+      // §3.1: Gracetown caravan sites from A$35, NSW powered sites average
+      // A$44 — the buffer to A$50 is January, not the rate. Byron itself is
+      // the national outlier at ~A$80, which the band's top carries.
+      camp: rate(50, 50, 90),
+      airbnb: rate(120, 120, 170),
       hotel: rate(250, 220, 300),
     },
-    food: rate(110, 110, 220),
+    food: rate(80, 80, 220),
+    foodNote: KITCHEN_ASSUMED,
     local: rate(20, 19, 40),
     activities: rate(40, 40, 120),
     car: rate(45, 45, 110),
@@ -220,6 +331,75 @@ export const MARKETS: Readonly<Record<MarketId, Market>> = {
     car: rate(0, 0, 0),
   },
 };
+
+/* ------------------------------------------------------------------ */
+/* Reading the rate card                                               */
+/* ------------------------------------------------------------------ */
+
+/** The default tier, and the one the whole model assumes. */
+export const DEFAULT_LODGING_TIER: LodgingTier = "airbnb";
+
+/**
+ * Which lodging tiers a market actually offers, cheapest first.
+ *
+ * This is the list a per-block tier control shows, and it is derived from the
+ * rate card rather than kept beside it — a market offers exactly the tiers it
+ * has a researched rate for. That is why `camp` shows up on Margaret River,
+ * Tasmania, Port Douglas and Byron and nowhere else (§3.4), with no second
+ * table to keep in step.
+ */
+export function lodgingTiersFor(market: MarketId): LodgingTier[] {
+  const card = MARKETS[market].lodging;
+  return LODGING_TIERS.filter((tier) => card[tier] !== undefined);
+}
+
+/**
+ * What a night costs at a tier, and which tier that turned out to be.
+ *
+ * A Scenario can name a tier this market does not offer — an older saved Plan,
+ * a Fork written against a different rate card, a hand-edited document. The
+ * answer is the default tier and a straight face about it, never a crash and
+ * never a guessed number: **repair, never reject**, the same rule the Scenario
+ * parser follows. The returned `tier` is what was actually charged, so the
+ * Day, the drill-in and the ledger note all agree on what the couple slept in.
+ */
+export function lodgingRate(
+  market: MarketId,
+  tier: LodgingTier,
+): { tier: LodgingTier; rate: Rate; substituted: boolean } {
+  const card = MARKETS[market].lodging;
+  const asked = card[tier];
+  if (asked) return { tier, rate: asked, substituted: false };
+  return {
+    tier: DEFAULT_LODGING_TIER,
+    rate: card[DEFAULT_LODGING_TIER] ?? rate(0, 0, 0),
+    substituted: true,
+  };
+}
+
+/**
+ * What one day moved from a paid city to a Home base saves, AUD per couple.
+ *
+ * cost-baselines §4 calls this "the site's headline finding" and puts it at
+ * A$500. That was a **mid-tier** figure, and the #64 recalibration is explicit
+ * that it no longer holds: a Sydney Buffer day at the floor is A$240 of living
+ * cost and a Perth day is A$55, so the lever is A$185 — still the largest
+ * single per-day lever in the model, and worth restating honestly rather than
+ * repeating a number that flatters the site.
+ *
+ * Derived rather than written down, so it can never drift from the rate card
+ * it is a statement about. One definition, three readers: the budget Warning,
+ * the savings menu, and the burn-down's Buffer note.
+ */
+export function homeBaseDayDeltaAud(): number {
+  const paid = MARKETS.sydney;
+  const home = MARKETS["home-base-city"];
+  const living = (market: Market) =>
+    lodgingRate(market.id, DEFAULT_LODGING_TIER).rate.plan +
+    market.food.plan +
+    market.local.plan;
+  return living(paid) - living(home);
+}
 
 /* ------------------------------------------------------------------ */
 /* Peak multipliers                                                    */

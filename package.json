@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --import ./lib/engine/__tests__/alias-hook.mjs --test --test-concurrency=1 'lib/engine/__tests__/*.test.ts' 'lib/store/__tests__/*.test.ts' 'lib/flights/__tests__/*.test.ts' 'lib/__tests__/*.test.ts'",
-    "bootstrap:plan": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/bootstrap-plan.mjs"
+    "bootstrap:plan": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/bootstrap-plan.mjs",
+    "seed:scenarios": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/seed-scenarios.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
