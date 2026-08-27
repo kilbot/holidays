@@ -24,6 +24,20 @@ export interface Scenario {
   name: string;
   /** ISO instant. Display only — nothing sorts or expires on it. */
   createdAt: string;
+  /**
+   * ISO instant of the last change to this Scenario's name or input.
+   *
+   * Absent on a Scenario nobody has touched since it was made, which is why it
+   * is optional rather than seeded equal to `createdAt`: "made on the 27th" and
+   * "made on the 27th and edited on the 27th" are different sentences, and only
+   * one of them is true of a seed. `lastEditedAt()` folds the two for display.
+   *
+   * The Plan document has its own `updatedAt` and it answers a different
+   * question — when the *server* last accepted a write, for the whole Plan. It
+   * cannot say which of three Scenarios has been worked on, which is exactly
+   * what `/scenarios` was asked for.
+   */
+  updatedAt?: string;
   input: PlanInput;
   /**
    * The Fork this Scenario was adopted from, if it was.
@@ -305,10 +319,19 @@ export function parseScenario(raw: unknown): Scenario | null {
         ? raw.createdAt
         : DEFAULT_SCENARIO.createdAt,
     input: parseInput(raw.input),
+    ...(typeof raw.updatedAt === "string" ? { updatedAt: raw.updatedAt } : {}),
     ...(typeof raw.adoptedFrom === "string"
       ? { adoptedFrom: raw.adoptedFrom }
       : {}),
   };
+}
+
+/**
+ * When this Scenario was last worked on — edited if it ever has been, made if
+ * not. The one date `/scenarios` shows, so both cases read the same way.
+ */
+export function lastEditedAt(scenario: Scenario): string {
+  return scenario.updatedAt ?? scenario.createdAt;
 }
 
 /**

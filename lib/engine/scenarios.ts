@@ -214,11 +214,25 @@ export function setToggled(capsuleId: string, on: boolean): void {
     ...now,
     scenarios: now.scenarios.map((scenario) =>
       scenario.id === current.id
-        ? { ...scenario, input: { ...scenario.input, toggled } }
+        ? touch({ ...scenario, input: { ...scenario.input, toggled } })
         : scenario,
     ),
   });
 }
+
+/**
+ * Stamp a Scenario as worked on, now.
+ *
+ * Every write that changes what a Scenario *is* goes through here — a knob, a
+ * drag, a rename, an Adventure toggled from three pages away. Selecting a
+ * different Scenario deliberately does not: reading the alternatives is not
+ * editing them, and a list where every row's date jumped as you clicked through
+ * it would tell the couple nothing about which one they have actually worked on.
+ */
+const touch = (scenario: Scenario): Scenario => ({
+  ...scenario,
+  updatedAt: new Date().toISOString(),
+});
 
 /**
  * Whether a Capsule is on the current Scenario. The read half of the pair, and
@@ -236,8 +250,17 @@ export interface ScenarioApi extends ScenarioState {
   current: Scenario;
   /** Replace the current Scenario's input. Every knob change lands here. */
   update: (input: PlanInput) => void;
-  /** Save a copy under a new name and switch to it. */
+  /** Save a copy of the **current** Scenario under a new name and switch to it. */
   fork: (name: string, input?: PlanInput) => string;
+  /**
+   * Copy any Scenario, named or not, **without** switching to it.
+   *
+   * `fork` is the globe's verb — take what I am looking at and start a variant
+   * of it — and it switches because that is what "start a variant" means. This
+   * is the list's verb: duplicating the third row from a page showing all of
+   * them should not silently change which trip the rest of the site is costing.
+   */
+  duplicate: (id: string, name?: string) => string | null;
   select: (id: string) => void;
   rename: (id: string, name: string) => void;
   remove: (id: string) => void;
@@ -258,7 +281,7 @@ export function useScenarios(): ScenarioApi {
     store().write({
       ...now,
       scenarios: now.scenarios.map((scenario) =>
-        scenario.id === now.currentId ? { ...scenario, input } : scenario,
+        scenario.id === now.currentId ? touch({ ...scenario, input }) : scenario,
       ),
     });
   }, []);
@@ -284,6 +307,31 @@ export function useScenarios(): ScenarioApi {
     return id;
   }, []);
 
+  const duplicate = useCallback((id: string, name?: string) => {
+    const now = store().read();
+    const source = now.scenarios.find((scenario) => scenario.id === id);
+    if (!source) return null;
+    const copyName = name ?? `${source.name} (copy)`;
+    const copyId = nextScenarioId(copyName, now.scenarios);
+    // Appended, never inserted beside its original. A Scenario's colour is its
+    // position in this list (`budget-chart.ts`, `scenarioInk`), so splicing one
+    // into the middle would repaint every Scenario after it — and "Aggressive
+    // is the sea-blue one" has to stay true across somebody else's duplicate.
+    store().write({
+      scenarios: [
+        ...now.scenarios,
+        {
+          id: copyId,
+          name: copyName,
+          createdAt: new Date().toISOString(),
+          input: source.input,
+        },
+      ],
+      currentId: now.currentId,
+    });
+    return copyId;
+  }, []);
+
   const select = useCallback((id: string) => {
     const now = store().read();
     if (!now.scenarios.some((scenario) => scenario.id === id)) return;
@@ -295,7 +343,7 @@ export function useScenarios(): ScenarioApi {
     store().write({
       ...now,
       scenarios: now.scenarios.map((scenario) =>
-        scenario.id === id ? { ...scenario, name } : scenario,
+        scenario.id === id ? touch({ ...scenario, name }) : scenario,
       ),
     });
   }, []);
@@ -312,7 +360,16 @@ export function useScenarios(): ScenarioApi {
     });
   }, []);
 
-  return { ...state, current, update, fork, select, remove, rename };
+  return {
+    ...state,
+    current,
+    update,
+    fork,
+    duplicate,
+    select,
+    remove,
+    rename,
+  };
 }
 
 /* ------------------------------------------------------------------ */

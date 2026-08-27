@@ -14,6 +14,7 @@ import { EMPTY_INPUT } from "@/lib/engine/plan";
 import {
   DEFAULT_SCENARIO,
   INITIAL_STATE,
+  lastEditedAt,
   type ScenarioState,
 } from "@/lib/engine/scenario-doc";
 import { fakeKv } from "@/lib/store/__tests__/fake-kv";
@@ -101,6 +102,32 @@ test("a corrupt plan document falls back to the reference trip", () => {
     toPlanDoc(null).scenarios.length,
     INITIAL_STATE.scenarios.length,
   );
+});
+
+test("a Scenario's own last-edited stamp survives the wire", () => {
+  const edited = "2026-11-02T09:15:00.000Z";
+  const plan = toPlanDoc({
+    scenarios: [
+      { id: "worked-on", name: "Worked on", createdAt: "2026-08-27T00:00:00.000Z", updatedAt: edited, input: {} },
+      { id: "untouched", name: "Untouched", createdAt: "2026-08-27T00:00:00.000Z", input: {} },
+    ],
+    currentId: "worked-on",
+  });
+
+  assert.equal(plan.scenarios[0].updatedAt, edited);
+  assert.equal(lastEditedAt(plan.scenarios[0]), edited);
+  // Never edited, so the honest answer is when it was made — not a fabricated
+  // edit at the same instant.
+  assert.equal(plan.scenarios[1].updatedAt, undefined);
+  assert.equal(lastEditedAt(plan.scenarios[1]), "2026-08-27T00:00:00.000Z");
+});
+
+test("a nonsense last-edited stamp is dropped, not trusted", () => {
+  const plan = toPlanDoc({
+    scenarios: [{ id: "x", name: "X", updatedAt: 1_760_000_000_000, input: {} }],
+    currentId: "x",
+  });
+  assert.equal(plan.scenarios[0].updatedAt, undefined);
 });
 
 test("writePlan stamps updatedAt", async () => {
