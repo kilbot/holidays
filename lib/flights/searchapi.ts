@@ -2,6 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 
+import { MIDDLE_EAST_TRANSIT_HUBS } from "@/lib/flights/comfort";
 import { appendFareHistory } from "@/lib/flights/history";
 import { reserveFareCall } from "@/lib/flights/quota";
 import { getKv } from "@/lib/store/kv";
@@ -13,6 +14,11 @@ export interface FareResult {
   carrier: string;
   durationMin: number;
   stops: number;
+}
+
+/** A parsed candidate, before the Middle East rule has thrown any of them out. */
+interface FareCandidate extends FareResult {
+  viaMiddleEast: boolean;
 }
 
 interface FareBounds {
@@ -28,7 +34,25 @@ interface SearchApiFlight {
   layovers?: unknown;
 }
 
-function parseFlight(value: unknown): FareResult | null {
+/** The airport codes a quoted itinerary touches, from whichever field has them. */
+function airportsOf(flight: SearchApiFlight): string[] {
+  const codes: string[] = [];
+  for (const layover of Array.isArray(flight.layovers) ? flight.layovers : []) {
+    const id = layover && typeof layover === "object" ? (layover as { id?: unknown }).id : null;
+    if (typeof id === "string") codes.push(id);
+  }
+  for (const leg of Array.isArray(flight.flights) ? flight.flights : []) {
+    if (!leg || typeof leg !== "object") continue;
+    for (const key of ["departure_airport", "arrival_airport"] as const) {
+      const airport = (leg as Record<string, unknown>)[key];
+      const id = airport && typeof airport === "object" ? (airport as { id?: unknown }).id : null;
+      if (typeof id === "string") codes.push(id);
+    }
+  }
+  return codes;
+}
+
+function parseFlight(value: unknown): FareCandidate | null {
   if (!value || typeof value !== "object") return null;
 
   const flight = value as SearchApiFlight;
@@ -45,6 +69,7 @@ function parseFlight(value: unknown): FareResult | null {
     carrier: [...new Set(carriers)].join(" / ") || "Unknown carrier",
     durationMin: flight.total_duration,
     stops: Array.isArray(flight.layovers) ? flight.layovers.length : Math.max(0, flight.flights.length - 1),
+    viaMiddleEast: airportsOf(flight).some((code) => MIDDLE_EAST_TRANSIT_HUBS.includes(code)),
   };
 }
 
@@ -72,12 +97,26 @@ export async function fetchFare(
       const candidates = [data.best_flights, data.other_flights]
         .flatMap((group) => (Array.isArray(group) ? group : []))
         .map(parseFlight)
-        .filter((flight): flight is FareResult => flight !== null)
+        .filter((flight): flight is FareCandidate => flight !== null)
+        // The cheapest quote on a Europe–Perth date is routinely a Gulf one,
+        // and this number is the *default* the page and the Leg popups show —
+        // the headline price, the carrier name, the stored history. A routing
+        // the trip has excluded (docs/CONTEXT.md) must not be the thing that
+        // sets it, so it is dropped before the sort rather than shown and
+        // apologised for. If nothing else came back the route keeps its
+        // research band, which is the honest answer anyway.
+        .filter((flight) => !flight.viaMiddleEast)
         .sort((a, b) => a.priceEur - b.priceEur);
-      const cheapest = candidates[0];
-      if (!cheapest || cheapest.priceEur < minEur || cheapest.priceEur > maxEur) {
+      const best = candidates[0];
+      if (!best || best.priceEur < minEur || best.priceEur > maxEur) {
         throw new Error("Fare unavailable");
       }
+      const cheapest: FareResult = {
+        priceEur: best.priceEur,
+        carrier: best.carrier,
+        durationMin: best.durationMin,
+        stops: best.stops,
+      };
       await appendFareHistory(kv, from, to, date, {
         ts: new Date().toISOString(), priceEur: cheapest.priceEur,
         carrier: cheapest.carrier, source: "searchapi",

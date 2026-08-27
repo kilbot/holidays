@@ -21,6 +21,9 @@
  * - **Whether a night is needed.** Barcelona's is structural (a midday
  *   departure and no flight from Valencia at all), a wrong-airport transfer
  *   earns one, and a protected same-airport feed does not.
+ * - **Whether the trip's own rule holds it out of the ranking.** Every row
+ *   carries the Gulf hubs it transits, and `excludedByDefault` below reads
+ *   them; the page ranks the rest and collapses these behind a count.
  *
  * **The comfort score covers the long-haul, not the positioning hop.** The
  * research's own ranking folds a Valencia→London hop into the London rows and
@@ -48,7 +51,12 @@
 
 import hubsFile from "@/docs/research/flight-hubs.json";
 import { AIRPORT_COORDINATES, type Coordinates } from "@/lib/airports";
-import { scoreItinerary, type ComfortScore, type Sector } from "@/lib/flights/comfort";
+import {
+  middleEastTransitsOf,
+  scoreItinerary,
+  type ComfortScore,
+  type Sector,
+} from "@/lib/flights/comfort";
 import { OUTBOUND_HUBS, RETURN_ARRIVALS, RETURN_ORIGINS } from "@/lib/flights/grid";
 
 /* ------------------------------------------------------------------ */
@@ -565,6 +573,13 @@ export interface SearchOption {
   /** IATA, or null for a carrier the ratings file does not cover. */
   iata: string | null;
   via: readonly string[];
+  /**
+   * The Gulf hubs this itinerary transits, in order flown — empty for almost
+   * every row. A non-empty list is what `excludedByDefault` reads, and it is
+   * also what the peek prints, so the row can say *which* airport the rule
+   * caught it on rather than just that it was caught.
+   */
+  middleEastTransit: readonly string[];
   stops: number;
   /** Per person, return, economy — the research's own band. Never a quote. */
   bandEurPP: Band | null;
@@ -580,6 +595,33 @@ export interface SearchOption {
   confidence: string;
   /** Whether `/api/fares` covers this origin/destination pair at all. */
   searchable: boolean;
+}
+
+/**
+ * Whether the trip's hard constraint keeps this itinerary out of the ranking.
+ *
+ * "No Middle East transits" (docs/CONTEXT.md, user, 2026-08-27) is the one
+ * rule on this page that is not a preference to be scored — a Gulf routing is
+ * excluded, not merely penalised, and the −1.0 it also carries is what the
+ * peek is for. The exclusion is *ours*, not the world's, so the site applies
+ * its own philosophy to it: nothing is deleted, the count is stated, and the
+ * rows stay one click away with their scores and prices intact.
+ *
+ * Istanbul is not a Middle East transit for this rule (kilbot/holidays#60);
+ * Turkish's SIN + IST return is ranked like any other row.
+ */
+export function excludedByDefault(option: SearchOption): boolean {
+  return option.middleEastTransit.length > 0;
+}
+
+/** Split a search into what it ranks and what the rule holds back. */
+export function partitionByDefaultRule<T extends { option: SearchOption }>(
+  rows: readonly T[],
+): { ranked: T[]; excluded: T[] } {
+  const ranked: T[] = [];
+  const excluded: T[] = [];
+  for (const row of rows) (excludedByDefault(row.option) ? excluded : ranked).push(row);
+  return { ranked, excluded };
 }
 
 function sectorsFor(
@@ -691,6 +733,7 @@ export function outboundOptions(): SearchOption[] {
         carrier: carrier.carrier,
         iata,
         via,
+        middleEastTransit: middleEastTransitsOf(via),
         stops: carrier.stops ?? via.length,
         bandEurPP: band,
         comfort: scoreItinerary(sectors),
@@ -767,6 +810,7 @@ export function returnOptions(): SearchOption[] {
         carrier: carrier.carrier,
         iata,
         via,
+        middleEastTransit: middleEastTransitsOf(via),
         stops: carrier.stops ?? via.length,
         bandEurPP: band,
         comfort: scoreItinerary(sectors),

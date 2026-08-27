@@ -18,7 +18,12 @@
  * (docs/CONTEXT.md). Fare bands arrive per person and are doubled once, here.
  */
 
-import type { Band, PositioningOption, SearchOption } from "@/lib/flights/search-plan";
+import {
+  excludedByDefault,
+  type Band,
+  type PositioningOption,
+  type SearchOption,
+} from "@/lib/flights/search-plan";
 import type { FareTrend } from "@/lib/flights/history";
 
 /** How many travellers. Matches the API's `ADULTS` and the Ledger's couple. */
@@ -203,6 +208,13 @@ const midpoint = (band: Band): number => (band[0] + band[1]) / 2;
  * against a Barcelona 777 measures the carrier, not the origin market. Where
  * the carrier does not fly to Barcelona at all (Thai, Malaysia, Scoot) the
  * cheapest Barcelona fare is the honest yardstick instead.
+ *
+ * That fallback is why the reference has to know about the Middle East rule.
+ * Barcelona's two cheapest carriers are Qatar and Emirates, both excluded
+ * (docs/CONTEXT.md), and a yardstick made of a fare the trip will not book
+ * would tell every other hub it was expensive by comparison with a routing
+ * that is not on offer. The bar is the cheapest Barcelona fare the couple
+ * would actually take.
  */
 export interface BarcelonaReference {
   byCarrier: Readonly<Record<string, number>>;
@@ -248,6 +260,7 @@ export function barcelonaReference(
 
   for (const entry of priced) {
     if (entry.option.origin !== "BCN") continue;
+    if (excludedByDefault(entry.option)) continue;
     const fare = midpoint(entry.price.fareEurPP);
     if (fare <= 0) continue;
     all.push(fare);
