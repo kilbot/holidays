@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The site's four sections, as a rail and as a tab bar.
+ * The site's five sections, as a rail and as a tab bar.
  *
  * Two renderings of one list, because the two form factors want opposite
  * things. On a desktop the globe is the point, so navigation is a 56px column
@@ -11,7 +11,7 @@
  * hidden label is just an unlabelled button, so the bottom bar shows the names
  * outright.
  *
- * The icons are inline SVG rather than an icon set: four glyphs is not worth a
+ * The icons are inline SVG rather than an icon set: five glyphs is not worth a
  * dependency, and drawing them here means the Capsule and Ledger marks can say
  * what those words mean in *this* site rather than borrowing whatever a generic
  * set calls closest.
@@ -65,6 +65,22 @@ function CapsulesIcon(props: IconProps) {
   );
 }
 
+/**
+ * Flights — a plane in plan view, banking east.
+ *
+ * Drawn rather than borrowed for the same reason as the others: an icon set's
+ * plane is a departure board's plane, and this section is not a departure
+ * board. It is the one page where the site argues about *which* aeroplane, so
+ * the mark is a wing with a body, at the same 1.75 stroke as the rest.
+ */
+function FlightsIcon(props: IconProps) {
+  return (
+    <Glyph {...props}>
+      <path d="M10.5 3.2a1.5 1.5 0 0 1 3 0V9l7 4.1v2.3l-7-2.1v3.9l2.2 1.7v1.6L12 19.8l-3.7 1.7v-1.6l2.2-1.7v-3.9l-7 2.1v-2.3l7-4.1Z" />
+    </Glyph>
+  );
+}
+
 /** Ledger — a page of priced day lines, long, long, short. */
 function LedgerIcon(props: IconProps) {
   return (
@@ -87,7 +103,7 @@ function BudgetIcon(props: IconProps) {
 }
 
 type NavItem = {
-  href: "/" | "/adventures" | "/ledger" | "/budget";
+  href: "/" | "/adventures" | "/flights" | "/ledger" | "/budget";
   label: string;
   /** Said to a screen reader, and to anyone who hovers long enough. */
   hint: string;
@@ -101,6 +117,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Adventures",
     hint: "Browse and sift the catalog",
     Icon: CapsulesIcon,
+  },
+  {
+    href: "/flights",
+    label: "Flights",
+    hint: "Multi-origin search, comfort-first",
+    Icon: FlightsIcon,
   },
   { href: "/ledger", label: "Ledger", hint: "Day-by-day costs", Icon: LedgerIcon },
   { href: "/budget", label: "Budget", hint: "Spend against the ceiling", Icon: BudgetIcon },

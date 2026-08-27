@@ -1,8 +1,23 @@
 import { getFare } from "@/lib/flights/fares";
 import { ROUTE_GRID } from "@/lib/flights/grid";
 
-// The free tier includes 100 calls total, so a daily warm must leave headroom for interactive requests.
-const MAX_WARM_CALLS = 30;
+/**
+ * Ceiling on calls per warm run.
+ *
+ * The Flights page (#50) turned the grid from thirteen route/date pairs into
+ * about a hundred: thirteen European hubs to Perth and ten return pairs, each
+ * on three dates, because a multi-origin search that has to fetch every origin
+ * live is a slow page and an expensive one. Warmed nightly they are all cache
+ * hits.
+ *
+ * 120 is a ceiling, not a target — the grid currently asks for fewer, and the
+ * headroom absorbs a few more dates without another edit here. At one run a day
+ * that is at most ~3,650 calls a month against the paid tier's 10,000, leaving
+ * roughly two thirds of the allowance for interactive requests, previews and
+ * the odd cache miss. If the grid ever grows past this the run reports
+ * `skipped` rather than silently overspending.
+ */
+const MAX_WARM_CALLS = 120;
 
 export async function GET() {
   let warmed = 0;
