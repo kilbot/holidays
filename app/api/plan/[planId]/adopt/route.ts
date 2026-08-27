@@ -23,6 +23,7 @@ import { isPlausibleId } from "@/lib/store/ids";
 import { getKv } from "@/lib/store/kv";
 import {
   adoptFork,
+  markForkAdopted,
   readFork,
   readPlan,
   readPlanMeta,
@@ -74,6 +75,10 @@ export async function POST(
     // Adopting the same Fork twice is a no-op, so the second call skips the
     // write rather than bumping `updatedAt` on a document that did not change.
     if (adopted.alreadyAdopted) {
+      // Still worth stamping: a Fork adopted before #90 gave Forks a lifetime
+      // has no `adoptedAt`, so it would otherwise be handed a 90-day expiry by
+      // the next read of a document the Plan permanently points at.
+      await markForkAdopted(kv, forkId, fork);
       return jsonResponse({
         planId,
         plan,
@@ -89,6 +94,10 @@ export async function POST(
       plan.version,
     );
     if (written.ok) {
+      // The Fork is now part of the itinerary's history, so its 90-day expiry
+      // comes off. After the write, never before: a Fork marked adopted by a
+      // write that then failed would outlive its only reason to exist.
+      await markForkAdopted(kv, forkId, fork);
       return jsonResponse({
         planId,
         plan: written.plan,

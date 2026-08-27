@@ -38,6 +38,24 @@ export interface KvClient {
   /** Write the document, overwriting whatever was there. */
   setJson(key: string, value: unknown): Promise<void>;
   /**
+   * Write the document with a lifetime, in one operation.
+   *
+   * One operation rather than a write and an expire, because the gap between
+   * two is a document that exists forever if the second call fails — which for
+   * the thing this was added for, unadopted Forks, is the leak it was meant to
+   * stop.
+   */
+  setJsonWithTtl(key: string, value: unknown, ttlSeconds: number): Promise<void>;
+  /**
+   * Change how long a key has left. `null` removes the expiry entirely, so the
+   * document lives until something deletes it.
+   *
+   * Both halves are used by Forks: a visit pushes the expiry back out, and an
+   * adopt takes it off, because a Fork the couple has copied into their
+   * Scenario list is part of the itinerary's history and not a draft.
+   */
+  setTtl(key: string, ttlSeconds: number | null): Promise<void>;
+  /**
    * Write only if the key is free. Returns whether this call did the writing —
    * how the bootstrap refuses to overwrite a Plan that already exists.
    */
@@ -89,6 +107,13 @@ function upstashClient(redis: Redis): KvClient {
     },
     async setJson(key, value) {
       await redis.set(key, JSON.stringify(value));
+    },
+    async setJsonWithTtl(key, value, ttlSeconds) {
+      await redis.set(key, JSON.stringify(value), { ex: ttlSeconds });
+    },
+    async setTtl(key, ttlSeconds) {
+      if (ttlSeconds === null) await redis.persist(key);
+      else await redis.expire(key, ttlSeconds);
     },
     async setJsonIfAbsent(key, value) {
       const result = await redis.set(key, JSON.stringify(value), { nx: true });

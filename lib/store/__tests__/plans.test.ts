@@ -18,10 +18,14 @@ import {
   type ScenarioState,
 } from "@/lib/engine/scenario-doc";
 import { fakeKv } from "@/lib/store/__tests__/fake-kv";
+import { reserveDailyPerIp } from "@/lib/store/guards";
 import {
+  DAILY_FORK_CAP_PER_IP,
+  FORK_TTL_SECONDS,
   adoptFork,
   createFork,
   createPlan,
+  markForkAdopted,
   readFork,
   readPlan,
   readPlanMeta,
@@ -194,6 +198,124 @@ test("long names and notes are cut to length", async () => {
 
 test("a missing fork reads as absent", async () => {
   assert.equal(await readFork(fakeKv(), "nope"), null);
+});
+
+/* ------------------------------------------------------------------ */
+/* How long a Fork lives (#90)                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Nothing ever deleted a Fork, and anyone may write one, so `fork:<id>` was a
+ * key space that only grew. The lifetime is a measure of *neglect* rather than
+ * of age: 90 days from the last visit, and none at all once the couple has
+ * adopted it.
+ */
+test("a new fork is written with a lifetime, not left immortal", async () => {
+  const kv = fakeKv();
+  const { forkId } = await createFork(kv, {
+    name: "Doof NYE",
+    planInput: EMPTY_INPUT,
+    forkedFrom: "PLAN",
+  });
+  assert.equal(kv.ttls.get(`fork:${forkId}`), FORK_TTL_SECONDS);
+});
+
+test("reading a fork pushes its expiry back out", async () => {
+  const kv = fakeKv();
+  const { forkId } = await createFork(kv, {
+    name: "Doof NYE",
+    planInput: EMPTY_INPUT,
+    forkedFrom: "PLAN",
+  });
+
+  // Something else shortened it — three days left, as a stand-in for 87 days
+  // of nobody looking.
+  await kv.setTtl(`fork:${forkId}`, 3 * 24 * 60 * 60);
+  await readFork(kv, forkId);
+  assert.equal(
+    kv.ttls.get(`fork:${forkId}`),
+    FORK_TTL_SECONDS,
+    "a Fork somebody keeps opening is not abandoned",
+  );
+});
+
+test("an adopted fork has no expiry, and reading it does not give it one", async () => {
+  const kv = fakeKv();
+  const { forkId, fork } = await createFork(kv, {
+    name: "Doof NYE",
+    planInput: EMPTY_INPUT,
+    forkedFrom: "PLAN",
+  });
+
+  await markForkAdopted(kv, forkId, fork, new Date("2026-09-02T00:00:00.000Z"));
+  assert.equal(kv.ttls.has(`fork:${forkId}`), false);
+
+  const read = await readFork(kv, forkId);
+  assert.equal(read?.adoptedAt, "2026-09-02T00:00:00.000Z");
+  assert.equal(
+    kv.ttls.has(`fork:${forkId}`),
+    false,
+    "the Plan points at this permanently — a countdown would be a dead link",
+  );
+});
+
+test("marking an already-adopted fork does not restamp when it happened", async () => {
+  const kv = fakeKv();
+  const { forkId, fork } = await createFork(kv, {
+    name: "Doof NYE",
+    planInput: EMPTY_INPUT,
+    forkedFrom: "PLAN",
+  });
+
+  await markForkAdopted(kv, forkId, fork, new Date("2026-09-02T00:00:00.000Z"));
+  const first = await readFork(kv, forkId);
+  assert.ok(first);
+  await markForkAdopted(kv, forkId, first, new Date("2026-10-10T00:00:00.000Z"));
+
+  assert.equal((await readFork(kv, forkId))?.adoptedAt, "2026-09-02T00:00:00.000Z");
+});
+
+test("one address may create ten forks a day, and then not an eleventh", async () => {
+  const kv = fakeKv();
+  const request = new Request("https://example.test/api/plan/PLAN/fork", {
+    method: "POST",
+    headers: { "x-forwarded-for": "1.2.3.4" },
+  });
+
+  for (let i = 0; i < DAILY_FORK_CAP_PER_IP; i += 1) {
+    assert.equal(
+      await reserveDailyPerIp(kv, request, "fork", DAILY_FORK_CAP_PER_IP),
+      true,
+      `fork ${i + 1}`,
+    );
+  }
+  assert.equal(
+    await reserveDailyPerIp(kv, request, "fork", DAILY_FORK_CAP_PER_IP),
+    false,
+  );
+
+  // The per-minute write throttle stops accidents; it does not stop patience,
+  // because 20 a minute is 28,800 forks a day. This is the one that does.
+  const somebodyElse = new Request("https://example.test/api/plan/PLAN/fork", {
+    method: "POST",
+    headers: { "x-forwarded-for": "5.6.7.8" },
+  });
+  assert.equal(
+    await reserveDailyPerIp(kv, somebodyElse, "fork", DAILY_FORK_CAP_PER_IP),
+    true,
+  );
+});
+
+test("fork and fare allowances are separate budgets", async () => {
+  const kv = fakeKv();
+  const request = new Request("https://example.test/", {
+    headers: { "x-forwarded-for": "1.2.3.4" },
+  });
+
+  await reserveDailyPerIp(kv, request, "fork", 1);
+  assert.equal(await reserveDailyPerIp(kv, request, "fork", 1), false);
+  // Spending every fork must not cost this visitor their fare calls.
+  assert.equal(await reserveDailyPerIp(kv, request, "fare", 1), true);
 });
 
 /* ------------------------------------------------------------------ */
