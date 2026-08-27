@@ -107,6 +107,23 @@ function openTile(tile: CapsuleTileData) {
   else openCatalogIdea(tile.id);
 }
 
+/**
+ * The filter set, into the address bar.
+ *
+ * `replaceState` rather than `push`: sifting is not a sequence of places you
+ * want the Back button to walk through one chip at a time. Next syncs the
+ * native call into its own router, so this costs no server round trip and no
+ * re-render of the route — the grid just re-filters an array.
+ */
+function writeUrl(filters: CatalogFilters): void {
+  const query = encodeFilters(filters);
+  window.history.replaceState(
+    null,
+    "",
+    query ? `?${query}` : window.location.pathname,
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Furniture                                                           */
 /* ------------------------------------------------------------------ */
@@ -151,24 +168,21 @@ export function CapsulesBrowser() {
 
   const { marks, counts, toggle: mark } = useShortlist();
 
-  const patch = useCallback((part: Partial<CatalogFilters>) => {
-    setFilters((current) => {
-      const next = { ...current, ...part };
-      const query = encodeFilters(next);
-      // `replaceState` rather than `push`: sifting is not a sequence of places
-      // you want the Back button to walk through one chip at a time. Next syncs
-      // it into the router, so no server round trip and no re-render of the
-      // route — the grid just re-filters an array.
-      window.history.replaceState(
-        null,
-        "",
-        query ? `?${query}` : window.location.pathname,
-      );
-      return next;
-    });
+  // Both writers take the whole next filter set rather than a functional
+  // updater on purpose: `writeUrl` touches the router, and a functional updater
+  // runs during React's render pass, where updating another component is a
+  // warning and, eventually, a bug.
+  const apply = useCallback((next: CatalogFilters) => {
+    setFilters(next);
+    writeUrl(next);
   }, []);
 
-  const reset = useCallback(() => patch(NO_FILTERS), [patch]);
+  const patch = useCallback(
+    (part: Partial<CatalogFilters>) => apply({ ...filters, ...part }),
+    [apply, filters],
+  );
+
+  const reset = useCallback(() => apply(NO_FILTERS), [apply]);
 
   // Back and Forward still mean something: they walk between whole visited
   // URLs, and each of those carries a filter set to restore.
