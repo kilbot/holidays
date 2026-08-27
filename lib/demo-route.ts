@@ -198,15 +198,60 @@ export function routePointsGeoJSON(): GeoJSON.FeatureCollection<
 }
 
 /**
- * Opening camera. Centred on the Indian Ocean so Europe sits top-left and
- * Australia bottom-right — the whole route visible in one frame without
- * spinning.
+ * Bounding box of the whole route, so the opening camera can be fitted to it
+ * rather than guessed at a fixed zoom that only frames well on one viewport.
+ * Europe lands top-left, Australia bottom-right.
  */
-export const GLOBE_HOME_VIEW = {
-  center: [78, -8] as [number, number],
-  zoom: 1.35,
-  pitch: 0,
-  bearing: 0,
+export const ROUTE_BOUNDS: [[number, number], [number, number]] = (() => {
+  const lons = ROUTE_POINTS.map((p) => p.coordinates[0]);
+  const lats = ROUTE_POINTS.map((p) => p.coordinates[1]);
+  return [
+    [Math.min(...lons), Math.min(...lats)],
+    [Math.max(...lons), Math.max(...lats)],
+  ];
+})();
+
+/**
+ * Camera padding, in px, that keeps the route clear of the chrome: the
+ * catalog drawer and cost HUD on the flanks, the date strip along the bottom.
+ * On a phone the flanking panels are not docked, so the route can use the
+ * full width.
+ */
+export const FRAME_PADDING = {
+  desktop: { top: 90, bottom: 180, left: 320, right: 320 },
+  compact: { top: 130, bottom: 215, left: 28, right: 28 },
+} as const;
+
+/** Matches the `lg:` breakpoint the layout switches on. */
+export const DESKTOP_BREAKPOINT_PX = 1024;
+
+/**
+ * Below this width the opening camera is set explicitly instead of fitted.
+ *
+ * `fitBounds` does its sizing in projected space, and this bounding box spans
+ * 152° of longitude — on a tall, narrow viewport its answer leaves the
+ * Australian end of the route off the right edge. Verified at 390×844: the
+ * fit drops Sydney, Melbourne and Cairns out of frame, while the camera
+ * below holds the whole route. Tablet widths (768×1024 measured) fit fine.
+ */
+export const COMPACT_CAMERA_MAX_WIDTH_PX = 600;
+
+/** Hand-framed on a 390×844 viewport; see COMPACT_CAMERA_MAX_WIDTH_PX. */
+export const COMPACT_CAMERA = {
+  center: [81, -8] as [number, number],
+  zoom: 0.47,
 };
+
+/**
+ * Zoom ceiling for the opening frame.
+ *
+ * Valencia and Melbourne are very nearly antipodal (≈157° apart), so the two
+ * ends of the trip sit close to opposite edges of the visible cap. The closer
+ * the camera, the smaller that cap gets — measured on a 1440×900 desktop,
+ * Valencia drops behind the horizon somewhere above zoom ~1.6. Capping the
+ * fit here keeps the origin marker on screen; a tighter frame would show a
+ * route that appears to start over the Balkans.
+ */
+export const GLOBE_MAX_FIT_ZOOM = 1.55;
 
 export const MAP_STYLE = "mapbox://styles/mapbox/dark-v11";

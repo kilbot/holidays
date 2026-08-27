@@ -5,14 +5,25 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import {
-  GLOBE_HOME_VIEW,
+  COMPACT_CAMERA,
+  COMPACT_CAMERA_MAX_WIDTH_PX,
+  DESKTOP_BREAKPOINT_PX,
+  FRAME_PADDING,
+  GLOBE_MAX_FIT_ZOOM,
   MAP_STYLE,
+  ROUTE_BOUNDS,
   routeLegsGeoJSON,
   routePointsGeoJSON,
 } from "@/lib/demo-route";
 
 const SOURCE_LEGS = "route-legs";
 const SOURCE_POINTS = "route-points";
+
+function framePadding(width: number) {
+  return width >= DESKTOP_BREAKPOINT_PX
+    ? FRAME_PADDING.desktop
+    : FRAME_PADDING.compact;
+}
 
 /**
  * Line and marker colours are read from the design tokens at mount rather
@@ -27,23 +38,23 @@ function tokenColor(name: string, fallback: string): string {
   return value || fallback;
 }
 
+/** Inlined at build time, so a missing token is knowable during render. */
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
 export function GlobeStage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [ready, setReady] = useState(false);
-  const [failure, setFailure] = useState<string | null>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const failure = MAPBOX_TOKEN
+    ? mapError
+    : "No Mapbox token — set NEXT_PUBLIC_MAPBOX_TOKEN.";
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || mapRef.current) return;
+    if (!container || mapRef.current || !MAPBOX_TOKEN) return;
 
-    const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-    if (!token) {
-      setFailure("No Mapbox token — set NEXT_PUBLIC_MAPBOX_TOKEN.");
-      return;
-    }
-
-    mapboxgl.accessToken = token;
+    mapboxgl.accessToken = MAPBOX_TOKEN;
 
     const sea = tokenColor("--sb-sea", "#5fa8c7");
     const accent = tokenColor("--sb-accent", "#ff6b4a");
@@ -54,16 +65,48 @@ export function GlobeStage() {
       container,
       style: MAP_STYLE,
       projection: { name: "globe" },
-      center: GLOBE_HOME_VIEW.center,
-      zoom: GLOBE_HOME_VIEW.zoom,
-      pitch: GLOBE_HOME_VIEW.pitch,
-      bearing: GLOBE_HOME_VIEW.bearing,
+      // Real framing happens via fitBounds once the style is up; these are
+      // only the pre-fit defaults.
+      center: [75, 0],
+      zoom: 1.3,
       attributionControl: false,
-      // The globe is a stage, not a map to get lost in: keep it in one hemisphere.
-      minZoom: 0.8,
+      // Bottom-left is where the catalog drawer lives, and Mapbox's logo has
+      // to stay visible under their terms — so it joins the attribution and
+      // zoom controls on the right.
+      logoPosition: "bottom-right",
+      // Low enough that a phone-width viewport can still fit the whole route:
+      // clamping at 0.8 pushed the Australian end off the right edge.
+      minZoom: 0.3,
       maxZoom: 8,
     });
     mapRef.current = map;
+
+    const frameRoute = (animate: boolean) => {
+      const width = container.clientWidth;
+      const duration = animate ? 900 : 0;
+
+      if (width < COMPACT_CAMERA_MAX_WIDTH_PX) {
+        map.easeTo({ ...COMPACT_CAMERA, duration });
+        return;
+      }
+
+      map.fitBounds(ROUTE_BOUNDS, {
+        padding: framePadding(width),
+        maxZoom: GLOBE_MAX_FIT_ZOOM,
+        duration,
+      });
+    };
+
+    // Once the traveller moves the globe themselves, it is theirs — resizes
+    // stop yanking the camera back to the route. Listening on the canvas
+    // rather than on map events keeps our own framing calls from tripping it.
+    let userMoved = false;
+    const markUserMoved = () => {
+      userMoved = true;
+    };
+    const canvas = map.getCanvas();
+    canvas.addEventListener("pointerdown", markUserMoved);
+    canvas.addEventListener("wheel", markUserMoved, { passive: true });
 
     map.addControl(
       new mapboxgl.AttributionControl({ compact: true }),
@@ -76,7 +119,7 @@ export function GlobeStage() {
     map.scrollZoom.disable(); // page scroll should not fight the globe on mobile
 
     map.on("error", (event) => {
-      setFailure(event.error?.message ?? "Mapbox failed to load.");
+      setMapError(event.error?.message ?? "Mapbox failed to load.");
     });
 
     map.on("style.load", () => {
@@ -85,7 +128,11 @@ export function GlobeStage() {
       map.setFog({
         color: "rgb(18, 30, 46)",
         "high-color": "rgb(26, 48, 74)",
-        "horizon-blend": 0.02,
+        // Kept low: Valencia sits ~80° from the camera — near the limb, because
+        // Valencia and Melbourne are very nearly antipodal and no globe
+        // framing can put both in the middle. A heavier haze would swallow
+        // the European end of the route entirely.
+        "horizon-blend": 0.015,
         "space-color": "rgb(7, 12, 20)",
         "star-intensity": 0.12,
       });
@@ -174,7 +221,12 @@ export function GlobeStage() {
           "text-offset": [0, 1.1],
           "text-anchor": "top",
           "text-letter-spacing": 0.08,
-          "text-allow-overlap": false,
+          // The route's own labels always draw: they are the point of the
+          // stage, and they must not lose placement to Mapbox's country
+          // names, least of all at the crowded Australian end. They still
+          // reserve space, so the country names move aside rather than
+          // disappearing wholesale.
+          "text-allow-overlap": true,
         },
         paint: {
           "text-color": text,
@@ -184,14 +236,28 @@ export function GlobeStage() {
         },
       });
 
+      frameRoute(false);
       setReady(true);
     });
 
-    const handleResize = () => map.resize();
-    window.addEventListener("resize", handleResize);
+    // Mapbox latches onto the container's size at construction, which in a
+    // dvh layout is often stale by the time fonts settle or the browser
+    // chrome resolves. Observing the container covers both that first
+    // correction and later window resizes.
+    const refit = () => {
+      map.resize();
+      if (!userMoved && map.isStyleLoaded()) frameRoute(false);
+    };
+
+    const observer = new ResizeObserver(refit);
+    observer.observe(container);
+    window.addEventListener("resize", refit);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+      window.removeEventListener("resize", refit);
+      canvas.removeEventListener("pointerdown", markUserMoved);
+      canvas.removeEventListener("wheel", markUserMoved);
       map.remove();
       mapRef.current = null;
     };
@@ -199,7 +265,11 @@ export function GlobeStage() {
 
   return (
     <div className="absolute inset-0 bg-[#070c14]">
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* Sized with width/height, not inset-0: mapbox-gl.css sets
+          `.mapboxgl-map { position: relative }` on whatever element it
+          mounts into, and its stylesheet lands after Tailwind's, so an
+          `absolute inset-0` container silently collapses to zero height. */}
+      <div ref={containerRef} className="size-full" />
 
       {/* Vignette: darkens the corners the panels sit in, so glass chrome
           keeps its contrast wherever the globe happens to be bright. */}

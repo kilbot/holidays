@@ -218,12 +218,23 @@
   scrollbar-color: var(--sb-line) transparent;
 }
 
-/* Mapbox's own chrome, pulled into the palette. */
+/* Mapbox's own chrome. The logo and attribution have to stay visible under
+   Mapbox's terms, so they are lifted clear of the date strip rather than left
+   to sit behind it. */
 .mapboxgl-ctrl-logo,
 .mapboxgl-ctrl-attrib {
-  opacity: 0.45;
+  opacity: 0.5;
 }
-.mapboxgl-ctrl-bottom-left,
-.mapboxgl-ctrl-bottom-right {
+/* The extra `.mapboxgl-map` is load-bearing: mapbox-gl.css is injected after
+   this stylesheet, so a bare class selector loses the tie on source order. */
+.mapboxgl-map .mapboxgl-ctrl-bottom-left,
+.mapboxgl-map .mapboxgl-ctrl-bottom-right {
   z-index: 1;
+  bottom: 152px;
+}
+@media (min-width: 1024px) {
+  .mapboxgl-map .mapboxgl-ctrl-bottom-left,
+  .mapboxgl-map .mapboxgl-ctrl-bottom-right {
+    bottom: 168px;
+  }
 }
