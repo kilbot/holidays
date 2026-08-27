@@ -394,10 +394,17 @@
 }
 
 /* Thin scrollbars so the catalog list does not grow a chunky OS bar
-   over the glass panel. */
+   over the glass panel.
+
+   Containment is the site's one marker that a box scrolls, so it is
+   also the right place to say a scroll stops at its own edges. It
+   matters most on the Plan page, where every panel is floating over a
+   map that zooms on a bare wheel since #56: a flick that runs out of
+   shortlist should stop, not carry on into the globe or the shell. */
 @utility sb-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--sb-line) transparent;
+  overscroll-behavior: contain;
 }
 
 /* Mapbox's own chrome. The logo and attribution have to stay visible under

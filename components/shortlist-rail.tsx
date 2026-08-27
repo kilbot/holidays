@@ -296,7 +296,7 @@ function ShortlistBody() {
               anything below it, so even scrolled to the end the last Adventure
               looked severed by the panel edge. A thin scrollbar says the same
               thing without lying about the row it is drawn over. */}
-          <ul className="sb-scroll mt-2.5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain pr-1.5 pb-0.5">
+          <ul className="sb-scroll mt-2.5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1.5 pb-0.5">
             {entries.map((entry) => (
               <ShortlistRow key={entry.id} entry={entry} onMark={mark} />
             ))}
