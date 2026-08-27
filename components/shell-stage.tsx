@@ -21,6 +21,7 @@
 import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 
+import { PreviewNotice } from "@/components/preview-notice";
 import { ShareBar } from "@/components/share-bar";
 
 const NO_STRIP = { "--sb-strip-h": "0px" } as CSSProperties;
@@ -34,6 +35,11 @@ export function ShellStage({ children }: { children: ReactNode }) {
       style={onPlan ? undefined : NO_STRIP}
     >
       {children}
+      {/* Both are plan-level and true on every page: a visitor can rearrange
+          the trip from the Capsules grid just as easily as from the globe, so
+          the notice that says their changes are not being saved has to be able
+          to reach them there. */}
+      <PreviewNotice />
       <ShareBar />
     </div>
   );

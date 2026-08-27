@@ -31,7 +31,7 @@ import {
   formatEur,
   type DeepCapsule,
 } from "@/lib/deep-capsules";
-import { useShortlist } from "@/lib/shortlist";
+import { usePlanShortlist } from "@/lib/engine/use-plan";
 
 /**
  * The Capsules page — the site's reading room.
@@ -166,7 +166,10 @@ export function CapsulesBrowser() {
   );
   const [refineOpen, setRefineOpen] = useState(false);
 
-  const { marks, counts, toggle: mark } = useShortlist();
+  // Reconciled against the Plan, not the raw marks: the eight researched
+  // Adventures start on the Plan with no verdict recorded, and a grid that drew
+  // them as untouched is half of what made #58 feel like nothing happened.
+  const { marks, counts, mark } = usePlanShortlist();
 
   // Both writers take the whole next filter set rather than a functional
   // updater on purpose: `writeUrl` touches the router, and a functional updater

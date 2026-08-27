@@ -40,6 +40,7 @@ import {
 } from "@/lib/store/edit-key";
 import { EDIT_KEY_HEADER } from "@/lib/store/guards";
 import {
+  discardPreview,
   readSyncStatus,
   readSyncStatusOnServer,
   refreshPlanFromServer,
@@ -109,6 +110,20 @@ export interface SharingApi {
   viewLink: string;
   /** The Fork this tab was opened on, if it was opened on one. */
   visiting: ForkView | null;
+  /**
+   * Whether this tab has changed the Plan without the right to save it.
+   *
+   * True from the first view-mode write and until the preview is discarded or
+   * the tab is reloaded. The one thing a visitor has to be told, and the reason
+   * `PreviewNotice` exists.
+   */
+  previewing: boolean;
+  /**
+   * Throw the preview away and re-read the couple's Plan. Resolves false when
+   * the store could not be reached — in which case nothing was discarded and
+   * the preview warning stands.
+   */
+  discardPreview: () => Promise<boolean>;
   /** Save the current Scenario as a Fork and get its shareable URL. */
   saveFork: (
     name: string,
@@ -241,6 +256,8 @@ export function useSharing(): SharingApi {
     savedAt: sync.savedAt,
     viewLink: origin ? `${origin}/` : "",
     visiting,
+    previewing: sync.status === "preview",
+    discardPreview,
     saveFork,
     adopt,
   };

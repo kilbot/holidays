@@ -6,11 +6,12 @@
  * Three sources feed it and it is worth being explicit about which is which,
  * because they have very different lifetimes:
  *
- * 1. **The current Scenario** (`scenarios.ts`) — dates, toggles, drags, knobs.
- *    Persisted, and the thing a Fork will eventually share.
- * 2. **The Catalog shortlist** (`shortlist.ts`) — every idea marked *placed*,
- *    which is exactly docs/CONTEXT.md's "on the Plan — give it calendar days".
- *    Persisted separately, because the sift outlives any one Scenario.
+ * 1. **The current Scenario** (`scenarios.ts`) — dates, what is on the Plan,
+ *    drags, knobs. Persisted, synced, and the thing a Fork shares. Since #58
+ *    this is the *only* say in what the Scheduler places.
+ * 2. **The Catalog shortlist** (`shortlist.ts`) — the bench and the discard
+ *    pile, per browser. It no longer decides membership; it writes membership
+ *    through to the Scenario and reads back a reconciled verdict.
  * 3. **Live fares** — fetched from `/api/fares` for the Legs the fares grid
  *    covers. Deliberately **not** persisted: a fare is true for a few hours,
  *    and a stale one saved into a Scenario would be a lie with a timestamp.
@@ -22,6 +23,10 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import { capsuleCatalogue } from "@/lib/engine/capsules";
+import {
+  effectiveVerdicts,
+  planMembership,
+} from "@/lib/engine/membership";
 import { buildPlan } from "@/lib/engine/plan";
 import {
   scenarioTotals,
@@ -30,7 +35,13 @@ import {
   type ScenarioTotal,
 } from "@/lib/engine/scenarios";
 import type { CapsuleSpec, LegMode, Plan, PlanInput } from "@/lib/engine/types";
-import { useShortlist } from "@/lib/shortlist";
+import {
+  countMarks,
+  useShortlist,
+  type MarkedState,
+  type ShortlistCounts,
+  type ShortlistMap,
+} from "@/lib/shortlist";
 import { TRAVELLERS } from "@/lib/engine/constants";
 import { moveRangeEnd, type RangeEnd } from "@/lib/trip-dates";
 
@@ -131,26 +142,73 @@ export interface PlanApi {
   setLegMode: (legId: string, mode: LegMode) => void;
 }
 
+/** The shortlist as every sift surface should read it. */
+export interface PlanShortlist {
+  /**
+   * Verdicts reconciled against the Plan — `effectiveVerdicts` says how.
+   *
+   * Read this, never the raw `useShortlist().marks`, anywhere a verdict is
+   * *shown* or *filtered on*. The raw marks know nothing about the eight
+   * Adventures the reference Scenario starts with, and they keep a stale
+   * *placed* long after a discarded preview put the Plan back.
+   */
+  marks: ShortlistMap;
+  counts: ShortlistCounts;
+  /** Record a verdict. Membership follows it into the Scenario. */
+  mark: (id: string, state: MarkedState) => void;
+}
+
+/**
+ * The sift's view of the shortlist, without building a Plan.
+ *
+ * `/adventures` renders 413 cards and re-sifts them on every keystroke; running
+ * the Scheduler and the ledger to find out which pins to draw would be absurd.
+ * Membership is one array off the current Scenario.
+ */
+export function usePlanShortlist(): PlanShortlist {
+  const scenarios = useScenarios();
+  const { marks, toggle: mark } = useShortlist();
+  const toggled = scenarios.current.input.toggled;
+
+  const effective = useMemo(
+    () => effectiveVerdicts(toggled, marks),
+    [toggled, marks],
+  );
+
+  return {
+    marks: effective,
+    counts: countMarks(effective),
+    mark,
+  };
+}
+
 export function usePlan(): PlanApi {
   const scenarios = useScenarios();
-  const { marks } = useShortlist();
+  const { toggle: mark } = useShortlist();
   const fares = useSyncExternalStore(subscribeFares, readFares, noFares);
 
   const input = scenarios.current.input;
 
-  // Catalog ideas marked *placed* are Capsules the Scheduler has to find days
-  // for. Ideas marked *interested* sit on the bench and cost nothing —
-  // docs/CONTEXT.md is explicit that the bench occupies no calendar Days.
-  const placed = useMemo(
-    () =>
-      Object.entries(marks)
-        .filter(([, state]) => state === "placed")
-        .map(([id]) => id)
-        .sort(),
-    [marks],
-  );
+  // What the Scheduler has to find days for. Just the Scenario's own list since
+  // #58: the shortlist used to be unioned in here, which could add a Capsule to
+  // the Plan and never take one off.
+  const onPlan = useMemo(() => planMembership(input.toggled), [input.toggled]);
 
-  const catalogue = useMemo(() => capsuleCatalogue(placed), [placed]);
+  // Specs for every id any Scenario might reach for, not just this one's: the
+  // comparison rows below price the alternates, and a Scenario whose Capsules
+  // were missing from the catalogue would silently price as a cheaper trip.
+  const catalogueIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const scenario of scenarios.scenarios) {
+      for (const id of scenario.input.toggled) ids.add(id);
+    }
+    return [...ids].sort();
+  }, [scenarios.scenarios]);
+
+  const catalogue = useMemo(
+    () => capsuleCatalogue(catalogueIds),
+    [catalogueIds],
+  );
 
   const capsules = useMemo(
     () => new Map(catalogue.map((spec) => [spec.id, spec])),
@@ -160,18 +218,10 @@ export function usePlan(): PlanApi {
   const plan = useMemo(
     () =>
       buildPlan(
-        {
-          ...input,
-          // The Scheduler places every researched Capsule that is toggled on,
-          // plus every Catalog idea marked Plan. The two lists are merged here
-          // rather than in the Scenario so that marking an idea Plan takes
-          // effect in every Scenario at once, which is what the sift means.
-          toggled: [...new Set([...input.toggled, ...placed])],
-          fareOverrides: { ...input.fareOverrides, ...fares },
-        },
+        { ...input, toggled: onPlan, fareOverrides: { ...input.fareOverrides, ...fares } },
         catalogue,
       ),
-    [input, placed, catalogue, fares],
+    [input, onPlan, catalogue, fares],
   );
 
   // Fetch the Legs the grid covers. Runs after render, once per Leg per tab.
@@ -192,10 +242,9 @@ export function usePlan(): PlanApi {
       scenarioTotals(
         { scenarios: scenarios.scenarios, currentId: scenarios.currentId },
         catalogue,
-        placed,
         fares,
       ),
-    [scenarios.scenarios, scenarios.currentId, catalogue, placed, fares],
+    [scenarios.scenarios, scenarios.currentId, catalogue, fares],
   );
 
   return {
@@ -213,12 +262,11 @@ export function usePlan(): PlanApi {
       );
       patch({ startDate: moved.start, endDate: moved.end });
     },
+    // One gesture, one writer. `setMark` records the verdict *and* writes the
+    // Scenario's `toggled` list, so a caller here and a click on a shortlist
+    // row cannot disagree about what is on the Plan.
     toggle: (capsuleId) =>
-      patch({
-        toggled: input.toggled.includes(capsuleId)
-          ? input.toggled.filter((id) => id !== capsuleId)
-          : [...input.toggled, capsuleId],
-      }),
+      mark(capsuleId, onPlan.includes(capsuleId) ? "interested" : "placed"),
     place: (capsuleId, startDate) =>
       patch({
         placementOverrides: { ...input.placementOverrides, [capsuleId]: startDate },

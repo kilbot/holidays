@@ -34,6 +34,7 @@ import {
   type Warning,
 } from "@/lib/engine";
 import { usePlan } from "@/lib/engine/use-plan";
+import { useSharing } from "@/lib/store/sharing";
 import { formatDayYear } from "@/lib/trip-dates";
 import { Switch } from "@/components/ui/switch";
 import { BurnDownChart } from "@/components/budget-burn-down";
@@ -246,6 +247,7 @@ function Assumptions({
 
 export function BudgetView() {
   const { plan, scenarios, totals, input, patch } = usePlan();
+  const { previewing } = useSharing();
   const { rollUp } = plan;
 
   const burn = useMemo(
@@ -345,11 +347,18 @@ export function BudgetView() {
 
             <div className="flex flex-wrap items-end gap-x-7 gap-y-3">
               <div className="min-w-[168px]">
-                <p className="sb-label text-[9px]">Plan total</p>
+                <p className="sb-label text-[9px]">
+                  {previewing ? "Plan total · preview" : "Plan total"}
+                </p>
                 {/* The hero figure: proportional digits, because tabular ones
                     give every digit the width of a zero and a four-figure sum
                     reads loose at this size. */}
-                <p className="sb-num text-[44px] leading-none font-semibold tracking-tight [font-variant-numeric:normal] lg:text-[52px]">
+                <p
+                  className={cn(
+                    "sb-num text-[44px] leading-none font-semibold tracking-tight [font-variant-numeric:normal] lg:text-[52px]",
+                    previewing && "text-[var(--sb-warn)]",
+                  )}
+                >
                   {formatEur(rollUp.totalEur)}
                 </p>
                 <div className="mt-2.5">
