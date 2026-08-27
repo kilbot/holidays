@@ -2,7 +2,30 @@
 
 Research for [issue #64](https://github.com/kilbot/holidays/issues/64). This document is the
 **analysis**: the new constant values, the evidence behind each, and the re-derived cost ladder for
-every deep Adventure. It changes no code. A builder wires it.
+every deep Adventure.
+
+> **Status: wired, 27 August 2026** — branch `build/cost-recalibration`. `constants.ts` carries the
+> new lodging and food floors and the `camp` tier; `capsules.ts` carries the **mechanical** half of
+> the §6 Event ladder; `deep-capsules.ts` carries the eight re-derived ladders, whose `ideal` rung
+> is now the figure the engine actually charges. `lib/engine/__tests__/floors.test.ts` asserts the
+> card and the ledger agree, which is what §6 was for.
+>
+> Three places the wiring departs from this document, on purpose:
+>
+> 1. **The discretionary Event cuts are not in the constants.** §6's own closing paragraph says the
+>    two Pennicott cruises, reef day II and Laneway are "the couple's call, not the model's", so
+>    they stay at full price and a Scenario switches them off through the new `eventOverrides`.
+>    That is why the default Scenario lands at **€21,254**, between §1's "lodging + food floors"
+>    row (€21,747) and its "+ re-derived event ladders" row (€20,097).
+> 2. **Margaret River's plan-on is €599, not €656.** The difference is A$93 — §5's Perth ⇄ Margaret
+>    River drive, which §6 says it excludes and §5 includes. The engine charges that drive as a
+>    Leg, on the day it happens, so folding it into the block would count it twice. Separately: the
+>    engine prices only the *return* drive today (as part of the Margaret River → Rottnest move);
+>    the outbound run is absorbed into the arrival Leg and costs nothing. That is a real modelling
+>    gap worth about €28, and it is not this ticket.
+> 3. **The food/lodging coupling is stated, not wired** — §4's second option. Every food line now
+>    carries the kitchen assumption in its own note. Coupling it would have made the Aggressive
+>    Scenario's hostel fortnight disagree with the audit's own arithmetic by ~€280.
 
 **Recalibrated:** 27 August 2026. New price checks carry their access date in [Sources](#sources).
 **Currency:** AUD per couple unless marked. FX A$1 = €0.61 (`AUD_TO_EUR`, cost-baselines §6).
