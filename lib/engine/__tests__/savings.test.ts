@@ -293,10 +293,37 @@ test("Comfortable re-homes the post-NYE gap without teleporting", () => {
     )
     .reduce((total, placement) => total + placement.days, 0);
   assert.ok(handedBack > 0, "the ceiling buys blocks this path does not");
+
+  // The Perth block is the one this path buys and the ceiling does not.
+  const bought = comfortable.placements
+    .filter(
+      (placement) =>
+        !base.placements.some(
+          (entry) => entry.capsuleId === placement.capsuleId,
+        ),
+    )
+    .reduce((total, placement) => total + placement.days, 0);
+  assert.ok(bought > 0, "and this path buys one the ceiling does not");
+
+  // …and a block on both paths can be a different length on each. The
+  // reference trip's WA sequence (#95) trims the arrival block and Christmas
+  // to their published floor rungs and gives Sydney a seventh night; this path
+  // keeps the researched lengths, so the difference is counted rather than
+  // assumed away.
+  const stretched = comfortable.placements.reduce((total, placement) => {
+    const held = base.placements.find(
+      (entry) => entry.capsuleId === placement.capsuleId,
+    );
+    return held ? total + (placement.days - held.days) : total;
+  }, 0);
+
   assert.equal(
     comfortable.days.filter((day) => day.buffer).length,
-    base.days.filter((day) => day.buffer).length + handedBack - 3,
-    "the Perth block and the blocks Comfortable does not buy account for all of it",
+    base.days.filter((day) => day.buffer).length +
+      handedBack -
+      bought -
+      stretched,
+    "the Perth block, the blocks Comfortable does not buy and the lengths that differ account for all of it",
   );
 });
 
@@ -371,11 +398,17 @@ test("the default Scenario's shape is untouched by the recalibration", () => {
   // Queensland ideas #54 put on the bench.
   assert.equal(DEFAULT_SCENARIO.input.toggled.length, 16);
   // Still nothing dragged, nothing camped and no Event switched off: the
-  // reference trip is shaped by Locks and dates, never by an override. The one
-  // knob it does hold is Byron at its researched three-night floor, which is
-  // the "more North Queensland" directive stated rather than implied.
+  // reference trip is shaped by Locks and dates, never by a drag. The knobs it
+  // does hold are block **lengths** — Byron at its researched three-night
+  // floor, which is the "more North Queensland" directive stated rather than
+  // implied, and the three the WA sequence costs (#95).
   assert.deepEqual(DEFAULT_SCENARIO.input.placementOverrides, {});
   assert.deepEqual(DEFAULT_SCENARIO.input.lodgingTiers, {});
   assert.deepEqual(DEFAULT_SCENARIO.input.eventOverrides, {});
-  assert.deepEqual(DEFAULT_SCENARIO.input.dayOverrides, { "byron-nimbin": 3 });
+  assert.deepEqual(DEFAULT_SCENARIO.input.dayOverrides, {
+    "byron-nimbin": 3,
+    "mundaring-arrival": 2,
+    "morawa-christmas": 3,
+    "sydney-nye": 7,
+  });
 });

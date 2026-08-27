@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "node --import ./lib/engine/__tests__/alias-hook.mjs --test --test-concurrency=1 'lib/engine/__tests__/*.test.ts' 'lib/store/__tests__/*.test.ts' 'lib/flights/__tests__/*.test.ts' 'lib/__tests__/*.test.ts'",
     "bootstrap:plan": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/bootstrap-plan.mjs",
-    "seed:scenarios": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/seed-scenarios.mjs"
+    "seed:scenarios": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/seed-scenarios.mjs",
+    "fetch:polylines": "node --import ./lib/engine/__tests__/alias-hook.mjs --env-file=.env.local scripts/fetch-route-polylines.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

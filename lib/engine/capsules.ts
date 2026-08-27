@@ -453,21 +453,40 @@ const CATALOG_LOCKS: Readonly<Record<string, Lock>> = {
     why: "southbound, after the reef and the Cape Trib night and before Byron — which is the only configuration capsule-fnq-wildlife.md endorses: \"if the Plan drives or buses south down the Bruce Highway, Mission Beach is directly on the route\". Etty Bay, 40 minutes north of it, is the best wild-cassowary site in Australia. The Catalog rates the entry's own season fit poor: this is wet season and the skydive is the part that gets weathered out, not the birds.",
   },
 
-  "perth-live-music-night": {
-    kind: "weekday",
-    // Friday and Saturday. `weekdayOf` is 0 = Sunday.
-    weekdays: [5, 6],
-    // …and inside the WA leg, for the same reason Rottnest is: Northbridge is
-    // not reachable from Port Douglas on a January Friday.
-    from: "2026-12-15",
-    to: "2026-12-29",
-    why: "Friday and Saturday are the only nights everything is on — the rest of the week is one room each, and the cheap Wed/Sun options finish early on purpose — and it has to be a night the couple is in Perth. perth-live-music.md",
-  },
+  /*
+   * The two WA evenings, at the **front** of the leg rather than the back
+   * (#95).
+   *
+   * The user's own sequence is *Mundaring base — Perth and Fremantle days from
+   * it — then Margaret River, Rottnest, Morawa for Christmas, and back to
+   * Perth*: the city nights are day trips out of Paul's dad's place while the
+   * couple is still finding its feet, not a second stay tacked on after the
+   * farm. Left where they were (26–29 Dec) they were the last two days of the
+   * leg, which is the reading the map showed and the couple did not recognise.
+   *
+   * They are **date** Locks rather than the weekday and window Locks they were,
+   * and that is load-bearing rather than tidy: `LOCK_RANK` places date-locked
+   * blocks before window-locked ones, and Margaret River is window-locked. A
+   * weekday Lock here would be offered the calendar after Margaret River had
+   * taken the whole of the arrival stretch, and the two evenings would land
+   * back at the end of the leg — which is exactly where they were. Friday the
+   * 18th is inside what `perth-live-music.md` asks for ("Friday or Saturday"),
+   * so pinning the date says the same thing about the world and also says
+   * which weekend.
+   */
   "fremantle-fish-and-chips": {
-    kind: "window",
-    from: "2026-12-27",
-    to: "2026-12-29",
-    why: "the last of the WA leg, after the drive down from Morawa and before the flight east. It is window-locked rather than floating because a Fishing Boat Harbour evening is a Fremantle evening, and a flexible one-day idea will otherwise score a Tuesday in January when the couple is in Queensland.",
+    kind: "date",
+    // Thursday 17 December 2026: the harbour, then home to the Hills.
+    from: "2026-12-17",
+    to: "2026-12-17",
+    why: "the Fremantle half of the arrival stretch, out of the Mundaring base and before the block moves south — a Fishing Boat Harbour evening is a Fremantle evening, and a floating one-day idea will otherwise score a Tuesday in January when the couple is in Queensland.",
+  },
+  "perth-live-music-night": {
+    kind: "date",
+    // Friday 18 December 2026, the first Friday after the couple lands.
+    from: "2026-12-18",
+    to: "2026-12-18",
+    why: "Friday and Saturday are the only nights everything is on — the rest of the week is one room each, and the cheap Wed/Sun options finish early on purpose — and this is the Friday of the arrival stretch, driven in from the Mundaring base. perth-live-music.md",
   },
 };
 

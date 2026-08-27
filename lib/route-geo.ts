@@ -30,12 +30,39 @@
  *    *is* an airport; approximate for anywhere else, and said so.
  * 4. **unknown** — nothing places it, so the Leg is not drawn and is reported
  *    in `unmapped` rather than crashing the stage.
+ *
+ * ## …and one Leg that overrules the order
+ *
+ * The tiers answer "where is this place?", which is the right question for a
+ * marker and the wrong one for the end of a crossing. A plane from Valencia
+ * lands at **Perth**; it does not land at whichever block the Scheduler put
+ * first. The engine names that Leg's far end by the Location the couple is
+ * heading for (`mundaring`, and on the Plan the user was looking at,
+ * `margaret-river`), so tier 1 answered with the town's own coordinates and
+ * drew a 13,000 km arc terminating three hours down the Bussell Highway (#95).
+ *
+ * So an international Leg — one with a non-Australian gateway at either end —
+ * resolves **both** its ends at their terminals through `atAirport`, whatever
+ * the tiers would otherwise say. The stops are unaffected: `routeStops` asks
+ * the tiers, so the marker stays on the town while the arc ends at PER.
+ *
+ * ## Flights are drawn; drives are looked up
+ *
+ * A flight's line is invented here — a great circle, because that is what an
+ * aeroplane flies. A drive's is not: it is the road, from
+ * `lib/route-polylines.json`, fetched once from Mapbox Directions and checked
+ * in. Perth to Margaret River drawn as a great circle was a ruler line over
+ * the Darling Scarp; drawn as the Bussell Highway it is recognisably the day
+ * it actually is. A pair with no stored road — the Rottnest ferry, and
+ * anything added since the last refresh — falls back to the line this module
+ * draws, which is the ferry's correct rendering anyway.
  */
 
 import { AIRPORT_COORDINATES, type Coordinates } from "@/lib/airports";
 import { DEEP_CAPSULES } from "@/lib/deep-capsules";
 import { LOCATIONS, locationById } from "@/lib/engine/locations";
 import type { Day, Leg, LegMode } from "@/lib/engine/types";
+import { roadBetween } from "@/lib/route-polylines";
 
 /* ------------------------------------------------------------------ */
 /* Geometry                                                            */
@@ -197,6 +224,18 @@ const KNOWN_LOCATIONS = new Map(
   LOCATIONS.map((location) => [location.id, location]),
 );
 
+export interface ResolveOptions {
+  /**
+   * Resolve at the terminal rather than at the place, and call it exact.
+   *
+   * Set for the ends of an international Leg, where the terminal is not an
+   * approximation of the place — it is where the aircraft actually touches
+   * down, and the drive inland is a different Leg with its own line in the
+   * ledger.
+   */
+  atAirport?: boolean;
+}
+
 /**
  * Where one end of a Leg is — the single answer the whole map is drawn from.
  *
@@ -207,11 +246,29 @@ const KNOWN_LOCATIONS = new Map(
 export function resolveEndpoint(
   locationId: string,
   code: string,
+  options: ResolveOptions = {},
 ): RouteEndpoint {
   const home = isOrigin(locationId);
   const name = home
     ? (GATEWAYS[code]?.city ?? code)
     : locationById(locationId).name;
+
+  if (options.atAirport) {
+    const gate = AIRPORT_COORDINATES[code] ?? GATEWAYS[code]?.at ?? null;
+    if (gate) {
+      return {
+        locationId,
+        code,
+        name,
+        at: gate,
+        source: "airport",
+        // Not a guess: the crossing lands here by definition.
+        approximate: false,
+      };
+    }
+    // No coordinates for the terminal — fall through to the tiers, which is
+    // better than losing the Leg over a gateway nobody has plotted yet.
+  }
 
   const place = KNOWN_LOCATIONS.get(locationId)?.coords ?? null;
   if (place) {
@@ -240,6 +297,37 @@ export function resolveEndpoint(
   return { locationId, code, name, at: null, source: "unknown", approximate: true };
 }
 
+/**
+ * Whether this Leg's ends are terminals rather than places.
+ *
+ * True for the crossings, and only for them: a Leg is international when
+ * either end is one of the `GATEWAYS` — the table is every airport outside
+ * Australia the Plan can route through — or when either end is home, which is
+ * an airport whether or not the gateway table has heard of it.
+ *
+ * Domestic hops are deliberately left on the tiers. Perth → Sydney between two
+ * researched Locations is a line between two cities, and redrawing it terminal
+ * to terminal would move both ends without telling the reader anything: the
+ * arc that lands 60 km from Port Douglas is honest about Cairns being the
+ * gateway, while a crossing that stops in the Margaret River vineyards is not
+ * honest about anything.
+ */
+export function legEndsAtAirports(leg: {
+  mode: LegMode;
+  from: string;
+  to: string;
+  fromLocationId: string;
+  toLocationId: string;
+}): boolean {
+  if (leg.mode !== "flight") return false;
+  return (
+    leg.from in GATEWAYS ||
+    leg.to in GATEWAYS ||
+    isOrigin(leg.fromLocationId) ||
+    isOrigin(leg.toLocationId)
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Arcs                                                                */
 /* ------------------------------------------------------------------ */
@@ -257,6 +345,13 @@ export interface RouteArcProperties {
   longHaul: boolean;
   /** True when an end is placed at its gateway rather than at itself. */
   approximate: boolean;
+  /**
+   * True when the line is the road, from `lib/route-polylines.json`, rather
+   * than geometry this module invented. A drive with no stored road is drawn
+   * straight and this is false — which is also the right answer for the
+   * Rottnest ferry, where there is no road to fetch.
+   */
+  road: boolean;
   /** One sentence, shown wherever an approximate arc is explained. */
   title: string;
 }
@@ -292,11 +387,20 @@ export function routeArcsGeoJSON(
   const features: GeoJSON.Feature<GeoJSON.LineString, RouteArcProperties>[] = [];
 
   for (const leg of legs) {
-    const from = resolveEndpoint(leg.fromLocationId, leg.from);
-    const to = resolveEndpoint(leg.toLocationId, leg.to);
+    const ends: ResolveOptions = { atAirport: legEndsAtAirports(leg) };
+    const from = resolveEndpoint(leg.fromLocationId, leg.from, ends);
+    const to = resolveEndpoint(leg.toLocationId, leg.to, ends);
     if (!from.at || !to.at) continue;
 
     const approximate = from.approximate || to.approximate;
+    // A drive follows the road where somebody has fetched it. Only where both
+    // ends are placed: a road drawn to a gateway airport would be a precise
+    // claim about a vague end, which is the thing the dotted line is for.
+    const road =
+      leg.mode === "drive" && !approximate
+        ? roadBetween(leg.fromLocationId, leg.toLocationId)
+        : null;
+
     features.push({
       type: "Feature",
       properties: {
@@ -309,15 +413,19 @@ export function routeArcsGeoJSON(
         mode: leg.mode,
         longHaul: kmBetween(from.at, to.at) >= LONG_HAUL_KM,
         approximate,
+        road: Boolean(road),
         title: approximate
           ? approximateTitle(from, to)
-          : `${MODE_VERB[leg.mode]} — ${from.name} to ${to.name}.`,
+          : road
+            ? `${MODE_VERB[leg.mode]} — ${from.name} to ${to.name}, by road.`
+            : `${MODE_VERB[leg.mode]} — ${from.name} to ${to.name}.`,
       },
       geometry: {
         type: "LineString",
         // An approximate end has not earned a flown curve: a great circle
         // between two guesses is a precise-looking claim about a vague one.
-        coordinates: approximate ? [from.at, to.at] : greatCircle(from.at, to.at),
+        coordinates:
+          road ?? (approximate ? [from.at, to.at] : greatCircle(from.at, to.at)),
       },
     });
   }
@@ -329,8 +437,9 @@ export function routeArcsGeoJSON(
 export function unmappedLegs(legs: readonly Leg[]): UnmappedLeg[] {
   const unmapped: UnmappedLeg[] = [];
   for (const leg of legs) {
-    const from = resolveEndpoint(leg.fromLocationId, leg.from);
-    const to = resolveEndpoint(leg.toLocationId, leg.to);
+    const ends: ResolveOptions = { atAirport: legEndsAtAirports(leg) };
+    const from = resolveEndpoint(leg.fromLocationId, leg.from, ends);
+    const to = resolveEndpoint(leg.toLocationId, leg.to, ends);
     const lost = [from, to].filter((end) => !end.at);
     if (lost.length === 0) continue;
     unmapped.push({
@@ -537,6 +646,9 @@ export function routeFromPoints(
           mode,
           longHaul: kmBetween(point.coordinates, next.coordinates) >= LONG_HAUL_KM,
           approximate: false,
+          // The skeleton is a placeholder for a Plan nobody has read yet;
+          // there is no Leg behind it to look a road up for.
+          road: false,
           title: `${MODE_VERB[mode]} — ${point.name} to ${next.name}.`,
         },
         geometry: {
