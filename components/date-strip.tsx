@@ -20,7 +20,7 @@ import {
 import { eventDaysOf, weatherOf } from "@/lib/engine/plan";
 import { usePlan } from "@/lib/engine/use-plan";
 import { TripRail } from "@/components/trip-rail";
-import { WeekZoom } from "@/components/week-zoom";
+import { WeekZoom, weekCostTitle } from "@/components/week-zoom";
 import {
   PRE_TRIP_DEADLINES,
   WINDOW_END,
@@ -415,7 +415,16 @@ function WeekCell({
                 ✦
               </span>
             )}
-            <span className="sb-num text-[10.5px] font-medium text-[var(--sb-text)]">
+            {/* A week cell is a *time* slice, not a place, so its figure is
+                everything spent in those seven days — the fare included, on the
+                week a Leg is flown. That is the honest reading of a calendar
+                cell, but the place name underneath makes it easy to read as
+                "Margaret River costs €4.9k" (#53), so the hover names the fare
+                share. The Ledger is where the two are actually pulled apart. */}
+            <span
+              className="sb-num text-[10.5px] font-medium text-[var(--sb-text)]"
+              title={weekCostTitle(week)}
+            >
               {formatEurCompact(week.costEur)}
             </span>
           </span>
