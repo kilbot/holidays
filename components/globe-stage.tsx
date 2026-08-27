@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { createPortal } from "react-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -37,12 +44,16 @@ import {
   COMPACT_CAMERA,
   COMPACT_CAMERA_MAX_WIDTH_PX,
   GLOBE_MAX_FIT_ZOOM,
-  LEG_FACTS,
   MAP_STYLE,
-  ROUTE_BOUNDS,
-  routeLegsGeoJSON,
-  routePointsGeoJSON,
+  SKELETON_ROUTE,
 } from "@/lib/demo-route";
+import { usePlan } from "@/lib/engine/use-plan";
+import type { CapsuleSpec, Leg, LegMode } from "@/lib/engine/types";
+import {
+  buildRoute,
+  type RouteArcProperties,
+  type RouteBounds,
+} from "@/lib/route-geo";
 import type { Coordinates } from "@/lib/airports";
 
 const SOURCE_LEGS = "route-legs";
@@ -59,6 +70,31 @@ function prefersReducedMotion(): boolean {
   return (
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/* ---- The client store, and the frame before it ---- */
+
+// Nothing to subscribe to: the answer changes exactly once, when React
+// finishes hydrating, and `useSyncExternalStore` reports that transition for
+// free. Module-level so the subscription is not torn down every render.
+const NEVER_CHANGES = () => () => {};
+
+/**
+ * Whether the client's own store has been read yet.
+ *
+ * The Scenarios live in localStorage, which the server never saw, so the first
+ * render — on the server and again during hydration — cannot know which
+ * itinerary this browser is holding. Drawing the *default* Scenario in that
+ * gap would be a route that flickers into a different one a frame later; a
+ * blank globe would be worse. So the skeleton draws, and the moment this flips
+ * the real Legs replace it.
+ */
+function useHydrated(): boolean {
+  return useSyncExternalStore(
+    NEVER_CHANGES,
+    () => true,
+    () => false,
   );
 }
 
@@ -106,6 +142,52 @@ function angularDistance(a: Coordinates, b: Coordinates): number {
 function onNearFace(map: mapboxgl.Map, at: Coordinates): boolean {
   const center = map.getCenter();
   return angularDistance([center.lng, center.lat], at) < 84;
+}
+
+/**
+ * The Adventure a stop marker stands for, or null.
+ *
+ * Live stops carry the Capsule id of the days spent there, which is the honest
+ * answer: the Day sequence already knows. The skeleton's stops have no Plan
+ * behind them, so they fall back to the gateway table — which is all the
+ * pre-hydration route ever knew.
+ */
+function capsuleOfStop(properties: Record<string, unknown>): string | null {
+  const capsuleId = properties.capsuleId;
+  if (typeof capsuleId === "string" && capsuleId) return capsuleId;
+  const code = properties.code;
+  return typeof code === "string"
+    ? (DEEP_CAPSULE_BY_ROUTE_CODE[code] ?? null)
+    : null;
+}
+
+/** Open the card behind a stop. False when there is nothing behind it. */
+function openStop(
+  properties: Record<string, unknown>,
+  capsules: ReadonlyMap<string, CapsuleSpec>,
+): boolean {
+  const capsuleId = capsuleOfStop(properties);
+  if (!capsuleId) return false;
+  // A Catalog idea toggled onto the Plan is a stop like any other, and its
+  // card is a different one.
+  if (capsules.get(capsuleId)?.tier === "catalog") openCatalogIdea(capsuleId);
+  else openDeepCapsule(capsuleId);
+  return true;
+}
+
+/**
+ * The anchored popup, dropped if the route no longer holds what it points at.
+ *
+ * Leg ids carry their date (`PER>SYD@2026-12-28`), so switching to a Scenario
+ * that leaves two days later replaces every id on the map. Without this the
+ * panel would sit there describing a flight this Plan does not have.
+ */
+function stillOnTheRoute(
+  anchored: Anchored | null,
+  legs: ReadonlyMap<string, Leg>,
+): Anchored | null {
+  if (anchored?.kind === "leg" && !legs.has(anchored.id)) return null;
+  return anchored;
 }
 
 /** Where an anchored popup currently sits, in stage pixels. */
@@ -168,6 +250,36 @@ export function GlobeStage() {
   const { marks } = useShortlist();
   const clusters = useMemo(() => interestedClusters(marks), [marks]);
 
+  /* ---- The route the globe is actually drawing (#87) ----
+     The arcs are the current Scenario's derived Legs — the same objects the
+     Ledger's transit rows read — so a Scenario switched on /scenarios, a
+     dragged block or a Leg flipped to a drive all redraw the map by the same
+     path they redraw everything else. Until the client store is read there is
+     no itinerary to know, and the static skeleton stands in. */
+  const { plan, capsules } = usePlan();
+  const hydrated = useHydrated();
+  const route = useMemo(
+    () => (hydrated ? buildRoute(plan.legs, plan.days) : SKELETON_ROUTE),
+    [hydrated, plan.legs, plan.days],
+  );
+
+  /** The clicked arc's Leg, for the popup: money, mode, provenance. */
+  const legById = useMemo(
+    () => new Map(plan.legs.map((leg) => [leg.id, leg])),
+    [plan.legs],
+  );
+  /** The drawn arc's own properties — the names, and why it is dotted. */
+  const arcById = useMemo(
+    () =>
+      new Map(
+        route.arcs.features.map((feature) => [
+          feature.properties.id,
+          feature.properties,
+        ]),
+      ),
+    [route.arcs],
+  );
+
   // What the detail card is showing, and where on Earth that is. Null while
   // nothing is open, and also for the twelve Catalog entries that are a route
   // rather than a place — see `capsuleLocation`.
@@ -184,7 +296,7 @@ export function GlobeStage() {
    * Leg it was anchored to — so it returns where it was, still pointing at
    * the arc the traveller was reading about.
    */
-  const popup = focus ? null : anchored;
+  const popup = focus ? null : stillOnTheRoute(anchored, legById);
 
   /**
    * The anchored popup, readable from a camera effect that must not re-run
@@ -196,6 +308,31 @@ export function GlobeStage() {
   useEffect(() => {
     anchoredRef.current = anchored;
   }, [anchored]);
+
+  /**
+   * The live route, readable from the map's own handlers.
+   *
+   * Mapbox's click handler and the camera helpers are installed once, when the
+   * style loads, and they outlive every re-render — so the route they consult
+   * has to be a box they read rather than a value they closed over. Rebuilding
+   * the map when the Scenario changes would be the alternative, and it would
+   * throw away the traveller's camera on every knob.
+   */
+  const routeRef = useRef(route);
+  useEffect(() => {
+    routeRef.current = route;
+  }, [route]);
+
+  const legsRef = useRef(legById);
+  useEffect(() => {
+    legsRef.current = legById;
+  }, [legById]);
+
+  /** Which card a stop marker opens: a researched Adventure or a Catalog idea. */
+  const capsulesRef = useRef(capsules);
+  useEffect(() => {
+    capsulesRef.current = capsules;
+  }, [capsules]);
 
   /**
    * True while the camera is somewhere a card put it.
@@ -343,9 +480,18 @@ export function GlobeStage() {
       });
     };
 
+    /**
+     * The whole trip, framed — on the **live** route's own bounds.
+     *
+     * Which is the point of the button: a Scenario that never leaves the east
+     * coast should frame the east coast, not the box the prototype's nine
+     * points happened to make. An itinerary with nothing drawable falls back to
+     * the continent, because a `fitBounds` on nothing is a Mapbox error.
+     */
     const frameRoute = (animate: boolean) => {
       const width = container.clientWidth;
       const duration = animate && !prefersReducedMotion() ? 900 : 0;
+      const bounds: RouteBounds = routeRef.current.bounds ?? AUSTRALIA_BOUNDS;
 
       if (width < COMPACT_CAMERA_MAX_WIDTH_PX) {
         // `NO_PADDING` because COMPACT_CAMERA was hand-framed against an
@@ -362,7 +508,7 @@ export function GlobeStage() {
         return;
       }
 
-      map.fitBounds(ROUTE_BOUNDS, {
+      map.fitBounds(bounds, {
         padding: fitPadding(framePadding(width), width, container.clientHeight),
         maxZoom: GLOBE_MAX_FIT_ZOOM,
         bearing: 0,
@@ -423,8 +569,16 @@ export function GlobeStage() {
         "star-intensity": 0.08,
       });
 
-      map.addSource(SOURCE_LEGS, { type: "geojson", data: routeLegsGeoJSON() });
-      map.addSource(SOURCE_POINTS, { type: "geojson", data: routePointsGeoJSON() });
+      // Whatever the route is at style-load — the skeleton if the client store
+      // has not been read yet. The effect below keeps both in step from there.
+      map.addSource(SOURCE_LEGS, {
+        type: "geojson",
+        data: routeRef.current.arcs,
+      });
+      map.addSource(SOURCE_POINTS, {
+        type: "geojson",
+        data: routeRef.current.stops,
+      });
       map.addSource(SOURCE_CAPSULES, {
         type: "geojson",
         data: capsuleMarkersGeoJSON(),
@@ -454,30 +608,72 @@ export function GlobeStage() {
         },
       });
 
-      // Long-haul solid and heavy, domestic hops dashed and light — the two
-      // ocean crossings are the expensive, committed part of the Plan.
-      // Split across two layers because `line-dasharray` is not
-      // data-driven-styleable, so it cannot branch on a feature property.
-      map.addLayer({
-        id: "legs-longhaul",
-        type: "line",
-        source: SOURCE_LEGS,
-        filter: ["==", ["get", "longHaul"], true],
-        layout: { "line-cap": "round", "line-join": "round" },
-        paint: { "line-color": arc, "line-width": 2.4, "line-opacity": 1 },
-      });
+      /* ---- One layer per mode (#87) ----
+         How a Leg is travelled is the first thing the map should say about
+         it: the Nullarbor variant is only interesting *because* it is three
+         days of driving instead of four hours of flying, and an arc that
+         looks like every other arc says nothing about that trade. So a
+         flight is a solid line, a drive is dashed, a ferry is dotted and a
+         train is dash-dot.
 
+         One layer each because `line-dasharray` is not data-driven-styleable
+         and cannot branch on a feature property. Width still can, so the
+         long-haul weighting rides along inside each mode: the ocean
+         crossings stay the heavy, committed part of the Plan. */
+      const modeLayer = (spec: {
+        mode: LegMode;
+        width: number;
+        /** Null draws a solid line. */
+        dashes?: number[];
+        /** Round caps turn a near-zero dash into a row of dots. */
+        cap?: "butt" | "round";
+      }) =>
+        map.addLayer({
+          id: `legs-${spec.mode}`,
+          type: "line",
+          source: SOURCE_LEGS,
+          filter: [
+            "all",
+            ["==", ["get", "mode"], spec.mode],
+            ["==", ["get", "approximate"], false],
+          ],
+          layout: {
+            "line-cap": spec.cap ?? (spec.dashes ? "butt" : "round"),
+            "line-join": "round",
+          },
+          paint: {
+            "line-color": arc,
+            "line-width": [
+              "case",
+              ["get", "longHaul"],
+              spec.width * 1.5,
+              spec.width,
+            ],
+            "line-opacity": ["case", ["get", "longHaul"], 1, 0.95],
+            ...(spec.dashes ? { "line-dasharray": spec.dashes } : {}),
+          },
+        });
+
+      modeLayer({ mode: "flight", width: 1.6 });
+      modeLayer({ mode: "drive", width: 1.8, dashes: [2.2, 1.6] });
+      modeLayer({ mode: "train", width: 1.7, dashes: [4, 1.4, 1, 1.4] });
+      modeLayer({ mode: "ferry", width: 2, dashes: [0.1, 2.4], cap: "round" });
+
+      // An arc whose ends are only known to their gateway airports. Drawn
+      // straight rather than flown, and finely dotted, because a great circle
+      // between two guesses is a precise-looking claim about a vague one. The
+      // popup says which end is the guess.
       map.addLayer({
-        id: "legs-hops",
+        id: "legs-approx",
         type: "line",
         source: SOURCE_LEGS,
-        filter: ["==", ["get", "longHaul"], false],
-        layout: { "line-cap": "butt", "line-join": "round" },
+        filter: ["==", ["get", "approximate"], true],
+        layout: { "line-cap": "round", "line-join": "round" },
         paint: {
           "line-color": arc,
-          "line-width": 1.6,
-          "line-opacity": 0.95,
-          "line-dasharray": [2.5, 1.8],
+          "line-width": 1.5,
+          "line-opacity": 0.7,
+          "line-dasharray": [0.1, 2.6],
         },
       });
 
@@ -633,28 +829,57 @@ export function GlobeStage() {
         },
       });
 
+      /* The stops carry their **place** names now, not their gateway codes.
+         A live route's stops are Locations, and three of the reference trip's
+         eight share the Perth gateway — "PER, PER, PER" stacked on one corner
+         of the continent was the old label layer's answer and it named
+         nothing. Margaret River, Rottnest Island and Perth are three places
+         and the map can say so.
+
+         The longest stay at each gateway keeps the always-on treatment: those
+         labels are the point of the stage and must not lose placement to
+         Mapbox's country names. The rest wait for a camera close enough for
+         them to separate. */
       map.addLayer({
         id: "point-labels",
         type: "symbol",
         source: SOURCE_POINTS,
+        filter: ["==", ["get", "major"], true],
         layout: {
-          "text-field": ["get", "code"],
+          "text-field": ["get", "name"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
           "text-size": 11,
           "text-offset": [0, 1.1],
           "text-anchor": "top",
-          "text-letter-spacing": 0.08,
-          // The route's own labels always draw: they are the point of the
-          // stage, and they must not lose placement to Mapbox's country
-          // names, least of all at the crowded Australian end. They still
-          // reserve space, so the country names move aside rather than
-          // disappearing wholesale.
+          "text-letter-spacing": 0.04,
+          "text-max-width": 8,
           "text-allow-overlap": true,
         },
         paint: {
           "text-color": text,
           "text-halo-color": halo,
           "text-halo-width": 1.8,
+        },
+      });
+
+      map.addLayer({
+        id: "point-labels-minor",
+        type: "symbol",
+        source: SOURCE_POINTS,
+        filter: ["==", ["get", "major"], false],
+        minzoom: 3.2,
+        layout: {
+          "text-field": ["get", "name"],
+          "text-font": ["DIN Pro Medium", "Arial Unicode MS Regular"],
+          "text-size": 10,
+          "text-offset": [0, 1.1],
+          "text-anchor": "top",
+          "text-max-width": 8,
+        },
+        paint: {
+          "text-color": text,
+          "text-halo-color": halo,
+          "text-halo-width": 1.6,
         },
       });
 
@@ -710,19 +935,21 @@ export function GlobeStage() {
           }
         }
 
-        // Route markers that stand for a researched Capsule open its card. The
-        // stops on this route *are* the Capsules' own gateways, so the mapping
-        // is a lookup rather than a nearest-neighbour search — and the two hubs
-        // with nothing researched behind them (Barcelona, Singapore) simply
-        // stay inert, cursor and all.
-        const code = hit.routePoint?.properties?.code;
-        if (typeof code === "string" && DEEP_CAPSULE_BY_ROUTE_CODE[code]) {
-          openDeepCapsule(DEEP_CAPSULE_BY_ROUTE_CODE[code]);
-          return;
+        // A stop that stands for an Adventure opens its card. The Day sequence
+        // already knows which one — the marker carries the Capsule id of the
+        // days spent there, so this is a lookup rather than a
+        // nearest-neighbour search, and it is right for a Catalog idea toggled
+        // onto the Plan as well as for the eight researched ones. A stop with
+        // nothing behind it (the skeleton's Barcelona and Singapore, a Buffer
+        // stretch) stays inert, cursor and all.
+        const stop = hit.routePoint?.properties;
+        if (stop) {
+          const opened = openStop(stop, capsulesRef.current);
+          if (opened) return;
         }
 
         const legId = hit.leg?.properties?.id;
-        if (typeof legId === "string" && LEG_FACTS[legId]) {
+        if (typeof legId === "string" && legsRef.current.has(legId)) {
           // Anchored where it was clicked, not at the arc's midpoint: the
           // midpoint of a Barcelona→Singapore great circle is over Iran, and
           // a popup that jumps 4,000km from the pointer reads as a bug.
@@ -737,13 +964,14 @@ export function GlobeStage() {
 
       map.on("mousemove", (event) => {
         const hit = hitAt(event.point);
-        const routeCode = hit.routePoint?.properties?.code;
+        const legId = hit.leg?.properties?.id;
         const actionable =
           hit.capsule ||
           hit.interested ||
-          hit.leg ||
-          (typeof routeCode === "string" &&
-            Boolean(DEEP_CAPSULE_BY_ROUTE_CODE[routeCode]));
+          (typeof legId === "string" && legsRef.current.has(legId)) ||
+          (hit.routePoint?.properties
+            ? Boolean(capsuleOfStop(hit.routePoint.properties))
+            : false);
         canvas.style.cursor = actionable ? "pointer" : "";
       });
 
@@ -778,6 +1006,21 @@ export function GlobeStage() {
     };
   }, []);
 
+  /* ---- The redraw ----
+     Everything that can change the itinerary — a Scenario selected on
+     /scenarios, a block dragged, an Adventure toggled, a Leg flipped to a
+     drive, the client store finishing its read — arrives here as a new
+     `route`, and the map is told twice: new geometry, and (once the store is
+     up) a route frame that fits the new bounds. */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const arcs = map.getSource(SOURCE_LEGS);
+    if (arcs?.type === "geojson") arcs.setData(route.arcs);
+    const stops = map.getSource(SOURCE_POINTS);
+    if (stops?.type === "geojson") stops.setData(route.stops);
+  }, [route, ready]);
+
   // Shortlist marks live outside React's tree and change while the map is up.
   const interested = useMemo(() => interestedGeoJSON(clusters), [clusters]);
   useEffect(() => {
@@ -790,6 +1033,15 @@ export function GlobeStage() {
   // The selected Leg lights its arc and rings the Capsules at its endpoints —
   // "this flight is how you reach those three".
   const selectedLegId = popup?.kind === "leg" ? popup.id : null;
+  const selectedArc: RouteArcProperties | undefined = selectedLegId
+    ? arcById.get(selectedLegId)
+    : undefined;
+  const selectedFrom = selectedArc?.from;
+  const selectedTo = selectedArc?.to;
+  /** The Leg itself — the popup's every figure comes off this one object. */
+  const selectedLeg: Leg | undefined = selectedLegId
+    ? legById.get(selectedLegId)
+    : undefined;
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
@@ -797,9 +1049,12 @@ export function GlobeStage() {
     map.setFilter("capsules-lit", [
       "in",
       ["get", "id"],
-      ["literal", selectedLegId ? capsulesOnLeg(selectedLegId) : []],
+      [
+        "literal",
+        selectedFrom && selectedTo ? capsulesOnLeg(selectedFrom, selectedTo) : [],
+      ],
     ]);
-  }, [selectedLegId, ready]);
+  }, [selectedLegId, selectedFrom, selectedTo, ready]);
 
   /* ---- The flight (#75) ----
      Opening an Adventure's card takes the globe to it. The plan is a list of
@@ -966,11 +1221,19 @@ export function GlobeStage() {
             onClick={(event) => event.stopPropagation()}
           >
             {popup.kind === "leg" ? (
-              <LegPopup
-                key={popup.id}
-                legId={popup.id}
-                onClose={() => setAnchored(null)}
-              />
+              selectedLeg &&
+              selectedArc && (
+                <LegPopup
+                  key={popup.id}
+                  leg={selectedLeg}
+                  fromName={selectedArc.fromName}
+                  toName={selectedArc.toName}
+                  approximateNote={
+                    selectedArc.approximate ? selectedArc.title : null
+                  }
+                  onClose={() => setAnchored(null)}
+                />
+              )
             ) : cluster ? (
               <div className="sb-panel relative w-[268px] p-3">
                 <button

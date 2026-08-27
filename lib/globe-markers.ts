@@ -117,9 +117,12 @@ export function interestedGeoJSON(
  * relationship the Leg actually has to it: flying PER→SYD is how you reach
  * both WA Capsules' base and Sydney's, and saying so is the point of
  * highlighting them.
+ *
+ * Takes the two codes rather than the Leg's id: a derived Leg's id carries its
+ * date as well (`PER>SYD@2026-12-28`), and splitting that on `>` used to hand
+ * this function `SYD@2026-12-28` as a destination airport.
  */
-export function capsulesOnLeg(legId: string): string[] {
-  const [from, to] = legId.split(">");
+export function capsulesOnLeg(from: string, to: string): string[] {
   return DEEP_CAPSULES.filter(
     (capsule) => capsule.airport === from || capsule.airport === to,
   ).map((capsule) => capsule.id);
