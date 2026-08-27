@@ -229,7 +229,10 @@ function WatchRow({
   return (
     <li className="sb-row rounded-xl border border-[var(--sb-line)] bg-[var(--sb-panel)] p-2.5 sm:p-3">
       <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
-        <div className="min-w-0 flex-1">
+        {/* A floor rather than `min-w-0`: with nothing to stop it, the identity
+            column collapses to one word per line on a phone and the actions
+            never wrap. Below this width they take a line of their own. */}
+        <div className="min-w-[15rem] flex-1">
           <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="sb-num text-[13px] font-semibold text-[var(--sb-text)]">
               {pin.from} <span aria-hidden>→</span> {pin.to}

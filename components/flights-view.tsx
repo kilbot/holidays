@@ -1594,15 +1594,27 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
             </li>
             <li>
               <span className="font-semibold text-[var(--sb-text)]">
-                Every day in the window is choosable, and says what it costs.
+                Every day in the window is choosable, and prices itself when you choose it.
               </span>{" "}
               Any date from 1 December to 28 February, on either search. A day carrying a
-              price in the strip or the calendar is already stored — free to look at and
-              instant. A day with nothing on it has never been priced, and the panel above
-              the results says how many live calls filling it would spend, and how many are
-              left this month, before a single one is made. Nothing is fetched without being
-              asked for; the fan-out is capped either way. Opening a row compares the days
-              either side of the one you are on, from stored history alone.
+              price in the strip or the calendar is already stored — instant. A day with
+              nothing on it has never been priced, and choosing it prices the origins that
+              are missing, live, then keeps what lands, so it is only ever cold once. The
+              fan-out is capped per search, and the two ceilings that can refuse a call —
+              the monthly budget and the daily runaway guard — say so in words up by the
+              meter rather than quietly handing back a stored price. Opening a row compares
+              the days either side of the one you are on, from stored history alone.
+            </li>
+            <li>
+              <span className="font-semibold text-[var(--sb-text)]">
+                A pin remembers a quote; the watchlist watches it.
+              </span>{" "}
+              The pin on any row keeps that itinerary as it stands — day, carrier, price,
+              comfort — and puts it at the top of this page with what its price has done
+              since. The comparison is read from stored fares only: pinning twenty flights
+              never costs a call, and a pinned day nobody has priced since says exactly
+              that instead of inventing a change. Twenty pins, shared with whoever holds
+              the plan.
             </li>
             <li>
               <span className="font-semibold text-[var(--sb-text)]">One fetch per origin, cached a week.</span>{" "}
