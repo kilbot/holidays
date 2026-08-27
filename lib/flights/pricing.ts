@@ -19,6 +19,7 @@
  */
 
 import type { Band, PositioningOption, SearchOption } from "@/lib/flights/search-plan";
+import type { FareTrend } from "@/lib/flights/history";
 
 /** How many travellers. Matches the API's `ADULTS` and the Ledger's couple. */
 export const TRAVELLERS = 2;
@@ -29,11 +30,12 @@ export interface LiveQuote {
   carrier: string;
   durationMin: number | null;
   stops: number | null;
-  source: "live" | "snapshot";
+  source: "live" | "history" | "snapshot";
   fetchedAt: string | null;
+  trend?: FareTrend | null;
 }
 
-export type PriceSource = "live" | "snapshot" | "estimate";
+export type PriceSource = "live" | "history" | "snapshot" | "estimate";
 
 export interface PriceLine {
   label: string;
@@ -50,6 +52,7 @@ export interface OptionPrice {
   /** Everything, for two people. */
   totalEurCouple: Band;
   lines: readonly PriceLine[];
+  trend: FareTrend | null;
 }
 
 const double = (band: Band): Band => [band[0] * TRAVELLERS, band[1] * TRAVELLERS];
@@ -89,7 +92,7 @@ export function priceOption(
   const lines: PriceLine[] = [
     {
       label: matched
-        ? `${option.carrier}, live fare`
+        ? `${option.carrier}, ${matched.source === "live" ? "live fare" : "stored fare"}`
         : `${option.carrier}, research band`,
       eur: double(fareEurPP),
       detail: matched
@@ -167,6 +170,7 @@ export function priceOption(
     chain: move,
     totalEurCouple: total,
     lines,
+    trend: matched?.trend ?? null,
   };
 }
 

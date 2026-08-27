@@ -1,5 +1,11 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+
+import { appendFareHistory } from "@/lib/flights/history";
+import { reserveFareCall } from "@/lib/flights/quota";
+import { getKv } from "@/lib/store/kv";
+
 const ADULTS = 2;
 
 export interface FareResult {
@@ -48,36 +54,36 @@ export async function fetchFare(
   date: string,
   { ttlSeconds, minEur, maxEur }: FareBounds,
 ): Promise<FareResult | null> {
-  const apiKey = process.env.SEARCHAPI_KEY;
-  if (!apiKey) return null;
-
-  const params = new URLSearchParams({
-    engine: "google_flights",
-    flight_type: "one_way",
-    departure_id: from,
-    arrival_id: to,
-    outbound_date: date,
-    currency: "EUR",
-    adults: String(ADULTS),
-    api_key: apiKey,
-  });
-
   try {
-    const response = await fetch(`https://www.searchapi.io/api/v1/search?${params}`, {
-      next: { revalidate: ttlSeconds },
-    });
-    if (!response.ok) return null;
+    return await unstable_cache(async () => {
+      const apiKey = process.env.SEARCHAPI_KEY;
+      if (!apiKey) throw new Error("Fare API unavailable");
+      const kv = getKv();
+      if (!(await reserveFareCall(kv))) throw new Error("Fare quota exhausted");
 
-    const data = (await response.json()) as { best_flights?: unknown; other_flights?: unknown };
-    const candidates = [data.best_flights, data.other_flights]
-      .flatMap((group) => (Array.isArray(group) ? group : []))
-      .map(parseFlight)
-      .filter((flight): flight is FareResult => flight !== null)
-      .sort((a, b) => a.priceEur - b.priceEur);
-    const cheapest = candidates[0];
+      const params = new URLSearchParams({
+        engine: "google_flights", flight_type: "one_way", departure_id: from,
+        arrival_id: to, outbound_date: date, currency: "EUR", adults: String(ADULTS), api_key: apiKey,
+      });
+      const response = await fetch(`https://www.searchapi.io/api/v1/search?${params}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("Fare API unavailable");
 
-    if (!cheapest || cheapest.priceEur < minEur || cheapest.priceEur > maxEur) return null;
-    return cheapest;
+      const data = (await response.json()) as { best_flights?: unknown; other_flights?: unknown };
+      const candidates = [data.best_flights, data.other_flights]
+        .flatMap((group) => (Array.isArray(group) ? group : []))
+        .map(parseFlight)
+        .filter((flight): flight is FareResult => flight !== null)
+        .sort((a, b) => a.priceEur - b.priceEur);
+      const cheapest = candidates[0];
+      if (!cheapest || cheapest.priceEur < minEur || cheapest.priceEur > maxEur) {
+        throw new Error("Fare unavailable");
+      }
+      await appendFareHistory(kv, from, to, date, {
+        ts: new Date().toISOString(), priceEur: cheapest.priceEur,
+        carrier: cheapest.carrier, source: "searchapi",
+      });
+      return cheapest;
+    }, ["fare", from, to, date], { revalidate: ttlSeconds })();
   } catch {
     return null;
   }

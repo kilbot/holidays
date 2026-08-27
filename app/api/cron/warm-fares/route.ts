@@ -7,17 +7,13 @@ import { ROUTE_GRID } from "@/lib/flights/grid";
  * The Flights page (#50) turned the grid from thirteen route/date pairs into
  * about a hundred: thirteen European hubs to Perth and ten return pairs, each
  * on three dates, because a multi-origin search that has to fetch every origin
- * live is a slow page and an expensive one. Warmed nightly they are all cache
+ * live is a slow page and an expensive one. Warmed weekly they are all cache
  * hits.
  *
- * 120 is a ceiling, not a target — the grid currently asks for fewer, and the
- * headroom absorbs a few more dates without another edit here. At one run a day
- * that is at most ~3,650 calls a month against the paid tier's 10,000, leaving
- * roughly two thirds of the allowance for interactive requests, previews and
- * the odd cache miss. If the grid ever grows past this the run reports
- * `skipped` rather than silently overspending.
+ * The full grid is roughly 99 calls; 110 leaves small headroom without letting
+ * a grid edit consume the monthly quota in one weekly run.
  */
-const MAX_WARM_CALLS = 120;
+const MAX_WARM_CALLS = 110;
 
 export async function GET() {
   let warmed = 0;

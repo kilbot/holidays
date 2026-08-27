@@ -47,6 +47,12 @@ export interface KvClient {
    * increment. The write throttle is the only caller.
    */
   incrementWithTtl(key: string, ttlSeconds: number): Promise<number>;
+  /** Put an observation at the front of a list. */
+  listPush(key: string, value: unknown): Promise<void>;
+  /** Keep an inclusive slice of a list. */
+  listTrim(key: string, start: number, end: number): Promise<void>;
+  /** Read an inclusive slice of a list. */
+  listRange<T>(key: string, start: number, end: number): Promise<T[]>;
 }
 
 /**
@@ -81,6 +87,15 @@ function upstashClient(redis: Redis): KvClient {
       // writes cannot keep pushing the window out in front of itself.
       if (count === 1) await redis.expire(key, ttlSeconds);
       return count;
+    },
+    async listPush(key, value) {
+      await redis.lpush(key, value);
+    },
+    async listTrim(key, start, end) {
+      await redis.ltrim(key, start, end);
+    },
+    async listRange<T>(key: string, start: number, end: number): Promise<T[]> {
+      return redis.lrange<T>(key, start, end);
     },
   };
 }

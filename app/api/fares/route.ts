@@ -14,7 +14,9 @@ export async function GET(request: Request) {
     return Response.json({ error: "Unknown route or date" }, { status: 404 });
   }
 
-  const fare = await getFare(route, date);
+  const fare = await getFare(route, date, {
+    allowApi: searchParams.get("stored") !== "1",
+  });
   if (!fare) {
     return Response.json({ error: "Fare unavailable" }, { status: 503 });
   }

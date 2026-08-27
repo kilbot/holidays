@@ -8,8 +8,8 @@
  * European hubs is the right one to leave from once the train, the hold bags,
  * the night before and the lost connection protection are all counted" — and
  * that question cannot be answered one airport at a time. So both searches are
- * multi-origin: one fetch per origin, in parallel, each cached 24 hours by the
- * route grid and warmed nightly by the cron, with the row showing which of its
+ * multi-origin: one fetch per origin, in parallel, each cached for a week by the
+ * route grid and warmed weekly by the cron, with the row showing which of its
  * numbers is live and which is the research band.
  *
  * Three rules the page holds to:
@@ -44,6 +44,7 @@ import {
   type OptionPrice,
 } from "@/lib/flights/pricing";
 import { RETURN_A380_TIP, type SearchOption } from "@/lib/flights/search-plan";
+import type { FareQuota } from "@/lib/flights/quota";
 import { formatDayYear } from "@/lib/trip-dates";
 import { FlightOptionRow } from "@/components/flight-option";
 import { cn } from "@/lib/utils";
@@ -59,7 +60,7 @@ const keyOf = (from: string, to: string, date: string) => `${from}-${to}-${date}
  * Module-level, like the rest of the site's client-side stores, so switching
  * between the two searches — or leaving for the Ledger and coming back — does
  * not re-ask the API for an answer that has not changed. The server-side cache
- * is 24 hours; this one only has to outlive a navigation.
+ * is up to a week; this one only has to outlive a navigation.
  *
  * It is the store; the component holds a snapshot of it in state and re-takes
  * that snapshot as each origin lands, which keeps the effect free of the
@@ -72,14 +73,19 @@ const QUOTE_CACHE = new Map<string, LiveQuote | null>();
 /** How many origins are fetched at once. */
 const SEARCH_CONCURRENCY = 4;
 
+/** Hard ceiling on cache misses one interactive search may request. */
+export const MAX_INTERACTIVE_FARE_CALLS = 25;
+
 async function fetchQuote(
   from: string,
   to: string,
   date: string,
   signal: AbortSignal,
+  storedOnly: boolean,
 ): Promise<LiveQuote | null> {
   try {
-    const response = await fetch(`/api/fares?from=${from}&to=${to}&date=${date}`, { signal });
+    const stored = storedOnly ? "&stored=1" : "";
+    const response = await fetch(`/api/fares?from=${from}&to=${to}&date=${date}${stored}`, { signal });
     if (!response.ok) return null;
     const body = (await response.json()) as Record<string, unknown>;
     const price = body.priceEur;
@@ -89,14 +95,35 @@ async function fetchQuote(
       carrier: typeof body.carrier === "string" ? body.carrier : "Unknown carrier",
       durationMin: typeof body.durationMin === "number" ? body.durationMin : null,
       stops: typeof body.stops === "number" ? body.stops : null,
-      source: body.source === "live" ? "live" : "snapshot",
+      source: body.source === "live" || body.source === "history" ? body.source : "snapshot",
       fetchedAt: typeof body.fetchedAt === "string" ? body.fetchedAt : null,
+      trend: body.trend === "up" || body.trend === "down" || body.trend === "flat" ? body.trend : null,
     };
   } catch {
     // An exhausted quota, an offline tab and a malformed body all land here,
     // and all mean the same thing to the page: keep the research band.
     return null;
   }
+}
+
+function QuotaMeter() {
+  const [quota, setQuota] = useState<FareQuota | null>(null);
+
+  useEffect(() => {
+    void fetch("/api/fares/quota")
+      .then((response) => response.ok ? response.json() as Promise<FareQuota> : null)
+      .then((value) => value && setQuota(value))
+      .catch(() => undefined);
+  }, []);
+
+  return (
+    <details className="mt-2 w-fit text-[10px] text-[var(--sb-faint)]">
+      <summary className="cursor-pointer">
+        live quota: {quota ? `${quota.used}/${quota.budget} this month` : "checking…"}
+      </summary>
+      {quota && <p className="mt-1">{quota.month} · soft stop at 150 calls per day</p>}
+    </details>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -166,7 +193,10 @@ function OriginStrip({
   // one: it is what `/api/fares` falls back to when the quote fails its sanity
   // bounds or the key is absent, and it names no carrier.
   const live = pairs.filter((pair) => quotes.get(pair.key)?.source === "live").length;
-  const stored = pairs.filter((pair) => quotes.get(pair.key)?.source === "snapshot").length;
+  const stored = pairs.filter((pair) => {
+    const source = quotes.get(pair.key)?.source;
+    return source === "history" || source === "snapshot";
+  }).length;
   const pending = pairs.filter((pair) => !quotes.has(pair.key)).length;
 
   return (
@@ -199,7 +229,7 @@ function OriginStrip({
                   : quote?.source === "live"
                     ? `${pair.from} → ${pair.to}: live fare, ${quote.carrier}`
                     : quote
-                      ? `${pair.from} → ${pair.to}: stored fare snapshot, no live quote`
+                      ? `${pair.from} → ${pair.to}: stored fare, no live quote`
                       : `${pair.from} → ${pair.to}: no fare returned, research band`
               }
               className="sb-num inline-flex items-center gap-1 rounded-md border border-[var(--sb-line)] px-1.5 py-[1px] text-[9.5px] text-[var(--sb-dim)]"
@@ -248,6 +278,9 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   const options = leg === "outbound" ? outbound : returns;
   const date = leg === "outbound" ? outboundDate : returnDate;
   const dates = leg === "outbound" ? OUTBOUND_SEARCH_DATES : RETURN_SEARCH_DATES;
+  const storedOnly = leg === "outbound"
+    ? date !== OUTBOUND_DEFAULT_DATE
+    : date !== RETURN_DEFAULT_DATE;
 
   /** The distinct airport pairs this search has to ask about. */
   const pairs = useMemo(() => {
@@ -263,13 +296,15 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   /* One fetch per origin, four at a time, abandoned if the search changes. */
   useEffect(() => {
     const controller = new AbortController();
-    const pending = pairs.filter((pair) => !QUOTE_CACHE.has(pair.key));
+    const pending = pairs
+      .filter((pair) => !QUOTE_CACHE.has(pair.key))
+      .slice(0, MAX_INTERACTIVE_FARE_CALLS);
 
     async function worker() {
       for (;;) {
         const pair = pending.shift();
         if (!pair || controller.signal.aborted) return;
-        const quote = await fetchQuote(pair.from, pair.to, date, controller.signal);
+        const quote = await fetchQuote(pair.from, pair.to, date, controller.signal, storedOnly);
         if (controller.signal.aborted) return;
         QUOTE_CACHE.set(pair.key, quote);
         setQuotes(new Map(QUOTE_CACHE));
@@ -280,7 +315,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     void Promise.all(workers);
 
     return () => controller.abort();
-  }, [pairs, date]);
+  }, [pairs, date, storedOnly]);
 
   const priceFor = useCallback(
     (option: SearchOption): OptionPrice => {
@@ -336,6 +371,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
             hold bags, the night before and the taxes back on before anything is
             compared.
           </p>
+          <QuotaMeter />
         </header>
 
         <div className="mt-5 flex flex-wrap items-start gap-x-6 gap-y-3">
@@ -415,8 +451,8 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               connection on a sold-out mid-December Perth flight is close to uncoverable.
             </li>
             <li>
-              <span className="font-semibold text-[var(--sb-text)]">One fetch per origin, cached a day.</span>{" "}
-              The grid is warmed nightly, so most of these are cache hits. Adelaide and Western
+              <span className="font-semibold text-[var(--sb-text)]">One fetch per origin, cached a week.</span>{" "}
+              The grid is warmed weekly; alternate dates read stored history only. Adelaide and Western
               Sydney stay out of the return search deliberately — one only matters if the trip
               already ends in South Australia, the other forces an 18-hour Singapore layover.
             </li>

@@ -24,8 +24,6 @@ export function fakeKv(seed: Record<string, unknown> = {}): FakeKv {
   for (const [key, value] of Object.entries(seed)) {
     map.set(key, JSON.stringify(value));
   }
-  const counters = new Map<string, number>();
-
   return {
     map,
     writes,
@@ -44,9 +42,25 @@ export function fakeKv(seed: Record<string, unknown> = {}): FakeKv {
       return true;
     },
     async incrementWithTtl(key) {
-      const next = (counters.get(key) ?? 0) + 1;
-      counters.set(key, next);
+      const raw = map.get(key);
+      const next = (raw === undefined ? 0 : Number(JSON.parse(raw))) + 1;
+      writes.push(key);
+      map.set(key, JSON.stringify(next));
       return next;
+    },
+    async listPush(key, value) {
+      const values = map.has(key) ? (JSON.parse(map.get(key)!) as unknown[]) : [];
+      writes.push(key);
+      map.set(key, JSON.stringify([value, ...values]));
+    },
+    async listTrim(key, start, end) {
+      const values = map.has(key) ? (JSON.parse(map.get(key)!) as unknown[]) : [];
+      writes.push(key);
+      map.set(key, JSON.stringify(values.slice(start, end + 1)));
+    },
+    async listRange<T>(key: string, start: number, end: number) {
+      const values = map.has(key) ? (JSON.parse(map.get(key)!) as T[]) : [];
+      return values.slice(start, end + 1);
     },
   };
 }
