@@ -22,7 +22,6 @@ import {
   type SeasonFit,
 } from "@/lib/catalog";
 import { FACETS, type FacetId } from "@/lib/facets";
-import { LENSES, lensWeight, type LensId } from "@/lib/lens";
 import { useShortlist, type ShortlistCounts } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
 
@@ -38,8 +37,14 @@ import { cn } from "@/lib/utils";
  *   always says how many of the 413 survived.
  * - Selecting several facets is an OR. Chips that narrow to nothing are a
  *   worse experience than chips that gather.
- * - The lens re-orders, it never filters — CONTEXT.md's "inform, never block"
- *   applied to taste.
+ *
+ * There used to be a third control here, a "her view / his view" taste lens
+ * that re-ordered the list by whose pick an idea was. It came out in #36:
+ * the Travellers' tastes are shared, not partitioned — "we're in this
+ * together", no per-person views anywhere in the site (docs/CONTEXT.md). The
+ * facet chips already carry the same information without the partition:
+ * pressing `hippie` or `sport` is the couple stating what they want out of
+ * this trip, not the site sorting the Catalog into his and hers.
  */
 
 const SEASON_FITS: readonly SeasonFit[] = ["good", "ok", "poor", "no"];
@@ -119,7 +124,6 @@ export function CatalogSift() {
   const [seasons, setSeasons] = useState<SeasonFit[]>([]);
   const [dayStop, setDayStop] = useState(DAY_STOPS.length - 1);
   const [costStop, setCostStop] = useState(COST_STOPS.length - 1);
-  const [lens, setLens] = useState<LensId>("both");
   const [shelf, setShelf] = useState<ShelfId>("open");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -134,11 +138,7 @@ export function CatalogSift() {
     (maxDays === Infinity ? 0 : 1) +
     (maxCost === Infinity ? 0 : 1);
   const dirty =
-    filterCount > 0 ||
-    facets.length > 0 ||
-    query !== "" ||
-    lens !== "both" ||
-    shelf !== "open";
+    filterCount > 0 || facets.length > 0 || query !== "" || shelf !== "open";
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -167,19 +167,15 @@ export function CatalogSift() {
       return true;
     });
 
-    // Weigh once, then sort — the comparator runs ~n log n times and the
-    // lens weight is the expensive half of it.
-    return kept
-      .map((idea) => ({ idea, weight: lensWeight(idea, lens) }))
-      .sort(
-        (a, b) =>
-          b.weight - a.weight ||
-          SEASON_RANK[a.idea.season_fit_dec_feb] -
-            SEASON_RANK[b.idea.season_fit_dec_feb] ||
-          a.idea.name.localeCompare(b.idea.name),
-      )
-      .map((scored) => scored.idea);
-  }, [query, facets, states, seasons, maxDays, maxCost, lens, shelf, marks]);
+    // One order, always: the ideas that suit a December-to-February trip
+    // float, and ties break alphabetically. Nothing re-ranks behind the
+    // traveller's back.
+    return kept.toSorted(
+      (a, b) =>
+        SEASON_RANK[a.season_fit_dec_feb] - SEASON_RANK[b.season_fit_dec_feb] ||
+        a.name.localeCompare(b.name),
+    );
+  }, [query, facets, states, seasons, maxDays, maxCost, shelf, marks]);
 
   const reset = () => {
     setQuery("");
@@ -188,11 +184,9 @@ export function CatalogSift() {
     setSeasons([]);
     setDayStop(DAY_STOPS.length - 1);
     setCostStop(COST_STOPS.length - 1);
-    setLens("both");
     setShelf("open");
   };
 
-  const activeLens = LENSES.find((entry) => entry.id === lens) ?? LENSES[0];
   const soleFacet =
     facets.length === 1 ? FACETS.find((f) => f.id === facets[0]) : undefined;
 
@@ -262,31 +256,6 @@ export function CatalogSift() {
         )}
       </div>
 
-      {/* ---- Lens ---- */}
-      <div className="mt-2 flex rounded-full bg-[color-mix(in_srgb,var(--sb-line)_35%,transparent)] p-[2px]">
-        {LENSES.map((entry) => (
-          <button
-            key={entry.id}
-            type="button"
-            onClick={() => setLens(entry.id)}
-            aria-pressed={lens === entry.id}
-            className={cn(
-              "flex-1 cursor-pointer rounded-full py-[3px] text-[10.5px] font-semibold transition-colors",
-              lens === entry.id
-                ? "text-[var(--primary-foreground)]"
-                : "text-[var(--sb-dim)] hover:text-[var(--sb-text)]",
-            )}
-            style={
-              lens === entry.id
-                ? { background: entry.tone, color: "var(--primary-foreground)" }
-                : undefined
-            }
-          >
-            {entry.label}
-          </button>
-        ))}
-      </div>
-
       {/* ---- Facet chips ---- */}
       <div className="mt-2 flex flex-wrap gap-1">
         {FACETS.map((facet) => {
@@ -308,7 +277,9 @@ export function CatalogSift() {
       </div>
 
       <p className="mt-1.5 text-[10px] leading-snug text-[var(--sb-faint)]">
-        {soleFacet ? soleFacet.hint : activeLens.note}
+        {soleFacet
+          ? soleFacet.hint
+          : "Chips gather rather than narrow — pick several. In-season ideas sort first."}
       </p>
 
       {/* ---- Numeric filters, behind a disclosure ---- */}
@@ -460,6 +431,19 @@ export function CatalogSift() {
           );
         })}
       </div>
+
+      {/* One helper line for the whole list. The three buttons on every row
+          say what they do; what they *mean* is a fact about the Plan — a
+          bench, a calendar, a shelf you stop looking at — and repeating that
+          413 times would be worse than saying it once, here. */}
+      <p className="mt-2 text-[10px] leading-snug text-[var(--sb-faint)]">
+        Tap a row to read it.{" "}
+        <span className="font-semibold text-[var(--sb-accent)]">Interested</span>{" "}
+        benches an idea,{" "}
+        <span className="font-semibold text-[var(--sb-good)]">Plan</span> gives
+        it days, <span className="font-semibold">Discard</span> hides it. Tap
+        again to undo.
+      </p>
 
       {/* The mask makes the cut-off row at the bottom read as "there is more"
           rather than as a clipping bug. */}

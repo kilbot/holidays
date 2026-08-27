@@ -216,7 +216,7 @@ export function TripRail({ startDate, endDate, onChange }: TripRailProps) {
   };
 
   return (
-    <div className="relative pt-4 pb-3.5 select-none">
+    <div className="relative pt-3.5 pb-3 select-none">
       {/* Deadline and anchor ticks, above the track and on the same scale. */}
       <div className="absolute inset-x-0 top-0 h-3.5">
         {WINDOW_DEADLINES.map((deadline) => (

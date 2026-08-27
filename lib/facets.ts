@@ -84,9 +84,9 @@ export const FACET_OUTDOORS: Facet = {
 
 /**
  * The journey as the destination: highways, rail and the long crossings.
- * Not on the original facet list, but 95 entries deep and the one lane
- * CONTEXT.md singles out for him — leaving it out stranded the Ghan, the
- * Explorers Way and the Nullarbor with no chip at all.
+ * Not on the original facet list, but 95 entries deep and the one CONTEXT.md
+ * singles out as carrying value beyond its cost math — leaving it out
+ * stranded the Ghan, the Explorers Way and the Nullarbor with no chip at all.
  */
 export const FACET_ROAD_TRIP: Facet = {
   id: "road-trip",
@@ -174,7 +174,8 @@ export const FACET_FOOD: Facet = {
   tags: ["food", "wine", "seafood", "food-pilgrimage", "beer", "pub"],
 };
 
-/** One tag, but it is her tag — 32 entries and worth its own chip. */
+/** One tag, but a first-class one for this couple — 32 entries and worth its
+ *  own chip. */
 export const FACET_MARKET: Facet = {
   id: "market",
   label: "markets",
@@ -209,7 +210,8 @@ export const FACET_FESTIVAL: Facet = {
   tags: ["festival", "event", "doof", "nye", "australia-day"],
 };
 
-/** Her lane: alternative culture, doofs, spa and ecovillage country. */
+/** First-class Event spend for the couple: alternative culture, doofs,
+ *  spa and ecovillage country. */
 export const FACET_HIPPIE: Facet = {
   id: "hippie",
   label: "hippie",
@@ -218,7 +220,8 @@ export const FACET_HIPPIE: Facet = {
   tags: ["hippie", "doof", "psytrance", "wellness", "reggae"],
 };
 
-/** His lane, and a small one: 20 entries, most of them cricket. */
+/** A minor shared interest, and a small facet: 20 entries, most of them
+ *  cricket. Cheap outings, never a big spend or a relocation driver. */
 export const FACET_SPORT: Facet = {
   id: "sport",
   label: "sport",
@@ -254,7 +257,7 @@ export const FACET_WARNING: Facet = {
 };
 
 /** Chip order: land, water, road, animals, then culture, then the two
- *  lenses, with caveats last because it filters *for* problems. */
+ *  taste chips, with caveats last because it filters *for* problems. */
 export const FACETS: readonly Facet[] = [
   FACET_OUTDOORS,
   FACET_BEACH,

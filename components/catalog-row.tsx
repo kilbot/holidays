@@ -18,12 +18,21 @@ import { cn } from "@/lib/utils";
 /**
  * One Catalog idea.
  *
- * Three lines — name and cost, where, then the season chip and the mark
- * buttons — and clicking anywhere on it opens the detail card. The row used to
- * expand in place instead; the card replaced that because it is a superset
- * (the same why-rated and season note, plus the sources, the flags and the
- * research links) and because two ways to open the same content in a 320px
- * column is one too many.
+ * Name and cost, where, the season chip, then a row of three labelled verdict
+ * buttons — and clicking anywhere above them opens the detail card. The row
+ * used to expand in place instead; the card replaced that because it is a
+ * superset (the same why-rated and season note, plus the sources, the flags
+ * and the research links) and because two ways to open the same content in a
+ * 280px column is one too many.
+ *
+ * The verdict buttons carry words as of #36. They were three 20px icons
+ * floating in the corner with the label only in a `title`, which meant the
+ * single action the whole Catalog exists for — sift 413 ideas down to a
+ * shortlist — was discoverable only by hovering and waiting. Sifting is the
+ * job; the buttons that do it should say what they do. `CatalogSift` also
+ * carries one helper line above the list explaining the three states, because
+ * "interested" versus "on the Plan" is a distinction about the Plan, not about
+ * the button.
  *
  * Memoised on purpose: a keystroke in the search box re-renders the list, and
  * the rows that survived the filter should not re-render with it.
@@ -31,18 +40,34 @@ import { cn } from "@/lib/utils";
 
 const MARK_BUTTONS: {
   state: MarkedState;
+  /** On the button. Short enough that three fit a 280px rail. */
   label: string;
+  /** In the tooltip and the accessible name, where there is room to be exact. */
+  title: string;
   icon: typeof Star;
   token: string;
 }[] = [
   {
     state: "interested",
     label: "Interested",
+    title: "Interested — keep it on the bench",
     icon: Star,
     token: "--sb-accent",
   },
-  { state: "placed", label: "On the Plan", icon: MapPin, token: "--sb-good" },
-  { state: "discarded", label: "Discard", icon: X, token: "--sb-over" },
+  {
+    state: "placed",
+    label: "Plan",
+    title: "On the Plan — give it calendar days",
+    icon: MapPin,
+    token: "--sb-good",
+  },
+  {
+    state: "discarded",
+    label: "Discard",
+    title: "Discard — hide it from the open shelf",
+    icon: X,
+    token: "--sb-over",
+  },
 ];
 
 const ROW_TONE: Record<ShortlistState, string> = {
@@ -77,7 +102,7 @@ function CatalogRowImpl({ idea, state, onMark }: CatalogRowProps) {
         onClick={() => openCatalogIdea(idea.id)}
         aria-haspopup="dialog"
         title={`Open ${idea.name}`}
-        className="w-full cursor-pointer px-2.5 pt-2 pb-1.5 text-left"
+        className="w-full cursor-pointer px-2.5 pt-2 pb-1 text-left"
       >
         <div className="flex items-start gap-2">
           <span className="line-clamp-2 min-w-0 flex-1 text-[12.5px] leading-tight font-semibold">
@@ -95,8 +120,7 @@ function CatalogRowImpl({ idea, state, onMark }: CatalogRowProps) {
           {idea.where && ` · ${idea.where}`}
         </p>
 
-        {/* Right padding keeps this line clear of the floating mark buttons. */}
-        <div className="mt-1.5 flex h-5 items-center gap-2 pr-[68px]">
+        <div className="mt-1 flex h-4 items-center gap-2">
           <span
             className="inline-flex items-center gap-1 text-[10px] font-medium whitespace-nowrap"
             style={{ color: SEASON_TOKEN[idea.season_fit_dec_feb] }}
@@ -123,9 +147,11 @@ function CatalogRowImpl({ idea, state, onMark }: CatalogRowProps) {
         </div>
       </button>
 
-      {/* Floated rather than in flow: the row stays three lines tall whether or
-          not it carries a caveat, and the marks always land in the same spot. */}
-      <div className="absolute right-2 bottom-1.5 flex gap-0.5">
+      {/* In flow rather than floated in the corner: these are the row's
+          actions, and a toolbar that shares the row's full width can afford
+          to say what each button does. Pressing the state an idea already
+          has clears it back to unseen — `aria-pressed` is what says so. */}
+      <div className="flex gap-1 px-2 pt-0.5 pb-1.5">
         {MARK_BUTTONS.map((button) => {
           const active = state === button.state;
           const Icon = button.icon;
@@ -135,12 +161,13 @@ function CatalogRowImpl({ idea, state, onMark }: CatalogRowProps) {
               type="button"
               onClick={() => onMark(idea.id, button.state)}
               aria-pressed={active}
-              title={`${button.label} — ${idea.name}`}
-              aria-label={`${button.label} — ${idea.name}`}
+              title={`${button.title} — ${idea.name}`}
+              aria-label={`${button.title} — ${idea.name}`}
               className={cn(
-                "flex size-5 cursor-pointer items-center justify-center rounded-[5px] transition-colors",
+                "flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md py-[3px]",
+                "text-[10px] font-semibold whitespace-nowrap transition-colors motion-reduce:transition-none",
                 !active &&
-                  "text-[var(--sb-faint)] hover:bg-[color-mix(in_srgb,var(--sb-line)_55%,transparent)] hover:text-[var(--sb-text)]",
+                  "bg-[color-mix(in_srgb,var(--sb-line)_38%,transparent)] text-[var(--sb-dim)] hover:bg-[color-mix(in_srgb,var(--sb-line)_70%,transparent)] hover:text-[var(--sb-text)]",
               )}
               style={
                 active
@@ -151,12 +178,12 @@ function CatalogRowImpl({ idea, state, onMark }: CatalogRowProps) {
                   : undefined
               }
             >
-              <Icon className="size-3" />
+              <Icon className="size-2.5 shrink-0" />
+              {button.label}
             </button>
           );
         })}
       </div>
-
     </li>
   );
 }

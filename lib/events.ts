@@ -35,7 +35,13 @@ export interface TripEvent {
   dates_status: string;
   category: string;
   tags: string[];
-  /** "her" (psytrance/markets), "him" (sport, minor), "both". */
+  /**
+   * How the original research sweep tagged an event's audience. Kept because
+   * it is a field of `events-dec-feb.json` and this interface describes that
+   * file, but never rendered: the Travellers' tastes are shared, not
+   * partitioned, and there are no per-person views in the site
+   * (docs/CONTEXT.md).
+   */
   travellers: string;
   why_it_matters: string;
   rough_ticket_cost_couple_aud?: string;

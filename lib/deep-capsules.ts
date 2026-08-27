@@ -33,6 +33,7 @@
  * the Catalog ideas each document argues with, so the card can offer them.
  */
 
+import type { Coordinates } from "@/lib/airports";
 import type { SeasonFit } from "@/lib/catalog";
 import type { FacetId } from "@/lib/facets";
 
@@ -94,6 +95,15 @@ export interface DeepCapsule {
   seasonFit: SeasonFit;
   /** IATA of the airport the Capsule is reached through. */
   airport: string;
+  /**
+   * Where the Capsule actually happens, [longitude, latitude] — its base, not
+   * its gateway. Port Douglas is 60km north of the Cairns airport it flies
+   * into and Margaret River is a three-hour drive from Perth; a marker on the
+   * airport would put the Capsule in the wrong place on a map whose whole job
+   * is saying where things are. Content, like every other figure here: these
+   * are the towns the research documents run their itineraries out of.
+   */
+  base: Coordinates;
   /** The days the research says the Capsule wants. */
   days: { min: number; ideal: number; max: number; unit: string };
   cost: { min: CostTier; ideal: CostTier; max: CostTier };
@@ -137,6 +147,7 @@ const GREAT_BARRIER_REEF: DeepCapsule = {
   tags: ["reef", "snorkel", "diving", "boat", "coast", "bucket-list"],
   seasonFit: "ok",
   airport: "CNS",
+  base: [145.4650, -16.4840], // Port Douglas — Macrossan St, the reef town itself
   days: { min: 3, ideal: 5, max: 7, unit: "nights" },
   cost: {
     min: { aud: 3020, eur: 1840, band: [1400, 2320] },
@@ -334,6 +345,7 @@ const FNQ_WILDLIFE: DeepCapsule = {
   tags: ["wildlife", "rainforest", "national-park", "birds", "conservation"],
   seasonFit: "ok",
   airport: "CNS",
+  base: [145.4530, -16.0850], // Cape Tribulation, north of the Daintree ferry
   days: { min: 0, ideal: 1, max: 2, unit: "extra days" },
   cost: {
     min: { aud: 170, eur: 105, band: [60, 200] },
@@ -526,6 +538,7 @@ const TASMANIA: DeepCapsule = {
   ],
   seasonFit: "good",
   airport: "HBA",
+  base: [147.3272, -42.8821], // Hobart — where the south-to-north arc starts
   days: { min: 6, ideal: 9, max: 12, unit: "nights" },
   cost: {
     min: { aud: 4588, eur: 2800, band: [2195, 3905] },
@@ -748,6 +761,7 @@ const SYDNEY_NYE: DeepCapsule = {
   tags: ["city", "nye", "festival", "event", "date-locked", "beach", "coastal-walk"],
   seasonFit: "good",
   airport: "SYD",
+  base: [151.2108, -33.8568], // Sydney Harbour, the Opera House side
   days: { min: 4, ideal: 6, max: 9, unit: "nights" },
   cost: {
     min: { aud: 2180, eur: 1330, band: [1065, 1710] },
@@ -950,6 +964,7 @@ const MARGARET_RIVER: DeepCapsule = {
   tags: ["wine", "food", "cave", "beach", "coast", "road-trip", "forest", "surf"],
   seasonFit: "good",
   airport: "PER",
+  base: [115.0750, -33.9550], // Margaret River township
   days: { min: 2, ideal: 3, max: 5, unit: "nights" },
   cost: {
     min: { aud: 1554, eur: 945, band: [700, 1525] },
@@ -1128,6 +1143,7 @@ const ROTTNEST: DeepCapsule = {
   tags: ["island", "snorkel", "beach", "wildlife", "cycling", "day-trip", "swimming"],
   seasonFit: "good",
   airport: "PER",
+  base: [115.5200, -32.0060], // Rottnest — Thomson Bay settlement
   days: { min: 1, ideal: 1, max: 2, unit: "days" },
   cost: {
     min: { aud: 230, eur: 140, band: [140, 340] },
@@ -1314,6 +1330,7 @@ const BYRON_NIMBIN: DeepCapsule = {
   tags: ["beach", "hippie", "market", "surf", "coastal-walk", "rainforest", "cheap"],
   seasonFit: "good",
   airport: "OOL",
+  base: [153.6120, -28.6434], // Byron Bay — the Cape Byron end
   days: { min: 3, ideal: 5, max: 7, unit: "nights" },
   cost: {
     min: { aud: 1106, eur: 670, band: [520, 1040] },
@@ -1508,6 +1525,7 @@ const MELBOURNE: DeepCapsule = {
   tags: ["city", "music", "techno", "psytrance", "nightlife", "market", "festival", "food"],
   seasonFit: "good",
   airport: "MEL",
+  base: [144.9800, -37.7980], // Fitzroy / Collingwood, not the CBD
   days: { min: 3, ideal: 4, max: 5, unit: "nights" },
   cost: {
     min: { aud: 1320, eur: 805, band: [610, 1160] },

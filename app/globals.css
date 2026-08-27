@@ -167,6 +167,60 @@
   --sidebar-primary-foreground: #121b28;
 }
 
+/* ------------------------------------------------------------------
+   Map ink.
+
+   The chrome is theme-aware; the map is not. A globe is a picture of
+   the world, and the world is green and blue whatever the viewer's OS
+   thinks about dark mode — the old dark-v11 style rendered Australia
+   as a grey smudge in both themes, which is a poor advertisement for a
+   trip round it. The style is bright and colourful now, and these
+   tokens are the ink the route is drawn in on top of it.
+
+   They are defined once, on :root, and deliberately *not* overridden
+   in the dark block: the route has to hold contrast against green
+   land, blue ocean and pale desert, and that problem does not change
+   when the panels do. They stay tokens rather than literals so the
+   globe's colours are still edited in one place, next to the rest of
+   the palette.
+   ------------------------------------------------------------------ */
+:root {
+  /* Deep petrol — dark enough to read over ocean, saturated enough not
+     to be mistaken for a border. */
+  --sb-map-arc: #0d4d66;
+  /* A soft white casing under every arc. Terrain styles are busy; a
+     line with no casing disappears over relief shading. */
+  --sb-map-casing: #ffffff;
+  /* The route's own stops keep the brand coral — it is the one colour
+     no map style uses for anything. */
+  --sb-map-stop: #d2402a;
+  /* Researched Capsules. Forest green, distinct from the style's own
+     lighter park and landcover greens. */
+  --sb-map-capsule: #146c3a;
+  --sb-map-label: #14232f;
+  --sb-map-halo: #ffffff;
+}
+
+/* ------------------------------------------------------------------
+   Resting height of the docked date strip, measured at its collapsed
+   default. Three pieces of chrome have to clear it — the catalog rail's
+   bottom edge, Mapbox's logo and its attribution — and before #36 each
+   carried its own hard-coded copy of the number, which drifted every
+   time the strip changed. One variable, three readers.
+
+   It is a *resting* height on purpose: opening a week zoom grows the
+   strip over the globe rather than pushing this out, which is what an
+   overlay should do.
+   ------------------------------------------------------------------ */
+:root {
+  --sb-strip-h: 212px;
+}
+@media (min-width: 1024px) {
+  :root {
+    --sb-strip-h: 140px;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -217,7 +271,7 @@
    scrollbar stays honest. */
 @utility sb-row {
   content-visibility: auto;
-  contain-intrinsic-size: auto 74px;
+  contain-intrinsic-size: auto 96px;
 }
 
 /* Thin scrollbars so the catalog list does not grow a chunky OS bar
@@ -237,18 +291,11 @@
 /* The extra `.mapboxgl-map` is load-bearing: mapbox-gl.css is injected after
    this stylesheet, so a bare class selector loses the tie on source order.
 
-   The offsets are the docked strip's measured height plus its 16px inset:
-   246px at desktop widths, 317px on a phone where the deadline banner and the
-   date chips each take two lines. An opened week zoom scrolls inside its own
-   box rather than growing past these. */
+   The offset is the docked strip's resting height plus its 16px inset and a
+   8px gap. An opened week zoom scrolls inside its own box rather than growing
+   past this. */
 .mapboxgl-map .mapboxgl-ctrl-bottom-left,
 .mapboxgl-map .mapboxgl-ctrl-bottom-right {
   z-index: 1;
-  bottom: 340px;
-}
-@media (min-width: 1024px) {
-  .mapboxgl-map .mapboxgl-ctrl-bottom-left,
-  .mapboxgl-map .mapboxgl-ctrl-bottom-right {
-    bottom: 272px;
-  }
+  bottom: calc(var(--sb-strip-h) + 24px);
 }
