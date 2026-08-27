@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, Plane, TrainFront, X } from "lucide-react";
 
-import { formatEur } from "@/lib/demo-plan";
+import { formatEur } from "@/lib/engine";
 import { LEG_FACTS, routePointOf } from "@/lib/demo-route";
 import {
   FARE_SOURCE_LABEL,

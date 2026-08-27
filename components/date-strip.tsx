@@ -4,7 +4,13 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import { AlarmClock, ChevronDown, TriangleAlert } from "lucide-react";
 
 import { eventsForDays } from "@/lib/events";
-import { formatEurCompact } from "@/lib/demo-plan";
+import {
+  DAILY_CAP_AUD,
+  formatEurCompact,
+  type PlanWeek,
+} from "@/lib/engine";
+import { eventDaysOf, weatherOf } from "@/lib/engine/plan";
+import { usePlan } from "@/lib/engine/use-plan";
 import { TripRail } from "@/components/trip-rail";
 import { WeekZoom } from "@/components/week-zoom";
 import {
@@ -15,18 +21,15 @@ import {
   formatDay,
   formatDayYear,
   monthKey,
-  moveRangeEnd,
+  anchorOn,
+  type Anchor,
   type RangeEnd,
-  type TripRange,
 } from "@/lib/trip-dates";
 import {
-  DEFAULT_TRIP_END,
-  DEFAULT_TRIP_START,
-  derivePlan,
-  eventDaysOf,
-  type PlanWeek,
-} from "@/lib/trip-plan";
-import { heatFraction, normalsFor } from "@/lib/weather";
+  heatFraction,
+  normalsFor,
+  type WeatherLocationId,
+} from "@/lib/weather";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -267,7 +270,7 @@ const WEEK_ZOOM_ID = "week-zoom";
  * dock jump 44px and back, ten times.
  */
 function WeatherRibbon({ week }: { week: PlanWeek }) {
-  const id = week.lead.weather;
+  const id = weatherOf(week) as WeatherLocationId | null;
   const month = monthKey(week.startDate);
   const normals = id ? normalsFor(id, month) : null;
   const heat = normals
@@ -304,7 +307,8 @@ function WeatherRibbon({ week }: { week: PlanWeek }) {
         )}
       </p>
       <p className="mt-1 text-[10px] leading-snug text-[var(--sb-faint)]">
-        {week.handover ?? week.lead.detail}
+        {week.handover ??
+          `${week.bufferDays} buffer day${week.bufferDays === 1 ? "" : "s"} this week`}
       </p>
     </div>
   );
@@ -353,7 +357,17 @@ function WeekCell({
   open: boolean;
   onToggle: () => void;
 }) {
-  const anchored = week.anchors.length > 0;
+  const anchors = week.days
+    .map((day) => anchorOn(day.date))
+    .filter((anchor): anchor is Anchor => Boolean(anchor));
+  const anchored = anchors.length > 0;
+  // A whole cell of Buffer is a Buffer week; a cell with a Capsule in it is not.
+  const allBuffer = week.days.every((day) => day.buffer);
+  const worst = week.warnings.some((warning) => warning.tone === "over")
+    ? "over"
+    : week.warnings.length > 0
+      ? "warn"
+      : null;
 
   return (
     <li className="relative flex min-w-[124px] flex-1 lg:min-w-0">
@@ -362,13 +376,13 @@ function WeekCell({
         onClick={onToggle}
         aria-expanded={open}
         aria-controls={WEEK_ZOOM_ID}
-        aria-label={`${week.label}, ${week.lead.place}. Open the day view.`}
+        aria-label={`${week.label}, ${week.leadLocationName}. Open the day view.`}
         className={cn(
           "peer flex w-full cursor-pointer flex-col rounded-lg border px-2 py-1.5 text-left transition-colors motion-reduce:transition-none",
           anchored
             ? "border-[color-mix(in_srgb,var(--sb-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--sb-accent)_9%,var(--sb-panel-2))]"
             : "border-[var(--sb-line)] bg-[color-mix(in_srgb,var(--sb-panel-2)_65%,transparent)]",
-          week.lead.buffer && !anchored && "border-dashed",
+          allBuffer && !anchored && "border-dashed",
           open
             ? "ring-1 ring-[var(--sb-accent)]"
             : "hover:border-[color-mix(in_srgb,var(--sb-dim)_45%,transparent)]",
@@ -381,13 +395,28 @@ function WeekCell({
             {week.label}
           </span>
           <span className="flex shrink-0 items-baseline gap-1">
+            {/* The Warning, reduced to its smallest honest form: a dot on the
+                week that carries it. The sentence is in the day view. */}
+            {worst && (
+              <span
+                aria-hidden
+                title={week.warnings
+                  .map((warning) => warning.label)
+                  .join(" · ")}
+                className="size-1.5 rounded-full"
+                style={{
+                  background:
+                    worst === "over" ? "var(--sb-over)" : "var(--sb-warn)",
+                }}
+              />
+            )}
             {/* The anchor mark sits out here rather than after the place name,
-                where a long place ("Margaret River + Rotto") would truncate
-                the one glyph that says this week is spoken for. */}
+                where a long place ("Margaret River") would truncate the one
+                glyph that says this week is spoken for. */}
             {anchored && (
               <span
                 className="text-[10px] text-[var(--sb-accent)]"
-                title={week.anchors
+                title={anchors
                   .map((anchor) => `${anchor.label} — ${formatDay(anchor.date)}`)
                   .join(" · ")}
               >
@@ -403,10 +432,10 @@ function WeekCell({
         <p
           className={cn(
             "mt-0.5 truncate text-[12px] leading-tight font-semibold",
-            week.lead.buffer && "text-[var(--sb-dim)] italic",
+            allBuffer && "text-[var(--sb-dim)] italic",
           )}
         >
-          {week.lead.place}
+          {allBuffer ? `${week.leadLocationName} · buffer` : week.leadLocationName}
         </p>
 
         <EventTicks week={week} />
@@ -437,36 +466,30 @@ function WeekCell({
  * weather, events, the deadlines that are already ticking) follows. Three ways
  * in, because the drag is the nicest one and must not be the only one: drag a
  * handle, arrow a handle, or type the date into the header.
+ *
+ * Since #25 the weeks come from the engine rather than from a scaled demo
+ * block list, and the range lives in the current Scenario rather than in this
+ * component's state — which is what makes a Scenario switch move the strip.
+ * The "demo math" chip is gone with the demo math: the figure in the header is
+ * the sum of the Plan's Days.
  */
 export function DateStrip() {
-  const [range, setRange] = useState<TripRange>({
-    start: DEFAULT_TRIP_START,
-    end: DEFAULT_TRIP_END,
-  });
+  const { plan, moveRange } = usePlan();
   const [openWeek, setOpenWeek] = useState<string | null>(null);
 
-  const plan = useMemo(() => derivePlan(range.start, range.end), [range]);
+  const range = { start: plan.startDate, end: plan.endDate };
   // Week ids are positional, so a range change can leave the open one pointing
   // at a week that no longer exists. Falling back to closed is the honest
   // reading — the traveller opened *that* week, not "week seven of whatever".
   const zoomed = plan.weeks.find((week) => week.id === openWeek) ?? null;
 
-  function change(end: RangeEnd, date: string) {
-    setRange((current) => moveRangeEnd(current, end, date));
-  }
+  const change = (end: RangeEnd, date: string) => moveRange(end, date);
 
-  const warnings = [
-    ...plan.missedAnchors.map(
-      (anchor) => `${anchor.label} (${formatDay(anchor.date)}) falls outside the trip`,
-    ),
-    ...(plan.droppedSegments.length > 0
-      ? [
-          `${plan.droppedSegments.length} block${plan.droppedSegments.length > 1 ? "s" : ""} no longer fit: ${plan.droppedSegments
-            .map((segment) => segment.place)
-            .join(", ")}`,
-        ]
-      : []),
-  ];
+  // Warnings with no Day of their own — the ones about the Plan as a whole.
+  // Everything dated is a dot on its week and a badge in the day view.
+  const warnings = plan.warnings.filter(
+    (warning) => warning.dates.length === 0,
+  );
 
   return (
     <section className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20">
@@ -496,22 +519,21 @@ export function DateStrip() {
             </span>
             <span>
               <span className="text-[var(--sb-dim)]">
-                {plan.freeLodgingNights}
+                {plan.rollUp.homeBaseNights}
               </span>{" "}
               free-lodging
             </span>
+            <span>
+              <span className="text-[var(--sb-dim)]">
+                {plan.rollUp.bufferDays}
+              </span>{" "}
+              buffer
+            </span>
             <span
-              title="Demo math: each block keeps its one-off costs and scales its nights. The real re-pricing lands with the cost model (#25)."
-              className="flex items-baseline gap-1"
+              title="The sum of every Day in the ledger, at the cheapest realistic figure. The band, the worst case and the contingency row are in the cost panel."
+              className="text-[var(--sb-text)]"
             >
-              <span className="text-[var(--sb-text)]">
-                €{plan.totalEur.toLocaleString("en-GB")}
-              </span>
-              <span className="rounded-full bg-[color-mix(in_srgb,var(--sb-line)_60%,transparent)] px-1.5 py-px text-[8.5px] font-semibold tracking-[0.08em] text-[var(--sb-dim)] uppercase">
-                {plan.atBaseline
-                  ? "baseline"
-                  : `demo ${plan.deltaEur >= 0 ? "+" : "−"}€${Math.abs(plan.deltaEur).toLocaleString("en-GB")}`}
-              </span>
+              €{Math.round(plan.rollUp.planOnEur).toLocaleString("en-GB")}
             </span>
           </p>
 
@@ -527,9 +549,18 @@ export function DateStrip() {
         />
 
         {warnings.length > 0 && (
-          <p className="mb-2 flex items-start gap-1.5 text-[10px] leading-snug text-[var(--sb-warn)]">
+          <p
+            className={cn(
+              "mb-2 flex items-start gap-1.5 text-[10px] leading-snug",
+              warnings.some((warning) => warning.tone === "over")
+                ? "text-[var(--sb-over)]"
+                : "text-[var(--sb-warn)]",
+            )}
+          >
             <TriangleAlert className="mt-px size-3 shrink-0" />
-            <span>{warnings.join(" · ")}</span>
+            <span title={warnings.map((warning) => warning.detail).join(" ")}>
+              {warnings.map((warning) => warning.label).join(" · ")}
+            </span>
           </p>
         )}
 
@@ -550,7 +581,13 @@ export function DateStrip() {
           ))}
         </ul>
 
-        {zoomed && <WeekZoom week={zoomed} id={WEEK_ZOOM_ID} />}
+        {zoomed && (
+          <WeekZoom
+            week={zoomed}
+            id={WEEK_ZOOM_ID}
+            capEur={DAILY_CAP_AUD * plan.rollUp.fxRate}
+          />
+        )}
 
         {zoomed && (
           <button

@@ -21,6 +21,7 @@
  */
 
 import { buildLedger } from "@/lib/engine/ledger";
+import { locationById } from "@/lib/engine/locations";
 import { deriveLegs } from "@/lib/engine/legs";
 import { rollUp } from "@/lib/engine/rollup";
 import { schedule } from "@/lib/engine/scheduler";
@@ -113,6 +114,25 @@ export function buildPlan(
     rollUp: totals,
     unplaced: scheduled.unplaced,
   };
+}
+
+/**
+ * The week as the events layer wants it: each day, and where that day is.
+ *
+ * Deliberately per-Day rather than a set of regions for the week — a week that
+ * flies from Perth to Sydney is in two places, and only its Days know which is
+ * which.
+ */
+export function eventDaysOf(week: PlanWeek) {
+  return week.days.map((day) => ({
+    date: day.date,
+    regions: locationById(day.locationId).regions,
+  }));
+}
+
+/** Which normals a week's weather layers read. Null while in transit. */
+export function weatherOf(week: PlanWeek): string | null {
+  return locationById(week.leadLocationId).weather;
 }
 
 /**
