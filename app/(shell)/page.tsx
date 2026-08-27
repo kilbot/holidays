@@ -3,19 +3,17 @@ import { CatalogDrawer } from "@/components/catalog-drawer";
 import { CostHud } from "@/components/cost-hud";
 import { DateStrip } from "@/components/date-strip";
 import { GlobeStage } from "@/components/globe-stage";
-import { ShareBar } from "@/components/share-bar";
 
 /**
- * The Globe stage (layout variant A, picked in #9).
+ * The Plan — the Globe stage (layout variant A, picked in #9).
  *
- * The globe owns the whole viewport; everything else floats over it as glass
- * chrome. Nothing is interactive beyond collapsing the panels — this is the
- * shell, with the catalog sift (#26) and the interactive date strip (#27)
- * landing on top of it.
+ * The globe owns the whole stage; everything else floats over it as glass
+ * chrome. Since #39 the stage is the shell's content box rather than the whole
+ * viewport, so the chrome's corners clear the icon rail and the mobile tab bar.
  */
-export default function Home() {
+export default function Plan() {
   return (
-    <main className="relative h-dvh w-full overflow-hidden">
+    <main className="relative h-full w-full overflow-hidden">
       <GlobeStage />
 
       {/* Centred over the globe on desktop; on a phone the cost HUD takes the
@@ -34,10 +32,6 @@ export default function Home() {
       <CatalogDrawer />
       <CostHud />
       <DateStrip />
-
-      {/* Sharing, per ADR 0001: one pill that says which link this tab holds,
-          with the fork/adopt controls one click behind it. */}
-      <ShareBar />
 
       {/* Mounted once, above everything. The three places that open a Capsule
           — a Catalog row, the researched strip, a marker on the globe — are in
