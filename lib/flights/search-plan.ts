@@ -520,7 +520,10 @@ const HOME_LEGS: Readonly<Record<string, HomeLeg>> = {
     fareEurPP: [40, 110],
     protection: "protected",
     detail:
-      "The only European arrival that can be through-ticketed home: Iberia rides the same oneworld PNR as Cathay or Qatar, Air Europa the same SkyTeam PNR as China Southern. The 1h56 train (€8–55) is the cheaper unprotected alternative.",
+      // Named Qatar as the oneworld example until #60: a routing excluded by
+      // default has no business being the illustration of a good connection.
+      // Cathay makes the same point and is a row the couple might actually take.
+      "The only European arrival that can be through-ticketed home: Iberia rides the same oneworld PNR as Cathay, Air Europa the same SkyTeam PNR as China Southern. The 1h56 train (€8–55) is the cheaper unprotected alternative.",
   },
   BCN: {
     from: "BCN",
