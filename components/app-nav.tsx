@@ -161,6 +161,12 @@ type NavItem = {
 export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/", label: "Plan", hint: "The globe and the current itinerary", Icon: PlanIcon },
   {
+    href: "/scenarios",
+    label: "Scenarios",
+    hint: "Saved alternate trips — compare and switch",
+    Icon: ScenariosIcon,
+  },
+  {
     href: "/adventures",
     label: "Adventures",
     hint: "Browse and sift the catalog",
@@ -174,12 +180,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   },
   { href: "/ledger", label: "Ledger", hint: "Day-by-day costs", Icon: LedgerIcon },
   { href: "/budget", label: "Budget", hint: "Spend against the ceiling", Icon: BudgetIcon },
-  {
-    href: "/scenarios",
-    label: "Scenarios",
-    hint: "Saved alternate trips — compare and switch",
-    Icon: ScenariosIcon,
-  },
   {
     href: "/resources",
     label: "Resources",
