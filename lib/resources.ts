@@ -350,13 +350,13 @@ export const RESOURCES: readonly Resource[] = [
   /* Documents & money                                                 */
   /* ---------------------------------------------------------------- */
   {
-    id: "spanish-idp",
+    id: "french-licence-translation",
     group: "Documents & money",
-    name: "Spanish International Driving Permit",
+    name: "French licence: IDP or NAATI translation",
     whyOneLine:
-      "An IDP can only be issued by the country that issued the licence, so Spain's DGT must do it before you leave — and without one only a single driver is legal, which turns a 790 km Nullarbor day from hard into unsafe.",
-    keyFigure: "≈€10 · valid one year, non-renewable · second driver depends on it",
-    url: "https://sede.dgt.gob.es/es/permisos-de-conducir/permiso-internacional/",
+      "Paul drives on his Australian licence, nothing needed — but a French licence isn't in English, so Australian states want an IDP or certified translation for the second driver; a French IDP must be issued BY FRANCE and processing runs months, so the fallback is a NAATI-certified translation (~A$60–90, days) once in Australia.",
+    keyFigure: "French IDP: free but slow (apply now) · NAATI translation: ~A$60–90, fast",
+    url: "https://permisdeconduire.ants.gouv.fr/demarches-en-ligne/permis-international",
     deadline: { date: "2026-12-01", kind: "before departure" },
     source: "relocation-transport-hacks.md §10",
   },
