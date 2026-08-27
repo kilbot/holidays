@@ -200,25 +200,25 @@ function DiffDetail({
   if (diff.adventuresAdded.length > 0) {
     lines.push({
       label: `Adds ${diff.adventuresAdded.length === 1 ? "an Adventure" : `${diff.adventuresAdded.length} Adventures`}`,
-      detail: diff.adventuresAdded.map(words.adventure).join(", "),
+      detail: diff.adventuresAdded.map(words.adventure).join(" · "),
     });
   }
   if (diff.adventuresRemoved.length > 0) {
     lines.push({
       label: `Drops ${diff.adventuresRemoved.length === 1 ? "an Adventure" : `${diff.adventuresRemoved.length} Adventures`}`,
-      detail: diff.adventuresRemoved.map(words.adventure).join(", "),
+      detail: diff.adventuresRemoved.map(words.adventure).join(" · "),
     });
   }
   if (diff.eventsOff.length > 0) {
     lines.push({
       label: "Event spend off",
-      detail: diff.eventsOff.map(words.event).join(", "),
+      detail: diff.eventsOff.map(words.event).join(" · "),
     });
   }
   if (diff.eventsKept.length > 0) {
     lines.push({
       label: "Event spend kept",
-      detail: `${diff.eventsKept.map(words.event).join(", ")} — the Plan has ${diff.eventsKept.length === 1 ? "it" : "them"} switched off`,
+      detail: `${diff.eventsKept.map(words.event).join(" · ")} — the Plan has ${diff.eventsKept.length === 1 ? "it" : "them"} switched off`,
     });
   }
   if (diff.eventsRepriced.length > 0) {
@@ -231,7 +231,7 @@ function DiffDetail({
             ? `${words.event(id)} at A$${knob}`
             : words.event(id);
         })
-        .join(", "),
+        .join(" · "),
     });
   }
   if (diff.lodgingChanged.length > 0) {
@@ -242,7 +242,7 @@ function DiffDetail({
           const tier = subject.input.lodgingTiers[id];
           return tier ? `${words.place(id)} — ${TIER_LABEL[tier]}` : words.place(id);
         })
-        .join(", "),
+        .join(" · "),
     });
   }
   if (diff.placementsChanged.length > 0) {
@@ -253,7 +253,7 @@ function DiffDetail({
           const at = subject.input.placementOverrides[id];
           return at ? `${words.adventure(id)} from ${formatDay(at)}` : words.adventure(id);
         })
-        .join(", "),
+        .join(" · "),
     });
   }
   if (diff.legModesChanged.length > 0) {
@@ -261,7 +261,7 @@ function DiffDetail({
       label: "Travelled differently",
       detail: diff.legModesChanged
         .map((id) => `${prettify(id)} by ${subject.input.legModeOverrides[id] ?? "the default"}`)
-        .join(", "),
+        .join(" · "),
     });
   }
   if (diff.carsChanged.length > 0) {
@@ -272,7 +272,7 @@ function DiffDetail({
           (id) =>
             `${words.place(id)} ${subject.input.carOverrides[id] ? "with" : "without"} one`,
         )
-        .join(", "),
+        .join(" · "),
     });
   }
   if (diff.fxStressChanged) {
@@ -404,7 +404,10 @@ function ScenarioRow({
                     }}
                     maxLength={MAX_FORK_NAME_LENGTH}
                     aria-label={`Rename ${scenario.name}`}
-                    className="min-w-0 rounded-md border border-[var(--sb-line)] bg-[var(--sb-panel-2)] px-2 py-1 font-display text-[16px] font-bold text-[var(--sb-text)] outline-none focus-visible:border-[var(--sb-accent)]"
+                    // Wide enough for the names this site actually produces —
+                    // "Comfortable — A$10k off (copy)" is 30 characters — so
+                    // renaming is not done through a four-word window.
+                    className="w-[30ch] max-w-full rounded-md border border-[var(--sb-line)] bg-[var(--sb-panel-2)] px-2 py-1 font-display text-[16px] font-bold text-[var(--sb-text)] outline-none focus-visible:border-[var(--sb-accent)]"
                   />
                   <button
                     type="submit"
@@ -456,7 +459,11 @@ function ScenarioRow({
                 {formatDay(scenario.input.startDate)} –{" "}
                 {formatDayYear(scenario.input.endDate)}
               </span>{" "}
-              · edited <Edited iso={lastEditedAt(scenario)} />
+              {/* "Edited" only if it ever was. A seeded Scenario nobody has
+                  touched was *made* on its date, and saying otherwise would be
+                  the page inventing work that never happened. */}
+              · {scenario.updatedAt ? "edited" : "made"}{" "}
+              <Edited iso={lastEditedAt(scenario)} />
               {total.warnings > 0 && (
                 <>
                   {" · "}
@@ -513,7 +520,7 @@ function ScenarioRow({
                   : `${formatSigned(diff.days)} days`}
               </Chip>
               {diff.adventuresAdded.length > 0 && (
-                <Chip title={diff.adventuresAdded.map(words.adventure).join(", ")}>
+                <Chip title={diff.adventuresAdded.map(words.adventure).join(" · ")}>
                   +{diff.adventuresAdded.length}{" "}
                   {diff.adventuresAdded.length === 1
                     ? "adventure"
@@ -522,7 +529,7 @@ function ScenarioRow({
               )}
               {diff.adventuresRemoved.length > 0 && (
                 <Chip
-                  title={diff.adventuresRemoved.map(words.adventure).join(", ")}
+                  title={diff.adventuresRemoved.map(words.adventure).join(" · ")}
                 >
                   −{diff.adventuresRemoved.length}{" "}
                   {diff.adventuresRemoved.length === 1
@@ -591,26 +598,27 @@ function ScenarioRow({
               <Copy className="size-3.5" /> Duplicate
             </Action>
 
-            {confirming ? (
-              <span className="inline-flex items-center gap-2">
-                <Action danger onClick={onDelete}>
-                  Delete for good
+            {/* No Delete on the last Scenario — the store refuses it anyway
+                ("exactly one is marked as the current Plan", and zero is not
+                one), and a button that quietly does nothing is worse than no
+                button. */}
+            {deletable &&
+              (confirming ? (
+                <span className="inline-flex items-center gap-2">
+                  <Action danger onClick={onDelete}>
+                    Delete for good
+                  </Action>
+                  <Action onClick={() => setConfirming(false)}>Keep it</Action>
+                </span>
+              ) : (
+                <Action
+                  danger
+                  onClick={() => setConfirming(true)}
+                  title="Deletes this Scenario. There is no undo."
+                >
+                  <Trash2 className="size-3.5" /> Delete
                 </Action>
-                <Action onClick={() => setConfirming(false)}>Keep it</Action>
-              </span>
-            ) : (
-              <Action
-                danger
-                onClick={() => setConfirming(true)}
-                title={
-                  deletable
-                    ? "Deletes this Scenario. There is no undo."
-                    : "The Plan always has at least one Scenario."
-                }
-              >
-                <Trash2 className="size-3.5" /> Delete
-              </Action>
-            )}
+              ))}
           </div>
         )}
       </div>

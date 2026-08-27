@@ -385,7 +385,7 @@ export function CostHud() {
           <Link
             href="/scenarios"
             title="All the saved Scenarios — compare, switch, fork"
-            className="mt-px flex max-w-[46%] shrink-0 items-center gap-0.5 rounded-full border border-[var(--sb-line)] py-[3px] pr-1 pl-2 text-[10px] font-medium text-[var(--sb-accent)] transition-colors hover:bg-[var(--sb-panel-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
+            className="mt-px flex max-w-[55%] shrink-0 items-center gap-0.5 rounded-full border border-[var(--sb-line)] py-[3px] pr-1 pl-2 text-[10px] font-medium text-[var(--sb-accent)] transition-colors hover:bg-[var(--sb-panel-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
           >
             <span className="truncate">{scenarios.current.name}</span>
             <ChevronRight aria-hidden className="size-3 shrink-0" />
