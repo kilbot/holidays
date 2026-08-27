@@ -16,6 +16,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { intoLedger } from "@/lib/engine/blocks";
 import { capsuleCatalogue } from "@/lib/engine/capsules";
 import { cents } from "@/lib/engine/ledger";
 import { buildPlan } from "@/lib/engine/plan";
@@ -82,6 +83,62 @@ test("every Leg's fare is charged to a Day", () => {
     assert.ok(line, `${leg.id} is a line on ${leg.date}`);
     assert.equal(line.eur, leg.eur);
   }
+});
+
+test("the Ledger reconciles: block subtotals + transit rows = plan-on", () => {
+  const rows = intoLedger(plan.days, plan.warnings, plan.legs);
+
+  const blocks = cents(
+    rows.reduce(
+      (total, row) => total + (row.kind === "block" ? row.block.costEur : 0),
+      0,
+    ),
+  );
+  const transits = cents(
+    rows.reduce(
+      (total, row) => total + (row.kind === "transit" ? row.transit.costEur : 0),
+      0,
+    ),
+  );
+
+  assert.equal(cents(blocks + transits), plan.rollUp.planOnEur);
+  assert.equal(
+    transits,
+    plan.rollUp.splits.find((split) => split.id === "flights")?.amountEur,
+    "the transit rows are the flights split, seen from the Ledger's side",
+  );
+});
+
+test("no block is charged for the Leg that reached it (#53)", () => {
+  const rows = intoLedger(plan.days, plan.warnings, plan.legs);
+  const fares = new Set(plan.legs.map((leg) => `${leg.date}:${leg.id}`));
+
+  for (const row of rows) {
+    if (row.kind !== "block") continue;
+    for (const entry of row.block.days) {
+      assert.ok(
+        entry.lines.every((line) => !fares.has(line.id)),
+        `${row.block.locationName} holds a fare on ${entry.day.date}`,
+      );
+    }
+  }
+
+  // The reported symptom, as an assertion: the €3,800 crossing from Valencia
+  // lands on the first Day of the Margaret River block, and the block's
+  // subtotal must not carry it. docs/CONTEXT.md — a Leg is not a place.
+  const first = rows[0];
+  assert.equal(first.kind, "transit", "the outbound crossing leads the Ledger");
+  if (first.kind !== "transit") return;
+
+  const arrival = rows[1];
+  assert.equal(arrival.kind, "block");
+  if (arrival.kind !== "block") return;
+
+  assert.ok(first.transit.costEur > 1_000, "the crossing is the big number");
+  assert.ok(
+    arrival.block.costEur < first.transit.costEur,
+    `${arrival.block.locationName} should not out-cost the flight that reaches it`,
+  );
 });
 
 test("the crossing is priced once, not twice", () => {

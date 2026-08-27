@@ -32,6 +32,40 @@ import {
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
+/* What a week's figure is made of                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The sentence behind a week's cost, for the strip cell and this panel (#53).
+ *
+ * A week is a slice of *time*, not a place: `plan.ts` cuts seven-day cells from
+ * the leaving date and `week.costEur` is everything spent in them, the fare on
+ * the week a Leg is flown included. That is the right figure for a calendar
+ * cell — and it is also the figure sitting next to a place name, which is how a
+ * week that opens with a long-haul reads as though the place cost thousands.
+ *
+ * So neither surface re-attributes anything; both just say what is in the
+ * number. Pulling places and journeys apart is the Ledger's job, and
+ * `lib/engine/blocks.ts` is where it happens.
+ */
+export function weekCostTitle(week: PlanWeek): string {
+  const fares = week.days.reduce(
+    (total, day) =>
+      total +
+      day.lines.reduce(
+        (sum, line) => sum + (line.kind === "transport" ? line.eur : 0),
+        0,
+      ),
+    0,
+  );
+
+  const spent = `${formatEur(week.costEur)} spent in these ${week.days.length} day${week.days.length === 1 ? "" : "s"}`;
+  return fares > 0
+    ? `${spent}, of which ${formatEur(fares)} is the fare for the journey travelled this week — a week's figure covers the time, not the place. The Ledger shows the two apart.`
+    : `${spent} — living, the car and the Event spend.`;
+}
+
+/* ------------------------------------------------------------------ */
 /* Bands                                                               */
 /* ------------------------------------------------------------------ */
 
@@ -679,7 +713,10 @@ export function WeekZoom({
           <span className="sb-num ml-1.5 text-[var(--sb-faint)]">
             {week.days.length} days
           </span>
-          <span className="sb-num ml-1.5 text-[var(--sb-text)]">
+          <span
+            className="sb-num ml-1.5 text-[var(--sb-text)]"
+            title={weekCostTitle(week)}
+          >
             {formatEur(week.costEur)}
           </span>
         </p>

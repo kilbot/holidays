@@ -21,7 +21,7 @@
  * | `locations.ts` | where the Plan can be, and how far apart |
  * | `scheduler.ts` | Capsules onto Days: Locks, Buffers, overrides |
  * | `ledger.ts` | Days priced individually — the cost model's structure |
- * | `blocks.ts` | those Days cut into place runs, for the Ledger page |
+ * | `blocks.ts` | those Days cut into place runs and the transit rows between |
  * | `legs.ts` | Legs derived from the Day sequence, and priced |
  * | `rollup.ts` | totals, bands, worst case, contingency, splits |
  * | `warnings.ts` | what is wrong, as data |
@@ -61,7 +61,15 @@ export {
   type BurnPoint,
   type Crossing,
 } from "@/lib/engine/burn-down";
-export { intoBlocks, type BlockPeak, type LedgerBlock } from "@/lib/engine/blocks";
+export {
+  intoBlocks,
+  intoLedger,
+  type BlockPeak,
+  type LedgerBlock,
+  type LedgerDay,
+  type LedgerRow,
+  type LedgerTransit,
+} from "@/lib/engine/blocks";
 export { schedule, lockAllows } from "@/lib/engine/scheduler";
 export { deriveLegs, legIsOnGrid } from "@/lib/engine/legs";
 export {
