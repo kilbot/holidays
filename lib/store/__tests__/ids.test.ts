@@ -67,12 +67,21 @@ test("isPlausibleId rejects everything that is not one of ours", () => {
 
 test("secretsMatch accepts only an exact match", () => {
   const key = newId();
+  // A fixed substitute (say "Z") is itself base58, so ~1 run in 58 it would
+  // equal the character it replaces and the mismatch below would not exist.
+  const flip = (c: string) => (c === "1" ? "2" : "1");
   assert.ok(secretsMatch(key, key));
   assert.ok(secretsMatch(`${key}`, key), "value equality, not identity");
   assert.ok(!secretsMatch(key, `${key}x`));
   assert.ok(!secretsMatch(key.slice(0, -1), key));
-  assert.ok(!secretsMatch(`${key.slice(0, -1)}Z`, key), "last character differs");
-  assert.ok(!secretsMatch(`Z${key.slice(1)}`, key), "first character differs");
+  assert.ok(
+    !secretsMatch(`${key.slice(0, -1)}${flip(key[key.length - 1]!)}`, key),
+    "last character differs",
+  );
+  assert.ok(
+    !secretsMatch(`${flip(key[0]!)}${key.slice(1)}`, key),
+    "first character differs",
+  );
   assert.ok(!secretsMatch("", ""), "an absent key is never a match");
 });
 
