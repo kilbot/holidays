@@ -609,19 +609,14 @@ export interface SearchOption {
  *
  * Istanbul is not a Middle East transit for this rule (kilbot/holidays#60);
  * Turkish's SIN + IST return is ranked like any other row.
+ *
+ * This is the routing half of the default view. The money half — the couple's
+ * €1,000-per-person cap — needs a priced row rather than a researched one, so
+ * it lives in `lib/flights/pricing.ts` with the arithmetic it depends on, and
+ * `groupByDefaultRules` there applies both.
  */
 export function excludedByDefault(option: SearchOption): boolean {
   return option.middleEastTransit.length > 0;
-}
-
-/** Split a search into what it ranks and what the rule holds back. */
-export function partitionByDefaultRule<T extends { option: SearchOption }>(
-  rows: readonly T[],
-): { ranked: T[]; excluded: T[] } {
-  const ranked: T[] = [];
-  const excluded: T[] = [];
-  for (const row of rows) (excludedByDefault(row.option) ? excluded : ranked).push(row);
-  return { ranked, excluded };
 }
 
 function sectorsFor(

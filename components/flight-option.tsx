@@ -22,7 +22,14 @@ import { useId, useState } from "react";
 
 import { formatEur } from "@/lib/engine";
 import { comfortBand, rawScoreOf, type ComfortBand } from "@/lib/flights/comfort";
-import type { Arbitrage, OptionPrice, PriceSource } from "@/lib/flights/pricing";
+import {
+  LONGHAUL_CAP_EUR_PP,
+  perPersonTotal,
+  type Arbitrage,
+  type HeldBack,
+  type OptionPrice,
+  type PriceSource,
+} from "@/lib/flights/pricing";
 import type { Band, Flag, PositioningOption, SearchOption } from "@/lib/flights/search-plan";
 import { cn } from "@/lib/utils";
 
@@ -97,6 +104,27 @@ function FlagChip({ flag }: { flag: Flag }) {
       }}
     >
       {flag.label}
+    </span>
+  );
+}
+
+/**
+ * Why a row is out of the default ranking, said on the row itself.
+ *
+ * Dashed like the row's own edge and inked with the site's over-budget signal,
+ * so it reads as the same statement the collapsed band above it makes — and so
+ * a row that broke both rules cannot be mistaken for one that broke one.
+ */
+function ReasonChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      className="inline-flex items-center rounded-md border border-dashed px-1.5 py-[1px] text-[9.5px] font-semibold tracking-[0.02em] whitespace-nowrap"
+      style={{
+        color: "var(--sb-over)",
+        borderColor: "color-mix(in srgb, var(--sb-over) 40%, transparent)",
+      }}
+    >
+      {children}
     </span>
   );
 }
@@ -352,15 +380,39 @@ export interface OptionRowProps {
   arbitrage: Arbitrage | null;
   /** True while this origin's live quote is still in flight. */
   loading: boolean;
+  /**
+   * Why the default rules hold this row out of the ranking, or null when they
+   * do not. It changes how the row *reads*, not what it says: dashed edge,
+   * muted panel, and each reason named on the surface — a Gulf row that is also
+   * over the cap says both, because one of them alone would be half an answer.
+   * The score, the price and the whole breakdown stay exactly as they are; the
+   * peek exists to show what the rules cost, and a row that hid its own numbers
+   * could not do that.
+   */
+  heldBack?: HeldBack | null;
 }
 
-export function FlightOptionRow({ option, price, arbitrage, loading }: OptionRowProps) {
+export function FlightOptionRow({
+  option,
+  price,
+  arbitrage,
+  loading,
+  heldBack = null,
+}: OptionRowProps) {
+  const excluded = heldBack !== null;
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const stops = option.stops === 0 ? "nonstop" : `${option.stops} stop${option.stops > 1 ? "s" : ""}`;
 
   return (
-    <li className="sb-row overflow-hidden rounded-xl border border-[var(--sb-line)] bg-[var(--sb-panel)]">
+    <li
+      className={cn(
+        "sb-row overflow-hidden rounded-xl border",
+        excluded
+          ? "border-dashed border-[var(--sb-line)] bg-[color-mix(in_srgb,var(--sb-panel)_55%,transparent)]"
+          : "border-[var(--sb-line)] bg-[var(--sb-panel)]",
+      )}
+    >
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
@@ -402,8 +454,17 @@ export function FlightOptionRow({ option, price, arbitrage, loading }: OptionRow
             </p>
           )}
 
-          {option.flags.length > 0 && (
+          {(excluded || option.flags.length > 0) && (
             <span className="mt-1.5 flex flex-wrap gap-1">
+              {heldBack?.middleEast.length ? (
+                <ReasonChip>Via {heldBack.middleEast.join(" + ")}</ReasonChip>
+              ) : null}
+              {heldBack?.overCap && (
+                <ReasonChip>
+                  {formatEur(Math.round(perPersonTotal(price)[0]))} pp — over{" "}
+                  {formatEur(LONGHAUL_CAP_EUR_PP)}
+                </ReasonChip>
+              )}
               {option.flags.map((flag) => (
                 <FlagChip key={flag.kind} flag={flag} />
               ))}
