@@ -58,14 +58,12 @@ const MODE_LABEL: Record<LegMode, string> = {
  * one claim about its money, wherever it is read.
  */
 const PRICING_LABEL: Record<Leg["pricing"], string> = {
-  grid: "fare snapshot",
   snapshot: "fare snapshot",
   band: "estimate",
   computed: "fuel only",
 };
 
 const PRICING_TOKEN: Record<Leg["pricing"], string> = {
-  grid: "--sb-sea",
   snapshot: "--sb-sea",
   band: "--sb-faint",
   computed: "--sb-faint",

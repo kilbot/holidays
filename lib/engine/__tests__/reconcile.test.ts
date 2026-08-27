@@ -329,11 +329,26 @@ test("no block is charged for the Leg that reached it (#53)", () => {
   );
 });
 
-test("the crossing is priced once, not twice", () => {
+test("both crossings are priced, and the ticket is not spent twice", () => {
   const crossings = plan.legs.filter(
     (leg) => leg.fromLocationId === "origin" || leg.toLocationId === "origin",
   );
   assert.equal(crossings.length, 2, "out and back");
-  assert.ok(crossings[0].eur > 0, "the outbound carries the return fare");
-  assert.equal(crossings[1].eur, 0, "and the homeward carries nothing");
+
+  const [outbound, homeward] = crossings;
+  assert.ok(outbound.eur > 0, "the outbound crossing is priced");
+  // The #90 regression, as an assertion. This used to be zero, on the grounds
+  // that the research band is a return — which stopped being true of the
+  // figure on the outbound Leg the instant a live one-way fare replaced it.
+  assert.ok(homeward.eur > 0, "and so is the journey home");
+  assert.ok(
+    outbound.eur > homeward.eur,
+    "December out is the peak; February home is the cheapest month of the year",
+  );
+
+  // Neither is a quote of its own yet, and the Leg says so: both are this
+  // crossing's share of a figure that covers the pair.
+  for (const leg of crossings) {
+    assert.equal(leg.fareBasis, "return-share", leg.id);
+  }
 });

@@ -227,7 +227,11 @@ export function usePlan(): PlanApi {
   // Fetch the Legs the grid covers. Runs after render, once per Leg per tab.
   useEffect(() => {
     for (const leg of plan.legs) {
-      if (leg.pricing !== "grid" || leg.hydrated) continue;
+      // `onGrid`, not `pricing`: the question is whether `/api/fares` can
+      // answer, which is not the same as whether a snapshot happens to exist.
+      // The homeward crossing has no snapshot and is very much worth asking
+      // about — before #90 it was the one Leg that never asked.
+      if (!leg.onGrid || leg.hydrated) continue;
       void hydrateFare(leg.id, leg.from, leg.to, leg.date);
     }
   }, [plan.legs]);

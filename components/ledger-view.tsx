@@ -611,7 +611,6 @@ const MODE_LABEL: Record<LegMode, string> = {
  * about to book on it.
  */
 const PRICING_LABEL: Record<LedgerTransit["pricing"], string> = {
-  grid: "snapshot",
   snapshot: "snapshot",
   band: "estimate",
   computed: "fuel",
@@ -682,12 +681,9 @@ function TransitRow({ transit }: { transit: LedgerTransit }) {
       >
         {free ? (
           <span className="text-[11px] font-medium text-[var(--sb-faint)]">
-            {/* The homeward crossing is the return half of the outbound
-                ticket, so the fare is carried there and this row is honestly
-                zero rather than quietly missing. */}
-            {transit.toLocationId === "origin"
-              ? "on the outbound ticket"
-              : "no fare"}
+            {/* Both crossings carry a fare since #90, so the only zero left is
+                a drive with no coordinates for one of its ends. */}
+            no fare
           </span>
         ) : (
           formatEur(transit.costEur)

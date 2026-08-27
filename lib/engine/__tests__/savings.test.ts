@@ -89,15 +89,35 @@ const hasEvent = (plan: Plan, id: string) =>
  */
 const AUDIT_EUR = { comfortable: 17_914, aggressive: 15_530 };
 
-test("Aggressive still lands within €150 of the audit's €15,530", () => {
+/**
+ * The one adjustment the audit needs, because it is older than the arithmetic:
+ * kilbot/holidays#90's fare re-basis.
+ *
+ * Every waterfall in `savings-menu-draft.md` was computed while the two ocean
+ * crossings were charged as a single €1,900-per-person **return** on the
+ * outbound Leg, with the homecoming carrying nothing. They are now priced per
+ * crossing — five-eighths of that snapshot out, and the homeward Leg from its
+ * own source, which is `longhaul-comfort.md`'s band rather than a snapshot
+ * because no MEL–VLC snapshot exists. That is €300 off plan-on, €330 with the
+ * 10% contingency on top, and it is the **same** €330 for all three Scenarios
+ * because all three fly the same two crossings — which is its own test, below.
+ *
+ * Named rather than folded into a wider tolerance: the €150 band is what says
+ * "the engine and the spreadsheet agree", and widening it to swallow a known,
+ * explainable change would retire the only test that can catch an unknown one.
+ */
+const FARE_REBASIS_EUR = 330;
+
+test("Aggressive still lands within €150 of the audit's €15,530, less the fare re-basis", () => {
   // The one waterfall the re-plan left standing, and it is not luck: Aggressive
   // was always the shortest, flattest version — every eligible block camped,
   // a hostel twin on the harbour, no cruises — so moving the *shape* of the
-  // trip moved it least. Live figures, no adjustment.
-  const drift = Math.abs(aggressive.rollUp.totalEur - AUDIT_EUR.aggressive);
+  // trip moved it least. The one adjustment is the crossings, above.
+  const expected = AUDIT_EUR.aggressive - FARE_REBASIS_EUR;
+  const drift = Math.abs(aggressive.rollUp.totalEur - expected);
   assert.ok(
     drift <= TOLERANCE_EUR,
-    `engine says €${Math.round(aggressive.rollUp.totalEur)}, audit says €${AUDIT_EUR.aggressive} — €${Math.round(drift)} apart`,
+    `engine says €${Math.round(aggressive.rollUp.totalEur)}, audit says €${AUDIT_EUR.aggressive} less €${FARE_REBASIS_EUR} = €${expected} — €${Math.round(drift)} apart`,
   );
 });
 
@@ -141,6 +161,22 @@ test("the arrival block is a re-plan, not a lever", () => {
       `${name}: €${Math.round(delta)} is too big to call a re-plan`,
     );
   }
+});
+
+test("all three Scenarios fly the same two crossings, priced the same way", () => {
+  // The claim `FARE_REBASIS_EUR` rests on: #90 is a constant offset across the
+  // ladder rather than a per-Scenario correction, because every Scenario pays
+  // for the same journey out and the same journey home. If one ever changes
+  // where it flies home from, this is what says so.
+  const crossings = (plan: Plan) =>
+    plan.legs
+      .filter(
+        (leg) => leg.fromLocationId === "origin" || leg.toLocationId === "origin",
+      )
+      .map((leg) => Math.round(leg.eur));
+
+  assert.deepEqual(crossings(comfortable), crossings(base));
+  assert.deepEqual(crossings(aggressive), crossings(base));
 });
 
 test("both paths clear the A$10,000 target the ticket set", () => {
