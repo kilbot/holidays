@@ -3,10 +3,11 @@
 import { memo } from "react";
 import { FlaskConical, MapPin, Star, TriangleAlert, X } from "lucide-react";
 
-import { CapsuleArt } from "@/components/capsule-art";
+import { CapsuleArt, CapsulePhotoCover } from "@/components/capsule-art";
 import { SEASON_LABEL, SEASON_TOKEN } from "@/lib/catalog";
 import type { SeasonFit } from "@/lib/catalog";
 import type { FacetId } from "@/lib/facets";
+import type { Photo } from "@/lib/region-images";
 import type { MarkedState, ShortlistState } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,12 @@ export interface CapsuleTileData {
   facets: readonly FacetId[];
   /** The sweep's caveat, if it flagged one. Ideas only. */
   caveat: string | null;
+  /**
+   * The curated photograph for this place. Absent for the several hundred
+   * region strings the map does not cover, and those tiles keep the generated
+   * scene — see `lib/region-images.ts`.
+   */
+  photo?: Photo;
 }
 
 const MARK_BUTTONS: {
@@ -160,18 +167,27 @@ function CapsuleTileImpl({
             hero ? "h-[152px] xl:h-[168px]" : "h-[124px]",
           )}
         >
-          <CapsuleArt
-            seed={tile.id}
-            state={tile.state}
-            where={hero ? tile.where : undefined}
-            tags={tile.tags}
-            facets={tile.facets}
-            // `hero` on both sizes: the oversized state name is what makes a
-            // wall of generated covers scannable by region, and the 21px
-            // `thumb` lettering was cut for a 124px-wide strip, not a card.
-            variant="hero"
-            className="size-full transition-transform duration-500 group-hover/tile:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover/tile:scale-100"
-          />
+          {tile.photo ? (
+            <CapsulePhotoCover
+              photo={tile.photo}
+              state={tile.state}
+              where={hero ? tile.where : undefined}
+              className="size-full transition-transform duration-500 group-hover/tile:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover/tile:scale-100"
+            />
+          ) : (
+            <CapsuleArt
+              seed={tile.id}
+              state={tile.state}
+              where={hero ? tile.where : undefined}
+              tags={tile.tags}
+              facets={tile.facets}
+              // `hero` on both sizes: the oversized state name is what makes a
+              // wall of generated covers scannable by region, and the 21px
+              // `thumb` lettering was cut for a 124px-wide strip, not a card.
+              variant="hero"
+              className="size-full transition-transform duration-500 group-hover/tile:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover/tile:scale-100"
+            />
+          )}
 
           {tile.kind === "deep" && (
             <span className="absolute top-2.5 left-3 inline-flex items-center gap-1 rounded-full bg-[rgb(6_10_16/0.55)] px-2 py-[3px] text-[9px] font-semibold tracking-[0.12em] text-[rgb(255_253_248/0.92)] uppercase backdrop-blur-sm">

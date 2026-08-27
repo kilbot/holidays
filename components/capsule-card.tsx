@@ -41,6 +41,7 @@ import {
   openDeepCapsule,
   useCapsuleFocus,
 } from "@/lib/capsule-focus";
+import { photoFor, regionPhoto, type Photo } from "@/lib/region-images";
 import { usePlanShortlist } from "@/lib/engine/use-plan";
 import type { MarkedState, ShortlistState } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
@@ -627,7 +628,10 @@ interface CardChrome {
   cost: string;
   tags: readonly string[];
   facets: CatalogIdea["facets"];
+  /** Photography the entry carries itself. Wins over the region map. */
   images?: readonly string[];
+  /** The curated photograph for this place, credited. */
+  photo?: Photo;
   deep: boolean;
 }
 
@@ -645,6 +649,7 @@ function chromeForDeep(capsule: DeepCapsule): CardChrome {
     tags: capsule.tags,
     facets: capsule.facets,
     images: capsule.images,
+    photo: photoFor({ id: capsule.id, region: capsule.region }),
     deep: true,
   };
 }
@@ -662,6 +667,7 @@ function chromeForIdea(idea: CatalogIdea): CardChrome {
     cost: formatEurBand(idea),
     tags: idea.tags,
     facets: idea.facets,
+    photo: regionPhoto(idea.region),
     deep: false,
   };
 }
@@ -747,6 +753,13 @@ export function CapsuleCardHost({ overMap = false }: { overMap?: boolean }) {
             <CapsuleImageStrip
               images={chrome.images}
               alt={chrome.name}
+              className="size-full"
+            />
+          ) : chrome.photo ? (
+            <CapsuleImageStrip
+              images={[chrome.photo.file]}
+              alt={chrome.photo.caption}
+              credit={chrome.photo}
               className="size-full"
             />
           ) : (
