@@ -21,9 +21,12 @@
  * Nothing here touches SearchAPI, and nothing here writes. It is KV reads and
  * two static tables, which is what makes it safe to call on every render of a
  * calendar covering ninety days.
+ *
+ * Deliberately not `server-only`: `readCoverage` takes its store as an argument
+ * rather than reaching for `getKv`, so the calendar on the client can import
+ * the shapes it is going to be handed without a second copy of them drifting
+ * out of step with this one.
  */
-
-import "server-only";
 
 import {
   FARE_WINDOW_END,
