@@ -1,0 +1,890 @@
+{
+  "$schema": "https://kilbot.github.io/holidays/schemas/comfort-ratings.schema.json",
+  "meta": {
+    "issue": "https://github.com/kilbot/holidays/issues/49",
+    "researchedOn": "2026-08-27",
+    "purpose": "Comfort-ranking dataset for the Flights page. Rank options by combined airline rating x aircraft rating, not price. Scope: economy, Europe <-> Australia, Dec 2026 outbound / Jan-Feb 2027 return.",
+    "builtOn": "docs/research/longhaul-comfort.md (researched 2026-08-26) — seat geometry, route/metal confirmations and price bands are reused from there rather than re-derived.",
+    "precision": "normalizedScore0to10, baseScore0to10 and configScore0to10 are rounded to the nearest 0.5. Differences below 0.5 on any single axis, or below ~0.3 on a combined score, are not meaningful — treat them as ties.",
+    "dataSourceCaveats": [
+      "Skytrax's passenger-review database airlinequality.com CLOSED in February 2026. Skytrax stated that generative AI had pushed suspected-fake reviews to ~30% of submissions, including in its 'Trip Verified' tier. The single largest source of numeric passenger-review scores for airlines no longer exists and cannot be refreshed. Any /10 'Skytrax review score' found on the web after Feb 2026 is a cached or scraped snapshot of a dead dataset — this file deliberately does NOT use one.",
+      "As a result reviewScore below is NOT a scraped star-average. It is a composite of the surviving credible signals, all dated: Skytrax Star Certification (audit-based, current 2026), Skytrax World Airline Awards 2025 top-100 rank (passenger vote, the 2026 awards are not announced until 18 Sep 2026), AirlineRatings World's Best Airlines 2026 (editorial/measurable, 18 Mar 2026), AirlineRatings Flyers' Choice Awards 2026 (passenger vote, 11 Aug 2026), and APEX Official Airline Ratings 2026 (PNR-verified passenger ratings via TripIt).",
+      "The sources disagree materially and the disagreements are noted per airline. The two biggest: (a) Skytrax WAA 2025 ranks Qatar #1 / Singapore #2 while AirlineRatings' 2026 LONG-HAUL assessment ranks Singapore #1 (36.95) / Qatar #2 (36.24) — and AirlineRatings' 2026 OVERALL list ranks Qatar #1 / Cathay #2 / Singapore #3. (b) APEX 2026 lists no rating at all for Singapore Airlines, Qatar, Emirates or Turkish, which is a coverage artifact of its TripIt sampling, not a low score — those absences are recorded as null, never as zero.",
+      "Skytrax stripped Qantas of its 5-star certification in March 2026, demoting it to 4-star. Skytrax's own A-Z index page still returned '5 stars' for Qantas when fetched on 2026-08-27 while its dedicated Qantas page and its 10-airline 5-star list both say 4-star. The dedicated page is treated as authoritative here.",
+      "Wikipedia's 'Seat configurations of Airbus A380' page is stale (per longhaul-comfort.md) — it still shows Singapore's retired V1 layout and miscodes Qantas premium economy as economy. aeroLOPA is used instead."
+    ]
+  },
+
+  "airlines": [
+    {
+      "iata": "SQ",
+      "name": "Singapore Airlines",
+      "skytraxStars": 5,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 2,
+        "airlineRatingsOverallRank2026": 3,
+        "airlineRatingsLongHaulRank2026": 1,
+        "airlineRatingsLongHaulScore2026": 36.95,
+        "airlineRatingsFlyersChoice2026": "Preferred Economy Airline — 1st (passenger vote, 11 Aug 2026); most-decorated airline of the 2026 awards with four titles",
+        "apex2026": null,
+        "apex2026Note": "Not listed in either APEX Five Star or Four Star 2026 — a TripIt sampling gap, not a low rating."
+      },
+      "normalizedScore0to10": 9.5,
+      "economyNote": "The only carrier here that is top-3 on every surviving list AND first on both economy-specific measures (AirlineRatings long-haul 2026, Flyers' Choice Preferred Economy 2026). This is why it outscores Qatar on an economy-weighted metric despite Qatar holding the Skytrax and AirlineRatings overall #1 spots.",
+      "sources": [
+        "https://skytraxratings.com/the-worlds-5-star-airlines",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
+        "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
+        "docs/research/longhaul-comfort.md#2-what-actually-determines-economy-comfort-seat-geometry"
+      ]
+    },
+    {
+      "iata": "QR",
+      "name": "Qatar Airways",
+      "skytraxStars": 5,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 1,
+        "airlineRatingsOverallRank2026": 1,
+        "airlineRatingsLongHaulRank2026": 2,
+        "airlineRatingsLongHaulScore2026": 36.24,
+        "airlineRatingsFlyersChoice2026": "Middle East/Africa 2nd; Best Business Class 1st (Qsuite)",
+        "apex2026": null,
+        "airhelpScore2025Rank": 1
+      },
+      "normalizedScore0to10": 9.0,
+      "economyNote": "World's Best Airline on both Skytrax 2025 and AirlineRatings 2026, and AirHelp's #1 for 2025. Scored a half-point below Singapore ONLY because its accolades cluster in business class (Qsuite) while its economy-specific placings are second-tier, and because its Perth sector is its worst economy hardware (777-300ER, 3-4-3). Treat SQ 9.5 vs QR 9.0 as a genuine but small edge, not a verdict on the airline.",
+      "sources": [
+        "https://skytraxratings.com/the-worlds-5-star-airlines",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
+        "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
+        "https://www.airhelp.com/en/airhelp-score/"
+      ]
+    },
+    {
+      "iata": "CX",
+      "name": "Cathay Pacific",
+      "skytraxStars": 5,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 3,
+        "skytraxCategoryWins2025": ["World's Best Economy Class", "World's Best Inflight Entertainment"],
+        "airlineRatingsOverallRank2026": 2,
+        "airlineRatingsLongHaulRank2026": 3,
+        "airlineRatingsLongHaulScore2026": 33.41,
+        "airlineRatingsFlyersChoice2026": "North East Asia 1st",
+        "apex2026": "Five Star Global"
+      },
+      "normalizedScore0to10": 9.0,
+      "economyNote": "Holds the single most on-point award in this whole dataset — Skytrax World's Best ECONOMY Class 2025 — plus Best IFE, plus APEX Five Star (PNR-verified passenger ratings). Statistically tied with Qatar; arguably should be 9.5 on an economy-only reading. Kept at 9.0 because its 2025 economy-class win is a year old and the 2026 Skytrax awards are not out until 18 Sep 2026.",
+      "sources": [
+        "https://skytraxratings.com/the-worlds-5-star-airlines",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
+      ]
+    },
+    {
+      "iata": "EK",
+      "name": "Emirates",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 4,
+        "airlineRatingsOverallRank2026": 8,
+        "airlineRatingsFlyersChoice2026": "Preferred Economy Airline — 2nd; Middle East/Africa 1st; Best Cabin Crew 2nd",
+        "apex2026": null
+      },
+      "normalizedScore0to10": 8.0,
+      "economyNote": "The clearest source conflict in the set: Skytrax has held Emirates at 4-star for years, yet ranks it 4th in the world by passenger vote, and passengers put it 2nd for economy specifically in Flyers' Choice 2026. The audit and the vote disagree. 8.0 splits them. Separately, Emirates is the one carrier where the A380-vs-777 gap is measured rather than felt (18.0in vs 17.0in at identical 32in pitch) — so its score swings more on metal than any other airline here.",
+      "sources": [
+        "https://skytraxratings.com/airlines/emirates-rating",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
+        "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes"
+      ]
+    },
+    {
+      "iata": "EY",
+      "name": "Etihad Airways",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 26,
+        "airlineRatingsOverallRank2026": 10,
+        "airlineRatingsFlyersChoice2026": "Middle East/Africa 3rd; Best Cabin Crew 3rd",
+        "apex2026": "Five Star Global",
+        "airhelpScore2025Rank": 2
+      },
+      "normalizedScore0to10": 7.5,
+      "economyNote": "Wide spread across sources (Skytrax #26 vs AirlineRatings #10 vs AirHelp #2 vs APEX Five Star). Return-leg only for this trip — Etihad has terminated its Perth service, so it cannot serve the December outbound at all.",
+      "sources": [
+        "https://skytraxratings.com/airlines/etihad-airways-rating",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/",
+        "docs/research/longhaul-comfort.md#which-long-haul-carriers-actually-serve-which-spanish-city-for-perth-in-december"
+      ]
+    },
+    {
+      "iata": "QF",
+      "name": "Qantas",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026-03",
+      "skytraxStarsChange": "Demoted from 5-star to 4-star by Skytrax in March 2026.",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 14,
+        "airlineRatingsOverallRank2026": 12,
+        "airlineRatingsFlyersChoice2026": "Australia/Pacific 1st; Peace of Mind 2nd",
+        "apex2026": "Five Star Global"
+      },
+      "normalizedScore0to10": 7.5,
+      "economyNote": "Downgraded by Skytrax in March 2026 — a real, dated change, not a rounding artifact. Passengers still rate it 1st in Australia/Pacific and APEX gives it Five Star. Its problem on this trip is hardware, not service: the LHR-PER nonstop is a 787-9 at 3-3-3 / 17.2in, the narrowest geometry in the entire dataset, flown for 16h40 unbroken.",
+      "sources": [
+        "https://skytraxratings.com/airlines/qantas-rating",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/",
+        "docs/research/longhaul-comfort.md#5-the-famous-nonstop--london--perth-on-qantas-qf10--considered-and-rejected"
+      ]
+    },
+    {
+      "iata": "TK",
+      "name": "Turkish Airlines",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 6,
+        "airlineRatingsOverallRank2026": 7,
+        "apex2026": null
+      },
+      "normalizedScore0to10": 7.5,
+      "economyNote": "Unusually consistent across sources (#6 and #7) for a 4-star carrier. Return-only for this trip: Turkish does not serve Perth. Its value is structural rather than qualitative — VLC-IST 11x weekly then IST-SIN-SYD/MEL on the A350-900 is the only single-ticket, all-A350 itinerary that starts and ends at Valencia airport with no train. Pitch is 31in, a half-inch-equivalent penalty against SQ/CX at 32in.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings",
+        "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what"
+      ]
+    },
+    {
+      "iata": "MH",
+      "name": "Malaysia Airlines",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 27,
+        "airlineRatingsOverallRank2026": 20,
+        "apex2026": "Four Star Global"
+      },
+      "normalizedScore0to10": 6.5,
+      "economyNote": "Middling airline, unusually good hardware. Its KUL-PER sector moves to the A330-900neo in 2-4-2 through mid-2026 — one of only two 8-abreast economy cabins reachable on this trip, meaning a couple can book a true side pair with no stranger. Needs LHR or CDG positioning; no Spanish service.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/",
+        "https://www.australianfrequentflyer.com.au/malaysia-airlines-a330neo-economy-review/"
+      ]
+    },
+    {
+      "iata": "BA",
+      "name": "British Airways",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 13,
+        "airlineRatingsOverallRank2026": null,
+        "airlineRatingsOverallNote": "Absent from the AirlineRatings 2026 top-25 full-service list entirely.",
+        "airlineRatingsFlyersChoice2026": "Europe 1st",
+        "apex2026": "Four Star Global"
+      },
+      "normalizedScore0to10": 6.5,
+      "economyNote": "Sharply split sources: passengers vote it Europe's best (Flyers' Choice 2026) and Skytrax ranks it 13th, but AirlineRatings leaves it out of the top 25 and APEX gives it only Four Star. 6.5 reflects the split. On this trip it is the vehicle for the only true 2-4-2 upper-deck economy cabin out of Europe — subject to the retrofit gamble in carrierConfigs.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/flyers-choice-awards-2026",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
+      ]
+    },
+    {
+      "iata": "LH",
+      "name": "Lufthansa",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 15,
+        "airlineRatingsOverallRank2026": null,
+        "airlineRatingsOverallNote": "Absent from the AirlineRatings 2026 top-25 full-service list.",
+        "airlineRatingsFlyersChoice2026": "Europe 2nd",
+        "apex2026": "Four Star Global"
+      },
+      "normalizedScore0to10": 6.5,
+      "economyNote": "Same profile as BA — respectable Skytrax rank, Europe podium on passenger vote, missing from AirlineRatings, APEX Four Star. Relevant here only as the operator of the SAFEST upper-deck-economy A380 (MUC-BKK): its 2026 VantageXL retrofit touches Business only, so the 35 upper-deck economy seats survive. No European carrier holds Skytrax 5-star as of 2026.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.euronews.com/travel/2026/05/15/the-world-has-10-five-star-airlines-and-none-are-european",
+        "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip"
+      ]
+    },
+    {
+      "iata": "AF",
+      "name": "Air France",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 8,
+        "airlineRatingsOverallRank2026": 19,
+        "apex2026": "Five Star Global"
+      },
+      "normalizedScore0to10": 7.0,
+      "economyNote": "Best-placed European carrier on the Skytrax 2025 vote (#8) and an APEX Five Star. Does not serve Perth; only reaches Australia via partner connections, so it is a feeder/return option rather than a comfort candidate for the December outbound.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
+      ]
+    },
+    {
+      "iata": "KL",
+      "name": "KLM Royal Dutch Airlines",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 21,
+        "airlineRatingsOverallRank2026": 18,
+        "airlineRatingsFlyersChoice2026": "Europe 3rd",
+        "apex2026": "Five Star Global"
+      },
+      "normalizedScore0to10": 7.0,
+      "economyNote": "Consistent mid-table across all four sources — the least contested score in the dataset. No Perth service; feeder/return only.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
+      ]
+    },
+    {
+      "iata": "NH",
+      "name": "ANA All Nippon Airways",
+      "skytraxStars": 5,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 5,
+        "airlineRatingsOverallRank2026": 15,
+        "airlineRatingsFlyersChoice2026": "North East Asia 3rd",
+        "apex2026": null
+      },
+      "normalizedScore0to10": 8.5,
+      "economyNote": "One of ten Skytrax 5-star carriers worldwide in 2026 and it DOES serve Perth (NRT-PER). But Europe-Tokyo-Perth is a long way round from Spain with a poor time-zone split, so it is a completeness entry, not a shortlist candidate.",
+      "sources": [
+        "https://skytraxratings.com/the-worlds-5-star-airlines",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what"
+      ]
+    },
+    {
+      "iata": "JL",
+      "name": "Japan Airlines",
+      "skytraxStars": 5,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 9,
+        "airlineRatingsOverallRank2026": 6,
+        "airlineRatingsFlyersChoice2026": "North East Asia 2nd",
+        "apex2026": null,
+        "airlineRatingsCategory": "Best Economy Seat — six consecutive years"
+      },
+      "normalizedScore0to10": 8.5,
+      "economyNote": "Holds the best-economy-SEAT title six years running because it flies its 787s at 2-4-2 / 8-abreast — the exception that proves the width rule. Does not serve Perth, so it cannot be booked for this trip. Kept in the dataset as the geometry benchmark.",
+      "sources": [
+        "https://skytraxratings.com/the-worlds-5-star-airlines",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "docs/research/longhaul-comfort.md#2-what-actually-determines-economy-comfort-seat-geometry"
+      ]
+    },
+    {
+      "iata": "KE",
+      "name": "Korean Air",
+      "skytraxStars": 5,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 7,
+        "airlineRatingsOverallRank2026": 4,
+        "apex2026": "Five Star Global"
+      },
+      "normalizedScore0to10": 8.5,
+      "economyNote": "Top-10 on both major lists and APEX Five Star. No Perth service; ICN hub only reaches the Australian east coast, so return-leg only.",
+      "sources": [
+        "https://skytraxratings.com/the-worlds-5-star-airlines",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
+      ]
+    },
+    {
+      "iata": "OZ",
+      "name": "Asiana Airlines",
+      "skytraxStars": 5,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 41,
+        "airlineRatingsOverallRank2026": null,
+        "apex2026": null
+      },
+      "normalizedScore0to10": 7.5,
+      "economyNote": "Biggest single conflict in the dataset: Skytrax certifies Asiana 5-star while ranking it 41st by passenger vote, and it is absent from AirlineRatings' top 25. The gap is real and unresolved — treat 7.5 as low-confidence. Relevant only because ICN-SYD is the ONE upper-deck-economy A380 touching Australia, and only 19 Oct - 31 Dec 2026.",
+      "sources": [
+        "https://skytraxratings.com/the-worlds-5-star-airlines",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck"
+      ]
+    },
+    {
+      "iata": "CI",
+      "name": "China Airlines",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 37,
+        "airlineRatingsOverallRank2026": null,
+        "apex2026": "Five Star Global"
+      },
+      "normalizedScore0to10": 6.5,
+      "economyNote": "APEX Five Star (PNR-verified) against a Skytrax #37 and 4-star — another audit/passenger split. No Perth service and no Spanish service; TPE hub reaches the Australian east coast only. Return-leg completeness entry.",
+      "sources": [
+        "https://skytraxratings.com/airlines/china-airlines-rating",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://apex.aero/awards/apex-five-star-and-apex-four-star-airline-awards/current-apex-four-and-five-star/"
+      ]
+    },
+    {
+      "iata": "TG",
+      "name": "Thai Airways",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 29,
+        "airlineRatingsOverallRank2026": 21,
+        "apex2026": null
+      },
+      "normalizedScore0to10": 6.0,
+      "economyNote": "Included because it is the mandatory second sector of the Lufthansa A380 upper-deck play (BKK-PER). Consistently upper-mid-20s across sources — it is the part of that itinerary that drags the score down.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings"
+      ]
+    },
+    {
+      "iata": "VN",
+      "name": "Vietnam Airlines",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 62,
+        "airlineRatingsOverallRank2026": 16,
+        "airlineRatingsFlyersChoice2026": "Central/South East Asia 2nd; Best Livery 1st",
+        "apex2026": null
+      },
+      "normalizedScore0to10": 6.0,
+      "economyNote": "A 46-place gap between Skytrax (#62) and AirlineRatings (#16) — the widest disagreement in the file. Serves Perth via SGN and sits in the value price band, but the score is genuinely uncertain.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "https://www.airlineratings.com/articles/worlds-best-airlines-for-2026-by-airline-ratings"
+      ]
+    },
+    {
+      "iata": "CZ",
+      "name": "China Southern Airlines",
+      "skytraxStars": 4,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 33,
+        "airlineRatingsOverallRank2026": null,
+        "apex2026": null
+      },
+      "normalizedScore0to10": 5.5,
+      "economyNote": "The budget floor. Its new MAD-CAN route plus CAN-PER is the cheapest genuine single-connection through-ticket with real interline protection (~EUR 868 average return), and it avoids Gulf airspace. Modern metal, weak soft product, mediocre hub.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/",
+        "docs/research/longhaul-comfort.md#4-the-budget-floor--madrid--guangzhou--perth-on-china-southern"
+      ]
+    },
+    {
+      "iata": "MU",
+      "name": "China Eastern Airlines",
+      "skytraxStars": 3,
+      "skytraxStarsAsOf": "2026",
+      "reviewScore": {
+        "skytraxWorldAirlineAwardsRank2025": 98,
+        "airlineRatingsOverallRank2026": null,
+        "apex2026": null
+      },
+      "normalizedScore0to10": 4.0,
+      "economyNote": "Only 3-star carrier in the dataset and 98th of 100 on the Skytrax vote. No Perth service. Listed so the Flights page has a floor value rather than a null for cheap PVG-routed fares.",
+      "sources": [
+        "https://skytraxratings.com/a-z-of-airline-ratings",
+        "https://www.worldairlineawards.com/worlds-top-100-airlines-2025/"
+      ]
+    }
+  ],
+
+  "aircraft": [
+    {
+      "type": "A380-800",
+      "baseScore0to10": 8.5,
+      "rationale": "Widest fuselage in service — wide enough that even a 10-abreast 3-4-3 main deck holds 18.0-18.5in seats, where a 777 at the same 3-4-3 drops to 17.0in. The upper deck at 2-4-2 is the single best economy geometry available anywhere (see A380-800-upper-deck). Base score assumes the TYPICAL 2026 case, which is main deck 3-4-3, because upper-deck economy has nearly vanished from the fleet.",
+      "confidence": "high"
+    },
+    {
+      "type": "A380-800-upper-deck",
+      "baseScore0to10": 9.5,
+      "rationale": "Scored separately because it is a different product, not a different seat. 2-4-2 means a couple books a side pair and has NO third passenger in the row — the only structural (as opposed to subjective) advantage in this entire dataset. Add a ~104-seat mini-cabin instead of ~199 below, less galley and lavatory traffic, and side storage bins under the windows unique to the A380 upper deck. Held at 9.5 rather than 10 because every surviving operator pairs it with 31in pitch.",
+      "confidence": "high",
+      "availabilityWarning": "As of Dec 2026 only British Airways, Lufthansa, Qatar and Asiana retain any upper-deck economy, and NONE of them fly it on a Europe<->Australia or Gulf<->Australia sector. Reachable only on the Europe->Southeast Asia leg."
+    },
+    {
+      "type": "A350-900",
+      "baseScore0to10": 9.0,
+      "rationale": "Airbus sized the A350 fuselage specifically to fit an 18in economy seat at 9-abreast, and operators have overwhelmingly held that line. 3-3-3 at ~18.0in and 32in is the best geometry a couple can reliably book on a Europe<->Australia sector in 2026. Also carries the modern-widebody soft advantages (higher cabin humidity, lower cabin altitude, quieter) that the A380 shares but the 777 does not.",
+      "confidence": "high"
+    },
+    {
+      "type": "A350-1000",
+      "baseScore0to10": 9.0,
+      "rationale": "Same cross-section and same 18in 3-3-3 as the -900; some operators (Qatar) give it 33in pitch rather than 32in, which is the only reason it ever scores above the -900 at config level.",
+      "confidence": "high"
+    },
+    {
+      "type": "A330-900neo",
+      "baseScore0to10": 8.5,
+      "rationale": "Scores far above the 787 despite a narrower fuselage, because operators fly it 8-abreast at 2-4-2 rather than squeezing in a ninth seat. A couple gets a true side pair with no stranger — the same structural win as an A380 upper deck, on a much more available aircraft. Typical 17.5in/32in. Docked from 9.0 for a smaller, older-feeling cabin and lower ceilings than the A350.",
+      "confidence": "high"
+    },
+    {
+      "type": "A330-300",
+      "baseScore0to10": 8.0,
+      "rationale": "Same 2-4-2 side-pair advantage as the A330neo at ~17.5in, but typically 31in pitch and an older cabin, IFE and air system.",
+      "confidence": "medium"
+    },
+    {
+      "type": "787-8",
+      "baseScore0to10": 6.5,
+      "rationale": "The 787 cabin is roughly 5-6in narrower than the A350's. At the 9-abreast 3-3-3 that almost every operator outside Japan chose, that lands the seat at ~17.0-17.2in — about 0.8in narrower than an A350 seat at identical pitch. That 0.8in is the whole difference between the good and bad long-haul economy cabins. The Dreamliner's real advantages (lower cabin altitude, higher humidity, bigger windows) are genuine but do not recover the width.",
+      "confidence": "high"
+    },
+    {
+      "type": "787-9",
+      "baseScore0to10": 6.5,
+      "rationale": "Identical cross-section and identical 9-abreast penalty to the 787-8. This is the aircraft on the Qantas LHR-PER nonstop — the narrowest geometry in the dataset flown for the longest unbroken sit (16h40).",
+      "confidence": "high"
+    },
+    {
+      "type": "787-10",
+      "baseScore0to10": 6.5,
+      "rationale": "Same cross-section again — a stretch adds length, not width. Note the operator conflict recorded in carrierConfigs: Singapore Airlines publishes 18in for its 787-10 economy seat, which is not reconcilable with the fuselage geometry that gives every other 9-abreast 787 ~17.2in. Independent sources put the real figure at 17.2-17.5in.",
+      "confidence": "high"
+    },
+    {
+      "type": "787-8-2-4-2",
+      "baseScore0to10": 9.0,
+      "rationale": "The exception that proves the width rule. Japan Airlines flies its 787s 8-abreast at 2-4-2 and has taken the best-economy-seat title six years running on the strength of it. Same airframe as the 6.5-scoring configs above — the entire difference is one seat per row. Not bookable on this trip (JAL does not serve Perth); included as proof that the CONFIG, not the type, is what should drive the ranking.",
+      "confidence": "high"
+    },
+    {
+      "type": "777-300ER",
+      "baseScore0to10": 6.0,
+      "rationale": "Lowest-scoring widebody here, and the score is measured rather than felt: Emirates flies the A380 at 18.0in and the 777-300ER at 17.0in with the SAME 32in pitch, so the type penalty is a clean full inch. Almost universally 10-abreast 3-4-3 in 2026, giving 17.0-17.3in. Also an older cabin environment than the A350/787 generation. The rare 9-abreast 3-3-3 777 is a completely different product at ~18.5in/34in — see 777-300ER-3-3-3.",
+      "confidence": "high"
+    },
+    {
+      "type": "777-300ER-3-3-3",
+      "baseScore0to10": 8.5,
+      "rationale": "Rare 9-abreast 777 economy at ~18.5in and 34in pitch — the widest single economy seat in the dataset. Essentially extinct on Europe<->Australia routes in 2026; recorded for completeness and to keep the Flights page from scoring a 777 low when it happens to be one of these.",
+      "confidence": "medium"
+    },
+    {
+      "type": "747-400",
+      "baseScore0to10": 6.5,
+      "rationale": "Included only because the issue asked. No 747 operates any Europe<->Australia economy sector relevant to this trip — Lufthansa's 747-8 is the last significant passenger 747 out of Europe and it does not serve Australia. Where one is encountered, 3-4-3 at ~17.2in with an old cabin environment; the 747 upper deck is business class on every remaining operator, so it offers no economy equivalent to the A380's upper deck.",
+      "confidence": "low",
+      "availabilityWarning": "Not bookable on any Europe<->Perth itinerary in Dec 2026."
+    },
+    {
+      "type": "A320/A321/A330-regional",
+      "baseScore0to10": 5.5,
+      "rationale": "Narrowbody positioning sectors (VLC-LHR, VLC-MUC, VLC-MAD/BCN, MAD-BCN). Scored low but they are short, so the block-hour weighting in the formula correctly stops them from dominating. Their real cost on this trip is a lost connection, not a narrow seat — see the through-ticket analysis in longhaul-comfort.md.",
+      "confidence": "medium"
+    }
+  ],
+
+  "carrierConfigs": [
+    {
+      "carrier": "SQ",
+      "type": "A350-900",
+      "variant": "Long Haul (253 seats: 42J/24W/187Y)",
+      "route": "BCN-SIN / SIN-BCN (SQ387/388), from 26 Oct 2026",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 32,
+      "layout": "3-3-3",
+      "configScore0to10": 9.0,
+      "confidence": "high",
+      "note": "The single most important config in this file — it is the 13-hour sector of the recommended itinerary. Safran Z300 recliners.",
+      "source": "docs/research/longhaul-comfort.md#5-origin-arbitrage (VERIFIED); https://www.singaporeair.com/"
+    },
+    {
+      "carrier": "SQ",
+      "type": "A350-900",
+      "variant": "Medium Haul (263Y, 3-3-3)",
+      "route": "SIN-PER (e.g. SQ213)",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 32,
+      "layout": "3-3-3",
+      "configScore0to10": 9.0,
+      "confidence": "medium",
+      "note": "SIN-PER runs a MIX of A350-900 and 787-10 across 28 weekly nonstops. Request the A350 rotation. At a 5-hour sector this is a tiebreak, not a dealbreaker — it moves the itinerary score by ~0.3.",
+      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what"
+    },
+    {
+      "carrier": "SQ",
+      "type": "787-10",
+      "route": "SIN-PER (e.g. SQ225)",
+      "economySeatWidthIn": 17.5,
+      "pitchIn": 32,
+      "layout": "3-3-3",
+      "configScore0to10": 7.0,
+      "confidence": "medium",
+      "note": "CONFLICT: Singapore Airlines publishes 18in for this seat, and third-party guides repeat it. That figure cannot be reconciled with the 787 fuselage, which yields ~17.0-17.2in at 9-abreast for every other operator; the A350 gets 18in because its cabin is ~5-6in wider. 17.5in is recorded here as the generous end of the independently supportable range. If SQ's 18in is literally true it is measured differently (e.g. armrest outer edges), not a wider seat.",
+      "source": "https://cabin.coach/aircraft-reviews/singapore-airlines-787-10-seat-guide; https://simpleflying.com/how-much-wider-airbus-a350-cabin-boeing-787-dreamliner/"
+    },
+    {
+      "carrier": "SQ",
+      "type": "A380-800",
+      "variant": "2017 four-class (471 seats, 343Y, main deck)",
+      "route": "SIN-SYD 2x daily, SIN-MEL daily (restored through late Mar 2027), SIN-LHR 2x daily — RETURN LEG",
+      "economySeatWidthIn": 18.5,
+      "pitchIn": 32,
+      "layout": "3-4-3",
+      "configScore0to10": 9.0,
+      "confidence": "high",
+      "note": "The widest main-deck economy seat in the dataset — 18.5in, half an inch MORE than an A350. Only 3-4-3 rather than 3-3-3 keeps it level with the A350 rather than above it. NO economy on the upper deck: the old V1 layout with 88 upper-deck economy seats is retired and all 12 aircraft are on the 2017 layout. This is how the couple gets Singapore Airlines AND an A380 — on the way home, at no extra cost. Aim for the rear taper rows, where the side blocks drop from 3 seats to 2.",
+      "source": "https://www.businesstraveller.com/news/airlines/flight-review-singapore-airlines-a380-economy-class/; https://mainlymiles.com/fleet-a380v3/; docs/research/longhaul-comfort.md#the-a380s-that-are-on-this-trips-likely-path"
+    },
+    {
+      "carrier": "CX",
+      "type": "A350-900",
+      "variant": "280 seats (38J/28W/214Y)",
+      "route": "MAD-HKG daily from 25 Oct 2026; HKG-PER (CX171) 2x daily, 7h40",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 32,
+      "layout": "3-3-3",
+      "configScore0to10": 9.0,
+      "confidence": "high",
+      "note": "The only itinerary in the dataset that delivers an 18in A350 on BOTH sectors, on the airline that holds Skytrax World's Best Economy Class 2025. Madrid only — Cathay's Barcelona service is summer-seasonal and does not operate in December.",
+      "source": "docs/research/longhaul-comfort.md#2-the-value-comfort-line; https://cabin.coach/aircraft-reviews/cathay-pacific-airbus-a350-900-seat-guide"
+    },
+    {
+      "carrier": "QR",
+      "type": "A350-1000",
+      "route": "MAD/BCN-DOH",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 33,
+      "layout": "3-3-3",
+      "configScore0to10": 9.5,
+      "confidence": "medium",
+      "note": "Highest config score in the file — 18in at 33in pitch, Recaro CL3710. Qatar's Europe sector is excellent; the problem is what it connects to.",
+      "source": "https://cabin.coach/aircraft/qatar-airways-boeing-777-300er-seat-guide"
+    },
+    {
+      "carrier": "QR",
+      "type": "777-300ER",
+      "route": "DOH-PER daily (QR900/901) — CONFIRMED for northern winter 2026/27",
+      "economySeatWidthIn": 17.2,
+      "pitchIn": 32,
+      "layout": "3-4-3",
+      "configScore0to10": 5.5,
+      "confidence": "high",
+      "note": "Decisive against Qatar for this trip. Qatar explicitly REVERSED its plan to put the A380 on Perth and confirmed the 777-300ER; the Qatar A380 returns to Australia on Sydney only from March 2027, i.e. after this trip. So the best airline on the Skytrax list flies its worst economy hardware on the exact sector this trip needs, for ~11 hours. Recaro slimline, quoted 17.0-17.3in.",
+      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what; https://cabin.coach/aircraft/qatar-airways-boeing-777-300er-seat-guide"
+    },
+    {
+      "carrier": "EK",
+      "type": "A380-800",
+      "variant": "main deck (3- or 4-class)",
+      "route": "MAD-DXB (BCN was DOWNGRADED A380 -> 777 in July 2026)",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 32,
+      "layout": "3-4-3",
+      "configScore0to10": 8.5,
+      "confidence": "high",
+      "note": "Best seats 68A/68K and 81A/81K (no seat in front, big legroom, storage); quietest rows 80-88, then 43-51. Emirates' remaining upper-deck economy exists only on the 615-seat two-class frames and all 15 were due to be converted by ~Nov 2026 — assume none by December.",
+      "source": "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes"
+    },
+    {
+      "carrier": "EK",
+      "type": "777-300ER",
+      "route": "DXB-PER — A380 suspended after 14 Mar 2026, 777 substituted, service cut from 2x daily to daily",
+      "economySeatWidthIn": 17.0,
+      "pitchIn": 32,
+      "layout": "3-4-3",
+      "configScore0to10": 5.5,
+      "confidence": "high",
+      "note": "The cleanest measurement in the dataset: same airline, same 32in pitch, one full inch narrower than its own A380. DO NOT assume an A380 on DXB-PER — this route has flip-flopped twice in 2026.",
+      "source": "docs/research/longhaul-comfort.md#emirates-the-one-place-the-narrow-777-reputation-is-measured-not-vibes"
+    },
+    {
+      "carrier": "QF",
+      "type": "787-9",
+      "route": "LHR-PER nonstop (QF10), 16h40, filed nonstop from 25 Oct 2026",
+      "economySeatWidthIn": 17.2,
+      "pitchIn": 32,
+      "layout": "3-3-3",
+      "configScore0to10": 6.0,
+      "confidence": "high",
+      "note": "Worst seat on the longest sit. Also note the route is currently ASYMMETRIC: westbound PER-LHR runs via Singapore through 31 Jan 2027; only the eastbound direction they would fly is nonstop.",
+      "source": "docs/research/longhaul-comfort.md#5-the-famous-nonstop--london--perth-on-qantas-qf10--considered-and-rejected"
+    },
+    {
+      "carrier": "QF",
+      "type": "A380-800",
+      "variant": "post-2019 refit (14F/70J/60W/341Y)",
+      "route": "SYD-SIN-LHR (QF1/QF2); SYD-SIN rises 9->13 weekly on 7 Dec 2026, QF81/82 upgauges 17 Dec 2026 — RETURN LEG",
+      "economySeatWidthIn": 17.5,
+      "pitchIn": 31,
+      "layout": "3-4-3",
+      "configScore0to10": 6.5,
+      "confidence": "medium",
+      "note": "NO economy upstairs — the upper-deck mini-cabin was removed in the 2019-20 refit and the upper deck is now Business + Premium Economy (VERIFIED, aeroLOPA). Qantas flies no A380 to Perth at all. Notably worse than the Singapore A380 on the same return sector: 17.5in/31in vs 18.5in/32in.",
+      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck"
+    },
+    {
+      "carrier": "QF",
+      "type": "A330-300",
+      "route": "SIN-PER — the oneworld second sector behind the BA A380",
+      "economySeatWidthIn": 17.5,
+      "pitchIn": 31,
+      "layout": "2-4-2",
+      "configScore0to10": 7.5,
+      "confidence": "medium",
+      "note": "2-4-2, so the side-pair advantage applies here too. Held below the Malaysia A330neo on pitch (31in vs 32in) and cabin age.",
+      "source": "docs/research/longhaul-comfort.md#3-the-upper-deck-play; operator fleet data"
+    },
+    {
+      "carrier": "BA",
+      "type": "A380-800",
+      "variant": "UNREFURBISHED — upper deck World Traveller, 104 seats, rows 70-83",
+      "route": "LHR-SIN daily, 7 Sep 2026 - at least 17 Mar 2027 (BA's longest A380 route)",
+      "economySeatWidthIn": 17.6,
+      "pitchIn": 31,
+      "layout": "2-4-2",
+      "configScore0to10": 8.0,
+      "confidence": "high",
+      "note": "The ONLY routing out of Europe that gives the couple a row with no stranger. Book 70A/70K or 80A/80K (front row, extra legroom, side storage bins). Avoid exit rows — they have no windows at all. Score is 8.0 not 9.5 because 17.6in and 31in are both below the Lufthansa upper deck.",
+      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck (VERIFIED, aeroLOPA)"
+    },
+    {
+      "carrier": "BA",
+      "type": "A380-800",
+      "variant": "REFURBISHED — 421 seats, 110 Club Suites across the ENTIRE upper deck, all economy moved to main deck",
+      "route": "LHR-SIN — same flight number, different airframe",
+      "economySeatWidthIn": 17.5,
+      "pitchIn": 31,
+      "layout": "3-4-3",
+      "configScore0to10": 6.5,
+      "confidence": "high",
+      "note": "RETROFIT ROULETTE. The refit began June 2026, the first refurbished frame is due back late 2026 and the fleet completes end-2027, so a December booking is a coin-flip between this config and the 8.0 one above. Main-deck fallback seat: 25D (no seat in front). Only book the upper-deck play if the seat map AT THE MOMENT OF BOOKING shows 2-4-2 in rows 70-83.",
+      "source": "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip"
+    },
+    {
+      "carrier": "LH",
+      "type": "A380-800",
+      "variant": "upper deck economy, 35 seats, rows 95-99",
+      "route": "MUC-BKK daily from 24 Oct 2026; 2x daily 16 Jan - 26 Feb 2027",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 31.5,
+      "layout": "2-4-2",
+      "configScore0to10": 9.5,
+      "confidence": "high",
+      "note": "The best economy SEAT reachable on this trip, full stop: 18in at 2-4-2 in a 35-seat mini-cabin. And it is the SAFEST upper-deck bet because Lufthansa's 2026 VantageXL retrofit touches Business only — First, Premium Economy and Economy are untouched. Pick 95E, 96A or 96C (cited as the quietest economy on the aircraft); rows 96-98 A/K have the side storage; avoid 95A/95K (no window). All LH A380s are Munich-based. The catch is everything around the seat: a 6.5 airline, a third sector, and Bangkok instead of Changi.",
+      "source": "docs/research/longhaul-comfort.md#where-a-ud-economy-a380-can-actually-be-flown-on-this-trip (VERIFIED, aeroLOPA)"
+    },
+    {
+      "carrier": "TK",
+      "type": "A350-900",
+      "variant": "297Y",
+      "route": "VLC-IST 11x weekly; IST-SIN-SYD 5x weekly, IST-SIN-MEL 3x weekly (moved from KUL to SIN on 26 Oct 2026) — RETURN LEG ONLY",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 31,
+      "layout": "3-3-3",
+      "configScore0to10": 8.5,
+      "confidence": "medium",
+      "note": "Full 18in width but 31in pitch and only ~3in of recline, notably less than peers on the same airframe. Structurally attractive for the return: a single ticket, all-A350, Changi-transiting itinerary that ends AT Valencia airport with no train. Turkish does not serve Perth, so it cannot do the outbound.",
+      "source": "docs/research/longhaul-comfort.md#3-who-actually-flies-europe--perth-and-on-what; https://cabin.coach/aircraft/turkish-airlines-airbus-a350-900-seat-guide"
+    },
+    {
+      "carrier": "MH",
+      "type": "A330-900neo",
+      "variant": "269Y",
+      "route": "KUL-PER — Malaysia moved all Australian operations to the A330neo by mid-2026",
+      "economySeatWidthIn": 17.5,
+      "pitchIn": 32,
+      "layout": "2-4-2",
+      "configScore0to10": 8.0,
+      "confidence": "high",
+      "note": "The sleeper. 2-4-2 means a couple books a true side pair with NO stranger — the same structural win as an A380 upper deck, on a widely available aircraft, without the retrofit gamble. Safran RAVE IFE, AC and USB at every seat, 4-way headrest. Narrower seat than an A350 (17.5in) but the row structure more than compensates for a couple. Needs LHR or CDG positioning: no Spanish service.",
+      "source": "https://www.australianfrequentflyer.com.au/malaysia-airlines-a330neo-economy-review/"
+    },
+    {
+      "carrier": "MH",
+      "type": "A350-900",
+      "route": "LHR-KUL",
+      "economySeatWidthIn": 18.0,
+      "pitchIn": 32,
+      "layout": "3-3-3",
+      "configScore0to10": 9.0,
+      "confidence": "medium",
+      "note": "Malaysia's long-haul flagship config. Combined with the A330neo second sector this is the best HARDWARE pairing available after Singapore and Cathay — it loses on the airline score (6.5) and the London positioning, not the metal.",
+      "source": "https://skytraxratings.com/a-z-of-airline-ratings; operator fleet data"
+    },
+    {
+      "carrier": "CZ",
+      "type": "787-9",
+      "route": "MAD-CAN (China Southern's first-ever Spain route) and CAN-PER",
+      "economySeatWidthIn": 17.2,
+      "pitchIn": 31,
+      "layout": "3-3-3",
+      "configScore0to10": 5.5,
+      "confidence": "low",
+      "note": "LOW CONFIDENCE — one secondary source quotes 17.6in for this cabin, which is not consistent with 9-abreast 787 geometry; 17.2in at 31in is used as the defensible figure. CZ also rotates A330-300s on some CAN-PER services, which would score higher (2-4-2). Verify the specific metal at booking.",
+      "source": "https://www.aerolopa.com/cz-78w; https://cabin.coach/aircraft/china-southern-787-9-seat-guide"
+    },
+    {
+      "carrier": "EY",
+      "type": "787-9",
+      "route": "Europe-AUH and AUH-east coast — RETURN LEG ONLY (Etihad has terminated Perth)",
+      "economySeatWidthIn": 17.2,
+      "pitchIn": 31,
+      "layout": "3-3-3",
+      "configScore0to10": 5.5,
+      "confidence": "medium",
+      "note": "Relevant only for the free-stopover play on the return: Etihad's promo (book by 20 Dec 2026, travel to end of Jan 2027) gives economy up to 2 free hotel nights in Abu Dhabi and matches the return window almost exactly. That is a cost lever, not a comfort one.",
+      "source": "docs/research/longhaul-comfort.md#cross-cutting-moves-that-apply-to-all-five"
+    },
+    {
+      "carrier": "OZ",
+      "type": "A380-800",
+      "variant": "upper deck economy, 106 seats, rows 70-83",
+      "route": "ICN-SYD, A380 confirmed 19 Oct - 31 Dec 2026 ONLY",
+      "economySeatWidthIn": 17.7,
+      "pitchIn": 32,
+      "layout": "2-4-2",
+      "configScore0to10": 8.5,
+      "confidence": "medium",
+      "note": "The only upper-deck-economy A380 that touches Australia at all. Wrong direction, wrong hub, unconfirmed past 31 Dec 2026, and the airline score is the least reliable in the file (Skytrax 5-star but #41 by vote). Recorded so the Flights page does not miss it if a Seoul routing surfaces.",
+      "source": "docs/research/longhaul-comfort.md#who-actually-has-economy-on-the-upper-deck (VERIFIED, aeroLOPA)"
+    },
+    {
+      "carrier": "*",
+      "type": "A320/A321",
+      "route": "European positioning sectors (VLC-LHR, VLC-MUC, VLC-MAD/BCN, MAD-BCN)",
+      "economySeatWidthIn": 17.5,
+      "pitchIn": 30,
+      "layout": "3-3",
+      "configScore0to10": 5.5,
+      "confidence": "medium",
+      "note": "Generic narrowbody placeholder. Short enough that block-hour weighting keeps it from moving an itinerary score much. Its real risk is the missed connection, not the seat — a missed connection on a sold-out mid-December Perth flight is close to uncoverable.",
+      "source": "docs/research/longhaul-comfort.md#through-ticket-vs-self-connect--the-lore-is-unanimous"
+    }
+  ],
+
+  "formula": {
+    "airlineWeight": 0.55,
+    "aircraftWeight": 0.45,
+    "expression": "comfortScore = 0.55 * airlineScore + 0.45 * seatScore",
+    "seatScoreResolution": [
+      "1. If a carrierConfigs entry matches {carrier, type, route}, use its configScore0to10. THIS IS THE PATH THAT SHOULD ALMOST ALWAYS BE TAKEN.",
+      "2. Else if a carrierConfigs entry matches {carrier, type}, use it.",
+      "3. Else fall back to aircraft[].baseScore0to10 for the type, and mark the result as low-confidence in the UI."
+    ],
+    "multiSectorRule": {
+      "method": "block-hour weighting",
+      "expression": "airlineScore = sum(sectorHours_i * airlineScore_i) / sum(sectorHours_i); seatScore = sum(sectorHours_i * configScore_i) / sum(sectorHours_i)",
+      "justification": "An itinerary is not one airline and one aeroplane. Weighting each sector by block time is the only way a 13-hour A350 and a 5-hour 787 combine into an honest number, and it correctly stops a 2h20 narrowbody positioning hop from dragging down a 20-hour journey."
+    },
+    "adjustments": [
+      {
+        "name": "gulfHubReliability",
+        "points": -1.0,
+        "appliesTo": "Any Dec 2026 - Jan 2027 itinerary transiting DOH, DXB or AUH",
+        "justification": "Not a comfort judgement — a reliability one, and the trip has a hard anchor (Christmas in Perth with family). As of mid-Aug 2026 the 2026 Gulf airspace disruption is NOT resolved: EASA conflict-zone guidance for the Persian Gulf and Gulf of Oman extended to at least 31 Aug 2026 advising operators not to overfly at any level; Doha airspace partially closed; Dubai restricted to approved corridors. Qatar has restored ~85% of its pre-crisis schedule, Emirates ~75%. Australian Frequent Flyer's read is that Gulf fares stay competitive precisely because the passenger carries the risk, and travel insurance may not respond where a government advisory is in force. A routing 5% more comfortable that materially raises the chance of stranding them in a restricted-airspace hub on 22 December is not comfort-optimal."
+      },
+      {
+        "name": "metalUncertainty",
+        "points": -0.75,
+        "appliesTo": "BA A380 LHR-SIN (retrofit roulette) and any sector where the operating type is not confirmed at booking",
+        "justification": "Expected-value correction. The BA A380 is a coin-flip between a 8.0 upper-deck config and a 6.5 main-deck one on the same flight number, which is worth about -0.7 in expected seat score. Applying it as an explicit, visible adjustment rather than burying it in the config score keeps the gamble legible to the user."
+      },
+      {
+        "name": "extraSector",
+        "points": -0.25,
+        "appliesTo": "Each sector beyond the second",
+        "justification": "Modest and deliberately so. Each extra sector is another bag transfer, another boarding, another missed-connection exposure — but the evidence in longhaul-comfort.md is that a WELL-PLACED stop (Singapore, same time zone as Perth) is worth far more than it costs, so this must never be large enough to make a nonstop win by default. It is a tiebreak, not a thesis."
+      }
+    ],
+    "justification": "0.55 airline / 0.45 aircraft, essentially even with a deliberate tilt to the airline. Three reasons.\n\n(1) THE TWO AXES HAVE COMPARABLE SPREAD. Across the realistic Europe->Perth set, airline scores span 5.5-9.5 (4 points) and seat-config scores span 5.5-9.5 (4 points). A near-even weighting is the only one under which neither axis can silently decide every ranking. Weight the aircraft at 60% and the Lufthansa A380 upper deck starts beating Singapore Airlines on the strength of one seat; weight the airline at 70% and Qatar's 3-4-3 777 to Perth disappears from view. Both of those are wrong answers.\n\n(2) THE AIRLINE COVERS MORE OF THE 24 HOURS. Seat geometry is the single biggest lever WITHIN the flight — that is the finding of longhaul-comfort.md and nothing here overturns it. But the airline determines crew, catering, IFE, ground and lounge product, the hub they sit in for hours, and, critically, how they are treated when something breaks on a sold-out December date. On a 20+ hour door-to-door journey with a stopover, more of the elapsed experience is airline than seat.\n\n(3) THE AIRLINE IS THE PART THAT IS ACTUALLY GUARANTEED. This is the decisive argument. At the moment of booking, the carrier is contractual; the aircraft is a schedule intention. This dataset alone documents Qatar reversing the A380 on Perth, Emirates pulling the A380 off DXB-PER and back and cutting frequency, Emirates downgrading BCN from A380 to 777, and BA mid-retrofit on the exact aircraft the upper-deck play depends on. Weighting the more volatile variable higher would make the ranking less stable than the world it describes.\n\nThe residual 45% on the aircraft is high enough that the 787-vs-A350 gap — 0.8in of width, worth ~2.5 points of config score — moves an itinerary by more than a full point, which is exactly the sensitivity the user asked for when they said to rank by aircraft as well as airline.",
+    "workedExamples": [
+      {
+        "label": "Singapore Airlines, BCN-SIN-PER, all A350 (RECOMMENDED)",
+        "sectors": [
+          {"carrier": "SQ", "type": "A350-900 Long Haul", "hours": 13, "airlineScore": 9.5, "configScore": 9.0},
+          {"carrier": "SQ", "type": "A350-900", "hours": 5, "airlineScore": 9.5, "configScore": 9.0}
+        ],
+        "weightedAirlineScore": 9.5,
+        "weightedSeatScore": 9.0,
+        "adjustments": 0,
+        "comfortScore": 9.3
+      },
+      {
+        "label": "Singapore Airlines, BCN-SIN-PER, 787-10 on the Perth sector",
+        "sectors": [
+          {"carrier": "SQ", "type": "A350-900 Long Haul", "hours": 13, "airlineScore": 9.5, "configScore": 9.0},
+          {"carrier": "SQ", "type": "787-10", "hours": 5, "airlineScore": 9.5, "configScore": 7.0}
+        ],
+        "weightedAirlineScore": 9.5,
+        "weightedSeatScore": 8.4,
+        "adjustments": 0,
+        "comfortScore": 9.0,
+        "note": "The whole cost of drawing the 787-10 rotation is 0.3 points. Worth requesting the A350; not worth restructuring the trip for."
+      },
+      {
+        "label": "Lufthansa A380 upper deck, VLC-MUC-BKK-PER — the pure A380 play",
+        "sectors": [
+          {"carrier": "LH", "type": "A320", "hours": 2.3, "airlineScore": 6.5, "configScore": 5.5},
+          {"carrier": "LH", "type": "A380 upper deck", "hours": 10.75, "airlineScore": 6.5, "configScore": 9.5},
+          {"carrier": "TG", "type": "787-8", "hours": 7, "airlineScore": 6.0, "configScore": 6.0}
+        ],
+        "weightedAirlineScore": 6.3,
+        "weightedSeatScore": 7.8,
+        "adjustments": -0.25,
+        "comfortScore": 6.7,
+        "note": "THE KEY WORKED EXAMPLE. It carries the best economy seat in the dataset (9.5) and still finishes 2.6 points behind Singapore Airlines, because the seat is attached to a 6.5 airline, a 6.0 second carrier and a third sector. This is the arithmetic answer to 'the A380 is well-rated — which is best?'"
+      },
+      {
+        "label": "Qatar Airways, MAD-DOH-PER",
+        "sectors": [
+          {"carrier": "QR", "type": "A350-1000", "hours": 7, "airlineScore": 9.0, "configScore": 9.5},
+          {"carrier": "QR", "type": "777-300ER", "hours": 11, "airlineScore": 9.0, "configScore": 5.5}
+        ],
+        "weightedAirlineScore": 9.0,
+        "weightedSeatScore": 7.1,
+        "adjustments": -1.0,
+        "comfortScore": 7.1,
+        "note": "Highest airline score in the set after SQ, and the highest single config score in the file on its Europe sector — then it puts the longest leg on its narrowest aircraft and routes through restricted airspace. Raw score before the Gulf adjustment is 8.1."
+      }
+    ]
+  }
+}
