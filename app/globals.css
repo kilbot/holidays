@@ -211,6 +211,15 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The Catalog list is 413 rows with no virtualisation library. Skipping
+   layout and paint for the rows scrolled out of view is what buys that:
+   `auto` lets each row remember its real height once measured, so the
+   scrollbar stays honest. */
+@utility sb-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 74px;
+}
+
 /* Thin scrollbars so the catalog list does not grow a chunky OS bar
    over the glass panel. */
 @utility sb-scroll {
