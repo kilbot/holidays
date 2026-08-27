@@ -14,6 +14,7 @@ import {
   FOCUS_ZOOM,
   NO_PADDING,
   capsuleLocation,
+  fitPadding,
   focusPadding,
   framePadding,
 } from "@/lib/capsule-camera";
@@ -32,6 +33,7 @@ import {
 } from "@/lib/globe-markers";
 import { useShortlist } from "@/lib/shortlist";
 import {
+  AUSTRALIA_BOUNDS,
   COMPACT_CAMERA,
   COMPACT_CAMERA_MAX_WIDTH_PX,
   GLOBE_MAX_FIT_ZOOM,
@@ -178,11 +180,22 @@ export function GlobeStage() {
    * An open card and an anchored popup are two answers to "what is here" and
    * only one of them can be on screen: the card's flight is about to take the
    * popup's point off the edge of the world. The popup is hidden rather than
-   * dismissed, because closing the card flies back to the same route frame it
-   * was anchored in — so it returns where it was, still pointing at the Leg
-   * the traveller was reading about.
+   * dismissed, because closing the card flies back to a frame that holds the
+   * Leg it was anchored to — so it returns where it was, still pointing at
+   * the arc the traveller was reading about.
    */
   const popup = focus ? null : anchored;
+
+  /**
+   * The anchored popup, readable from a camera effect that must not re-run
+   * when it moves. Its `screen` field is rewritten on every frame of every
+   * flight, so listing `anchored` among the flight effect's dependencies
+   * would restart the flight mid-air.
+   */
+  const anchoredRef = useRef<Anchored | null>(null);
+  useEffect(() => {
+    anchoredRef.current = anchored;
+  }, [anchored]);
 
   /**
    * True while the camera is somewhere a card put it.
@@ -209,8 +222,18 @@ export function GlobeStage() {
     ? mapError
     : "No Mapbox token — set NEXT_PUBLIC_MAPBOX_TOKEN.";
 
-  /** Set by the map effect so the React controls can drive the camera. */
+  /**
+   * Set by the map effect so the React controls can drive the camera.
+   *
+   * `frameRoute` is the "frame the whole route" button: the whole trip, and
+   * from then on that is the frame the stage rests in. `frameResting` is what
+   * a resize and a closing card use — back to whatever seat the stage is
+   * currently in, which at load is Australia.
+   */
   const frameRouteRef = useRef<(animate: boolean) => void>(() => {});
+  const frameRestingRef = useRef<
+    (animate: boolean, keepLegsInView?: boolean) => void
+  >(() => {});
 
   const zoomBy = useCallback((delta: number) => {
     const map = mapRef.current;
@@ -283,6 +306,43 @@ export function GlobeStage() {
     map.touchZoomRotate.disableRotation();
     map.keyboard.disableRotation();
 
+    /**
+     * Which frame the stage rests in.
+     *
+     * Australia at load; the "frame the whole route" button hands the seat to
+     * the route, and from then on that is what a resize or a closing card
+     * comes back to. Without this the button's frame would survive exactly
+     * until the next container resize.
+     */
+    let resting: "australia" | "route" = "australia";
+
+    /**
+     * The opening frame: Australia, filling the stage (#81).
+     *
+     * `fitBounds` rather than a hand-picked centre and zoom, for the same
+     * reason the route frame uses it — the answer has to be right on a 375px
+     * phone and a 1440px laptop, and those want different zooms. Padding is
+     * sticky on the transform (see `capsule-camera`), so this states its own:
+     * the same reservation the route frame makes for the docked chrome, which
+     * is what keeps the continent out from under the shortlist and the date
+     * strip rather than merely on screen.
+     *
+     * No `maxZoom`: the route frame needs one to keep Valencia on the near
+     * face of the globe, and this frame has no far end to protect.
+     */
+    const frameAustralia = (animate: boolean) => {
+      map.fitBounds(AUSTRALIA_BOUNDS, {
+        padding: fitPadding(
+          framePadding(container.clientWidth),
+          container.clientWidth,
+          container.clientHeight,
+        ),
+        bearing: 0,
+        pitch: 0,
+        duration: animate && !prefersReducedMotion() ? 900 : 0,
+      });
+    };
+
     const frameRoute = (animate: boolean) => {
       const width = container.clientWidth;
       const duration = animate && !prefersReducedMotion() ? 900 : 0;
@@ -303,14 +363,28 @@ export function GlobeStage() {
       }
 
       map.fitBounds(ROUTE_BOUNDS, {
-        padding: framePadding(width),
+        padding: fitPadding(framePadding(width), width, container.clientHeight),
         maxZoom: GLOBE_MAX_FIT_ZOOM,
         bearing: 0,
         pitch: 0,
         duration,
       });
     };
-    frameRouteRef.current = frameRoute;
+
+    // Pressing the button is what moves the resting seat; nothing else does.
+    frameRouteRef.current = (animate: boolean) => {
+      resting = "route";
+      frameRoute(animate);
+    };
+
+    // `keepLegsInView` is the closing card's escape hatch: an anchored Leg
+    // popup is context the restored frame has to hold, and the Barcelona and
+    // Singapore arcs are not in the Australia frame. It borrows the route
+    // frame for that one call without taking the seat.
+    frameRestingRef.current = (animate: boolean, keepLegsInView = false) => {
+      if (keepLegsInView || resting === "route") frameRoute(animate);
+      else frameAustralia(animate);
+    };
 
     // Once the traveller moves the globe themselves, it is theirs — resizes
     // stop yanking the camera back to the route. Listening on the canvas
@@ -673,7 +747,7 @@ export function GlobeStage() {
         canvas.style.cursor = actionable ? "pointer" : "";
       });
 
-      frameRoute(false);
+      frameAustralia(false);
       setReady(true);
     });
 
@@ -686,7 +760,7 @@ export function GlobeStage() {
       // `flownRef` keeps a resize from undoing an open card's flight; without
       // it, a phone rotating mid-read snaps the camera back to the route.
       if (!userMoved && !flownRef.current && map.isStyleLoaded()) {
-        frameRoute(false);
+        frameRestingRef.current(false);
       }
     };
 
@@ -738,13 +812,20 @@ export function GlobeStage() {
     if (!ready || !map || !container) return;
 
     if (!focus) {
-      // Card closed: back to the route frame, and by the same call that drew
-      // it at load, so it is the same frame rather than a near miss. Only
-      // when a flight actually took the camera away — a card that never flew
-      // should not re-frame a globe the traveller had spun themselves.
+      // Card closed: back to the frame the stage was resting in, and by the
+      // same call that drew it at load, so it is the same frame rather than a
+      // near miss. Only when a flight actually took the camera away — a card
+      // that never flew should not re-frame a globe the traveller had spun
+      // themselves.
+      //
+      // An anchored popup is the one piece of context that outranks the
+      // resting frame: it is still pointing at a Leg, and the Leg it points
+      // at may be a Barcelona–Singapore arc the Australia frame does not
+      // hold. With one open, the restore borrows the whole-route frame so the
+      // popup comes back where it was, still on its arc.
       if (flownRef.current) {
         flownRef.current = false;
-        frameRouteRef.current(true);
+        frameRestingRef.current(true, Boolean(anchoredRef.current));
       }
       return;
     }

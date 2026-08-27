@@ -121,6 +121,48 @@ export const NO_PADDING: CameraPadding = {
 };
 
 /**
+ * The smallest strip of map a fit is allowed to aim at, in px.
+ *
+ * Small enough that it only ever binds on a window nobody plans a trip in,
+ * large enough that what survives is still a picture rather than a letterbox.
+ */
+const MIN_FIT_BOX_PX = 80;
+
+/** Both reservations on one axis, trimmed until they leave room to fit in. */
+function trimAxis(near: number, far: number, extent: number): [number, number] {
+  const room = extent - MIN_FIT_BOX_PX;
+  const asked = near + far;
+  if (asked <= room) return [near, far];
+  if (room <= 0) return [0, 0];
+  const scale = room / asked;
+  return [near * scale, far * scale];
+}
+
+/**
+ * The resting padding, cut down to something the stage can actually honour.
+ *
+ * `fitBounds` does not clamp: asked to reserve more than the canvas has, it
+ * warns to the console, returns no camera, and leaves the map exactly where it
+ * was — which at load is the pre-fit default the constructor set, pointing at
+ * the Indian Ocean. Observed live in a 1440-wide window whose stage was short:
+ * the 110/200 compact reservation is taller than a stage under ~310px, so the
+ * globe simply never framed.
+ *
+ * Trimming proportionally keeps the intent — the chrome-heavy side stays the
+ * chrome-heavy side — and turns "the panels are bigger than the stage" into a
+ * tight frame instead of no frame at all.
+ */
+export function fitPadding(
+  base: CameraPadding,
+  width: number,
+  height: number,
+): CameraPadding {
+  const [left, right] = trimAxis(base.left, base.right, width);
+  const [top, bottom] = trimAxis(base.top, base.bottom, height);
+  return { top, bottom, left, right };
+}
+
+/**
  * Padding for the flight, while the card is open.
  *
  * Mapbox centres on the middle of the box *inside* the camera padding, so

@@ -301,6 +301,34 @@ export const ROUTE_BOUNDS: [[number, number], [number, number]] = (() => {
 })();
 
 /**
+ * Australia, corner to corner — the frame the globe opens on (#81).
+ *
+ * The route bounds above answer "where does this trip go?", which is a
+ * question you can only ask once you already care. The first frame has a
+ * different job: a globe that opens on the Indian Ocean with a thread across
+ * it is a diagram, and the traveller looking over your shoulder has no idea
+ * which of those specks is the point. Opening *inside* Australia, filling the
+ * screen with it, says what the trip is before a word is read — and getting
+ * back to the whole route is the one button already sitting on the stage.
+ *
+ * Mainland plus Tasmania, and nothing else: the external territories put the
+ * box out past Christmas Island and Norfolk and would zoom the continent back
+ * down to make room for two dots nobody is flying to.
+ *
+ *   west   113.15°E  Steep Point, WA — the mainland's western tip
+ *   east   153.64°E  Cape Byron, NSW — its eastern one, and a Capsule
+ *   north  −10.69°   Cape York, QLD
+ *   south  −43.65°   South East Cape, Tasmania
+ *
+ * The arcs run off-view at this zoom, Singapore and Valencia with them. That
+ * is the trade the frame is making, not a bug in it.
+ */
+export const AUSTRALIA_BOUNDS: [[number, number], [number, number]] = [
+  [113.15, -43.65],
+  [153.64, -10.69],
+];
+
+/**
  * Camera padding, in px, that keeps the route clear of the chrome: the
  * catalog drawer and cost HUD on the flanks, the date strip along the bottom.
  * On a phone the flanking panels are not docked, so the route can use the
