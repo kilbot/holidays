@@ -142,13 +142,13 @@ function ShortlistRow({
   return (
     <li
       className={cn(
-        "rounded-lg border transition-colors motion-reduce:transition-none",
+        "rounded-lg border px-2 py-1.5 transition-colors motion-reduce:transition-none",
         entry.placed
           ? "border-[color-mix(in_srgb,var(--sb-good)_50%,transparent)] bg-[color-mix(in_srgb,var(--sb-good)_13%,var(--sb-panel-2))]"
           : "border-[color-mix(in_srgb,var(--sb-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--sb-accent)_12%,var(--sb-panel-2))]",
       )}
     >
-      <div className="flex items-start gap-1 px-2 pt-1.5">
+      <div className="flex items-start gap-1">
         <button
           type="button"
           onClick={() =>
@@ -157,7 +157,7 @@ function ShortlistRow({
               : openCatalogIdea(entry.id)
           }
           aria-haspopup="dialog"
-          title={`Open ${entry.name}`}
+          title={`Open ${entry.name} — ${entry.place}, ${entry.days}, ${entry.cost}`}
           className="min-w-0 flex-1 cursor-pointer text-left"
         >
           <span className="flex items-start gap-1">
@@ -170,15 +170,6 @@ function ShortlistRow({
             <span className="line-clamp-2 text-[12px] leading-tight font-semibold">
               {entry.name}
             </span>
-          </span>
-          <span className="mt-0.5 flex items-center gap-1.5 truncate text-[10px] text-[var(--sb-faint)]">
-            <span
-              aria-hidden
-              className="size-1.5 shrink-0 rounded-full"
-              style={{ background: SEASON_TOKEN[entry.seasonFit] }}
-              title={SEASON_LABEL[entry.seasonFit]}
-            />
-            <span className="truncate">{entry.place}</span>
           </span>
         </button>
 
@@ -196,23 +187,33 @@ function ShortlistRow({
         </button>
       </div>
 
-      <div className="flex items-center gap-2 px-2 pt-1 pb-1.5">
-        <span className="sb-num shrink-0 text-[10px] text-[var(--sb-faint)]">
-          {entry.days}
-        </span>
-        <span className="sb-num shrink-0 text-[10.5px] font-medium">
-          {entry.cost}
+      {/* Place, length and price on one line with the switch. They were three
+          stacked rows, which cost about 18px a card for facts that read
+          perfectly well side by side — and eight cards of that is what pushed
+          the last Adventure past the rail's bottom edge (#56). */}
+      <div className="mt-0.5 flex items-center gap-1.5">
+        <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[10px] text-[var(--sb-faint)]">
+          <span
+            aria-hidden
+            className="size-1.5 shrink-0 rounded-full"
+            style={{ background: SEASON_TOKEN[entry.seasonFit] }}
+            title={SEASON_LABEL[entry.seasonFit]}
+          />
+          <span className="truncate">{entry.place}</span>
+          <span className="sb-num shrink-0">{entry.days}</span>
+          <span className="sb-num shrink-0 text-[10.5px] font-medium text-[var(--sb-text)]">
+            {entry.cost}
+          </span>
         </span>
 
-        <label className="ml-auto flex cursor-pointer items-center gap-1.5">
-          <span
-            className={cn(
-              "text-[10px] font-semibold whitespace-nowrap",
-              entry.placed ? "text-[var(--sb-good)]" : "text-[var(--sb-dim)]",
-            )}
-          >
-            In the plan
-          </span>
+        <label
+          className="flex shrink-0 cursor-pointer items-center"
+          title={
+            entry.placed
+              ? `${entry.name} is in the plan — switch off to leave it on the bench`
+              : `Put ${entry.name} in the plan`
+          }
+        >
           <Switch
             size="sm"
             checked={entry.placed}
@@ -288,7 +289,14 @@ function ShortlistBody() {
         </div>
       ) : (
         <>
-          <ul className="sb-scroll mt-2.5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1 [mask-image:linear-gradient(to_bottom,black_calc(100%-24px),transparent)]">
+          {/* Shrink-wraps to its rows, and scrolls once there are more of them
+              than the rail is tall. It used to carry a fade over its last 24px,
+              which is what made the bottom card read as *cut off* rather than
+              as *scrollable* (#56): the fade was on whether or not there was
+              anything below it, so even scrolled to the end the last Adventure
+              looked severed by the panel edge. A thin scrollbar says the same
+              thing without lying about the row it is drawn over. */}
+          <ul className="sb-scroll mt-2.5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain pr-1.5 pb-0.5">
             {entries.map((entry) => (
               <ShortlistRow key={entry.id} entry={entry} onMark={mark} />
             ))}
@@ -348,7 +356,9 @@ export function ShortlistRail() {
           // of glass over a map with nothing on it.
           collapsed
             ? "w-11"
-            : "max-h-[calc(100%-var(--sb-strip-h)-2rem)] w-[264px]",
+            // Top inset, the live strip height, and a gap so the rail stops
+            // short of the strip rather than resting on its edge.
+            : "max-h-[calc(100%-var(--sb-strip-h)-3rem)] w-[264px]",
         )}
       >
         {collapsed ? (

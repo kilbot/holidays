@@ -332,30 +332,48 @@ function WeekGrid({
     <div className="sb-scroll -mx-0.5 overflow-x-auto px-0.5 pb-1 lg:overflow-x-visible lg:pb-0">
       <div className="min-w-[520px] lg:min-w-0">
         <div className="grid grid-cols-7 gap-1">
-          {places.map((place) => (
-            <p
-              key={place.key}
-              style={span(place)}
-              title={`${place.locationName}${place.capsuleName ? ` · ${place.capsuleName}` : ""} — ${formatWeekdaySpan(days[place.from].date, days[place.to].date)}`}
-              className={cn(
-                "truncate rounded-md px-1.5 py-0.5 text-[11px] leading-tight font-semibold",
-                place.buffer
-                  ? "bg-[color-mix(in_srgb,var(--sb-panel-2)_60%,transparent)] text-[var(--sb-dim)] italic"
-                  : "bg-[color-mix(in_srgb,var(--sb-accent)_14%,transparent)] text-[var(--sb-text)]",
-              )}
-            >
-              {place.locationName}
-              {place.capsuleName && (
-                <span className="font-normal text-[var(--sb-dim)]">
-                  {" · "}
-                  {place.capsuleName}
-                </span>
-              )}
-              {place.buffer && !place.capsuleName && (
-                <span className="font-normal"> · buffer</span>
-              )}
-            </p>
-          ))}
+          {places.map((place, index) => {
+            // Three Capsules in one town is three bands, and repeating the
+            // town's name across all three is the same fault the day cells had.
+            // The place is said once per run of days in it; the bands after
+            // that carry only what changed.
+            const sameTown =
+              index > 0 && places[index - 1].locationName === place.locationName;
+            return (
+              <p
+                key={place.key}
+                style={span(place)}
+                title={`${place.locationName}${place.capsuleName ? ` · ${place.capsuleName}` : ""} — ${formatWeekdaySpan(days[place.from].date, days[place.to].date)}`}
+                className={cn(
+                  "truncate rounded-md px-1.5 py-0.5 text-[11px] leading-tight font-semibold",
+                  place.buffer
+                    ? "bg-[color-mix(in_srgb,var(--sb-panel-2)_60%,transparent)] text-[var(--sb-dim)] italic"
+                    : "bg-[color-mix(in_srgb,var(--sb-accent)_14%,transparent)] text-[var(--sb-text)]",
+                )}
+              >
+                {sameTown ? (
+                  <span aria-hidden className="text-[var(--sb-faint)]">
+                    ↳{" "}
+                  </span>
+                ) : (
+                  place.locationName
+                )}
+                {place.capsuleName && (
+                  <span
+                    className={cn(
+                      sameTown ? "" : "font-normal text-[var(--sb-dim)]",
+                    )}
+                  >
+                    {sameTown ? "" : " · "}
+                    {place.capsuleName}
+                  </span>
+                )}
+                {!place.capsuleName && place.buffer && (
+                  <span className="font-normal">{sameTown ? "" : " · "}buffer</span>
+                )}
+              </p>
+            );
+          })}
         </div>
 
         <div className="mt-1 grid grid-cols-7 gap-1">
