@@ -27,4 +27,5 @@ Glossary for the Australia trip planner. Terms only — no implementation detail
 - **Home base** — a place with free lodging and a borrowed car (Paul's dad in Mundaring Hills, the Perth family home, the sister's farm). Adventures near a Home base cost far less than east-coast Adventures, where hotels and car rental are paid.
 - **Fare snapshot** — a stored result of flight-price research for a specific route and date range, with a fetched-at date. The fallback data source if live pricing is too expensive.
 - **Live pricing** — fetching current fares from a flight-data API at the moment the user changes dates or toggles a Adventure. Preferred if affordable.
+- **No Middle East transits** — hard constraint (user, 2026-08-27, "in today's climate"): itineraries transiting Gulf/Middle East hubs (DOH, DXB, AUH, and kin) are excluded by default, not merely penalized. Asia-routed options (SIN, HKG, KUL) are the lane.
 - **Comfort-first** — the flight-selection criterion for long-haul Legs: best comfort per euro, not cheapest. Signals: aircraft type (e.g. A380), seat position, layover airport quality (Singapore Changi preferred), option of an overnight stopover.
