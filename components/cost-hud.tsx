@@ -12,6 +12,7 @@ import {
 } from "@/lib/engine";
 import type { ScenarioTotal } from "@/lib/engine/scenarios";
 import { usePlan } from "@/lib/engine/use-plan";
+import { useSharing } from "@/lib/store/sharing";
 import { cn } from "@/lib/utils";
 
 function BudgetBar({ rollUp }: { rollUp: RollUp }) {
@@ -291,6 +292,7 @@ function WarningBadge({ warning }: { warning: Warning }) {
 export function CostHud() {
   const [open, setOpen] = useState(false);
   const { plan, scenarios, totals, input, patch } = usePlan();
+  const { previewing } = useSharing();
   const { rollUp, warnings } = plan;
 
   // The badge shows the loudest three. The rest are on the Days they belong to,
@@ -322,7 +324,11 @@ export function CostHud() {
           className="block w-full cursor-pointer text-left"
         >
           <span className="flex items-baseline justify-between gap-2">
-            <span className="sb-label">Plan total</span>
+            {/* The number the bug was reported against. If it is a figure only
+                this browser believes, it says so where it is read. */}
+            <span className="sb-label">
+              {previewing ? "Plan total · preview" : "Plan total"}
+            </span>
             <span className="flex items-center gap-1.5">
               {/* The Warning, reduced to its smallest honest form. */}
               {!open && ranked.length > 0 && (
@@ -353,7 +359,12 @@ export function CostHud() {
             </span>
           </span>
 
-          <span className="sb-num mt-0.5 block text-[26px] leading-none font-semibold tracking-tight">
+          <span
+            className={cn(
+              "sb-num mt-0.5 block text-[26px] leading-none font-semibold tracking-tight",
+              previewing && "text-[var(--sb-warn)]",
+            )}
+          >
             {formatEur(rollUp.totalEur)}
           </span>
 

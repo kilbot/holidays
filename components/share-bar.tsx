@@ -21,9 +21,14 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Copy, GitFork, Link2, Pencil, X } from "lucide-react";
+import { Check, Copy, GitFork, Link2, Pencil, Undo2, X } from "lucide-react";
 
 import { usePlan } from "@/lib/engine/use-plan";
+import {
+  closeSharePanel,
+  toggleSharePanel,
+  useSharePanelOpen,
+} from "@/lib/share-panel";
 import { MAX_FORK_NAME_LENGTH } from "@/lib/store/plans";
 import { useSharing, type SharingApi } from "@/lib/store/sharing";
 import { cn } from "@/lib/utils";
@@ -81,6 +86,10 @@ function CopyRow({ label, url }: { label: string; url: string }) {
  * offline" is the one the traveller has to know about.
  */
 function restingLabel(sharing: SharingApi): string {
+  // The preview reads before the Fork's name: a visitor previewing on top of
+  // someone else's Fork has changed something, and that is the more urgent of
+  // the two facts.
+  if (sharing.previewing) return "Previewing — not saved";
   if (sharing.visiting) return sharing.visiting.name;
   if (sharing.mode === "local") return "This browser only";
   if (sharing.mode === "view") return "Viewing — fork to play";
@@ -91,6 +100,10 @@ function restingLabel(sharing: SharingApi): string {
 }
 
 function toneFor(sharing: SharingApi): string | null {
+  // A dot on the view-mode pill, for once. It is the only state in which a
+  // visitor has something at stake — unsaved work — and the pill is where they
+  // will look after dismissing the notice.
+  if (sharing.previewing) return "var(--sb-warn)";
   if (sharing.mode !== "edit") return null;
   if (sharing.status === "offline" || sharing.status === "rejected") {
     return "var(--sb-warn)";
@@ -138,8 +151,8 @@ function ForkPanel({ sharing }: { sharing: SharingApi }) {
     <div className="mt-2 border-t border-[var(--sb-line)] pt-2">
       <p className="sb-label text-[9px]">Make your own version</p>
       <p className="mt-1 text-[10.5px] leading-snug text-[var(--sb-dim)]">
-        Saves the trip exactly as you have it now, under its own link. The
-        couple&rsquo;s plan is untouched.
+        Saves the trip exactly as you have it now — every change you have made
+        while previewing, on its own link. The couple&rsquo;s plan is untouched.
       </p>
 
       <input
@@ -186,6 +199,47 @@ function ForkPanel({ sharing }: { sharing: SharingApi }) {
           still here in this browser.
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * The way back out of a preview.
+ *
+ * A visitor's changes are real and immediate and live in this browser only, so
+ * the undo is not an undo stack — it is re-reading the couple's Plan, which is
+ * the same thing a reload does and the only thing that could be true after an
+ * arbitrary number of edits. Saying "reload the page" would have worked; a
+ * button that does it without losing the tab is better.
+ */
+function DiscardRow({ sharing }: { sharing: SharingApi }) {
+  const [working, setWorking] = useState(false);
+
+  return (
+    <div className="mt-2 border-t border-[var(--sb-line)] pt-2">
+      <p className="flex items-baseline gap-1.5 text-[10.5px] leading-snug text-[var(--sb-dim)]">
+        <span
+          aria-hidden
+          className="mt-[3px] size-1.5 shrink-0 rounded-full"
+          style={{ background: "var(--sb-warn)" }}
+        />
+        <span>
+          Your changes are in this browser only. A reload puts the
+          couple&rsquo;s plan back.
+        </span>
+      </p>
+      <button
+        type="button"
+        disabled={working}
+        onClick={() => {
+          setWorking(true);
+          void sharing.discardPreview().finally(() => setWorking(false));
+        }}
+        className="mt-1.5 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border border-[var(--sb-line)] px-2 py-1.5 text-[11px] font-semibold text-[var(--sb-text)] transition-colors hover:bg-[var(--sb-panel-2)] disabled:opacity-50 motion-reduce:transition-none"
+      >
+        <Undo2 className="size-3.5" />
+        {working ? "Restoring…" : "Discard my changes"}
+      </button>
     </div>
   );
 }
@@ -254,7 +308,9 @@ function VisitingPanel({ sharing }: { sharing: SharingApi }) {
 
 export function ShareBar() {
   const sharing = useSharing();
-  const [open, setOpen] = useState(false);
+  // Open-ness is a module store rather than component state because the preview
+  // notice opens this panel too — `lib/share-panel.ts` says why.
+  const open = useSharePanelOpen();
   const panel = useRef<HTMLDivElement>(null);
 
   // Escape closes, and so does a click anywhere else — this sits over a globe
@@ -263,10 +319,10 @@ export function ShareBar() {
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") closeSharePanel();
     };
     const onPointerDown = (event: PointerEvent) => {
-      if (!panel.current?.contains(event.target as Node)) setOpen(false);
+      if (!panel.current?.contains(event.target as Node)) closeSharePanel();
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("pointerdown", onPointerDown);
@@ -289,7 +345,7 @@ export function ShareBar() {
       <div className={cn("sb-panel", open ? "p-3" : "p-0")}>
         <button
           type="button"
-          onClick={() => setOpen((value) => !value)}
+          onClick={toggleSharePanel}
           aria-expanded={open}
           className={cn(
             "flex w-full cursor-pointer items-center gap-2 text-left",
@@ -334,6 +390,8 @@ export function ShareBar() {
                 the one in your bookmarks; do not paste it anywhere.
               </p>
             )}
+
+            {sharing.previewing && <DiscardRow sharing={sharing} />}
 
             {sharing.visiting && <VisitingPanel sharing={sharing} />}
             {sharing.mode === "view" && !sharing.visiting && (

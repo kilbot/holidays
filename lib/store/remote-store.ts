@@ -28,6 +28,20 @@
  * problem this site does not have, `updatedAt` comes back on every write so the
  * UI can say when it last saved, and ADR 0001's whole premise is that the
  * audience is small enough not to need the machinery.
+ *
+ * ## What a visitor's write does (#58)
+ *
+ * A tab holding only the view link may not touch the canonical Plan — that is
+ * ADR 0001, and it is not negotiable. But "may not save" is not "may not act":
+ * the write still lands in localStorage, everything downstream recomputes, and
+ * the visitor gets a working **preview** of their own version, which is the
+ * "fork to play" invitation actually functioning.
+ *
+ * What was missing was the second half. The push used to be skipped in silence,
+ * so the pill went on saying whatever it last said and nothing anywhere told the
+ * visitor their rearranged trip would evaporate on reload. The status is now
+ * `"preview"` from the first such write, and it is the UI's job to be loud about
+ * it once.
  */
 
 import { toPlanDoc, type PlanDoc } from "@/lib/engine/scenario-doc";
@@ -41,16 +55,26 @@ import { EDIT_KEY_HEADER } from "@/lib/store/guards";
  * drag is one request and short enough that closing the laptop right after an
  * edit still saves it (`pagehide` flushes anything outstanding regardless).
  */
-const SAVE_DEBOUNCE_MS = 800;
+export const SAVE_DEBOUNCE_MS = 800;
 
-/** What the share UI shows about the connection. */
+/**
+ * What the share UI shows about the connection.
+ *
+ * `"preview"` is the one that is about permission rather than plumbing: this
+ * tab holds the view link, so its edits are real, immediate and local, and will
+ * never reach the canonical Plan. Before #58 that case had no status at all —
+ * the push was skipped and the pill went on saying whatever it last said — and
+ * a visitor could rearrange the trip for ten minutes without a single word
+ * telling them it was theirs alone.
+ */
 export type SyncStatus =
   | "local"
   | "loading"
   | "synced"
   | "saving"
   | "offline"
-  | "rejected";
+  | "rejected"
+  | "preview";
 
 /* ------------------------------------------------------------------ */
 /* Status, as its own tiny external store                              */
@@ -117,6 +141,18 @@ export async function refreshPlanFromServer(): Promise<void> {
   await refresh?.();
 }
 
+/**
+ * Throw away a view-mode preview and go back to the couple's Plan.
+ *
+ * The same re-read as `refreshPlanFromServer`, under the name the visitor's
+ * button means — and the only way back, since the preview overwrote the tab's
+ * localStorage on its way through. A reload would do it too; a button says so
+ * out loud.
+ */
+export async function discardPreview(): Promise<void> {
+  await refresh?.();
+}
+
 export function remoteScenarioStore(
   local: ScenarioStore,
   { planId, getEditKey }: RemoteStoreOptions,
@@ -152,7 +188,12 @@ export function remoteScenarioStore(
 
   async function push(state: ScenarioState, keepalive = false) {
     const editKey = getEditKey();
-    if (!editKey) return;
+    // Belt and braces: `write` already turns a keyless edit into a preview, and
+    // an unguarded push would be a request the route can only answer with 403.
+    if (!editKey) {
+      setStatus("preview");
+      return;
+    }
     setStatus("saving");
     try {
       const response = await fetch(`/api/plan/${planId}`, {
@@ -182,7 +223,6 @@ export function remoteScenarioStore(
   }
 
   function schedulePush() {
-    if (!getEditKey()) return;
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
       timer = null;
@@ -202,7 +242,12 @@ export function remoteScenarioStore(
     });
   }
 
-  refresh = () => hydrate(true);
+  refresh = async () => {
+    // The tab is asking for the server's copy on purpose — as an adopt, or as a
+    // visitor discarding their preview — so its own edits stop counting.
+    editedLocally = false;
+    await hydrate(true);
+  };
   void hydrate();
 
   return {
@@ -211,7 +256,17 @@ export function remoteScenarioStore(
     subscribe: (listener) => local.subscribe(listener),
     write(state) {
       editedLocally = true;
+      // The write always lands locally, in every mode. That is the whole shape
+      // of this store — localStorage is where the state lives — and it is what
+      // makes a view-mode edit a working preview rather than a dead click.
       local.write(state);
+
+      if (!getEditKey()) {
+        // …but it stops here. Saying so is the point: the visitor gets their
+        // recomputed total *and* the news that it is theirs alone.
+        setStatus("preview");
+        return;
+      }
       schedulePush();
     },
   };
