@@ -39,11 +39,12 @@ import { cn } from "@/lib/utils";
  *   worse experience than chips that gather.
  *
  * There used to be a third control here, a "her view / his view" taste lens
- * that re-ordered the list by whose pick an idea was. It came out in #36: two
- * people sifting one Catalog together do not want the list rearranging itself
- * around a guess at which of them is holding the laptop, and the facet chips
- * already say the same thing more honestly — pressing `hippie` or `sport` is
- * the traveller stating what they want, not the site inferring it.
+ * that re-ordered the list by whose pick an idea was. It came out in #36:
+ * the Travellers' tastes are shared, not partitioned — "we're in this
+ * together", no per-person views anywhere in the site (docs/CONTEXT.md). The
+ * facet chips already carry the same information without the partition:
+ * pressing `hippie` or `sport` is the couple stating what they want out of
+ * this trip, not the site sorting the Catalog into his and hers.
  */
 
 const SEASON_FITS: readonly SeasonFit[] = ["good", "ok", "poor", "no"];
