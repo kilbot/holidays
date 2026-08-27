@@ -78,7 +78,7 @@ function DateChip({
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="sb-num cursor-pointer rounded-md border border-transparent px-1 py-px text-[12px] font-semibold decoration-[var(--sb-faint)] decoration-dotted underline-offset-[3px] transition-colors hover:border-[var(--sb-line)] hover:bg-[var(--sb-panel-2)] focus-visible:border-[var(--sb-accent)] focus-visible:outline-none"
+          className="sb-num cursor-pointer rounded-md border border-transparent px-1 py-px text-[12px] font-semibold decoration-[var(--sb-faint)] decoration-dotted underline-offset-[3px] transition-colors hover:border-[var(--sb-line)] hover:bg-[var(--sb-panel-2)] focus-visible:border-[var(--sb-accent)] focus-visible:outline-none motion-reduce:transition-none"
         >
           <span className="underline decoration-dotted">
             {formatDayYear(value)}
@@ -120,16 +120,20 @@ function ClocksTicking() {
 
   return (
     <div className="mb-2 rounded-lg bg-[color-mix(in_srgb,var(--sb-warn)_12%,transparent)] px-2 py-1.5">
-      <div className="flex items-center gap-2 overflow-hidden">
-        <AlarmClock className="size-3 shrink-0 text-[var(--sb-warn)]" />
-        <span className="sb-label shrink-0 text-[9px] text-[var(--sb-warn)]">
-          Clocks ticking
+      {/* Wraps rather than truncates: a deadline you can only half-read is
+          not doing its job, and on a phone these are two full lines. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="flex shrink-0 items-center gap-1.5">
+          <AlarmClock className="size-3 text-[var(--sb-warn)]" />
+          <span className="sb-label text-[9px] text-[var(--sb-warn)]">
+            Clocks ticking
+          </span>
         </span>
-        <ul className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+        <ul className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
           {PRE_TRIP_DEADLINES.map((deadline) => {
             const away = today ? daysBetween(today, deadline.date) - 1 : null;
             return (
-              <li key={deadline.id} className="min-w-0">
+              <li key={deadline.id}>
                 <button
                   type="button"
                   onClick={() =>
@@ -138,7 +142,7 @@ function ClocksTicking() {
                     )
                   }
                   aria-expanded={open === deadline.id}
-                  className="cursor-pointer truncate text-[10.5px] leading-tight text-[var(--sb-dim)] transition-colors hover:text-[var(--sb-text)]"
+                  className="cursor-pointer text-left text-[10.5px] leading-tight text-[var(--sb-dim)] transition-colors hover:text-[var(--sb-text)] motion-reduce:transition-none"
                 >
                   <span className="font-semibold text-[var(--sb-text)]">
                     {deadline.label}
@@ -194,6 +198,9 @@ function Legend() {
 /* ------------------------------------------------------------------ */
 /* Week cell                                                           */
 /* ------------------------------------------------------------------ */
+
+/** One zoom at a time, so every week cell can point `aria-controls` at it. */
+const WEEK_ZOOM_ID = "week-zoom";
 
 /**
  * Dec/Jan/Feb normals for the week's place, as a bar and two numbers.
@@ -299,6 +306,7 @@ function WeekCell({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
+        aria-controls={WEEK_ZOOM_ID}
         aria-label={`${week.label}, ${week.lead.place}. Open the day view.`}
         className={cn(
           "flex w-full cursor-pointer flex-col rounded-lg border px-2.5 py-2 text-left transition-colors motion-reduce:transition-none",
@@ -470,7 +478,7 @@ export function DateStrip() {
           ))}
         </ul>
 
-        {zoomed && <WeekZoom week={zoomed} />}
+        {zoomed && <WeekZoom week={zoomed} id={WEEK_ZOOM_ID} />}
 
         {zoomed && (
           <button

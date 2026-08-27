@@ -86,7 +86,7 @@ function DeadlineMarker({
         <span
           aria-hidden
           className={cn(
-            "block h-full rounded-[2px] transition-opacity",
+            "block h-full rounded-[2px] transition-opacity motion-reduce:transition-none",
             open ? "opacity-100" : "opacity-70 hover:opacity-100",
           )}
           style={{

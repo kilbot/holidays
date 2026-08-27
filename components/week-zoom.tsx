@@ -248,13 +248,17 @@ function EventList({ hits }: { hits: EventHit[] }) {
  * own event spend, its own warning if it blows the daily cap — with the week's
  * weather and events alongside it rather than compressed into a ribbon.
  */
-export function WeekZoom({ week }: { week: PlanWeek }) {
+export function WeekZoom({ week, id }: { week: PlanWeek; id: string }) {
   const hits = eventsForDays(eventDaysOf(week));
 
   return (
     // Capped and scrollable: opened out, a week is taller than the strip it
     // hangs off, and it must not push the globe off the screen on a phone.
-    <div className="sb-scroll mt-2 max-h-[42vh] overflow-y-auto rounded-xl border border-[color-mix(in_srgb,var(--sb-accent)_28%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-panel-2)_45%,transparent)] p-2.5">
+    <div
+      id={id}
+      role="region"
+      aria-label={`${week.label} — day view`}
+      className="sb-scroll mt-2 max-h-[42vh] overflow-y-auto rounded-xl border border-[color-mix(in_srgb,var(--sb-accent)_28%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-panel-2)_45%,transparent)] p-2.5">
       <div className="flex flex-col gap-3 lg:flex-row">
         <div className="min-w-0 lg:flex-1">
           <p className="sb-label mb-1.5 text-[9px]">
