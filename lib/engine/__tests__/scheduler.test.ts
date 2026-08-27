@@ -8,7 +8,7 @@ import test from "node:test";
 import { buildPlan } from "@/lib/engine/plan";
 import { lockAllows, schedule } from "@/lib/engine/scheduler";
 import { weekdayOf } from "@/lib/trip-dates";
-import { FIXTURES, input } from "@/lib/engine/__tests__/fixtures";
+import { ARRIVING, FIXTURES, input } from "@/lib/engine/__tests__/fixtures";
 
 const placementOf = (plan: ReturnType<typeof buildPlan>, id: string) =>
   plan.placements.find((placement) => placement.capsuleId === id);
@@ -40,13 +40,52 @@ test("a weekday-locked Capsule lands on its weekday", () => {
   assert.equal(weekdayOf(placed.startDate), 6, "Saturday");
 });
 
-test("all four Locks hold when every Capsule is on at once", () => {
-  const plan = buildPlan(
-    input({ toggled: FIXTURES.map((capsule) => capsule.id) }),
-    FIXTURES,
+test("an arrival-locked Capsule starts on the trip's first day", () => {
+  const specs = [...FIXTURES, ARRIVING];
+  const plan = buildPlan(input({ toggled: ["arriving"] }), specs);
+  const placed = placementOf(plan, "arriving");
+
+  assert.ok(placed);
+  assert.equal(placed.startDate, "2026-12-20", "the leaving date, not a date");
+  assert.equal(placed.lockViolated, false);
+});
+
+test("the arrival block follows the leaving date, and the others do not", () => {
+  const specs = [...FIXTURES, ARRIVING];
+  const later = buildPlan(
+    input({ startDate: "2026-12-27", toggled: ["arriving", "fixed"] }),
+    specs,
   );
 
-  for (const capsule of FIXTURES) {
+  assert.equal(placementOf(later, "arriving")?.startDate, "2026-12-27");
+  // The date-locked block stayed on New Year's Eve: only `arrival` is relative.
+  assert.ok(placementOf(later, "fixed")!.startDate <= "2026-12-31");
+  assert.ok(placementOf(later, "fixed")!.endDate >= "2026-12-31");
+});
+
+test("the arrival block gets the first days even against a block that wants them", () => {
+  const specs = [...FIXTURES, ARRIVING];
+  const plan = buildPlan(
+    input({ toggled: ["floating", "arriving"] }),
+    specs,
+  );
+
+  const arriving = placementOf(plan, "arriving");
+  const floating = placementOf(plan, "floating");
+  assert.equal(arriving?.startDate, "2026-12-20");
+  assert.deepEqual(arriving?.overlaps, []);
+  // The flexible block would otherwise have taken the trip's opening days.
+  assert.ok(floating!.startDate > arriving!.endDate, floating!.startDate);
+});
+
+test("all five Locks hold when every Capsule is on at once", () => {
+  const specs = [...FIXTURES, ARRIVING];
+  const plan = buildPlan(
+    input({ toggled: specs.map((capsule) => capsule.id) }),
+    specs,
+  );
+
+  for (const capsule of specs) {
     const placed = placementOf(plan, capsule.id);
     assert.ok(placed, `${capsule.id} was placed`);
     assert.equal(
@@ -55,7 +94,7 @@ test("all four Locks hold when every Capsule is on at once", () => {
       `${capsule.id} landed inside its Lock`,
     );
     assert.ok(
-      lockAllows(capsule.lock, placed.startDate, placed.days),
+      lockAllows(capsule.lock, placed.startDate, placed.days, plan.startDate),
       `${capsule.id} at ${placed.startDate}`,
     );
   }

@@ -64,12 +64,21 @@ export interface Location {
  * names a range it must sit inside (the reef wants 18–31 January, anywhere in
  * there). The Scheduler treats the first as immovable and the second as a
  * corridor to find the cheapest week in.
+ *
+ * `arrival` is the fourth kind and the only **relative** one: it names the
+ * trip's own first day rather than a calendar date. docs/CONTEXT.md's
+ * semi-fixed Anchor — *"the first days after landing are spent with Paul's dad
+ * in Mundaring Hills"* — is a claim about landing, not about 12 December, and
+ * writing it as a window would quietly desynchronise the moment the couple
+ * drags the leaving date. Dragging the rail moves an arrival-locked block with
+ * it; every other Lock stays where the calendar put it.
  */
 export type Lock =
   | { kind: "flexible" }
   | { kind: "window"; from: string; to: string; why: string }
   | { kind: "weekday"; weekdays: readonly number[]; why: string }
-  | { kind: "date"; from: string; to: string; why: string };
+  | { kind: "date"; from: string; to: string; why: string }
+  | { kind: "arrival"; why: string };
 
 /** An Event spend line a Capsule brings with it. docs/CONTEXT.md, Event spend. */
 export interface CapsuleEvent {

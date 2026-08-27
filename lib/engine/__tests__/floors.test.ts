@@ -143,11 +143,26 @@ test("the home-base lever is derived from the rate card, not written down", () =
 
 const plan = buildPlan(DEFAULT_SCENARIO.input, capsuleCatalogue([]));
 
+/**
+ * What the top rung of a ladder may be called.
+ *
+ * "As published" is the normal one and means the figure the Adventure's own
+ * research document first wrote up. `mundaring-arrival` has no research
+ * document — it comes from docs/CONTEXT.md's Anchor directive — so it has no
+ * published figure to quote, and its ceiling is the same block taken as a
+ * paying visitor instead. Both are ceilings; only one is a quotation, and the
+ * label is where a reader is told which they are looking at.
+ */
+const CEILING_LABELS = ["As published", "If you paid for it"];
+
 test("every Adventure's ladder reads floor → plan-on → ceiling", () => {
   for (const capsule of DEEP_CAPSULES) {
     const rungs = costLadder(capsule.cost);
     assert.ok(rungs.length >= 2, `${capsule.id} has a ladder`);
-    assert.equal(rungs.at(-1)?.label, "As published", capsule.id);
+    assert.ok(
+      CEILING_LABELS.includes(rungs.at(-1)?.label ?? ""),
+      `${capsule.id}: top rung is "${rungs.at(-1)?.label}"`,
+    );
 
     for (let i = 1; i < rungs.length; i += 1) {
       assert.ok(

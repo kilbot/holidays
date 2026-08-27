@@ -42,6 +42,22 @@ export const LOCATIONS: readonly Location[] = [
     regions: ["WA"],
   },
   {
+    id: "mundaring",
+    name: "Mundaring Hills",
+    // Home base #3, docs/CONTEXT.md: Paul's dad, free lodging, a borrowed car.
+    // It prices on the Perth card rather than `home-base-regional` because the
+    // block's outings are Perth outings — the Hills are 35 km from Northbridge,
+    // not 350 — and the extra fuel that run costs is exactly what the A$10–30
+    // band on the Perth `local` rate is for. `docs/research/perth-live-music.md`
+    // measures the run: 40–50 min to Northbridge, 55–65 to North Fremantle.
+    market: "home-base-city",
+    airport: "PER",
+    coords: [116.1667, -31.9000], // Mundaring township, in the Perth Hills
+    homeBase: true,
+    weather: "perth",
+    regions: ["WA"],
+  },
+  {
     id: "margaret-river",
     name: "Margaret River",
     // Paid nights, but the car is the family's — the Capsule carries no hire.

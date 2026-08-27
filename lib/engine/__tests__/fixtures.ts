@@ -4,8 +4,8 @@
  * Hand-written rather than imported from `lib/engine/capsules.ts` on purpose:
  * a test that asserts "the reef lands in its window" against the real reef
  * Capsule fails the day someone re-researches the reef, which is a change to
- * content and not to the scheduler. These four exist to exercise the four Lock
- * kinds and nothing else.
+ * content and not to the scheduler. These exist to exercise the Lock kinds and
+ * nothing else.
  */
 
 import type { CapsuleSpec, PlanInput } from "@/lib/engine/types";
@@ -79,6 +79,25 @@ export const FLOATING: CapsuleSpec = {
   needsCar: false,
   events: [],
   publishedEur: 400,
+  tier: "deep",
+};
+
+/**
+ * The arrival-locked kind. Deliberately **not** in `FIXTURES`: it would claim
+ * the first days of every fixture-based suite in the engine, and those suites
+ * are testing the ledger and the warnings, not this. The scheduler test opts
+ * into it by name.
+ */
+export const ARRIVING: CapsuleSpec = {
+  id: "arriving",
+  name: "Arriving Thing",
+  locationId: "mundaring",
+  days: 2,
+  minDays: 1,
+  lock: { kind: "arrival", why: "test: straight off the plane." },
+  needsCar: false,
+  events: [],
+  publishedEur: 0,
   tier: "deep",
 };
 

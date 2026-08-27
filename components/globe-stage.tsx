@@ -742,7 +742,7 @@ export function GlobeStage() {
         },
       });
 
-      /* ---- The eight researched Capsules, always on ---- */
+      /* ---- The nine researched Capsules, always on ---- */
       // Drawn under the route points: where a Capsule sits on top of its own
       // gateway the route's marker should win, because it carries the label.
       map.addLayer({

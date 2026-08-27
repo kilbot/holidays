@@ -46,7 +46,7 @@ import { photoFor, regionPhoto } from "@/lib/region-images";
  *
  * Three decisions worth keeping:
  *
- * **The two tiers stay apart.** The eight researched Capsules get their own row
+ * **The two tiers stay apart.** The nine researched Capsules get their own row
  * at larger size, above the 413. They are a different kind of thing — day-by-day
  * itineraries, operator prices, booking deadlines — and mixing them into one
  * grid would make the shallow tier look researched, which is the one lie the
@@ -169,7 +169,7 @@ export function CapsulesBrowser() {
   );
   const [refineOpen, setRefineOpen] = useState(false);
 
-  // Reconciled against the Plan, not the raw marks: the eight researched
+  // Reconciled against the Plan, not the raw marks: the nine researched
   // Adventures start on the Plan with no verdict recorded, and a grid that drew
   // them as untouched is half of what made #58 feel like nothing happened.
   const { marks, counts, mark } = usePlanShortlist();

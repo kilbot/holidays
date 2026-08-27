@@ -2,7 +2,7 @@
  * What sits on the globe besides the route.
  *
  * Two layers of Capsule, matching the two tiers the site already keeps apart:
- * the eight researched Capsules are always on, at their real bases; the
+ * the nine researched Capsules are always on, at their real bases; the
  * Catalog's 413 shallow ideas appear only once a traveller marks one
  * *interested*, and then only as a dot at the airport it is reached through.
  *

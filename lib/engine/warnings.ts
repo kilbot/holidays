@@ -141,6 +141,8 @@ function lockBreachLabel(capsule: CapsuleSpec): string {
       return `${capsule.name} misses the dates it has to cover`;
     case "weekday":
       return `${capsule.name} is on the wrong days`;
+    case "arrival":
+      return `${capsule.name} is not where the trip lands`;
     case "flexible":
       return `${capsule.name} is out of place`;
   }

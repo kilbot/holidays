@@ -155,7 +155,7 @@ test("Aggressive is shorter, cheaper, and says so through its dates", () => {
   );
 });
 
-test("Aggressive keeps all eight Adventures — what it drops is February", () => {
+test("Aggressive keeps all nine Adventures — what it drops is February", () => {
   const diff = diffScenarios(aggressive, fireworks);
   assert.deepEqual(diff.adventuresAdded, []);
   assert.deepEqual(diff.adventuresRemoved, []);

@@ -8,7 +8,7 @@
  *    shareable, so `?q=reef&f=beach&r=QLD` has to mean the same thing on
  *    someone else's screen. Encode and decode belong next to the shape they
  *    read and write, or they drift.
- * 2. Two tiers are sifted by the same controls. The eight researched Capsules
+ * 2. Two tiers are sifted by the same controls. The nine researched Capsules
  *    are not Catalog entries — different module, different fields — but a
  *    traveller who types "reef" means both. `SiftCandidate` is the small
  *    projection both tiers can answer to, so there is exactly one predicate

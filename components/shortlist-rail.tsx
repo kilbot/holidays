@@ -81,9 +81,9 @@ function railEntries(marks: ShortlistMap): RailEntry[] {
   const entries: RailEntry[] = [];
 
   // These are `usePlanShortlist`'s reconciled verdicts, so *placed* is exactly
-  // "on the Plan" — including the eight researched Adventures the reference
+  // "on the Plan" — including the nine researched Adventures the reference
   // Scenario starts with and never recorded a verdict for. Listing only marked
-  // ideas left the traveller with no control over the eight that were actually
+  // ideas left the traveller with no control over the ones that were actually
   // costing money (#58).
   for (const [id, state] of Object.entries(marks)) {
     if (state !== "interested" && state !== "placed") continue;

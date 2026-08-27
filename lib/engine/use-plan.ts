@@ -148,7 +148,7 @@ export interface PlanShortlist {
    * Verdicts reconciled against the Plan — `effectiveVerdicts` says how.
    *
    * Read this, never the raw `useShortlist().marks`, anywhere a verdict is
-   * *shown* or *filtered on*. The raw marks know nothing about the eight
+   * *shown* or *filtered on*. The raw marks know nothing about the researched
    * Adventures the reference Scenario starts with, and they keep a stale
    * *placed* long after a discarded preview put the Plan back.
    */

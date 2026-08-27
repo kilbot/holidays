@@ -413,6 +413,11 @@ export function describeLock(
         chip: "certain days only",
         sentence: `Only runs on certain days — ${lock.why}`,
       };
+    case "arrival":
+      return {
+        chip: "straight off the plane",
+        sentence: `Starts the day the trip does — ${lock.why}`,
+      };
   }
 }
 

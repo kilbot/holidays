@@ -82,6 +82,20 @@ interface Scheduling {
  * wherever the reef Capsule lands.
  */
 const SCHEDULING: Readonly<Record<string, Scheduling>> = {
+  "mundaring-arrival": {
+    locationId: "mundaring",
+    lock: {
+      kind: "arrival",
+      why: "docs/CONTEXT.md's semi-fixed Anchor: the first days after landing are spent with Paul's dad in Mundaring Hills — jet-lag recovery and Perth acclimatisation, before anything with a ticket on it starts.",
+    },
+    // Home base #3. The car is Dad's, so the block hires nothing.
+    needsCar: false,
+    // No Event lines at all, and that is the point of the block: three days
+    // whose entire cost is the groceries and the fuel the ledger already
+    // charges. A jet-lag block with a splurge on it is not a jet-lag block.
+    events: [],
+  },
+
   "margaret-river": {
     locationId: "margaret-river",
     // The one hard exclusion the research states is 26 Dec – 3 Jan. The WA leg
@@ -407,7 +421,7 @@ export const DEEP_SPECS: readonly CapsuleSpec[] = DEEP_CAPSULES.map(fromDeep)
 const CATALOG_SPECS = new Map<string, CapsuleSpec>();
 
 /**
- * The Capsules the engine can place: the eight researched ones, plus whichever
+ * The Capsules the engine can place: the nine researched ones, plus whichever
  * Catalog ideas the Travellers have marked **Plan**.
  *
  * Catalog specs are built lazily and cached — 413 of them would be 413 objects

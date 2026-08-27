@@ -30,11 +30,11 @@
  *
  * ## The algorithm, in full
  *
- * 1. **Order the Capsules by how little freedom they have.** Date-locked first,
- *    then window-locked, then weekday-locked, then flexible; longer before
- *    shorter inside a tier; id as the final tiebreak. Placing the immovable
- *    things first is the whole trick — a flexible Capsule that got the reef's
- *    only legal week would push the reef out of its window.
+ * 1. **Order the Capsules by how little freedom they have.** Arrival-locked
+ *    first, then date-locked, then window-locked, then weekday-locked, then
+ *    flexible; longer before shorter inside a tier; id as the final tiebreak.
+ *    Placing the immovable things first is the whole trick — a flexible Capsule
+ *    that got the reef's only legal week would push the reef out of its window.
  * 2. **For each, enumerate candidate start dates** inside the trip range that
  *    its Lock permits.
  * 3. **Score each candidate** and take the best (see `scoreCandidate`).
@@ -55,12 +55,21 @@ import { addDays, daysBetween, weekdayOf } from "@/lib/trip-dates";
 /** One Buffer day after each block, so nothing is scheduled edge to edge. */
 export const BUFFER_DAYS_AFTER_BLOCK = 1;
 
-/** Lower sorts first: the less freedom a Lock leaves, the earlier it is placed. */
+/**
+ * Lower sorts first: the less freedom a Lock leaves, the earlier it is placed.
+ *
+ * `arrival` leads outright. It has exactly one legal start — the trip's first
+ * day — so it is the least free thing on the calendar, and a window-locked
+ * block that got there first would push the arrival block off the only day it
+ * has. Ahead of `date` for the same reason: a date-lock still has a run of
+ * legal starts, an arrival lock has one.
+ */
 const LOCK_RANK: Record<Lock["kind"], number> = {
-  date: 0,
-  window: 1,
-  weekday: 2,
-  flexible: 3,
+  arrival: 0,
+  date: 1,
+  window: 2,
+  weekday: 3,
+  flexible: 4,
 };
 
 export interface ScheduleInput {
@@ -76,8 +85,21 @@ export interface ScheduleResult {
   unplaced: string[];
 }
 
-/** Does a Lock permit a block of `days` starting here? */
-export function lockAllows(lock: Lock, startDate: string, days: number): boolean {
+/**
+ * Does a Lock permit a block of `days` starting here?
+ *
+ * `tripStart` is only read by the `arrival` kind, which is the one Lock defined
+ * against the trip rather than the calendar. It is a required argument rather
+ * than an optional one on purpose: a caller that cannot say when the trip
+ * starts cannot answer the question for an arrival-locked block, and defaulting
+ * it would answer wrongly and silently.
+ */
+export function lockAllows(
+  lock: Lock,
+  startDate: string,
+  days: number,
+  tripStart: string,
+): boolean {
   const endDate = addDays(startDate, days - 1);
   switch (lock.kind) {
     case "flexible":
@@ -90,6 +112,9 @@ export function lockAllows(lock: Lock, startDate: string, days: number): boolean
       return startDate <= lock.from && endDate >= lock.to;
     case "weekday":
       return lock.weekdays.includes(weekdayOf(startDate));
+    case "arrival":
+      // The first day of the trip, and no other. Jet lag does not wait a week.
+      return startDate === tripStart;
   }
 }
 
@@ -98,6 +123,8 @@ function preferredStart(lock: Lock, startDate: string): string {
   if (lock.kind === "window" || lock.kind === "date") {
     return lock.from > startDate ? lock.from : startDate;
   }
+  // `arrival` and `flexible` both want the trip's own first day, which is what
+  // `startDate` already is.
   return startDate;
 }
 
@@ -150,7 +177,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
       endDate: addDays(clamped, days - 1),
       days,
       origin: "override",
-      lockViolated: !lockAllows(capsule.lock, clamped, days),
+      lockViolated: !lockAllows(capsule.lock, clamped, days, startDate),
       overlaps: overlapsAt(clamped, days),
     });
   }
@@ -174,7 +201,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
 
     for (let offset = 0; offset <= lastStart; offset += 1) {
       const start = addDays(startDate, offset);
-      if (!lockAllows(capsule.lock, start, days)) continue;
+      if (!lockAllows(capsule.lock, start, days, startDate)) continue;
       if (!free(start, days)) continue;
 
       const score = scoreCandidate(start, days, endDate, free);
@@ -211,7 +238,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
       endDate: addDays(fallback, days - 1),
       days,
       origin: "proposed",
-      lockViolated: !lockAllows(capsule.lock, fallback, days),
+      lockViolated: !lockAllows(capsule.lock, fallback, days, startDate),
       overlaps: overlapsAt(fallback, days),
     });
   }

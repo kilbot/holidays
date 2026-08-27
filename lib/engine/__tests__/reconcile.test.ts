@@ -5,7 +5,7 @@
  * the ledger, and a fixture is the only way to do that without the tests
  * failing every time someone re-researches Tasmania.
  *
- * This one is different. It runs the default Scenario — all eight researched
+ * This one is different. It runs the default Scenario — all nine researched
  * Capsules, the reference dates — through the whole pipeline and asserts the
  * invariant the entire cost model rests on: **the Plan's total is the sum of
  * its Days, to the cent**. If a Leg ever gets priced onto a Leg object instead
@@ -24,8 +24,8 @@ import { DEFAULT_SCENARIO } from "@/lib/engine/scenarios";
 
 const plan = buildPlan(DEFAULT_SCENARIO.input, capsuleCatalogue([]));
 
-test("the default Scenario places all eight researched Capsules", () => {
-  assert.equal(plan.placements.length, 8);
+test("the default Scenario places all nine researched Capsules", () => {
+  assert.equal(plan.placements.length, 9);
   assert.deepEqual(plan.unplaced, []);
   for (const placement of plan.placements) {
     assert.equal(

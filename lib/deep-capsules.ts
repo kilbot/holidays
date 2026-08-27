@@ -27,6 +27,13 @@
  * different bases, durations and cost scales, and splitting them here is what
  * the document itself does.
  *
+ * The ninth, `mundaring-arrival`, has **no document at all**. It comes from
+ * docs/CONTEXT.md's Anchor and Home-base entries — a user directive rather than
+ * a research sweep — and it says so in its own comment and its own sources
+ * rather than borrowing a citation. Its ceiling rung is labelled "If you paid
+ * for it" instead of "As published" for the same reason: there is nothing
+ * published to quote.
+ *
  * These Capsules are deliberately **not** in `catalog.json`. The Catalog is the
  * shallow tier — 413 unsifted ideas — and the sweep left the marquee blocks out
  * because they were already researched. `related` points the other way instead:
@@ -1006,6 +1013,129 @@ const SYDNEY_NYE: DeepCapsule = {
 };
 
 /* ------------------------------------------------------------------ *
+ * WA — Mundaring Hills, the arrival block
+ * ------------------------------------------------------------------ */
+
+/**
+ * The one Adventure here that came from a **user directive rather than a
+ * research document**, and it says so rather than borrowing a citation it does
+ * not have.
+ *
+ * docs/CONTEXT.md names it under Anchor — *"the first days after landing are
+ * spent with Paul's dad in Mundaring Hills ('it'd be rude not to') — doubling
+ * as jet-lag recovery and Perth acclimatisation"* — and under Home base, where
+ * Mundaring is the third of the three. That glossary entry is the source, and
+ * the sources list points at it instead of a `capsule-*.md` that was never
+ * written.
+ *
+ * Its figures are correspondingly derived, not published: three days on the
+ * `home-base-city` rate card, which is the same arithmetic the ledger runs on
+ * every other Home-base Day. There is no operator table because there is
+ * nothing to book, and there are no deadlines because the only booking is a
+ * phone call. Saying that out loud is more useful than padding it.
+ */
+const MUNDARING_ARRIVAL: DeepCapsule = {
+  id: "mundaring-arrival",
+  name: "Mundaring Hills — the arrival block",
+  region: "WA — Perth Hills / Mundaring",
+  tagline: "Land, sleep, eat, come back to earth. Dad's place, the borrowed car.",
+  facets: ["outdoors", "food"],
+  tags: ["home-base", "family", "hills", "cheap", "free", "walking", "forest"],
+  seasonFit: "good",
+  airport: "PER",
+  base: [116.1667, -31.9000], // Mundaring township, ~35 km east of the CBD
+  days: { min: 2, ideal: 3, max: 5, unit: "days" },
+  /**
+   * No ladder above the floor, because there is nothing above the floor to
+   * buy. Free lodging, a borrowed car, and food and fuel that are emphatically
+   * not free — A$45/day and A$10/day on the Perth Home-base card, plus the
+   * A$20 day-to-day activities line every Day carries. Three days is A$225.
+   *
+   * `max` is the same trip taken as a paying visitor: three nights in a cheap
+   * Perth room at A$120 plus a hire car at A$45/day, which is what the block
+   * would cost if the family house were not there. It is the only honest
+   * ceiling for a block whose whole value is that it is free.
+   */
+  cost: {
+    min: { aud: 150, eur: 92, band: null, days: 2, label: "Two days" },
+    ideal: { aud: 225, eur: 137, band: [137, 190], days: 3, label: "Plan on" },
+    max: { aud: 720, eur: 439, band: [400, 480], days: 3, label: "If you paid for it" },
+  },
+  window: "The first days of the trip, whichever days those are.",
+  verdict: "Non-negotiable, and the cheapest three days on the calendar.",
+  why: "Twenty-two hours of flying lands the couple in a timezone seven hours out of step, and the first Perth days are the ones nobody remembers anyway. Spending them at the Hills house costs nothing but groceries and fuel, settles the family visit that would otherwise have to be squeezed in around Christmas, and lets the body clock reset before anything with a ticket on it starts.",
+  durationNote:
+    "Three days is two full nights of real sleep plus the day either side, which is roughly what a westbound seven-hour shift takes. Two is survivable and the ladder prices it. Five starts to eat the pre-Christmas WA run, which is Margaret River's only clear window all trip.",
+  budgetShare: "€137 — under 1% of the Budget, and the lowest per-day figure in the Plan.",
+  itinerary: [
+    {
+      day: "Day 1",
+      title: "Land, drive up the hill, stop",
+      body: "Perth Airport to Mundaring is ~30 km and 30 minutes on the Roe Highway — Dad collects, so there is no hire desk and no fare. The rest of the day is a shower, a meal and daylight; the one thing that actually shifts a body clock is staying awake until a local bedtime.",
+    },
+    {
+      day: "Day 2",
+      title: "Hills day",
+      body: "Mundaring Weir and the Golden View lookout, the Kep and Bibbulmun tracks off the same car park, Fred Jacoby Park for shade. All free, all within fifteen minutes of the house. A supermarket run in Midland is the day's only spend.",
+    },
+    {
+      day: "Day 3",
+      title: "Down to the coast, and back",
+      body: "The acclimatisation day: the borrowed car goes down to Perth or Fremantle for a beach and a wander, and comes back up the hill to sleep. It is also the natural slot for the Fremantle ideas on the bench, and — if it falls on a Friday or a Saturday — for the Perth music night.",
+    },
+  ],
+  caveats: [
+    {
+      label: "It is a semi-fixed Anchor, not a hard one",
+      tone: "info",
+      body: "docs/CONTEXT.md rates it below Christmas and NYE: the block wants the first days after landing, and dragging the leaving date drags it along. Moving it off the arrival is allowed and warns rather than refuses, which is the whole bargain the site runs on.",
+    },
+    {
+      label: "Thirty-five kilometres of hill between here and a band",
+      tone: "warn",
+      body: "There is no train from Mundaring; the nearest station is Midland, ~20 minutes' drive, and the last service back leaves well before a gig finishes. Every Perth night out is a designated driver, a A$120–170 rideshare round trip, or a room in town. docs/research/perth-live-music.md prices all three.",
+    },
+    {
+      label: "Free lodging is not free living",
+      tone: "info",
+      body: "The block still charges A$45/day of groceries and A$10/day of fuel for two, because the ledger charges them everywhere and a Home base that priced at zero would flatter the total. The lever is the A$185/day it saves against a Sydney Day, and that lever is real.",
+    },
+    {
+      label: "Summer in the Hills means fire season",
+      tone: "warn",
+      body: "December through February is the WA bushfire window and the Perth Hills are its front line. Nothing here needs booking, but Emergency WA warnings and total fire bans are worth a look on any day the plan involves a walk or a barbecue.",
+    },
+  ],
+  operators: [],
+  deadlines: [
+    {
+      when: "Whenever the flights are booked",
+      what: "Tell Dad the arrival date and time. The whole block depends on one phone call and no other booking.",
+    },
+  ],
+  sources: [
+    {
+      label: "docs/CONTEXT.md — Anchor, and Home base",
+      url: "https://github.com/kilbot/holidays/blob/main/docs/CONTEXT.md",
+    },
+    {
+      label: "Research: perth-live-music.md — the Mundaring transport problem",
+      url: `${RESEARCH}perth-live-music.md`,
+    },
+    {
+      label: "Research: cost-baselines.md §2 — the Home-base rate card",
+      url: `${RESEARCH}cost-baselines.md`,
+    },
+  ],
+  related: [
+    "perth-live-music-night",
+    "fremantle-fish-and-chips",
+    "fremantle-markets-and-the-freo-alternative-scene",
+    "perth-city-kings-park-cottesloe-and-boola-bardip",
+  ],
+};
+
+/* ------------------------------------------------------------------ *
  * WA — Margaret River
  * ------------------------------------------------------------------ */
 
@@ -1783,10 +1913,11 @@ const MELBOURNE: DeepCapsule = {
 /* ------------------------------------------------------------------ */
 
 /**
- * Trip order, not alphabetical: Perth first, then east and south, finishing in
- * Melbourne. The strip reads as the shape of the journey.
+ * Trip order, not alphabetical: the arrival block, then Perth, then east and
+ * south, finishing in Melbourne. The strip reads as the shape of the journey.
  */
 export const DEEP_CAPSULES: readonly DeepCapsule[] = [
+  MUNDARING_ARRIVAL,
   MARGARET_RIVER,
   ROTTNEST,
   SYDNEY_NYE,

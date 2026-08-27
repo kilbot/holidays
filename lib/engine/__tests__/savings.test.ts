@@ -39,6 +39,26 @@ const base = priced(DEFAULT_SCENARIO);
 const comfortable = priced(COMFORTABLE_SCENARIO);
 const aggressive = priced(AGGRESSIVE_SCENARIO);
 
+/**
+ * The same Scenario with the Mundaring arrival block off.
+ *
+ * `savings-menu-draft.md` was written before the arrival block existed (#54),
+ * so the audit's two waterfalls priced a Plan whose first days were Margaret
+ * River. Reconciling today's total against that figure would be comparing two
+ * different trips and calling the difference an error, so the reconciliation
+ * takes the block back off and compares like with like. What the block costs is
+ * then its own assertion, below, where it can be read rather than absorbed.
+ */
+const withoutArrival = (scenario: Scenario): Plan => {
+  const toggled = scenario.input.toggled.filter(
+    (id) => id !== "mundaring-arrival",
+  );
+  return buildPlan(
+    { ...scenario.input, toggled },
+    capsuleCatalogue(toggled),
+  );
+};
+
 const on = (plan: Plan, date: string) =>
   plan.days.find((day) => day.date === date);
 
@@ -50,19 +70,50 @@ const hasEvent = (plan: Plan, id: string) =>
 /* ------------------------------------------------------------------ */
 
 test("Comfortable lands within €150 of the audit's €17,914", () => {
-  const drift = Math.abs(comfortable.rollUp.totalEur - 17_914);
+  const audited = withoutArrival(COMFORTABLE_SCENARIO).rollUp.totalEur;
+  const drift = Math.abs(audited - 17_914);
   assert.ok(
     drift <= TOLERANCE_EUR,
-    `engine says €${Math.round(comfortable.rollUp.totalEur)}, audit says €17,914 — €${Math.round(drift)} apart`,
+    `engine says €${Math.round(audited)}, audit says €17,914 — €${Math.round(drift)} apart`,
   );
 });
 
 test("Aggressive lands within €150 of the audit's €15,530", () => {
-  const drift = Math.abs(aggressive.rollUp.totalEur - 15_530);
+  const audited = withoutArrival(AGGRESSIVE_SCENARIO).rollUp.totalEur;
+  const drift = Math.abs(audited - 15_530);
   assert.ok(
     drift <= TOLERANCE_EUR,
-    `engine says €${Math.round(aggressive.rollUp.totalEur)}, audit says €15,530 — €${Math.round(drift)} apart`,
+    `engine says €${Math.round(audited)}, audit says €15,530 — €${Math.round(drift)} apart`,
   );
+});
+
+/**
+ * What the arrival block does to a total, said out loud rather than absorbed.
+ *
+ * It is counter-intuitive and it is real: a block of **free** Home-base nights
+ * makes every Scenario slightly *dearer*, because it does not add days — it
+ * displaces them. Margaret River slides three days later, and the two Buffer
+ * nights that open up behind it inherit Margaret River's regional rate instead
+ * of the Perth Home base's zero. The block itself is the cheapest thing on the
+ * calendar; the re-plan around it is what costs.
+ *
+ * The bound is deliberately loose and one-sided. The assertion worth keeping is
+ * "this is a rounding on a €20,000 trip, not a lever", not a golden number that
+ * has to be re-typed every time the rate card moves.
+ */
+test("the arrival block is a small upward re-plan, not a saving", () => {
+  for (const [name, scenario, priced_] of [
+    ["default", DEFAULT_SCENARIO, base],
+    ["comfortable", COMFORTABLE_SCENARIO, comfortable],
+    ["aggressive", AGGRESSIVE_SCENARIO, aggressive],
+  ] as const) {
+    const delta = priced_.rollUp.totalEur - withoutArrival(scenario).rollUp.totalEur;
+    assert.ok(delta > 0, `${name}: €${Math.round(delta)} — expected a rise`);
+    assert.ok(
+      delta < 250,
+      `${name}: €${Math.round(delta)} is too big to call a re-plan`,
+    );
+  }
 });
 
 test("both paths clear the A$10,000 target the ticket set", () => {
@@ -167,9 +218,9 @@ test("Comfortable re-homes the post-NYE gap without teleporting", () => {
   );
 });
 
-test("Aggressive keeps all eight Adventures and loses February", () => {
+test("Aggressive keeps all nine Adventures and loses February", () => {
   assert.equal(aggressive.endDate, "2027-02-08");
-  assert.equal(aggressive.placements.length, 8);
+  assert.equal(aggressive.placements.length, 9);
   assert.equal(
     hasEvent(aggressive, "mel-laneway"),
     false,
@@ -230,10 +281,11 @@ test("the seeded state survives a round trip through the parser", () => {
 
 test("the default Scenario's shape is untouched by the recalibration", () => {
   // #64 re-prices the reference trip; it does not re-plan it. Same dates, same
-  // eight Adventures, no overrides of any kind — only the rate card moved.
+  // Adventures, no overrides of any kind — only the rate card moved. The count
+  // is nine since #54 added the Mundaring arrival block to every seed.
   assert.equal(DEFAULT_SCENARIO.input.startDate, "2026-12-12");
   assert.equal(DEFAULT_SCENARIO.input.endDate, "2027-02-22");
-  assert.equal(DEFAULT_SCENARIO.input.toggled.length, 8);
+  assert.equal(DEFAULT_SCENARIO.input.toggled.length, 9);
   assert.deepEqual(DEFAULT_SCENARIO.input.placementOverrides, {});
   assert.deepEqual(DEFAULT_SCENARIO.input.lodgingTiers, {});
   assert.deepEqual(DEFAULT_SCENARIO.input.eventOverrides, {});

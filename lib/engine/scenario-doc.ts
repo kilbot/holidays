@@ -82,8 +82,19 @@ export interface ScenarioState {
 /* The seeded Scenarios                                                */
 /* ------------------------------------------------------------------ */
 
-/** The eight researched Adventures, which every seeded Scenario keeps. */
+/**
+ * The nine researched Adventures, which every seeded Scenario keeps.
+ *
+ * `mundaring-arrival` leads because the calendar does: docs/CONTEXT.md makes
+ * the first days after landing a semi-fixed Anchor, and it is arrival-locked in
+ * `capsules.ts` so the Scheduler puts it on the trip's own first day in every
+ * Scenario, whatever the leaving date is. It is on all three seeds rather than
+ * just the default for the same reason Christmas is: a savings Scenario that
+ * saved money by skipping Paul's dad is not a savings Scenario, and the block
+ * is the cheapest three days on the calendar anyway.
+ */
 const ADVENTURES = [
+  "mundaring-arrival",
   "margaret-river",
   "rottnest-island",
   "sydney-nye",
@@ -95,7 +106,7 @@ const ADVENTURES = [
 ] as const;
 
 /**
- * "Fireworks NYE" — the reference trip, with all eight researched Capsules on.
+ * "Fireworks NYE" — the reference trip, with all nine researched Capsules on.
  * It is a starting position, not a recommendation: everything in it can be
  * toggled off, dragged, or forked.
  */
@@ -132,7 +143,7 @@ const PERTH_CITY_DAYS = "perth-city-kings-park-cottesloe-and-boola-bardip";
 /**
  * "Comfortable — A$10k off". `docs/research/savings-menu-draft.md` §5.
  *
- * Keeps all 73 days, all eight Adventures at their ideal length, **both
+ * Keeps all 73 days, all nine Adventures at their ideal length, **both
  * Melbourne festivals**, both reef weather-buffer days and the whole WA family
  * stretch. Pays for it with calendar shape, three boat lines and a tent:
  *
@@ -201,7 +212,7 @@ export const COMFORTABLE_SCENARIO: Scenario = {
  * eligible block and Buffer, a hostel twin across the Sydney fortnight.
  *
  * Every hard Anchor survives — Christmas in Perth, New Year's Eve on the
- * harbour, all eight Adventures still on the Plan at their researched ideal
+ * harbour, all nine Adventures still on the Plan at their researched ideal
  * length. What goes is February: ending on the 8th costs fourteen days, the
  * Laneway ticket and the free St Kilda weekend.
  *
