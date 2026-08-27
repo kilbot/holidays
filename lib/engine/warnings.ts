@@ -101,7 +101,7 @@ function lockWarnings(input: WarningInput): Warning[] {
         kind: "overlap",
         tone: "over",
         label: `${capsule.name} overlaps ${placement.overlaps.length} block${placement.overlaps.length === 1 ? "" : "s"}`,
-        detail: `There was no free run of ${placement.days} days its Lock allows, so it is placed on top of ${names}. Those Days are priced once, at ${capsule.name}'s rates. Drag something, or drop a Adventure.`,
+        detail: `There was no free run of ${placement.days} days its Lock allows, so it is placed on top of ${names}. Those Days are priced once, at ${capsule.name}'s rates. Drag something, or drop an Adventure.`,
         dates: datesOf(placement),
         capsuleId: capsule.id,
       });
