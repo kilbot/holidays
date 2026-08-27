@@ -49,7 +49,7 @@ import { cents, retotal } from "@/lib/engine/ledger";
 import { ORIGIN_AIRPORT, distanceKm, locationById } from "@/lib/engine/locations";
 import type { Day, Leg, LegMode } from "@/lib/engine/types";
 import { FARE_SNAPSHOTS } from "@/lib/flights/snapshots";
-import { ROUTE_GRID } from "@/lib/flights/grid";
+import { EUROPEAN_AIRPORTS, ROUTE_GRID } from "@/lib/flights/grid";
 
 /**
  * Research bands for routes the snapshots do not carry, EUR **per person**,
@@ -71,8 +71,15 @@ const RESEARCH_BANDS: Readonly<Record<string, [number, number]>> = {
   LONGHAUL: [1_500, 2_300],
 };
 
-/** Anything crossing an ocean prices off the long-haul band, not a domestic row. */
-const EUROPEAN: readonly string[] = ["VLC", "BCN", "MAD", "MXP"];
+/**
+ * Anything crossing an ocean prices off the long-haul band, not a domestic row.
+ *
+ * The list lives in the grid rather than here because the grid is where hubs
+ * get added: the Flights page's search put ten more European airports on it,
+ * and a Frankfurt that this file had never heard of would have been subtracted
+ * into `AUSTRALIAN` and priced as a domestic hop.
+ */
+const EUROPEAN: readonly string[] = EUROPEAN_AIRPORTS;
 
 const AUSTRALIAN = new Set<string>(
   ROUTE_GRID.flatMap((entry): string[] => [entry.from, entry.to]).filter(
