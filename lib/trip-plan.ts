@@ -27,6 +27,13 @@ import type { WeatherLocationId } from "@/lib/weather";
 export const DEFAULT_TRIP_START = "2026-12-12";
 export const DEFAULT_TRIP_END = "2027-02-22";
 
+/**
+ * The Daily cap in EUR — A$500 per couple (docs/CONTEXT.md) at the research's
+ * own A$1 = €0.61. A ceiling on a paid day's living costs, not a target; a Day
+ * above it gets a warning, never a refusal.
+ */
+export const DAILY_CAP_EUR = Math.round(500 * 0.61);
+
 /** One block of the trip: a place, for a while, at a price. */
 export interface PlanSegment {
   id: string;
@@ -144,7 +151,7 @@ export const PLAN_SEGMENTS: PlanSegment[] = [
     costEur: 940,
     fixedEur: 140,
     weather: "byron_bay",
-    regions: ["NSW-Northern-Rivers", "NSW"],
+    regions: ["NSW-Northern-Rivers"],
   },
   {
     id: "tasmania",
@@ -250,8 +257,20 @@ export interface PlanWeek {
   handover: string | null;
   costEur: number;
   anchors: Anchor[];
-  /** Every region the week touches, for the events filter. */
-  regions: string[];
+}
+
+/**
+ * The week as the events layer wants it: each day, and where that day is.
+ *
+ * Deliberately per-day rather than a set of regions for the week — a week that
+ * flies from Perth to Sydney is in two places, and only its days know which is
+ * which.
+ */
+export function eventDaysOf(week: PlanWeek) {
+  return week.days.map((day) => ({
+    date: day.date,
+    regions: day.segment.regions,
+  }));
 }
 
 export interface DerivedPlan {
@@ -367,9 +386,6 @@ function intoWeeks(days: PlanDay[]): PlanWeek[] {
       anchors: slice
         .map((day) => day.anchor)
         .filter((anchor): anchor is Anchor => Boolean(anchor)),
-      regions: [
-        ...new Set(slice.flatMap((day) => day.segment.regions)),
-      ],
     });
   }
 

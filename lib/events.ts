@@ -176,9 +176,11 @@ function overlaps(
 /**
  * Events touching [startIso, endIso], narrowed to the regions given.
  *
- * Region matching is prefix-based so "NSW" catches "NSW-Northern-Rivers"; pass
- * no regions and the filter is dropped. Without it a week in Sydney would draw
- * ticks for an Adelaide market, which is noise dressed as data.
+ * Matching is exact against the research's own region strings, one tour line
+ * ("NSW / QLD / VIC") splitting into three. Exact rather than prefix on
+ * purpose: "NSW-Northern-Rivers" is its own region in this data, and a Byron
+ * hinterland craft market drawn onto a Sydney week is noise dressed as data.
+ * Pass no regions and the filter is dropped.
  */
 export function eventsBetween(
   startIso: string,
@@ -189,11 +191,8 @@ export function eventsBetween(
 
   for (const event of EVENTS) {
     if (regions && regions.length > 0) {
-      const match = regions.some(
-        (region) =>
-          event.region.startsWith(region) || event.region === "multi",
-      );
-      if (!match) continue;
+      const eventRegions = event.region.split("/").map((part) => part.trim());
+      if (!eventRegions.some((region) => regions.includes(region))) continue;
     }
 
     const schedule = SCHEDULES.get(event.id);
@@ -234,4 +233,20 @@ export function eventsBetween(
 /** Events touching one day — what the day cells in the week zoom show. */
 export function eventsOn(iso: string, regions?: string[]): EventHit[] {
   return eventsBetween(iso, iso, regions);
+}
+
+/**
+ * Events across a run of days, each day asked about its own regions.
+ *
+ * A week that straddles two places has two different answers to "what is on",
+ * and asking the week as a whole gets both wrong: it would put a Sydney
+ * festival on the Margaret River days it overlaps. Days know where they are;
+ * weeks only know where they mostly are.
+ */
+export function eventsForDays(
+  days: Array<{ date: string; regions: string[] }>,
+): EventHit[] {
+  return days
+    .flatMap((day) => eventsOn(day.date, day.regions))
+    .sort((a, b) => a.start.localeCompare(b.start));
 }

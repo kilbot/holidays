@@ -60,6 +60,36 @@ export function clampToWindow(iso: string): string {
   return isoAt(Math.min(WINDOW_DAYS - 1, Math.max(0, dayIndex(iso))));
 }
 
+export type RangeEnd = "start" | "end";
+
+export interface TripRange {
+  start: string;
+  end: string;
+}
+
+/**
+ * Move one end of the trip.
+ *
+ * The only place the range's rules live, so the rail's drag, the rail's arrow
+ * keys and the header's typed date all obey exactly the same ones: stay inside
+ * the window, and never let the two ends come closer than a week. The ends
+ * push rather than swap — dragging the leaving date past the return date parks
+ * it a week short instead of turning the trip inside out.
+ */
+export function moveRangeEnd(
+  range: TripRange,
+  end: RangeEnd,
+  iso: string,
+): TripRange {
+  const index = dayIndex(clampToWindow(iso));
+  if (end === "start") {
+    const limit = dayIndex(range.end) - (MIN_TRIP_DAYS - 1);
+    return { ...range, start: isoAt(Math.min(index, limit)) };
+  }
+  const limit = dayIndex(range.start) + (MIN_TRIP_DAYS - 1);
+  return { ...range, end: isoAt(Math.max(index, limit)) };
+}
+
 /** 0 = Sunday, matching `Date.getUTCDay`. */
 export function weekdayOf(iso: string): number {
   return new Date(toUtc(iso)).getUTCDay();
@@ -94,7 +124,7 @@ export function formatSpan(startIso: string, endIso: string): string {
   const sameMonth = startIso.slice(0, 7) === endIso.slice(0, 7);
   return sameMonth
     ? `${Number(startIso.slice(8, 10))}–${formatDay(endIso)}`
-    : `${formatDay(startIso)} – ${formatDay(endIso)}`;
+    : `${formatDay(startIso)}–${formatDay(endIso)}`;
 }
 
 /** Which normals column a day reads from. The window is Dec/Jan/Feb only. */
