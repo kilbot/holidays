@@ -41,9 +41,21 @@ export function fakeKv(seed: Record<string, unknown> = {}): FakeKv {
       map.set(key, JSON.stringify(value));
       return true;
     },
+    // Read and write with no `await` between them, which is what makes this an
+    // honest model of Redis `INCR`: two callers racing through this function
+    // are handed different numbers, exactly as they would be over the wire. A
+    // fake that yielded in the middle would let a cap be tested against a
+    // store that is more forgiving than the real one.
     async incrementWithTtl(key) {
       const raw = map.get(key);
       const next = (raw === undefined ? 0 : Number(JSON.parse(raw))) + 1;
+      writes.push(key);
+      map.set(key, JSON.stringify(next));
+      return next;
+    },
+    async decrement(key) {
+      const raw = map.get(key);
+      const next = (raw === undefined ? 0 : Number(JSON.parse(raw))) - 1;
       writes.push(key);
       map.set(key, JSON.stringify(next));
       return next;

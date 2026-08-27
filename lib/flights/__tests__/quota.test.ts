@@ -97,6 +97,74 @@ test("a day under the guard leaves the gate open", async () => {
   assert.equal(await reserveFareCall(kv, NOW), true);
 });
 
+/* ------------------------------------------------------------------ */
+/* Concurrency: the caps have to hold under a burst                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The failure this is about is not theoretical — it is what "hard cap" meant
+ * before kilbot/holidays#90. `reserveFareCall` read the counter, compared it to
+ * the cap and then incremented, so every caller in a burst read the same value
+ * before any of them wrote and every one of them was told there was room. One
+ * stuck effect firing forty requests at a cap with one call left in it spent
+ * forty.
+ *
+ * `fakeKv`'s `incrementWithTtl` models `INCR` faithfully — read and write with
+ * no `await` between them — so `Promise.all` here really does interleave the
+ * way concurrent requests do, and this test fails against the old code.
+ */
+test("a concurrent burst cannot spend more than the daily cap allows", async () => {
+  const kv = fakeKv({
+    "quota:2026-08": 0,
+    "quota:day:2026-08-27": DAILY_CALL_CAP - 3,
+  });
+
+  const results = await Promise.all(
+    Array.from({ length: 40 }, () => reserveFareCall(kv, NOW)),
+  );
+
+  assert.equal(
+    results.filter(Boolean).length,
+    3,
+    "exactly the three calls that were left",
+  );
+  assert.equal(await kv.getJson("quota:day:2026-08-27"), DAILY_CALL_CAP);
+  assert.equal(
+    await kv.getJson("quota:2026-08"),
+    3,
+    "and the refused calls gave the monthly budget back",
+  );
+});
+
+test("a burst against a spent month leaves the daily counter alone", async () => {
+  const kv = fakeKv({ "quota:2026-08": MONTHLY_CALL_BUDGET });
+
+  const results = await Promise.all(
+    Array.from({ length: 25 }, () => reserveFareCall(kv, NOW)),
+  );
+
+  assert.equal(results.filter(Boolean).length, 0);
+  assert.equal(await kv.getJson("quota:2026-08"), MONTHLY_CALL_BUDGET);
+  // The month is the gate that refused them, so none of them may cost a day.
+  assert.equal(await kv.getJson("quota:day:2026-08-27"), null);
+});
+
+test("a refused call costs nothing, so the next one still gets through", async () => {
+  const kv = fakeKv({ "quota:day:2026-08-27": DAILY_CALL_CAP });
+
+  assert.equal(await reserveFareCall(kv, NOW), false);
+  assert.equal(
+    await kv.getJson("quota:2026-08"),
+    0,
+    "the monthly increment was handed back",
+  );
+
+  // A new day, and the month is exactly as unspent as it should be.
+  const tomorrow = new Date("2026-08-28T09:00:00.000Z");
+  assert.equal(await reserveFareCall(kv, tomorrow), true);
+  assert.equal(await kv.getJson("quota:2026-08"), 1);
+});
+
 test("the monthly reset reads as a date, and wraps at the year", () => {
   assert.equal(monthlyResetLabel("2026-08"), "1 Sep");
   assert.equal(monthlyResetLabel("2026-12"), "1 Jan");

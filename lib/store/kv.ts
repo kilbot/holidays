@@ -44,9 +44,22 @@ export interface KvClient {
   setJsonIfAbsent(key: string, value: unknown): Promise<boolean>;
   /**
    * Increment a counter and make sure it expires. Returns the value after the
-   * increment. The write throttle is the only caller.
+   * increment.
+   *
+   * The return value is the whole point for a cap: `INCR` is atomic, so the
+   * number it hands back is this caller's own place in the queue and no two
+   * concurrent callers can be given the same one. Reading a counter and then
+   * incrementing it is two operations and a race — see `lib/flights/quota.ts`.
    */
   incrementWithTtl(key: string, ttlSeconds: number): Promise<number>;
+  /**
+   * Give a counter back. Returns the value after the decrement.
+   *
+   * The other half of INCR-first budgeting: a caller that increments to find
+   * out whether it may proceed has to put the number back when the answer is
+   * no, or a refused call would cost the same as a made one.
+   */
+  decrement(key: string): Promise<number>;
   /** Put an observation at the front of a list. */
   listPush(key: string, value: unknown): Promise<void>;
   /** Keep an inclusive slice of a list. */
@@ -87,6 +100,9 @@ function upstashClient(redis: Redis): KvClient {
       // writes cannot keep pushing the window out in front of itself.
       if (count === 1) await redis.expire(key, ttlSeconds);
       return count;
+    },
+    async decrement(key) {
+      return redis.decr(key);
     },
     async listPush(key, value) {
       await redis.lpush(key, value);

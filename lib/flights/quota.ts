@@ -104,14 +104,38 @@ export async function readFareQuota(kv: KvClient, now = new Date()): Promise<Far
   };
 }
 
-/** Reserve one outbound SearchAPI request, or refuse it at either quota cap. */
+/**
+ * Reserve one outbound SearchAPI request, or refuse it at either quota cap.
+ *
+ * **Increment first, then look at the number you were given.** The obvious
+ * shape — read the counter, compare it to the cap, increment if there is room —
+ * is three operations with two gaps in it, and every concurrent caller reads
+ * the same value before any of them writes. A burst of forty requests against a
+ * cap with one call left in it lets forty through: the counter ends up past the
+ * ceiling and the "hard" cap was never hard (kilbot/holidays#90).
+ *
+ * `INCR` is atomic, so the value it returns is this caller's own place in the
+ * queue and no two callers can be handed the same one. Over the line, the
+ * number goes back — a refused call must not cost the same as a made one.
+ *
+ * The monthly budget is checked before the daily counter is touched at all, so
+ * a request refused for the month does not spend a day's allowance on its way
+ * out. A concurrent `readFareQuota` can catch a counter mid-refund and read one
+ * high; it corrects itself within the round trip and no decision is made on it.
+ */
 export async function reserveFareCall(kv: KvClient, now = new Date()): Promise<boolean> {
-  const monthly = (await kv.getJson<number>(monthKey(now))) ?? 0;
-  const daily = (await kv.getJson<number>(dayKey(now))) ?? 0;
-  if (gateOf(monthly, daily) !== "open") return false;
-  // Hobby-site stakes: this check/increment pair may race by a few calls, which
-  // costs quota but cannot corrupt user data and does not justify locking.
-  await kv.incrementWithTtl(monthKey(now), MONTH_TTL_SECONDS);
-  await kv.incrementWithTtl(dayKey(now), DAY_TTL_SECONDS);
+  const monthly = await kv.incrementWithTtl(monthKey(now), MONTH_TTL_SECONDS);
+  if (monthly > MONTHLY_CALL_BUDGET) {
+    await kv.decrement(monthKey(now));
+    return false;
+  }
+
+  const daily = await kv.incrementWithTtl(dayKey(now), DAY_TTL_SECONDS);
+  if (daily > DAILY_CALL_CAP) {
+    await kv.decrement(dayKey(now));
+    await kv.decrement(monthKey(now));
+    return false;
+  }
+
   return true;
 }
