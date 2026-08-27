@@ -81,7 +81,7 @@ export const DEFAULT_SCENARIO: Scenario = {
  * researched Adventure, and it is doing something specific here: **a Buffer day
  * inherits the place of the block before it**, so parking a Perth-located block
  * in the post-NYE gap is what turns eight idle Sydney days at €188 into eight
- * Home-base days at €55. Its own Event line is zero — the Catalog quotes A$0–200
+ * Home-base days at €48. Its own Event line is zero — the Catalog quotes A$0–200
  * all-in and the ledger already charges more than that in living costs, so it
  * contributes a place to be rather than a thing to buy.
  *

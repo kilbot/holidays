@@ -39,6 +39,7 @@ import { formatDayYear } from "@/lib/trip-dates";
 import { Switch } from "@/components/ui/switch";
 import { BurnDownChart } from "@/components/budget-burn-down";
 import { ScenarioCompare } from "@/components/budget-scenarios";
+import { SavingsMenu } from "@/components/budget-savings";
 import { SplitBars, type SplitRow } from "@/components/budget-splits";
 import { scenarioInk } from "@/components/budget-chart";
 import { cn } from "@/lib/utils";
@@ -425,6 +426,12 @@ export function BudgetView() {
           <SplitBars rows={splitRows} totalEur={rollUp.totalEur} />
           <ScenarioCompare totals={totals} onSelect={scenarios.select} />
         </div>
+
+        {/* Under the splits and the Scenario comparison on purpose: it is the
+            question those two provoke. "Living is €12k" and "the Aggressive
+            Scenario is €5.7k less" both end in "so what would we actually have
+            to give up", and this is the answer, at reading size. */}
+        <SavingsMenu />
 
         <p className="mt-4 text-[10.5px] text-[var(--sb-faint)]">
           Every figure on this page is the sum of the Plan&rsquo;s Days, EUR per
