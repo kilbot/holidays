@@ -16,7 +16,9 @@ import { ShellStage } from "@/components/shell-stage";
  */
 export default function ShellLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex h-dvh w-full flex-col overflow-hidden lg:flex-row">
+    // `print:` opts the frame out on paper: the Ledger is a document, and a
+    // fixed-height overflow-hidden shell would print one screenful of it.
+    <div className="flex h-dvh w-full flex-col overflow-hidden lg:flex-row print:block print:h-auto print:overflow-visible">
       <AppRail />
       <ShellStage>{children}</ShellStage>
       <AppTabBar />

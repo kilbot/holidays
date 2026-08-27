@@ -29,7 +29,7 @@ import {
   type ScenarioApi,
   type ScenarioTotal,
 } from "@/lib/engine/scenarios";
-import type { LegMode, Plan, PlanInput } from "@/lib/engine/types";
+import type { CapsuleSpec, LegMode, Plan, PlanInput } from "@/lib/engine/types";
 import { useShortlist } from "@/lib/shortlist";
 import { TRAVELLERS } from "@/lib/engine/constants";
 import { moveRangeEnd, type RangeEnd } from "@/lib/trip-dates";
@@ -104,6 +104,15 @@ async function hydrateFare(id: string, from: string, to: string, date: string) {
 
 export interface PlanApi {
   plan: Plan;
+  /**
+   * The Capsule specs this Plan was built from, by id.
+   *
+   * A `Day` carries the Capsule's name but not its Lock, and a Lock is a claim
+   * about *why* a block sits where it does — which the Ledger's place bands say
+   * out loud. Handing the specs out here beats every reader rebuilding the
+   * catalogue from the shortlist and hoping it matches the one the Plan used.
+   */
+  capsules: ReadonlyMap<string, CapsuleSpec>;
   scenarios: ScenarioApi;
   /** Every Scenario's headline numbers, computed the same way as this one's. */
   totals: ScenarioTotal[];
@@ -142,6 +151,11 @@ export function usePlan(): PlanApi {
   );
 
   const catalogue = useMemo(() => capsuleCatalogue(placed), [placed]);
+
+  const capsules = useMemo(
+    () => new Map(catalogue.map((spec) => [spec.id, spec])),
+    [catalogue],
+  );
 
   const plan = useMemo(
     () =>
@@ -186,6 +200,7 @@ export function usePlan(): PlanApi {
 
   return {
     plan,
+    capsules,
     scenarios,
     totals,
     input,

@@ -21,6 +21,7 @@
  * | `locations.ts` | where the Plan can be, and how far apart |
  * | `scheduler.ts` | Capsules onto Days: Locks, Buffers, overrides |
  * | `ledger.ts` | Days priced individually — the cost model's structure |
+ * | `blocks.ts` | those Days cut into place runs, for the Ledger page |
  * | `legs.ts` | Legs derived from the Day sequence, and priced |
  * | `rollup.ts` | totals, bands, worst case, contingency, splits |
  * | `warnings.ts` | what is wrong, as data |
@@ -49,6 +50,7 @@ export { LOCATIONS, locationById } from "@/lib/engine/locations";
 
 export { buildPlan, EMPTY_INPUT } from "@/lib/engine/plan";
 export { buildLedger, dayHeadline, TIER_LABEL } from "@/lib/engine/ledger";
+export { intoBlocks, type BlockPeak, type LedgerBlock } from "@/lib/engine/blocks";
 export { schedule, lockAllows } from "@/lib/engine/scheduler";
 export { deriveLegs, legIsOnGrid } from "@/lib/engine/legs";
 export {

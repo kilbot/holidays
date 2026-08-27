@@ -124,7 +124,7 @@ export function AppRail() {
   return (
     <nav
       aria-label="Sections"
-      className="relative z-40 hidden w-14 shrink-0 flex-col items-center gap-1 border-r border-[var(--sb-line)] bg-[var(--sb-panel)] py-3 lg:flex"
+      className="relative z-40 hidden w-14 shrink-0 flex-col items-center gap-1 border-r border-[var(--sb-line)] bg-[var(--sb-panel)] py-3 lg:flex print:hidden"
     >
       {NAV_ITEMS.map(({ href, label, hint, Icon }) => {
         const current = isCurrent(pathname, href);
@@ -184,7 +184,7 @@ export function AppTabBar() {
   return (
     <nav
       aria-label="Sections"
-      className="relative z-40 flex shrink-0 border-t border-[var(--sb-line)] bg-[var(--sb-panel)] pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="relative z-40 flex shrink-0 border-t border-[var(--sb-line)] bg-[var(--sb-panel)] pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >
       {NAV_ITEMS.map(({ href, label, Icon }) => {
         const current = isCurrent(pathname, href);
