@@ -18,9 +18,9 @@
  */
 
 import { ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
-import { formatEur } from "@/lib/engine";
+import { formatEur, formatEurCompact } from "@/lib/engine";
 import { comfortBand, rawScoreOf, type ComfortBand } from "@/lib/flights/comfort";
 import {
   perPersonTotal,
@@ -30,6 +30,7 @@ import {
   type PriceSource,
 } from "@/lib/flights/pricing";
 import type { Band, Flag, PositioningOption, SearchOption } from "@/lib/flights/search-plan";
+import { WINDOW_DAYS, dayIndex, formatDayYear, isoAt, weekdayName } from "@/lib/trip-dates";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -370,6 +371,161 @@ function ChainOptions({
 }
 
 /* ------------------------------------------------------------------ */
+/* Is there a cheaper day                                              */
+/* ------------------------------------------------------------------ */
+
+/** Days either side of the selection the comparison covers. */
+const ALTERNATE_RADIUS = 3;
+
+/**
+ * The same airport pair on the days around the one being searched.
+ *
+ * The first question anyone asks about a long-haul fare is whether the day is
+ * what is making it expensive, and a page that answers it by re-running a
+ * fourteen-origin search per day is a page that eats its own quota. So this is
+ * **reads only** — the stored history for this one pair, which the coverage
+ * index already handed the page for its calendar. A day with nothing stored
+ * shows as nothing stored; it is not fetched to fill the chart in.
+ *
+ * Dataviz discipline, per the ticket: one axis, no gridlines, a direct label on
+ * the cheapest day and on the selected one and nowhere else, tabular figures.
+ * The bar is the only ink that varies, and it is scaled across the days that
+ * actually have prices rather than from zero — the interesting quantity is the
+ * spread between days, and a €1,180-to-€1,420 spread anchored at zero is seven
+ * bars of the same height.
+ */
+function AlternateDays({
+  date,
+  prices,
+  onPickDate,
+}: {
+  date: string;
+  prices: ReadonlyMap<string, number>;
+  onPickDate?: (date: string) => void;
+}) {
+  const days = useMemo(() => {
+    const index = dayIndex(date);
+    const first = Math.min(
+      Math.max(index - ALTERNATE_RADIUS, 0),
+      WINDOW_DAYS - 1 - ALTERNATE_RADIUS * 2,
+    );
+    return Array.from({ length: ALTERNATE_RADIUS * 2 + 1 }, (_, offset) => {
+      const day = isoAt(first + offset);
+      return { date: day, priceEur: prices.get(day) ?? null };
+    });
+  }, [date, prices]);
+
+  const known = days.flatMap((day) =>
+    day.priceEur === null ? [] : [{ date: day.date, priceEur: day.priceEur }],
+  );
+  const cheapest = known.reduce<{ date: string; priceEur: number } | null>(
+    (best, day) => (best === null || day.priceEur < best.priceEur ? day : best),
+    null,
+  );
+  const low = cheapest?.priceEur ?? 0;
+  const high = known.length > 0 ? Math.max(...known.map((day) => day.priceEur)) : 0;
+  const spread = high - low;
+  const onDate = known.find((day) => day.date === date) ?? null;
+
+  return (
+    <Section title="Is there a cheaper day">
+      <ul className="flex items-end gap-1">
+        {days.map((day) => {
+          const selected = day.date === date;
+          const best = day.date === cheapest?.date && known.length > 1;
+          // 14px of floor under every priced day, so the cheapest is a short
+          // bar rather than no bar — an empty column already means "no data".
+          const height = day.priceEur === null
+            ? 0
+            : 14 + (spread === 0 ? 20 : Math.round(((day.priceEur - low) / spread) * 20));
+          const ink = best ? "var(--sb-good)" : selected ? "var(--sb-accent)" : "var(--sb-dim)";
+
+          return (
+            <li key={day.date} className="flex min-w-0 flex-1 flex-col items-center">
+              <span
+                className={cn(
+                  "sb-num block h-3 text-[9px] leading-none font-semibold tabular-nums",
+                  !(best || selected) && "opacity-0",
+                )}
+                style={{ color: ink }}
+                aria-hidden={!(best || selected)}
+              >
+                {day.priceEur === null ? "" : formatEurCompact(day.priceEur)}
+              </span>
+              <button
+                type="button"
+                onClick={() => onPickDate?.(day.date)}
+                disabled={!onPickDate || selected}
+                aria-current={selected ? "date" : undefined}
+                title={
+                  day.priceEur === null
+                    ? `${formatDayYear(day.date)} — nothing stored for this pair yet.`
+                    : `${formatDayYear(day.date)} — €${Math.round(day.priceEur)} pp stored${
+                        best ? ", the cheapest of these seven days" : ""
+                      }.`
+                }
+                className={cn(
+                  "mt-1 flex w-full cursor-pointer flex-col items-center gap-1 rounded-md px-0.5 py-1 transition-colors motion-reduce:transition-none",
+                  "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
+                  selected
+                    ? "bg-[color-mix(in_srgb,var(--sb-accent)_12%,transparent)]"
+                    : "hover:bg-[var(--sb-panel-2)] disabled:cursor-default",
+                )}
+              >
+                {day.priceEur === null ? (
+                  <span
+                    aria-hidden
+                    className="block w-full border-t border-dashed border-[var(--sb-line)]"
+                    style={{ marginTop: 34 }}
+                  />
+                ) : (
+                  <span
+                    aria-hidden
+                    className="block w-full rounded-[2px]"
+                    style={{ height, background: ink, opacity: selected || best ? 1 : 0.5 }}
+                  />
+                )}
+                <span
+                  className={cn(
+                    "sb-num block text-[9.5px] leading-none tabular-nums",
+                    selected ? "font-semibold text-[var(--sb-accent)]" : "text-[var(--sb-faint)]",
+                  )}
+                >
+                  {weekdayName(day.date).slice(0, 1)}
+                  {Number(day.date.slice(8, 10))}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-1.5 max-w-[62ch] text-[10px] leading-snug text-[var(--sb-faint)]">
+        {known.length === 0 ? (
+          "Nothing stored for this pair on these days yet. This strip reads the fare history and never spends a call to fill itself in — pick a day and the search above will say what pricing it would cost."
+        ) : known.length === 1 ? (
+          "One stored day so far. Days fill in as the weekly warm and deliberate fetches cover them; this strip only ever reads what is already there."
+        ) : (
+          <>
+            {known.length} stored days, history only — no call is spent drawing this.
+            {cheapest && onDate && cheapest.date !== date && (
+              <>
+                {" "}
+                <span className="text-[var(--sb-good)]">
+                  {formatDayYear(cheapest.date)} is {formatEur(Math.round(onDate.priceEur - cheapest.priceEur))} pp
+                  cheaper than the day you are searching
+                </span>{" "}
+                — click it to move the whole search there.
+              </>
+            )}
+            {cheapest && onDate && cheapest.date === date && " The day you are searching is the cheapest of them."}
+          </>
+        )}
+      </p>
+    </Section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* The row                                                             */
 /* ------------------------------------------------------------------ */
 
@@ -396,7 +552,18 @@ export interface OptionRowProps {
    * saying what winning it costs.
    */
   floorEurPP?: number | null;
+  /** The day the search is on, so the expansion can compare the days around it. */
+  date?: string | null;
+  /**
+   * Stored per-person fares for *this* airport pair, by date — the coverage the
+   * page already holds. Reads only: the alternate-days strip never fetches.
+   */
+  datePrices?: ReadonlyMap<string, number>;
+  /** Re-anchor the whole search on another day. Absent means the strip is read-only. */
+  onPickDate?: (date: string) => void;
 }
+
+const NO_PRICES: ReadonlyMap<string, number> = new Map();
 
 export function FlightOptionRow({
   option,
@@ -405,6 +572,9 @@ export function FlightOptionRow({
   loading,
   heldBack = null,
   floorEurPP = null,
+  date = null,
+  datePrices = NO_PRICES,
+  onPickDate,
 }: OptionRowProps) {
   const excluded = heldBack !== null;
   const overFloor =
@@ -543,6 +713,12 @@ export function FlightOptionRow({
         >
           <ComfortBreakdown option={option} />
           <PriceBreakdown price={price} />
+
+          {date && option.searchable && (
+            <div className="sm:col-span-2">
+              <AlternateDays date={date} prices={datePrices} onPickDate={onPickDate} />
+            </div>
+          )}
 
           {option.positioning.length > 0 && (
             <div className="sm:col-span-2">

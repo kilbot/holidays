@@ -38,9 +38,10 @@
  *   philosophy applied to the site's own rules.
  */
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Zap } from "lucide-react";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
+import type { CoverageReport } from "@/lib/flights/coverage";
 import {
   OUTBOUND_DEFAULT_DATE,
   OUTBOUND_SEARCH_DATES,
@@ -68,6 +69,7 @@ import { MIDDLE_EAST_TRANSIT_HUBS } from "@/lib/flights/comfort";
 import type { FareQuota } from "@/lib/flights/quota";
 import { formatEur } from "@/lib/engine";
 import { formatDayYear } from "@/lib/trip-dates";
+import { FareDateField, type CoverageByDate, type DayCoverage } from "@/components/fare-dates";
 import { FlightOptionRow } from "@/components/flight-option";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
@@ -75,7 +77,15 @@ import { cn } from "@/lib/utils";
 type Leg = "outbound" | "return";
 type Sort = "comfort" | "price";
 
-const keyOf = (from: string, to: string, date: string) => `${from}-${to}-${date}`;
+/**
+ * Pipe-separated, because a date has hyphens in it and the page reads these
+ * keys back apart to work out which route-days it has already paid for.
+ */
+const keyOf = (from: string, to: string, date: string) => `${from}|${to}|${date}`;
+
+const routeKeyOf = (from: string, to: string) => `${from}-${to}`;
+
+const NO_PRICES: ReadonlyMap<string, number> = new Map();
 
 /**
  * Quotes already fetched in this tab.
@@ -129,16 +139,7 @@ async function fetchQuote(
   }
 }
 
-function QuotaMeter() {
-  const [quota, setQuota] = useState<FareQuota | null>(null);
-
-  useEffect(() => {
-    void fetch("/api/fares/quota")
-      .then((response) => response.ok ? response.json() as Promise<FareQuota> : null)
-      .then((value) => value && setQuota(value))
-      .catch(() => undefined);
-  }, []);
-
+function QuotaMeter({ quota }: { quota: FareQuota | null }) {
   return (
     <details className="mt-2 w-fit text-[10px] text-[var(--sb-faint)]">
       <summary className="cursor-pointer">
@@ -146,6 +147,96 @@ function QuotaMeter() {
       </summary>
       {quota && <p className="mt-1">{quota.month} · soft stop at 150 calls per day</p>}
     </details>
+  );
+}
+
+/**
+ * What this day costs, before it costs it.
+ *
+ * The other half of date freedom (#61). Every day in the window is now
+ * choosable, and most of them have never been priced — so a page that just went
+ * and fetched on selection would turn a calendar into a quota bill nobody
+ * agreed to. The transparency principle the Constraints already follow
+ * (docs/CONTEXT.md) applies just as well to the site's own metered API: state
+ * the cost in the same words a person would use, then let them decide.
+ *
+ * Three things this panel is careful about:
+ *
+ * - **The number is the real one.** It counts the origins in *this* search that
+ *   have nothing stored on this day, capped at the same fan-out ceiling the
+ *   fetch itself obeys — not a guess, and not the full grid.
+ * - **A free day says so.** When everything is already stored, there is no
+ *   button and no decision, because there is nothing to decide.
+ * - **Nothing is blocked.** Declining costs the couple the live quotes, not the
+ *   day: the research bands and the stored history are already on the rows, and
+ *   the page keeps ranking them.
+ */
+function ColdDateCost({
+  date,
+  calls,
+  origins,
+  quota,
+  onFetch,
+}: {
+  date: string;
+  calls: number;
+  /** How many origins this search asks about, so a partly-known day says so. */
+  origins: number;
+  quota: FareQuota | null;
+  onFetch: () => void;
+}) {
+  const left = quota ? Math.max(0, quota.budget - quota.used) : null;
+  const exhausted = left !== null && left < calls;
+
+  if (calls === 0) {
+    return (
+      <p className="mt-3 flex items-center gap-1.5 text-[11px] leading-snug text-[var(--sb-dim)]">
+        <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[var(--sb-good)]" />
+        Every origin on {formatDayYear(date)} is already stored — this day is free to
+        look at, and instant.
+      </p>
+    );
+  }
+
+  return (
+    <section className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-dashed border-[color-mix(in_srgb,var(--sb-warn)_40%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-warn)_6%,transparent)] p-2.5">
+      <p className="min-w-0 flex-1 text-[11px] leading-snug text-[var(--sb-dim)]">
+        <span className="font-semibold text-[var(--sb-text)]">
+          {calls >= origins
+            ? `${formatDayYear(date)} has not been priced yet.`
+            : `${formatDayYear(date)} is priced for ${origins - calls} of ${origins} origins.`}
+        </span>{" "}
+        The rest of the rows are showing the research bands. Filling the gaps with live
+        fares costs{" "}
+        <span className="sb-num font-semibold text-[var(--sb-warn)]">~{calls} calls</span>
+        {left !== null && (
+          <>
+            {" "}
+            <span aria-hidden>·</span>{" "}
+            <span className="sb-num">{left.toLocaleString("en-GB")} left this month</span>
+          </>
+        )}
+        .{" "}
+        {exhausted
+          ? "There is not enough monthly quota left for that, so the bands stay."
+          : "Nothing is spent until you say so."}
+      </p>
+      <button
+        type="button"
+        onClick={onFetch}
+        disabled={exhausted}
+        className={cn(
+          "flex min-h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-[11.5px] font-semibold transition-colors motion-reduce:transition-none",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
+          "border-[color-mix(in_srgb,var(--sb-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--sb-accent)_14%,transparent)] text-[var(--sb-accent)]",
+          "hover:bg-[color-mix(in_srgb,var(--sb-accent)_22%,transparent)]",
+          "disabled:cursor-default disabled:opacity-45 disabled:hover:bg-[color-mix(in_srgb,var(--sb-accent)_14%,transparent)]",
+        )}
+      >
+        <Zap className="size-3.5 shrink-0" aria-hidden />
+        Spend ~{calls} calls on this day
+      </button>
+    </section>
   );
 }
 
@@ -633,13 +724,44 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   const [quotes, setQuotes] = useState<ReadonlyMap<string, LiveQuote | null>>(
     () => new Map(QUOTE_CACHE),
   );
+  /** The monthly meter, so a cold day can price itself before it is fetched. */
+  const [quota, setQuota] = useState<FareQuota | null>(null);
+  /** Which route-days already hold a fare. One read per origin, no fare calls. */
+  const [coverage, setCoverage] = useState<CoverageReport | null>(null);
+  /**
+   * What the visitor has said yes to spending live calls on.
+   *
+   * Two sets, because they answer two different questions. `approvedKeys` holds
+   * the exact origin/day pairs the fetch loop may spend on — *only* the ones
+   * that had nothing stored when the button was pressed, so the "~4 calls" the
+   * panel quoted is the number of calls the click actually makes rather than a
+   * number followed by a re-fetch of all thirteen origins. `approvedDates` is
+   * the same decision at the granularity the copy speaks in, so the panel knows
+   * it has been answered.
+   *
+   * The warmed default day stays live without being asked about, because it is
+   * a cache hit and asking permission for a cache hit is theatre.
+   */
+  const [approvedKeys, setApprovedKeys] = useState<ReadonlySet<string>>(() => new Set());
+  const [approvedDates, setApprovedDates] = useState<ReadonlySet<string>>(() => new Set());
 
   const options = leg === "outbound" ? outbound : returns;
   const date = leg === "outbound" ? outboundDate : returnDate;
-  const dates = leg === "outbound" ? OUTBOUND_SEARCH_DATES : RETURN_SEARCH_DATES;
-  const storedOnly = leg === "outbound"
-    ? date !== OUTBOUND_DEFAULT_DATE
-    : date !== RETURN_DEFAULT_DATE;
+  const defaultDate = leg === "outbound" ? OUTBOUND_DEFAULT_DATE : RETURN_DEFAULT_DATE;
+  const warmedDates = leg === "outbound" ? OUTBOUND_SEARCH_DATES : RETURN_SEARCH_DATES;
+  const approvalKey = `${leg}|${date}`;
+  /** The warmed day the search starts on is fetched live without being asked. */
+  const isDefaultDate = date === defaultDate;
+  const answered = isDefaultDate || approvedDates.has(approvalKey);
+
+  const refreshQuota = useCallback(() => {
+    void fetch("/api/fares/quota")
+      .then((response) => (response.ok ? (response.json() as Promise<FareQuota>) : null))
+      .then((value) => value && setQuota(value))
+      .catch(() => undefined);
+  }, []);
+
+  useEffect(refreshQuota, [refreshQuota]);
 
   /**
    * The distinct airport pairs this search has to ask about.
@@ -656,16 +778,137 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
    * flight. An over-cap row shares its origin with rankable rows regardless.
    */
   const showMiddleEast = !rules.avoidMiddleEast || peek.middleEast;
-  const pairs = useMemo(() => {
-    const seen = new Map<string, { from: string; to: string; key: string }>();
+  /**
+   * The airport pairs, with no date in them.
+   *
+   * Split out from `pairs` because coverage is a property of the *route*, not
+   * of the day: asking which days a route already holds is one KV read whatever
+   * day the strip is on, and re-asking it every time someone steps a day would
+   * turn a free lookup into ninety of them.
+   */
+  const routePairs = useMemo(() => {
+    const seen = new Map<string, { from: string; to: string }>();
     for (const option of options) {
       if (!option.searchable) continue;
       if (!showMiddleEast && excludedByDefault(option)) continue;
-      const key = keyOf(option.origin, option.destination, date);
-      if (!seen.has(key)) seen.set(key, { from: option.origin, to: option.destination, key });
+      const key = routeKeyOf(option.origin, option.destination);
+      if (!seen.has(key)) seen.set(key, { from: option.origin, to: option.destination });
     }
     return [...seen.values()];
-  }, [options, date, showMiddleEast]);
+  }, [options, showMiddleEast]);
+
+  const pairs = useMemo(
+    () => routePairs.map((pair) => ({ ...pair, key: keyOf(pair.from, pair.to, date) })),
+    [routePairs, date],
+  );
+
+  /* Which days are already paid for. KV reads only — this never costs a call. */
+  const routeQuery = useMemo(
+    () => routePairs.map((pair) => routeKeyOf(pair.from, pair.to)).join(","),
+    [routePairs],
+  );
+
+  useEffect(() => {
+    if (!routeQuery) return;
+    const controller = new AbortController();
+    void fetch(`/api/fares/coverage?route=${routeQuery}`, { signal: controller.signal })
+      .then((response) => (response.ok ? (response.json() as Promise<CoverageReport>) : null))
+      .then((value) => value && setCoverage(value))
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [routeQuery]);
+
+  /**
+   * Stored per-person fares by route and day: the coverage index, plus whatever
+   * this tab has already been handed.
+   *
+   * The second half matters. A day the couple just paid to price is a day that
+   * is now free, and the page knows its prices already — going back to
+   * `/api/fares/coverage` to be told what it just fetched would be a round trip
+   * to learn nothing, and the endpoint is edge-cached for five minutes anyway.
+   */
+  const knownRoutes = useMemo(
+    () => new Set(routePairs.map((pair) => routeKeyOf(pair.from, pair.to))),
+    [routePairs],
+  );
+
+  const pricesByRoute = useMemo(() => {
+    const byRoute = new Map<string, Map<string, number>>();
+    const record = (route: string, day: string, priceEur: number) => {
+      const days = byRoute.get(route) ?? new Map<string, number>();
+      days.set(day, priceEur);
+      byRoute.set(route, days);
+    };
+
+    for (const route of coverage?.routes ?? []) {
+      for (const [day, entry] of Object.entries(route.dates)) record(route.route, day, entry.priceEur);
+    }
+    for (const [key, quote] of quotes) {
+      // A snapshot is the research estimate, not an observation of a day: it is
+      // the same number on all ninety of them, so dotting the calendar with it
+      // would say every day was priced when none of them were.
+      if (!quote || quote.source === "snapshot") continue;
+      const [from, to, day] = key.split("|");
+      record(routeKeyOf(from, to), day, quote.priceEur);
+    }
+    return byRoute;
+  }, [coverage, quotes]);
+
+  /** The same thing folded across origins: what the calendar's dots read from. */
+  const coverageByDate = useMemo<CoverageByDate>(() => {
+    const days = new Map<string, DayCoverage>();
+    // The cron's own list is static truth and needs no endpoint, so the strip
+    // is never blank — not on first paint, and not with an empty KV.
+    for (const day of warmedDates) {
+      days.set(day, { source: "warm", cheapestEur: null, routes: 0 });
+    }
+    for (const [route, byDay] of pricesByRoute) {
+      if (!knownRoutes.has(route)) continue;
+      for (const [day, priceEur] of byDay) {
+        const known = days.get(day);
+        const priced = known?.source === "history" ? known : null;
+        days.set(day, {
+          source: "history",
+          cheapestEur: priced?.cheapestEur == null ? priceEur : Math.min(priced.cheapestEur, priceEur),
+          routes: (priced?.routes ?? 0) + 1,
+        });
+      }
+    }
+    return days;
+  }, [warmedDates, pricesByRoute, knownRoutes]);
+
+  /**
+   * What pricing this day live would cost: one call per origin with nothing
+   * stored, under the same fan-out ceiling the fetch itself obeys.
+   */
+  const coldPairs = useMemo(
+    () =>
+      pairs
+        .filter((pair) => !pricesByRoute.get(routeKeyOf(pair.from, pair.to))?.has(date))
+        .slice(0, MAX_INTERACTIVE_FARE_CALLS),
+    [pairs, pricesByRoute, date],
+  );
+
+  /**
+   * Say yes to spending on this day.
+   *
+   * Only the origins the panel counted are approved and re-asked: the ones with
+   * a stored fare keep reading it, because paying again for a number already in
+   * hand is exactly the thing the coverage index exists to stop. The stored-only
+   * answers for the cold ones have to be dropped from the cache or the fetch
+   * loop would skip them as already-known and the click would do nothing — so
+   * those rows blink back to "checking fares", which is what is happening.
+   */
+  const fetchLive = useCallback(() => {
+    for (const pair of coldPairs) QUOTE_CACHE.delete(pair.key);
+    setQuotes(new Map(QUOTE_CACHE));
+    setApprovedKeys((current) => {
+      const next = new Set(current);
+      for (const pair of coldPairs) next.add(pair.key);
+      return next;
+    });
+    setApprovedDates((current) => new Set(current).add(approvalKey));
+  }, [coldPairs, approvalKey]);
 
   /* One fetch per origin, four at a time, abandoned if the search changes. */
   useEffect(() => {
@@ -673,12 +916,23 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     const pending = pairs
       .filter((pair) => !QUOTE_CACHE.has(pair.key))
       .slice(0, MAX_INTERACTIVE_FARE_CALLS);
+    // Live is per origin-day, not per search: the warmed default is live for
+    // everything, and a cold day is live only for the origins that were
+    // counted and approved. Everything else asks the store and spends nothing.
+    const goesLive = (key: string) => isDefaultDate || approvedKeys.has(key);
+    const spends = pending.some((pair) => goesLive(pair.key));
 
     async function worker() {
       for (;;) {
         const pair = pending.shift();
         if (!pair || controller.signal.aborted) return;
-        const quote = await fetchQuote(pair.from, pair.to, date, controller.signal, storedOnly);
+        const quote = await fetchQuote(
+          pair.from,
+          pair.to,
+          date,
+          controller.signal,
+          !goesLive(pair.key),
+        );
         if (controller.signal.aborted) return;
         QUOTE_CACHE.set(pair.key, quote);
         setQuotes(new Map(QUOTE_CACHE));
@@ -686,10 +940,15 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     }
 
     const workers = Array.from({ length: Math.min(SEARCH_CONCURRENCY, pending.length) }, worker);
-    void Promise.all(workers);
+    void Promise.all(workers).then(() => {
+      // A live run may have spent quota, and the cold-day panel quotes what is
+      // left. Re-read it once the batch settles rather than counting locally:
+      // a call the server refused is not a call, and the meter knows.
+      if (spends && !controller.signal.aborted) refreshQuota();
+    });
 
     return () => controller.abort();
-  }, [pairs, date, storedOnly]);
+  }, [pairs, date, isDefaultDate, approvedKeys, refreshQuota]);
 
   const priceFor = useCallback(
     (option: SearchOption): OptionPrice => {
@@ -700,6 +959,20 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     },
     [quotes, date],
   );
+
+  /**
+   * The stored fares for one row's airport pair, by day — what the row's
+   * alternate-days strip reads. Already in hand from the coverage index, so
+   * opening a row costs nothing.
+   */
+  const pricesFor = useCallback(
+    (option: SearchOption): ReadonlyMap<string, number> =>
+      pricesByRoute.get(routeKeyOf(option.origin, option.destination)) ?? NO_PRICES,
+    [pricesByRoute],
+  );
+
+  /** Clicking a day inside a row re-anchors the whole search on it. */
+  const pickDate = leg === "outbound" ? setOutboundDate : setReturnDate;
 
   const rows = useMemo(() => {
     const priced = options.map((option) => ({ option, price: priceFor(option) }));
@@ -767,7 +1040,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
             hold bags, the night before and the taxes back on before anything is
             compared.
           </p>
-          <QuotaMeter />
+          <QuotaMeter quota={quota} />
         </header>
 
         <div className="mt-5 flex flex-wrap items-start gap-x-6 gap-y-3">
@@ -783,11 +1056,12 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               { value: "return", label: "Return → Valencia", hint: "East coast to Spain, February 2027" },
             ]}
           />
-          <Segmented<string>
+          <FareDateField
             label={leg === "outbound" ? "Leaving" : "Coming home"}
             value={date}
             onChange={leg === "outbound" ? setOutboundDate : setReturnDate}
-            options={dates.map((option) => ({ value: option, label: formatDayYear(option) }))}
+            coverage={coverageByDate}
+            defaultDate={defaultDate}
           />
           <Segmented<Sort>
             label="Rank by"
@@ -821,6 +1095,24 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
           heldBack={viaMiddleEast.length + overCap.length}
         />
 
+        {!answered ? (
+          <ColdDateCost
+            date={date}
+            calls={coldPairs.length}
+            origins={pairs.length}
+            quota={quota}
+            onFetch={fetchLive}
+          />
+        ) : (
+          approvedDates.has(approvalKey) && (
+            <p className="mt-3 flex items-center gap-1.5 text-[11px] leading-snug text-[var(--sb-dim)]">
+              <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[var(--sb-accent)]" />
+              Pricing {formatDayYear(date)} live. Whatever lands is stored, so this day is
+              free from here on — and it will carry a price in the calendar above.
+            </p>
+          )
+        )}
+
         <OriginStrip pairs={pairs} quotes={quotes} />
 
         {leg === "return" && (
@@ -843,6 +1135,9 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               arbitrage={row.arbitrage}
               loading={row.loading}
               floorEurPP={floorEurPP}
+              date={date}
+              datePrices={pricesFor(row.option)}
+              onPickDate={pickDate}
             />
           ))}
           {ranked.length === 0 && (
@@ -880,6 +1175,9 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 loading={row.loading}
                 floorEurPP={floorEurPP}
                 heldBack={heldBackBy(row.option, row.price, rules)}
+                date={date}
+                datePrices={pricesFor(row.option)}
+                onPickDate={pickDate}
               />
             ))}
           </HeldBackBand>
@@ -911,6 +1209,9 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 loading={row.loading}
                 floorEurPP={floorEurPP}
                 heldBack={heldBackBy(row.option, row.price, rules)}
+                date={date}
+                datePrices={pricesFor(row.option)}
+                onPickDate={pickDate}
               />
             ))}
           </HeldBackBand>
@@ -970,10 +1271,23 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               connection on a sold-out mid-December Perth flight is close to uncoverable.
             </li>
             <li>
+              <span className="font-semibold text-[var(--sb-text)]">
+                Every day in the window is choosable, and says what it costs.
+              </span>{" "}
+              Any date from 1 December to 28 February, on either search. A day carrying a
+              price in the strip or the calendar is already stored — free to look at and
+              instant. A day with nothing on it has never been priced, and the panel above
+              the results says how many live calls filling it would spend, and how many are
+              left this month, before a single one is made. Nothing is fetched without being
+              asked for; the fan-out is capped either way. Opening a row compares the days
+              either side of the one you are on, from stored history alone.
+            </li>
+            <li>
               <span className="font-semibold text-[var(--sb-text)]">One fetch per origin, cached a week.</span>{" "}
-              The grid is warmed weekly; alternate dates read stored history only. Adelaide and Western
-              Sydney stay out of the return search deliberately — one only matters if the trip
-              already ends in South Australia, the other forces an 18-hour Singapore layover.
+              Three dates per route are warmed weekly by the cron, which is why they are the
+              ones the searches start on. Adelaide and Western Sydney stay out of the return
+              search deliberately — one only matters if the trip already ends in South
+              Australia, the other forces an 18-hour Singapore layover.
             </li>
           </ul>
         </section>
