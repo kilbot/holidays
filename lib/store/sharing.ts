@@ -76,6 +76,12 @@ export function isEditor(): boolean {
   return Boolean(CANONICAL_PLAN_ID) && Boolean(editKey);
 }
 
+/** Nothing to subscribe to: these facts are fixed for the life of the tab. */
+const subscribeNever = () => () => undefined;
+const readOrigin = () => window.location.origin;
+const readNoOrigin = () => "";
+const readNotEditor = () => false;
+
 function forkIdFromUrl(): string | null {
   if (typeof window === "undefined") return null;
   const value = new URLSearchParams(window.location.search).get(
@@ -114,16 +120,14 @@ export function useSharing(): SharingApi {
     readSyncStatusOnServer,
   );
 
-  // `useState` and not a render-time read: the server render has no location,
-  // and reading one during hydration is the classic mismatch.
-  const [origin, setOrigin] = useState("");
+  // Two client-only facts, read through `useSyncExternalStore` rather than set
+  // in an effect. Neither ever changes after boot, so there is nothing to
+  // subscribe to — but the server snapshot is what keeps the markup React
+  // renders on the server identical to the markup it hydrates, and an effect
+  // that called `setState` would be a cascading render for a constant.
+  const origin = useSyncExternalStore(subscribeNever, readOrigin, readNoOrigin);
+  const editing = useSyncExternalStore(subscribeNever, isEditor, readNotEditor);
   const [visiting, setVisiting] = useState<ForkView | null>(null);
-  const [editing, setEditing] = useState(false);
-
-  useEffect(() => {
-    setOrigin(window.location.origin);
-    setEditing(isEditor());
-  }, []);
 
   // Fetch the Fork this tab was opened on, once. A Fork that has been deleted
   // or was never real leaves `visiting` null and the page behaves as a plain
