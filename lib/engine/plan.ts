@@ -153,15 +153,6 @@ function intoWeeks(days: Day[], warnings: readonly Warning[]): PlanWeek[] {
     if (slice.length === 0) break;
 
     const lead = dominantLocation(slice);
-    const others = slice
-      .map((day) => day.locationId)
-      .filter((id, index, all) => all.indexOf(id) === index)
-      .filter((id) => id !== lead.locationId)
-      .map(
-        (id) =>
-          slice.find((day) => day.locationId === id)?.locationName ?? id,
-      );
-
     const dates = new Set(slice.map((day) => day.date));
 
     weeks.push({
@@ -172,7 +163,7 @@ function intoWeeks(days: Day[], warnings: readonly Warning[]): PlanWeek[] {
       days: slice,
       leadLocationId: lead.locationId,
       leadLocationName: lead.locationName,
-      handover: others.length > 0 ? `then ${others.join(" · ")}` : null,
+      handover: handoverOf(slice, lead.locationId),
       costEur: slice.reduce((total, day) => total + day.totalEur, 0),
       bufferDays: slice.filter((day) => day.buffer).length,
       warnings: warnings.filter((warning) =>
@@ -182,6 +173,41 @@ function intoWeeks(days: Day[], warnings: readonly Warning[]): PlanWeek[] {
   }
 
   return weeks;
+}
+
+/**
+ * The other places in the cell, said in the order they are actually visited
+ * (#98).
+ *
+ * The headline place is whichever owns the most Days, which has nothing to do
+ * with when it is visited: a week that spends two days in Sydney and five in
+ * Tasmania is headlined *Tasmania* and the second place, Sydney, came **first**.
+ * The line under it used to read "then Sydney" regardless, so on three of the
+ * trip's four mixed weeks the strip described the journey running backwards —
+ * including the finale, where "8–14 Feb · Melbourne / then Byron Bay" says the
+ * trip ends by leaving its last stop.
+ *
+ * So the word is chosen from the dates rather than asserted. Each other place
+ * is put before or after the headline by its own first Day in the cell, and
+ * "then" survives only where it is true.
+ */
+function handoverOf(days: Day[], leadId: string): string | null {
+  const leadStart = days.findIndex((day) => day.locationId === leadId);
+
+  const before: string[] = [];
+  const after: string[] = [];
+  const seen = new Set<string>([leadId]);
+
+  days.forEach((day, index) => {
+    if (seen.has(day.locationId)) return;
+    seen.add(day.locationId);
+    (index < leadStart ? before : after).push(day.locationName);
+  });
+
+  if (before.length === 0 && after.length === 0) return null;
+  if (before.length === 0) return `then ${after.join(" · ")}`;
+  if (after.length === 0) return `after ${before.join(" · ")}`;
+  return `after ${before.join(" · ")}, then ${after.join(" · ")}`;
 }
 
 /** Whichever place owns the most Days in the cell; ties go to the earlier. */
