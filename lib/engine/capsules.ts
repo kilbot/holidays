@@ -185,7 +185,7 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
       kind: "window",
       from: "2027-01-18",
       to: "2027-01-31",
-      why: "capsule-fnq-wildlife.md: inside the reef Capsule's 18–31 January window.",
+      why: "capsule-fnq-wildlife.md: inside the reef Adventure's 18–31 January window.",
     },
     needsCar: true,
     events: [

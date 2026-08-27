@@ -596,7 +596,7 @@ export function LedgerView() {
       <div className="mx-auto max-w-[1120px] px-3 pb-24 sm:px-6 print:max-w-none print:px-0 print:pb-0">
         <header className="pt-7 print:pt-0">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <p className="sb-label">Southbound · the ledger</p>
+            <p className="sb-label">Australia 2026–27</p>
             <p className="text-[11px] text-[var(--sb-faint)]">
               Scenario{" "}
               <span className="font-semibold text-[var(--sb-dim)]">
@@ -704,7 +704,7 @@ export function LedgerView() {
 
         <p className="mt-6 border-t border-[var(--sb-line)] pt-3 text-[10.5px] leading-snug text-[var(--sb-faint)]">
           Every figure is the sum of its Days — {plan.dayCount} of them, priced
-          one at a time. Bands and sources are on the lines. Southbound ·{" "}
+          one at a time. Bands and sources are on the lines. Australia 2026–27 ·{" "}
           {scenarios.current.name} · {formatDayYear(plan.startDate)} –{" "}
           {formatDayYear(plan.endDate)}.
         </p>

@@ -196,7 +196,7 @@ const GREAT_BARRIER_REEF: DeepCapsule = {
     {
       label: "Weather writes off 3–5 days a month",
       tone: "warn",
-      body: "Wind, swell or a low can take a reef day, and a multi-day blow is a real possibility. This is why the Capsule buys buffer days rather than a third reef day.",
+      body: "Wind, swell or a low can take a reef day, and a multi-day blow is a real possibility. This is why the Adventure buys buffer days rather than a third reef day.",
     },
     {
       label: "Visibility drops to 15–20 m",
@@ -226,7 +226,7 @@ const GREAT_BARRIER_REEF: DeepCapsule = {
     {
       label: "February is worse, not cheaper",
       tone: "info",
-      body: "More cyclone-active, thermal stress peaked there in 2026, and Port Douglas is quiet enough that restaurants close or open a few days a week. Keep the Capsule in 18–31 January.",
+      body: "More cyclone-active, thermal stress peaked there in 2026, and Port Douglas is quiet enough that restaurants close or open a few days a week. Keep the Adventure in 18–31 January.",
     },
   ],
   operators: [
@@ -272,7 +272,7 @@ const GREAT_BARRIER_REEF: DeepCapsule = {
       name: "Passions of Paradise",
       where: "Cairns",
       price: "A$275 (€168) · intro dive A$90",
-      note: "The best Cairns-based option and the cheapest credible day on the list. The fallback if the Capsule moves to a Cairns base.",
+      note: "The best Cairns-based option and the cheapest credible day on the list. The fallback if the Adventure moves to a Cairns base.",
     },
     {
       name: "Pro Dive Cairns — 5-day PADI Open Water",
@@ -340,7 +340,7 @@ const FNQ_WILDLIFE: DeepCapsule = {
   id: "fnq-wildlife",
   name: "Far North Queensland wildlife — crocs, rainforest, cassowaries",
   region: "QLD — Daintree / Cape Tribulation",
-  tagline: "An extension of the reef Capsule, bought with one night north of the ferry.",
+  tagline: "An extension of the reef Adventure, bought with one night north of the ferry.",
   facets: ["wildlife", "outdoors"],
   tags: ["wildlife", "rainforest", "national-park", "birds", "conservation"],
   seasonFit: "ok",
@@ -352,14 +352,14 @@ const FNQ_WILDLIFE: DeepCapsule = {
     ideal: { aud: 739, eur: 450, band: [335, 580] },
     max: { aud: 1100, eur: 670, band: null },
   },
-  window: "Inside the reef Capsule's 18–31 January window",
+  window: "Inside the reef Adventure's 18–31 January window",
   verdict:
     "Cassowaries: January is a good month. Crocodiles: January is the worst month for sighting quality.",
-  why: "The brief's three targets do not live in the same place. Rainforest and wild crocodile are already bought and paid for by the reef Capsule's Daintree buffer day; only the cassowary argues for a separate base, and it argues for one on the wrong side of Cairns. So this is an extension, not a Capsule — and the one night north of the Daintree ferry is what converts it from 'we did a croc cruise' into a dusk and a dawn in cassowary country.",
+  why: "The brief's three targets do not live in the same place. Rainforest and wild crocodile are already bought and paid for by the reef Adventure's Daintree buffer day; only the cassowary argues for a separate base, and it argues for one on the wrong side of Cairns. So this is an extension, not a Adventure — and the one night north of the Daintree ferry is what converts it from 'we did a croc cruise' into a dusk and a dawn in cassowary country.",
   durationNote:
     "The binding constraint is dawn and dusk. Every target here is a crepuscular animal, and every one is unavailable to a couple sleeping in Port Douglas — the ferry is 45 minutes away and Cape Tribulation is 1h45 beyond it. The reef is a mid-morning product; they do not compete for hours, they compete for where you sleep.",
   budgetShare:
-    "The ideal at €450 is 2–4% of the Budget — the cheapest marquee block researched, because it rides on the reef Capsule's base, car and rainforest day.",
+    "The ideal at €450 is 2–4% of the Budget — the cheapest marquee block researched, because it rides on the reef Adventure's base, car and rainforest day.",
   itinerary: [
     {
       day: "Day 1",
@@ -550,9 +550,9 @@ const TASMANIA: DeepCapsule = {
     "Yes — but February is quietly better, and Tasmania is the most expensive block in the Plan per day.",
   why: "Tasmania's highlights sit on a diagonal: Hobart and the Tasman Peninsula in the far south-east, Freycinet halfway up the east coast, the Bay of Fires in the north-east, Launceston at the top. That is a single monotonic line, so the arc never backtracks and no driving day runs over three hours. Sydney flies nonstop to both airports and there is no fare penalty for the open jaw.",
   durationNote:
-    "The binding constraint is transit cost per hub. Every hub costs half a day of driving plus a minimum of one night, and a hub with one night is a hub you drove to and left. Nine nights buys five hubs; seven forces you to drop either Freycinet's second night or the Tasman Peninsula. Nights eight and nine are the cheapest in the Capsule at ~A$490 each and each buys back a whole hub.",
+    "The binding constraint is transit cost per hub. Every hub costs half a day of driving plus a minimum of one night, and a hub with one night is a hub you drove to and left. Nine nights buys five hubs; seven forces you to drop either Freycinet's second night or the Tasman Peninsula. Nights eight and nine are the cheapest in the Adventure at ~A$490 each and each buys back a whole hub.",
   budgetShare:
-    "The ideal at €4,430 is 22–37% of the Budget. With the reef Capsule, the two take 35–58% of the whole trip for 14 of its nights — the trimmed ideal at €3,460 is the version to take if the Budget is doing real work.",
+    "The ideal at €4,430 is 22–37% of the Budget. With the reef Adventure, the two take 35–58% of the whole trip for 14 of its nights — the trimmed ideal at €3,460 is the version to take if the Budget is doing real work.",
   itinerary: [
     {
       day: "Fri 15 Jan",
@@ -592,7 +592,7 @@ const TASMANIA: DeepCapsule = {
     {
       day: "Fri 22 Jan",
       title: "Freycinet → Bay of Fires",
-      body: "Coles Bay → Bicheno → Binalong Bay, ~2 h. Orange-lichen granite at The Gardens and Cosy Corner. The best beach in the Capsule, and it is directly on the way to the departure airport.",
+      body: "Coles Bay → Bicheno → Binalong Bay, ~2 h. Orange-lichen granite at The Gardens and Cosy Corner. The best beach in the Adventure, and it is directly on the way to the departure airport.",
     },
     {
       day: "Sat 23 Jan",
@@ -660,7 +660,7 @@ const TASMANIA: DeepCapsule = {
       where: "Salamanca Place, Hobart",
       price: "Free",
       pick: true,
-      note: "Saturdays only, 08:30–15:00, 300+ stalls in 1830s sandstone warehouses. The itinerary's fixed point and the best-value item in the Capsule.",
+      note: "Saturdays only, 08:30–15:00, 300+ stalls in 1830s sandstone warehouses. The itinerary's fixed point and the best-value item in the Adventure.",
     },
     {
       name: "Port Arthur Historic Site",
@@ -673,7 +673,7 @@ const TASMANIA: DeepCapsule = {
       name: "Tasman Island Cruise (Pennicott)",
       where: "ex-Port Arthur",
       price: "A$180 (€110)",
-      note: "Three hours along the tallest sea cliffs in the Southern Hemisphere. The best boat in the Capsule — and the first A$360 to cut if the Budget bites.",
+      note: "Three hours along the tallest sea cliffs in the Southern Hemisphere. The best boat in the Adventure — and the first A$360 to cut if the Budget bites.",
     },
     {
       name: "Bruny Island — self-drive",
@@ -698,7 +698,7 @@ const TASMANIA: DeepCapsule = {
       name: "kunanyi / Mt Wellington",
       where: "Hobart",
       price: "Free self-drive · ~A$35 Explorer Bus return",
-      note: "Best free thing in the Capsule. Bus it if you skipped the car on days 1–3.",
+      note: "Best free thing in the Adventure. Bus it if you skipped the car on days 1–3.",
     },
   ],
   deadlines: [
@@ -892,7 +892,7 @@ const SYDNEY_NYE: DeepCapsule = {
       name: "Blu Bar on 36, Shangri-La",
       where: "The Rocks",
       price: "A$1,349 pp — confirmed for 31 Dec 2026",
-      note: "Genuinely the best indoor view in Sydney, genuinely a lot of money, and standing. A$2,698 for the couple is more than the entire suburb-tier Capsule.",
+      note: "Genuinely the best indoor view in Sydney, genuinely a lot of money, and standing. A$2,698 for the couple is more than the entire suburb-tier Adventure.",
     },
     {
       name: "Harbour cruises",
@@ -920,7 +920,7 @@ const SYDNEY_NYE: DeepCapsule = {
     },
     {
       when: "26 Dec 2026, 10:00am AEDT = 7:00am AWST",
-      what: "Opera House Forecourt free tickets released — on the day of the PER→SYD flight. Whoever is not driving books it from a phone with the page already open. The highest-value 10 minutes in the Capsule.",
+      what: "Opera House Forecourt free tickets released — on the day of the PER→SYD flight. Whoever is not driving books it from a phone with the page already open. The highest-value 10 minutes in the Adventure.",
     },
   ],
   sources: [
@@ -973,11 +973,11 @@ const MARGARET_RIVER: DeepCapsule = {
   },
   window: "Mid-week, after ~5 January. Avoid 26 Dec – 3 Jan entirely.",
   verdict: "Yes — but three days is the floor, not the ideal. Four days is the honest number.",
-  why: "A Home-base excursion: the Perth family house and the borrowed car mean this Capsule carries no flights and no car hire, only the nights. Its real differentiator over every other Australian wine region is that the wine, the caves and the coast are all inside a 30-minute radius — and January is the region's best weather, the exact opposite of the reef's January problem.",
+  why: "A Home-base excursion: the Perth family house and the borrowed car mean this Adventure carries no flights and no car hire, only the nights. Its real differentiator over every other Australian wine region is that the wine, the caves and the coast are all inside a 30-minute radius — and January is the region's best weather, the exact opposite of the reef's January problem.",
   durationNote:
     "The binding constraint is the drive plus the driver: six hours of highway at the ends, and WA's 0.05 limit means one of you is spitting on the wine day. Two nights gets one clean theme done properly and a hurried version of the other. Night three costs about A$460 of lodging and food and buys back an entire theme.",
   budgetShare:
-    "Both WA Capsules together at ~€1,590 are 8–13% of the Budget — the cheapest marquee content in the Plan.",
+    "Both WA Adventures together at ~€1,590 are 8–13% of the Budget — the cheapest marquee content in the Plan.",
   itinerary: [
     {
       day: "Day 1",
@@ -1325,7 +1325,7 @@ const BYRON_NIMBIN: DeepCapsule = {
   id: "byron-nimbin",
   name: "Byron Bay + Nimbin",
   region: "NSW — Northern Rivers / Byron Bay",
-  tagline: "One Capsule: a Byron base on foot, Nimbin as a shuttle day.",
+  tagline: "One Adventure: a Byron base on foot, Nimbin as a shuttle day.",
   facets: ["beach", "hippie", "market", "outdoors"],
   tags: ["beach", "hippie", "market", "surf", "coastal-walk", "rainforest", "cheap"],
   seasonFit: "good",
@@ -1338,10 +1338,10 @@ const BYRON_NIMBIN: DeepCapsule = {
     max: { aud: 2544, eur: 1555, band: [1220, 2380] },
   },
   window: "From Thursday 28 January 2027 — the day NSW school holidays end",
-  verdict: "Place it 27/28 Jan – 2 Feb, southbound. The price cliff is real and dated.",
+  verdict: "Place it 27/28 Jan – 2 Feb, heading south. The price cliff is real and dated.",
   why: "The headline attraction is free: the Walgun Cape Byron walking track, 3.7 km of rainforest and clifftop past Wategos and The Pass to the lighthouse and the most easterly point of mainland Australia. The only paid Events are a bus and a surf lesson, which makes this a net contributor to the Event-spend pot rather than a drain on it. Nimbin is two hours of town — the day's real value is the hinterland drive, the waterfall and the country pub the tour wraps around it.",
   durationNote:
-    "Byron is a small town with a short list of genuinely good things, most of them free, and it gets expensive per unit of novelty after about day four. Four nights gives three full days and Nimbin eats one, leaving two Byron days — one of which is the arrival hangover. Night five is what turns this from a stopover into a rest, and at A$150 it is the cheapest thing in the Capsule.",
+    "Byron is a small town with a short list of genuinely good things, most of them free, and it gets expensive per unit of novelty after about day four. Four nights gives three full days and Nimbin eats one, leaving two Byron days — one of which is the arrival hangover. Night five is what turns this from a stopover into a rest, and at A$150 it is the cheapest thing in the Adventure.",
   budgetShare: "The ideal at €1,070 is 5–9% of the Budget — cheap for a five-night east-coast block.",
   itinerary: [
     {
@@ -1538,7 +1538,7 @@ const MELBOURNE: DeepCapsule = {
   durationNote:
     "The binding constraint is recovery, and it has a hard edge: this is the last block before a 24-hour flight to Europe. Four nights buys a soft arrival night so both big nights are attacked fresh, plus a genuine Buffer day and a slack departure day. Melbourne's going-out is Thursday-to-Sunday shaped — Sub Club opens Friday and Saturday only — so nights five and six would be paying inner-Melbourne lodging to drink in bars.",
   budgetShare:
-    "The ideal at €1,040 is 5–9% of the Budget, and about 40% of what the reef Capsule costs. Living costs run A$290/day — 58% of the A$500 Daily cap, by design.",
+    "The ideal at €1,040 is 5–9% of the Budget, and about 40% of what the reef Adventure costs. Living costs run A$290/day — 58% of the A$500 Daily cap, by design.",
   itinerary: [
     {
       day: "Thu 18 Feb",
@@ -1563,7 +1563,7 @@ const MELBOURNE: DeepCapsule = {
     {
       day: "Mon 22 Feb",
       title: "Slack, then fly",
-      body: "Late checkout, coffee, a last laneway hour, SkyBus out. Never put a big night before a long-haul: two clear nights' sleep between the last club and the airport is the whole reason this Capsule is four nights and not two.",
+      body: "Late checkout, coffee, a last laneway hour, SkyBus out. Never put a big night before a long-haul: two clear nights' sleep between the last club and the airport is the whole reason this Adventure is four nights and not two.",
     },
   ],
   caveats: [
@@ -1575,12 +1575,12 @@ const MELBOURNE: DeepCapsule = {
     {
       label: "There is no Victorian doof inside the window",
       tone: "warn",
-      body: "Rainbow Spirit, Esoteric and Pitch all run in March, after they fly home. Aggregator sites listing 'Rainbow, 22–26 Jan 2027, Lexton' are recycling stale data. That is the honest reason this Capsule is club-shaped rather than festival-shaped.",
+      body: "Rainbow Spirit, Esoteric and Pitch all run in March, after they fly home. Aggregator sites listing 'Rainbow, 22–26 Jan 2027, Lexton' are recycling stale data. That is the honest reason this Adventure is club-shaped rather than festival-shaped.",
     },
     {
       label: "Australia Day week is the wrong window",
       tone: "info",
-      body: "26 Jan 2027 is a Tuesday — a stranded midweek public holiday — the Australian Open runs 11–31 Jan and fills the city's beds at A$314–439/night, and the reef and Byron Capsules already own those dates.",
+      body: "26 Jan 2027 is a Tuesday — a stranded midweek public holiday — the Australian Open runs 11–31 Jan and fills the city's beds at A$314–439/night, and the reef and Byron Adventures already own those dates.",
     },
     {
       label: "The tourist peak does not improve the clubbing",

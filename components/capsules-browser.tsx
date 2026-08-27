@@ -213,9 +213,9 @@ export function CapsulesBrowser() {
     <main className="sb-scroll h-full w-full overflow-y-auto">
       {/* ---- Masthead ---- */}
       <header className="mx-auto max-w-[1440px] px-5 pt-8 pb-6 sm:px-8 lg:pt-10">
-        <p className="sb-label">Southbound · the catalog</p>
+        <p className="sb-label">The catalog</p>
         <h1 className="mt-2 font-display text-[32px] leading-[1.05] font-extrabold tracking-[-0.02em] text-[var(--sb-text)] lg:text-[40px]">
-          Capsules
+          Adventures
         </h1>
         <p className="mt-3 max-w-[64ch] text-[13.5px] leading-[1.7] text-[var(--sb-dim)] lg:text-[14.5px]">
           <span className="sb-num font-semibold text-[var(--sb-text)]">
