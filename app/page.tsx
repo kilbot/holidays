@@ -3,6 +3,7 @@ import { CatalogDrawer } from "@/components/catalog-drawer";
 import { CostHud } from "@/components/cost-hud";
 import { DateStrip } from "@/components/date-strip";
 import { GlobeStage } from "@/components/globe-stage";
+import { ShareBar } from "@/components/share-bar";
 
 /**
  * The Globe stage (layout variant A, picked in #9).
@@ -33,6 +34,10 @@ export default function Home() {
       <CatalogDrawer />
       <CostHud />
       <DateStrip />
+
+      {/* Sharing, per ADR 0001: one pill that says which link this tab holds,
+          with the fork/adopt controls one click behind it. */}
+      <ShareBar />
 
       {/* Mounted once, above everything. The three places that open a Capsule
           — a Catalog row, the researched strip, a marker on the globe — are in
