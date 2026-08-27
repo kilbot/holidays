@@ -15,47 +15,45 @@
  * change to the pricing constants, and makes a side-by-side comparison two
  * calls to the same function.
  *
- * ## The boundary for #30
+ * ## The boundary #30 used
  *
- * Forks and server storage are #30's job. The seam is `ScenarioStore`: an
- * interface with four methods and no knowledge of where the bytes live.
- * `localScenarioStore()` is the localStorage implementation; a server-backed
- * one drops in beside it without touching a caller. Nothing above this file
- * knows which it has.
+ * The seam is `ScenarioStore`: an interface with four methods and no knowledge
+ * of where the bytes live. `localScenarioStore()` is the localStorage
+ * implementation; `remoteScenarioStore()` (`lib/store/remote-store.ts`) wraps it
+ * to sync the canonical Plan with the server. Nothing above this file knows
+ * which it has, and `chooseScenarioStore()` is the one line that decides.
  *
  * ## Storage
  *
- * localStorage, deliberately — there are no accounts, and #30 is where sharing
- * lands. Every access is wrapped: Safari private mode throws on read and a full
- * quota throws on write, and neither should cost the traveller their session.
- * The in-memory copy is authoritative for the tab either way; storage is where
- * it tries to persist, not where it lives.
+ * localStorage is still the floor, deliberately. There are no accounts, the
+ * network is not guaranteed, and a traveller poking at the Plan on a phone in a
+ * tunnel should keep their session — so the local store is where the state
+ * *lives*, and the server is something the remote wrapper syncs it with. Every
+ * access is wrapped: Safari private mode throws on read and a full quota throws
+ * on write, and neither should cost the traveller their session.
  */
 
 import { useCallback, useSyncExternalStore } from "react";
 
-import { EMPTY_INPUT, buildPlan } from "@/lib/engine/plan";
+import { buildPlan } from "@/lib/engine/plan";
+import {
+  DEFAULT_SCENARIO,
+  INITIAL_STATE,
+  nextScenarioId,
+  parseScenarioState,
+  type Scenario,
+  type ScenarioState,
+} from "@/lib/engine/scenario-doc";
 import type { CapsuleSpec, PlanInput } from "@/lib/engine/types";
 
 const STORAGE_KEY = "southbound.scenarios.v1";
 
-export interface Scenario {
-  id: string;
-  name: string;
-  /** ISO instant. Display only — nothing sorts or expires on it. */
-  createdAt: string;
-  input: PlanInput;
-}
-
-export interface ScenarioState {
-  scenarios: Scenario[];
-  /** Exactly one Scenario is the current Plan. */
-  currentId: string;
-}
+export { DEFAULT_SCENARIO };
+export type { Scenario, ScenarioState };
 
 /**
- * Where Scenarios live. The seam #30 replaces to put them on a server: a Fork
- * is a Scenario with a URL, and a URL is a storage concern, not a domain one.
+ * Where Scenarios live. The seam #30 filled to put them on a server: a Fork is
+ * a Scenario with a URL, and a URL is a storage concern, not a domain one.
  */
 export interface ScenarioStore {
   read(): ScenarioState;
@@ -66,136 +64,26 @@ export interface ScenarioStore {
 }
 
 /* ------------------------------------------------------------------ */
-/* The default Scenario                                                */
-/* ------------------------------------------------------------------ */
-
-/**
- * "Fireworks NYE" — the reference trip, with all eight researched Capsules on.
- * It is a starting position, not a recommendation: everything in it can be
- * toggled off, dragged, or forked.
- */
-export const DEFAULT_SCENARIO: Scenario = {
-  id: "fireworks-nye",
-  name: "Fireworks NYE",
-  createdAt: "2026-08-27T00:00:00.000Z",
-  input: {
-    ...EMPTY_INPUT,
-    toggled: [
-      "margaret-river",
-      "rottnest-island",
-      "sydney-nye",
-      "gbr-port-douglas",
-      "fnq-wildlife",
-      "byron-nimbin",
-      "tasmania-arc",
-      "melbourne-party",
-    ],
-  },
-};
-
-const INITIAL: ScenarioState = {
-  scenarios: [DEFAULT_SCENARIO],
-  currentId: DEFAULT_SCENARIO.id,
-};
-
-/* ------------------------------------------------------------------ */
-/* Parsing                                                             */
-/* ------------------------------------------------------------------ */
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  Boolean(value) && typeof value === "object" && !Array.isArray(value);
-
-/**
- * Rebuild a `PlanInput` from whatever came out of storage.
- *
- * Field by field, with `EMPTY_INPUT` as the floor. A stored Scenario written by
- * an older build is missing whichever knobs have been added since, and the
- * right answer to that is the default for the missing ones — never a discarded
- * Scenario and never a crash.
- */
-function parseInput(raw: unknown): PlanInput {
-  if (!isRecord(raw)) return EMPTY_INPUT;
-
-  const strings = (value: unknown): string[] =>
-    Array.isArray(value) ? value.filter((item) => typeof item === "string") : [];
-
-  const record = <T,>(value: unknown, ok: (item: unknown) => item is T) => {
-    if (!isRecord(value)) return {};
-    const clean: Record<string, T> = {};
-    for (const [key, item] of Object.entries(value)) {
-      if (ok(item)) clean[key] = item;
-    }
-    return clean;
-  };
-
-  const isString = (item: unknown): item is string => typeof item === "string";
-  const isNumber = (item: unknown): item is number =>
-    typeof item === "number" && Number.isFinite(item);
-  const isBoolean = (item: unknown): item is boolean =>
-    typeof item === "boolean";
-
-  return {
-    startDate:
-      typeof raw.startDate === "string" ? raw.startDate : EMPTY_INPUT.startDate,
-    endDate:
-      typeof raw.endDate === "string" ? raw.endDate : EMPTY_INPUT.endDate,
-    toggled: strings(raw.toggled),
-    placementOverrides: record(raw.placementOverrides, isString),
-    legModeOverrides: record(raw.legModeOverrides, isString) as PlanInput["legModeOverrides"],
-    lodgingTiers: record(raw.lodgingTiers, isString) as PlanInput["lodgingTiers"],
-    carOverrides: record(raw.carOverrides, isBoolean),
-    fxStress: raw.fxStress === true,
-    contingency: raw.contingency !== false,
-    fareOverrides: record(raw.fareOverrides, isNumber),
-  };
-}
-
-function parse(raw: string | null): ScenarioState {
-  if (!raw) return INITIAL;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!isRecord(parsed) || !Array.isArray(parsed.scenarios)) return INITIAL;
-
-    const scenarios = parsed.scenarios
-      .filter(isRecord)
-      .filter((entry) => typeof entry.id === "string")
-      .map(
-        (entry): Scenario => ({
-          id: entry.id as string,
-          name: typeof entry.name === "string" ? entry.name : "Untitled",
-          createdAt:
-            typeof entry.createdAt === "string"
-              ? entry.createdAt
-              : DEFAULT_SCENARIO.createdAt,
-          input: parseInput(entry.input),
-        }),
-      );
-
-    if (scenarios.length === 0) return INITIAL;
-
-    const currentId =
-      typeof parsed.currentId === "string" &&
-      scenarios.some((scenario) => scenario.id === parsed.currentId)
-        ? parsed.currentId
-        : scenarios[0].id;
-
-    return { scenarios, currentId };
-  } catch {
-    return INITIAL;
-  }
-}
-
-/* ------------------------------------------------------------------ */
 /* The localStorage store                                              */
 /* ------------------------------------------------------------------ */
 
 let cachedRaw: string | null = null;
-let cachedState: ScenarioState = INITIAL;
+let cachedState: ScenarioState = INITIAL_STATE;
 const listeners = new Set<() => void>();
 
 function readRaw(): string | null {
   try {
     return window.localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Bytes to a value `parseScenarioState` can repair. Corrupt reads as absent. */
+function readJson(raw: string | null): unknown {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as unknown;
   } catch {
     return null;
   }
@@ -217,7 +105,7 @@ export function localScenarioStore(): ScenarioStore {
       const raw = readRaw();
       if (raw !== cachedRaw) {
         cachedRaw = raw;
-        cachedState = parse(raw);
+        cachedState = parseScenarioState(readJson(raw));
       }
       return cachedState;
     },
@@ -248,9 +136,50 @@ export function localScenarioStore(): ScenarioStore {
   };
 }
 
-const STORE = localScenarioStore();
+/* ------------------------------------------------------------------ */
+/* Which store this tab got                                            */
+/* ------------------------------------------------------------------ */
 
-const getServerSnapshot = (): ScenarioState => INITIAL;
+/**
+ * The store, built on first use.
+ *
+ * Lazy because the choice needs `window`: on the server there is no
+ * localStorage and no fetch worth making, and `useSyncExternalStore`'s server
+ * snapshot covers that render. The first *client* call is what picks.
+ *
+ * A function per method rather than `STORE.read` passed directly, because
+ * `useSyncExternalStore` holds onto the references it is given and these have
+ * to stay stable across the swap from "not built yet" to "built".
+ */
+let STORE: ScenarioStore | null = null;
+
+function store(): ScenarioStore {
+  if (!STORE) STORE = chooseScenarioStore(localScenarioStore());
+  return STORE;
+}
+
+const subscribeToStore = (listener: () => void) => store().subscribe(listener);
+const readStore = () => store().read();
+const getServerSnapshot = (): ScenarioState => INITIAL_STATE;
+
+/**
+ * Decides local-only or server-synced. Replaced at boot by
+ * `lib/store/plan-client.ts`; the default keeps the engine free of any
+ * knowledge of the network, which is how `node --test` can import this file.
+ */
+let chooseScenarioStore: (local: ScenarioStore) => ScenarioStore = (local) =>
+  local;
+
+/**
+ * Install the store the app boots with. Called once, before the first render,
+ * by the sharing layer — the only place that knows there is a server at all.
+ */
+export function installScenarioStore(
+  choose: (local: ScenarioStore) => ScenarioStore,
+): void {
+  if (STORE) return;
+  chooseScenarioStore = choose;
+}
 
 export interface ScenarioApi extends ScenarioState {
   current: Scenario;
@@ -265,8 +194,8 @@ export interface ScenarioApi extends ScenarioState {
 
 export function useScenarios(): ScenarioApi {
   const state = useSyncExternalStore(
-    STORE.subscribe,
-    STORE.read,
+    subscribeToStore,
+    readStore,
     getServerSnapshot,
   );
   const current =
@@ -274,8 +203,8 @@ export function useScenarios(): ScenarioApi {
     state.scenarios[0];
 
   const update = useCallback((input: PlanInput) => {
-    const now = STORE.read();
-    STORE.write({
+    const now = store().read();
+    store().write({
       ...now,
       scenarios: now.scenarios.map((scenario) =>
         scenario.id === now.currentId ? { ...scenario, input } : scenario,
@@ -284,12 +213,12 @@ export function useScenarios(): ScenarioApi {
   }, []);
 
   const fork = useCallback((name: string, input?: PlanInput) => {
-    const now = STORE.read();
+    const now = store().read();
     const source =
       now.scenarios.find((scenario) => scenario.id === now.currentId) ??
       now.scenarios[0];
-    const id = nextId(name, now.scenarios);
-    STORE.write({
+    const id = nextScenarioId(name, now.scenarios);
+    store().write({
       scenarios: [
         ...now.scenarios,
         {
@@ -305,14 +234,14 @@ export function useScenarios(): ScenarioApi {
   }, []);
 
   const select = useCallback((id: string) => {
-    const now = STORE.read();
+    const now = store().read();
     if (!now.scenarios.some((scenario) => scenario.id === id)) return;
-    STORE.write({ ...now, currentId: id });
+    store().write({ ...now, currentId: id });
   }, []);
 
   const rename = useCallback((id: string, name: string) => {
-    const now = STORE.read();
-    STORE.write({
+    const now = store().read();
+    store().write({
       ...now,
       scenarios: now.scenarios.map((scenario) =>
         scenario.id === id ? { ...scenario, name } : scenario,
@@ -321,12 +250,12 @@ export function useScenarios(): ScenarioApi {
   }, []);
 
   const remove = useCallback((id: string) => {
-    const now = STORE.read();
+    const now = store().read();
     // Never leave the Plan without a current Scenario: docs/CONTEXT.md says
     // exactly one is marked, and zero is not one.
     if (now.scenarios.length <= 1) return;
     const scenarios = now.scenarios.filter((scenario) => scenario.id !== id);
-    STORE.write({
+    store().write({
       scenarios,
       currentId: now.currentId === id ? scenarios[0].id : now.currentId,
     });
@@ -399,20 +328,4 @@ export function scenarioTotals(
       warnings: plan.warnings.length,
     };
   });
-}
-
-/** A slug that is not already taken, so two "Doof NYE" forks can coexist. */
-function nextId(name: string, existing: readonly Scenario[]): string {
-  const base =
-    name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || "scenario";
-  let id = base;
-  let suffix = 2;
-  while (existing.some((scenario) => scenario.id === id)) {
-    id = `${base}-${suffix}`;
-    suffix += 1;
-  }
-  return id;
 }
