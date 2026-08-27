@@ -219,7 +219,7 @@ function DayRow({
   return (
     <li
       className={cn(
-        "border-l-2 print:break-inside-avoid",
+        "border-b border-l-2 border-b-[color-mix(in_srgb,var(--sb-line)_50%,transparent)] print:break-inside-avoid",
         // An Anchor is a fixed date+place commitment, not a plan item — it is
         // pinned on the strip and on the week zoom, and it is pinned here.
         anchor
@@ -233,8 +233,12 @@ function DayRow({
         aria-expanded={open}
         title={`${day.locationName}${day.capsuleName ? ` · ${day.capsuleName}` : ""} — open the day's lines.`}
         className={cn(
-          "grid w-full cursor-pointer items-baseline gap-x-2.5 py-[5px] pr-1 pl-2 text-left",
-          "grid-cols-[54px_minmax(0,1fr)_minmax(0,1.35fr)_auto]",
+          "grid w-full cursor-pointer items-baseline gap-x-2 py-[5px] pr-1 pl-2 text-left",
+          // On a phone the four columns are all still here — a row has to say
+          // where and what even at 375px — but the space goes to what is
+          // happening, because the place is repeated down the whole block and
+          // the band above already said it.
+          "grid-cols-[46px_minmax(0,0.8fr)_minmax(0,1.6fr)_auto]",
           "sm:grid-cols-[118px_minmax(0,160px)_minmax(0,1fr)_auto] sm:gap-x-4 sm:py-1.5 sm:pl-3",
           "transition-colors hover:bg-[color-mix(in_srgb,var(--sb-panel-2)_55%,transparent)] motion-reduce:transition-none",
           "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
@@ -256,10 +260,15 @@ function DayRow({
           {formatDay(day.date)}
         </time>
 
+        {/* The place, deliberately quiet. The sticky band overhead already
+            names it, so repeating it in bold on every row of a fourteen-day
+            block shouts the one thing that is not changing. It stays on the row
+            because a row torn out of context — printed, scrolled past its
+            band — still has to say where the couple is. */}
         <span
           className={cn(
-            "truncate text-[11.5px] leading-snug font-semibold sm:text-[12.5px]",
-            day.locationId === "transit" && "text-[var(--sb-dim)] italic",
+            "truncate text-[11px] leading-snug text-[var(--sb-dim)] sm:text-[12px]",
+            day.locationId === "transit" && "text-[var(--sb-faint)] italic",
           )}
         >
           {day.locationName}
@@ -277,12 +286,12 @@ function DayRow({
           )}
           <span
             className={cn(
-              "truncate text-[11px] leading-snug sm:text-[12px]",
+              "truncate text-[11.5px] leading-snug sm:text-[12.5px]",
               anchor
                 ? "font-semibold text-[var(--sb-accent)]"
                 : day.buffer
                   ? "text-[var(--sb-faint)] italic"
-                  : "text-[var(--sb-dim)]",
+                  : "font-medium text-[var(--sb-text)]",
             )}
           >
             {text}
@@ -394,6 +403,11 @@ function DayLines({
 
 function LedgerLine({ line }: { line: DayLine }) {
   const banded = line.bandEur[0] !== line.bandEur[1];
+  // The accent marks Event spend — the deliberate splurge the day-to-day thrift
+  // pays for — and `docs/CONTEXT.md` lists inter-city Legs in it. Not `!living`:
+  // the A$40 day-to-day activities line is outside the Daily cap but it is not
+  // a splurge, and `rollup.ts` files it under living for exactly that reason.
+  const splurge = line.kind === "event" || line.kind === "transport";
 
   return (
     <div>
@@ -401,9 +415,9 @@ function LedgerLine({ line }: { line: DayLine }) {
         <dt
           className={cn(
             "min-w-0 text-[11px] leading-snug",
-            // Event spend and Legs are the deliberate splurge the daily thrift
-            // pays for, so they carry the accent and living lines do not.
-            line.living ? "text-[var(--sb-dim)]" : "text-[var(--sb-accent)]",
+            splurge
+              ? "font-semibold text-[var(--sb-accent)]"
+              : "text-[var(--sb-dim)]",
           )}
         >
           {line.label}
@@ -446,12 +460,33 @@ function BlockBand({
       .map((warning) => warning.capsuleId),
   );
 
+  // Two window-locked Capsules in one place print two identical chips and say
+  // nothing twice, so the chips are one per *kind* of Lock and the reasons —
+  // which are per Capsule and are the interesting part — collect in the title.
+  const locks: { label: string; title: string; breached: boolean }[] = [];
+  for (const id of block.capsuleIds) {
+    const capsule = capsules.get(id);
+    const chip = capsule && lockChip(capsule.lock);
+    if (!capsule || !chip) continue;
+    const breached = violated.has(id);
+    const reason = `${capsule.name}: ${chip.title}${breached ? " This placement sits outside it." : ""}`;
+    const existing = locks.find((lock) => lock.label === chip.label);
+    if (existing) {
+      existing.title += `\n\n${reason}`;
+      existing.breached ||= breached;
+      continue;
+    }
+    locks.push({ label: chip.label, title: reason, breached });
+  }
+
   return (
     <div
       className={cn(
         "sticky top-0 z-10 border-b border-[var(--sb-line)] bg-[var(--sb-ink)]",
         "px-2 pt-4 pb-1.5 sm:px-3",
-        "print:static print:break-after-avoid print:bg-transparent",
+        // On paper a band must not be split across sheets, nor printed as the
+        // last thing on one with its Days overleaf.
+        "print:static print:break-inside-avoid print:break-after-avoid print:bg-transparent",
       )}
     >
       <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
@@ -480,20 +515,16 @@ function BlockBand({
           </Chip>
         ))}
 
-        {block.capsuleIds.map((id) => {
-          const chip = capsules.get(id) && lockChip(capsules.get(id)!.lock);
-          if (!chip) return null;
-          return (
-            <Chip
-              key={id}
-              tone={violated.has(id) ? "over" : "neutral"}
-              title={`${chip.title}${violated.has(id) ? " — this placement sits outside it." : ""}`}
-            >
-              {chip.label}
-              {violated.has(id) && " breached"}
-            </Chip>
-          );
-        })}
+        {locks.map((lock) => (
+          <Chip
+            key={lock.label + (lock.breached ? "!" : "")}
+            tone={lock.breached ? "over" : "neutral"}
+            title={lock.title}
+          >
+            {lock.label}
+            {lock.breached && " breached"}
+          </Chip>
+        ))}
 
         <p
           className="sb-num ml-auto text-[12px] font-semibold whitespace-nowrap sm:text-[13.5px]"
@@ -621,10 +652,15 @@ export function LedgerView() {
             </ul>
           )}
 
-          <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--sb-line)] pt-2 print:hidden">
+          {/* The note stays on paper — the FX rate every figure below is quoted
+              at is exactly the thing a printed sheet has to carry with it. */}
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--sb-line)] pt-2">
             <p className="text-[10.5px] text-[var(--sb-faint)]">
-              Plan-on figures, EUR per couple, at A$1 = €{rollUp.fxRate}. Open a
-              day for its lines, bands and sources.
+              Plan-on figures, EUR per couple, at A$1 = €{rollUp.fxRate}.
+              <span className="print:hidden">
+                {" "}
+                Open a day for its lines, bands and sources.
+              </span>
             </p>
             <button
               type="button"
