@@ -23,7 +23,6 @@ import { useId, useState } from "react";
 import { formatEur } from "@/lib/engine";
 import { comfortBand, rawScoreOf, type ComfortBand } from "@/lib/flights/comfort";
 import {
-  LONGHAUL_CAP_EUR_PP,
   perPersonTotal,
   type Arbitrage,
   type HeldBack,
@@ -390,6 +389,13 @@ export interface OptionRowProps {
    * could not do that.
    */
   heldBack?: HeldBack | null;
+  /**
+   * The cheapest per-person total anywhere in this search, so the row can show
+   * what it costs over the floor. This is the price of comfort, stated: the
+   * ranking is not by price, so the row that wins it owes the reader a number
+   * saying what winning it costs.
+   */
+  floorEurPP?: number | null;
 }
 
 export function FlightOptionRow({
@@ -398,8 +404,11 @@ export function FlightOptionRow({
   arbitrage,
   loading,
   heldBack = null,
+  floorEurPP = null,
 }: OptionRowProps) {
   const excluded = heldBack !== null;
+  const overFloor =
+    floorEurPP === null ? null : Math.round(perPersonTotal(price)[0] - floorEurPP);
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const stops = option.stops === 0 ? "nonstop" : `${option.stops} stop${option.stops > 1 ? "s" : ""}`;
@@ -461,8 +470,8 @@ export function FlightOptionRow({
               ) : null}
               {heldBack?.overCap && (
                 <ReasonChip>
-                  {formatEur(Math.round(perPersonTotal(price)[0]))} pp — over{" "}
-                  {formatEur(LONGHAUL_CAP_EUR_PP)}
+                  {formatEur(perPersonTotal(price)[0])} pp — over{" "}
+                  {formatEur(heldBack.capEurPP)}
                 </ReasonChip>
               )}
               {option.flags.map((flag) => (
@@ -487,6 +496,21 @@ export function FlightOptionRow({
               )}
             </span>
             <span className="block text-[9.5px] text-[var(--sb-faint)]">for two, all in</span>
+            {overFloor !== null && (
+              <span
+                className="sb-num block text-[9.5px]"
+                style={{ color: overFloor <= 0 ? "var(--sb-good)" : "var(--sb-dim)" }}
+                title={
+                  overFloor <= 0
+                    ? "Nothing in this search is cheaper. This is the floor everything else is measured against."
+                    : "Per person, against the cheapest thing in this search — whatever its routing or its elapsed time."
+                }
+              >
+                {overFloor <= 0
+                  ? "= cheapest possible"
+                  : `+${formatEur(overFloor)} pp over floor`}
+              </span>
+            )}
             <span
               className={cn(
                 "mt-0.5 inline-flex items-center gap-1 text-[9.5px] font-semibold",

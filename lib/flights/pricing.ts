@@ -58,6 +58,8 @@ export interface OptionPrice {
   totalEurCouple: Band;
   lines: readonly PriceLine[];
   trend: FareTrend | null;
+  /** Door to door, when a live quote said so. Never inferred. */
+  durationMin: number | null;
 }
 
 const double = (band: Band): Band => [band[0] * TRAVELLERS, band[1] * TRAVELLERS];
@@ -176,6 +178,7 @@ export function priceOption(
     totalEurCouple: total,
     lines,
     trend: matched?.trend ?? null,
+    durationMin: matched?.durationMin ?? null,
   };
 }
 
@@ -265,6 +268,8 @@ export interface HeldBack {
   middleEast: readonly string[];
   /** True when the cheapest per-person total is over the price setting. */
   overCap: boolean;
+  /** The setting it was measured against, so the row can name the number. */
+  capEurPP: number;
 }
 
 export function heldBackBy(
@@ -275,7 +280,7 @@ export function heldBackBy(
   const middleEast = rules.avoidMiddleEast ? option.middleEastTransit : [];
   const over = overCap(price, rules.maxEurPP);
   if (middleEast.length === 0 && !over) return null;
-  return { middleEast, overCap: over };
+  return { middleEast, overCap: over, capEurPP: rules.maxEurPP };
 }
 
 /**
@@ -304,6 +309,39 @@ export function groupByDefaultRules<T extends { option: SearchOption; price: Opt
   }
 
   return { ranked, viaMiddleEast, overCap: dear };
+}
+
+/* ------------------------------------------------------------------ */
+/* The floor                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The cheapest thing in the search, whatever it is.
+ *
+ * Not a recommendation and not a row anyone is expected to book — a *ruler*.
+ * The user's own framing: "that's the cheapest it can possibly be, then we see
+ * how close we can get". So it ignores every rule the page has, including the
+ * comfort sort, the Middle East exclusion and the price cap, because a floor
+ * that already agreed with the filters would measure nothing. It is routinely a
+ * Gulf or a Guangzhou routing with a forty-hour elapsed time, and the reference
+ * that quotes it says so in the same breath.
+ *
+ * Measured in the same unit as the cap — the whole journey, per person, at the
+ * cheap end of its band — so that every other row's distance from it is the
+ * price of the comfort, the protection and the hours it buys instead.
+ *
+ * Derived from the rows already priced, so it never costs a fare call.
+ */
+export function cheapestFloor<T extends { price: OptionPrice }>(
+  rows: readonly T[],
+): T | null {
+  let floor: T | null = null;
+  for (const row of rows) {
+    const eurPP = perPersonTotal(row.price)[0];
+    if (eurPP <= 0) continue;
+    if (!floor || eurPP < perPersonTotal(floor.price)[0]) floor = row;
+  }
+  return floor;
 }
 
 /* ------------------------------------------------------------------ */

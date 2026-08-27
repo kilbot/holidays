@@ -50,12 +50,16 @@ import {
 import {
   arbitrageVsBarcelona,
   barcelonaReference,
+  cheapestFloor,
   DEFAULT_RULES,
   groupByDefaultRules,
   heldBackBy,
   LONGHAUL_CAP_RANGE_EUR_PP,
+  perPersonTotal,
   priceOption,
+  TRAVELLERS,
   type DefaultRules,
+  type HeldBack,
   type LiveQuote,
   type OptionPrice,
 } from "@/lib/flights/pricing";
@@ -225,7 +229,7 @@ function PriceCap({ value, onChange }: { value: number; onChange: (value: number
           step={step}
           value={value}
           onChange={(event) => onChange(Number(event.target.value))}
-          aria-label="Most one person may pay for the whole journey"
+          aria-label="Max € per person — the most one person may pay for the whole journey"
           className="h-4 w-[112px] cursor-pointer accent-[var(--sb-accent)]"
         />
         <span className="text-[10px] whitespace-nowrap text-[var(--sb-faint)]">
@@ -257,7 +261,19 @@ function MiddleEastToggle({
     <div className="min-w-0">
       <p className="sb-label text-[9px]">Middle East</p>
       <div className="mt-1 flex h-8 items-center gap-2 rounded-lg border border-[var(--sb-line)] bg-[var(--sb-panel)] px-2.5">
-        <Switch id={id} checked={avoiding} onCheckedChange={onChange} className="shrink-0" />
+        {/* `label htmlFor` does not reliably name a button, and Base UI's
+            switch is one — so the name is stated here rather than inferred. */}
+        <Switch
+          id={id}
+          checked={avoiding}
+          onCheckedChange={onChange}
+          aria-label={
+            avoiding
+              ? "Avoiding Gulf transits — switch off to rank them with everything else"
+              : "Gulf transits included — switch on to hold them out of the ranking"
+          }
+          className="shrink-0"
+        />
         <label
           htmlFor={id}
           className="cursor-pointer text-[11.5px] font-semibold whitespace-nowrap text-[var(--sb-text)]"
@@ -303,14 +319,21 @@ function ActiveRules({
         {formatEur(rules.maxEurPP)}
       </span>{" "}
       per person
+      {/* The rows are priced for the couple, the rule is written per person.
+          Saying both once is cheaper than making anyone halve a number. */}
+      <span className="text-[var(--sb-faint)]">
+        {" "}
+        ({formatEur(rules.maxEurPP * TRAVELLERS)} for the two of them)
+      </span>
       {rules.avoidMiddleEast ? ", avoiding Middle East transits" : ", Middle East transits included"},
       ranked by {sort === "comfort" ? "comfort" : "price"}.
       {heldBack > 0 && (
         <>
           {" "}
           <span className="text-[var(--sb-faint)]">
-            {heldBack} more {heldBack === 1 ? "is" : "are"} greyed out below, each
-            saying which rule caught it.
+            {heldBack === 1
+              ? "1 more is greyed out below, with the reason on it."
+              : `${heldBack} more are greyed out below, each saying which rule caught it.`}
           </span>
         </>
       )}
@@ -498,6 +521,86 @@ function HeldBackBand({
 }
 
 /* ------------------------------------------------------------------ */
+/* The floor                                                           */
+/* ------------------------------------------------------------------ */
+
+/** "41h", "16h 40m" — an elapsed time, when a live quote gave one. */
+function formatElapsed(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest === 0 ? `${hours}h` : `${hours}h ${rest}m`;
+}
+
+/**
+ * The cheapest thing in the search, quoted as a ruler rather than an offer.
+ *
+ * Every row above carries its distance from this number, and a page full of
+ * "+€178" with no statement of what they are +€178 *from* is a page that has
+ * hidden its own baseline — so the reference is always here, even when the row
+ * it names is sitting in the ranking with a "= cheapest possible" chip on it.
+ * That is the whole point of having it: the ranking is comfort-first, and a
+ * comfort-first ranking owes the reader the price of the comfort.
+ *
+ * Deliberately not a row and deliberately not a button. It is styled as a
+ * reference line — no chevron, no hover, nothing to open — and it states its
+ * own catches in the same sentence as its price, because a floor that quoted
+ * its number without mentioning the elapsed hours and the Gulf transit that
+ * bought it would be an advert.
+ */
+function FloorReference({
+  option,
+  price,
+  heldBack,
+  inRanking,
+}: {
+  option: SearchOption;
+  price: OptionPrice;
+  heldBack: HeldBack | null;
+  inRanking: boolean;
+}) {
+  const eurPP = perPersonTotal(price)[0];
+  const airHours = option.comfort.sectors.reduce((total, s) => total + s.sector.hours, 0);
+  const reasons = [
+    ...(heldBack?.middleEast.length ? [`transits ${heldBack.middleEast.join(" + ")}`] : []),
+    ...(heldBack?.overCap ? ["over the price you set"] : []),
+  ];
+
+  return (
+    <section className="mt-2 rounded-xl border border-[var(--sb-line)] bg-[var(--sb-panel-2)] p-2.5 sm:p-3">
+      <p className="sb-label text-[9px]">Cheapest possible</p>
+      <p className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+        <span className="sb-num text-[15px] font-semibold text-[var(--sb-text)]">
+          {formatEur(eurPP)} pp
+        </span>
+        <span className="text-[12px] font-semibold text-[var(--sb-text)]">{option.carrier}</span>
+        <span className="sb-num text-[10.5px] text-[var(--sb-dim)]">
+          {option.origin} <span aria-hidden>→</span> {option.destination}
+        </span>
+        <span className="text-[10.5px] text-[var(--sb-dim)]">
+          {option.via.length > 0 ? `via ${option.via.join(" + ")}` : "nonstop"} ·{" "}
+          {price.durationMin !== null
+            ? formatElapsed(price.durationMin)
+            : `≈${Math.round(airHours)}h in the air`}{" "}
+          · comfort {option.comfort.score?.toFixed(1) ?? "unrated"}
+        </span>
+      </p>
+      <p className="mt-1 max-w-[80ch] text-[10.5px] leading-snug text-[var(--sb-dim)]">
+        The floor everything above is measured against — not a recommendation.
+        It is the cheapest result in this search with every rule switched off,
+        including the ones you set:{" "}
+        {reasons.length > 0
+          ? `this one ${reasons.join(" and ")}, so it is greyed out above.`
+          : inRanking
+            ? "this one happens to clear them both, so it is up in the ranking too, marked as the floor."
+            : "this one is not in the ranking."}{" "}
+        Each row&rsquo;s <span className="sb-num">+€</span> is what it costs to do
+        better than this.
+      </p>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* The page                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -632,6 +735,14 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     [rows, rules],
   );
 
+  /**
+   * The floor, and every row's distance from it. Derived from the same priced
+   * set as the ranking — no second search, no extra fare call.
+   */
+  const floor = useMemo(() => cheapestFloor(rows), [rows]);
+  const floorEurPP = floor ? perPersonTotal(floor.price)[0] : null;
+  const floorIsRanked = floor !== null && ranked.includes(floor);
+
   const cheapest = ranked.reduce(
     (best, row) => Math.min(best, row.price.totalEurCouple[0]),
     Number.POSITIVE_INFINITY,
@@ -731,6 +842,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               price={row.price}
               arbitrage={row.arbitrage}
               loading={row.loading}
+              floorEurPP={floorEurPP}
             />
           ))}
           {ranked.length === 0 && (
@@ -766,6 +878,7 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 price={row.price}
                 arbitrage={row.arbitrage}
                 loading={row.loading}
+                floorEurPP={floorEurPP}
                 heldBack={heldBackBy(row.option, row.price, rules)}
               />
             ))}
@@ -796,10 +909,20 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 price={row.price}
                 arbitrage={row.arbitrage}
                 loading={row.loading}
+                floorEurPP={floorEurPP}
                 heldBack={heldBackBy(row.option, row.price, rules)}
               />
             ))}
           </HeldBackBand>
+        )}
+
+        {floor && (
+          <FloorReference
+            option={floor.option}
+            price={floor.price}
+            heldBack={heldBackBy(floor.option, floor.price, rules)}
+            inRanking={floorIsRanked}
+          />
         )}
 
         <section className="mt-6 rounded-xl border border-[var(--sb-line)] bg-[var(--sb-panel)] p-3">
@@ -817,6 +940,16 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               0.55 × airline + 0.45 × seat, weighted by block hours, minus 1.0 for a Gulf transit,
               0.75 for metal that is a schedule intention rather than a booking, and 0.25 for every
               sector past the second. Open a row to see all of it.
+            </li>
+            <li>
+              <span className="font-semibold text-[var(--sb-text)]">
+                Every row says what it costs over the floor.
+              </span>{" "}
+              The cheapest result in the whole search — every rule switched off, however it routes
+              and however long it takes — is quoted at the foot of the page, and each row&rsquo;s
+              <span className="sb-num"> +€</span> is the per-person distance from it. That number is
+              the price of the comfort, the protected connection and the hours saved, said out loud
+              rather than left for anyone to work out.
             </li>
             <li>
               <span className="font-semibold text-[var(--sb-text)]">

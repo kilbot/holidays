@@ -18,6 +18,8 @@ import { describe, it } from "node:test";
 import {
   airlineScoreOf,
   comfortBand,
+  middleEastTransitsOf,
+  MIDDLE_EAST_TRANSIT_HUBS,
   rawScoreOf,
   scoreItinerary,
   seatScoreOf,
@@ -296,5 +298,25 @@ describe("bands", () => {
     assert.equal(comfortBand(6.9), "fair");
     assert.equal(comfortBand(5.5), "poor");
     assert.equal(comfortBand(null), "unrated");
+  });
+});
+
+describe("the Middle East hub set", () => {
+  it("is the three airports the Gulf adjustment names, and nothing else", () => {
+    // Read out of `gulfHubReliability.appliesTo` rather than typed beside it,
+    // so the −1.0 and the Flights page's exclusion cannot come to disagree.
+    // If a reworded justification empties this set, the exclusion silently
+    // stops working — which is what this line is here to catch.
+    assert.deepEqual([...MIDDLE_EAST_TRANSIT_HUBS].sort(), ["AUH", "DOH", "DXB"]);
+  });
+
+  it("does not count Istanbul — it is an ordinary via (kilbot/holidays#60)", () => {
+    assert.equal(MIDDLE_EAST_TRANSIT_HUBS.includes("IST"), false);
+    assert.deepEqual(middleEastTransitsOf(["SIN", "IST"]), []);
+  });
+
+  it("finds the excluded hub inside a multi-stop routing, in order flown", () => {
+    assert.deepEqual(middleEastTransitsOf(["MEL", "DOH"]), ["DOH"]);
+    assert.deepEqual(middleEastTransitsOf(["SIN"]), []);
   });
 });
