@@ -21,12 +21,18 @@ import type { Leg } from "@/lib/engine/types";
 import {
   buildRoute,
   greatCircle,
+  kmBetween,
   legEndsAtAirports,
   resolveEndpoint,
   routeArcsGeoJSON,
   routeStops,
   unmappedLegs,
 } from "@/lib/route-geo";
+import {
+  POLYLINE_MAX_POINTS,
+  roadBetween,
+  storedRoads,
+} from "@/lib/route-polylines";
 
 /** The reference Scenario, built exactly as the Plan page builds it. */
 function referencePlan() {
@@ -191,6 +197,108 @@ test("a placed pair is interpolated along the great circle", () => {
   const [arc] = routeArcsGeoJSON([leg({})]).features;
   assert.equal(arc.properties.approximate, false);
   assert.ok(arc.geometry.coordinates.length > 2);
+});
+
+/* ------------------------------------------------------------------ */
+/* Roads                                                               */
+/* ------------------------------------------------------------------ */
+
+test("a drive follows the road that was fetched for it", () => {
+  const road = roadBetween("mundaring", "perth");
+  assert.ok(road, "the Hills-to-Northbridge run is in route-polylines.json");
+
+  const [arc] = routeArcsGeoJSON([
+    leg({
+      id: "PER>PER@2026-12-17",
+      mode: "drive",
+      fromLocationId: "mundaring",
+      toLocationId: "perth",
+      from: "PER",
+      to: "PER",
+    }),
+  ]).features;
+
+  assert.equal(arc.properties.road, true);
+  assert.deepEqual(arc.geometry.coordinates, road);
+  assert.match(arc.properties.title, /by road/);
+  // A road bends. A great circle over 35 km would be a straight line with 97
+  // vertices on it, which is the thing this replaces.
+  assert.ok(road.length > 8, `${road.length} points`);
+});
+
+test("a road read backwards is the same road", () => {
+  const there = roadBetween("mundaring", "perth");
+  const back = roadBetween("perth", "mundaring");
+  assert.ok(there && back);
+  assert.deepEqual(back, [...there].reverse());
+});
+
+test("a drive with no road falls back to the plain line", () => {
+  // Rottnest is an island: Directions answers NoRoute, nothing is stored, and
+  // the ferry is drawn as the straight dotted line it should have been.
+  assert.equal(roadBetween("margaret-river", "rottnest"), null);
+
+  const [arc] = routeArcsGeoJSON([
+    leg({
+      id: "PER>PER@2026-12-22",
+      mode: "drive",
+      fromLocationId: "margaret-river",
+      toLocationId: "rottnest",
+      from: "PER",
+      to: "PER",
+    }),
+  ]).features;
+
+  assert.equal(arc.properties.road, false);
+  assert.doesNotMatch(arc.properties.title, /by road/);
+  const [first] = arc.geometry.coordinates;
+  const last = arc.geometry.coordinates[arc.geometry.coordinates.length - 1];
+  assert.ok(Math.abs(first[0] - 115.075) < 0.01, "starts at Margaret River");
+  assert.ok(Math.abs(last[0] - 115.52) < 0.01, "and ends on the island");
+});
+
+test("a flight is never given a road, even where one exists", () => {
+  const [arc] = routeArcsGeoJSON([
+    leg({
+      id: "PER>PER@2026-12-17",
+      mode: "flight",
+      fromLocationId: "mundaring",
+      toLocationId: "perth",
+      from: "PER",
+      to: "PER",
+    }),
+  ]).features;
+  assert.equal(arc.properties.road, false);
+});
+
+test("every stored road is one the map can use", () => {
+  const roads = storedRoads();
+  assert.ok(roads.length > 0, "the file is not empty");
+
+  for (const road of roads) {
+    assert.equal(road.source, "mapbox-directions");
+    assert.match(road.fetchedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(
+      road.coords.length > 1 && road.coords.length <= POLYLINE_MAX_POINTS,
+      `${road.pairKey} has ${road.coords.length} points`,
+    );
+
+    // The ends are the Locations the key names, give or take the snap onto the
+    // nearest road. A road that starts somewhere else is a stale file, which is
+    // the failure this whole approach trades a network call for.
+    const [fromId, toId] = road.pairKey.split(">");
+    for (const [locationId, at] of [
+      [fromId, road.coords[0]],
+      [toId, road.coords[road.coords.length - 1]],
+    ] as const) {
+      const end = resolveEndpoint(locationId, "PER");
+      assert.ok(end.at, `${locationId} is a placed Location`);
+      assert.ok(
+        kmBetween(end.at, at) < 5,
+        `${road.pairKey}: ${locationId} end is ${Math.round(kmBetween(end.at, at))} km off`,
+      );
+    }
+  }
 });
 
 test("great circles survive their two degenerate cases", () => {
