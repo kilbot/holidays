@@ -8,13 +8,18 @@
  * *placed* (on the Plan). Only the marks are stored — unseen is the absence of
  * a mark, so the payload stays small however long the sift runs.
  *
- * Persistence is localStorage, deliberately: there are no accounts, and a
- * sift session that survives a refresh is worth more than one that syncs.
- * Every access is wrapped — Safari private mode throws on read, a full quota
- * throws on write, and the drawer has to work regardless.
+ * Persistence is localStorage, deliberately: there are no accounts, and a sift
+ * session that survives a refresh is worth more than one that syncs. Every
+ * access is wrapped — Safari private mode throws on read, a full quota throws
+ * on write — and the marks stay in memory either way, so the drawer works with
+ * storage switched off. It just won't outlive the tab.
+ *
+ * The marks live in a module-level store rather than component state so the
+ * two mounted drawers (desktop rail, mobile overlay) and any other tab all
+ * read the same shortlist.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 export type ShortlistState = "unseen" | "interested" | "discarded" | "placed";
 
@@ -31,35 +36,92 @@ const MARKED_STATES: readonly MarkedState[] = [
   "discarded",
 ];
 
+const EMPTY: ShortlistMap = {};
+
 function isMarked(value: unknown): value is MarkedState {
   return (
     typeof value === "string" && MARKED_STATES.includes(value as MarkedState)
   );
 }
 
-function readStored(): ShortlistMap {
+function parse(raw: string | null): ShortlistMap {
+  if (!raw) return EMPTY;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
     const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return {};
+    if (!parsed || typeof parsed !== "object") return EMPTY;
     const clean: Record<string, MarkedState> = {};
     for (const [id, value] of Object.entries(parsed)) {
       if (isMarked(value)) clean[id] = value;
     }
     return clean;
   } catch {
-    return {};
+    return EMPTY;
   }
 }
 
-function writeStored(map: ShortlistMap): void {
+function readRaw(): string | null {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+    return window.localStorage.getItem(STORAGE_KEY);
   } catch {
-    // No storage, or no room in it. The session still works, it just won't
-    // outlive the tab.
+    return null;
   }
+}
+
+// useSyncExternalStore compares snapshots by reference, so the parsed map is
+// cached against the raw string it came from and only rebuilt when that
+// changes — including when another tab writes it.
+let cachedRaw: string | null = null;
+let cachedMarks: ShortlistMap = EMPTY;
+
+function getSnapshot(): ShortlistMap {
+  const raw = readRaw();
+  if (raw !== cachedRaw) {
+    cachedRaw = raw;
+    cachedMarks = parse(raw);
+  }
+  return cachedMarks;
+}
+
+function getServerSnapshot(): ShortlistMap {
+  return EMPTY;
+}
+
+const listeners = new Set<() => void>();
+
+function onStorageEvent(event: StorageEvent) {
+  if (event.key === null || event.key === STORAGE_KEY) {
+    for (const listener of listeners) listener();
+  }
+}
+
+function subscribe(listener: () => void): () => void {
+  if (listeners.size === 0) window.addEventListener("storage", onStorageEvent);
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+    if (listeners.size === 0) {
+      window.removeEventListener("storage", onStorageEvent);
+    }
+  };
+}
+
+/** Marking with the state an idea already has clears it back to unseen. */
+function setMark(id: string, state: MarkedState): void {
+  const current = getSnapshot();
+  const next = { ...current };
+  if (next[id] === state) delete next[id];
+  else next[id] = state;
+
+  const raw = JSON.stringify(next);
+  // Cache first: if storage is unavailable the session still gets its marks.
+  cachedRaw = raw;
+  cachedMarks = next;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, raw);
+  } catch {
+    cachedRaw = null;
+  }
+  for (const listener of listeners) listener();
 }
 
 export interface ShortlistCounts {
@@ -71,41 +133,17 @@ export interface ShortlistCounts {
 export interface Shortlist {
   marks: ShortlistMap;
   counts: ShortlistCounts;
-  /** Marking with the state an idea already has clears it back to unseen. */
   toggle: (id: string, state: MarkedState) => void;
-  clear: () => void;
+}
+
+export function countMarks(marks: ShortlistMap): ShortlistCounts {
+  const tally: ShortlistCounts = { interested: 0, placed: 0, discarded: 0 };
+  for (const state of Object.values(marks)) tally[state] += 1;
+  return tally;
 }
 
 export function useShortlist(): Shortlist {
-  // Starts empty so the server render and the first client render agree;
-  // the stored marks arrive on the effect that follows hydration.
-  const [marks, setMarks] = useState<ShortlistMap>({});
-
-  useEffect(() => {
-    const stored = readStored();
-    if (Object.keys(stored).length > 0) setMarks(stored);
-  }, []);
-
-  const toggle = useCallback((id: string, state: MarkedState) => {
-    setMarks((current) => {
-      const next = { ...current };
-      if (next[id] === state) delete next[id];
-      else next[id] = state;
-      writeStored(next);
-      return next;
-    });
-  }, []);
-
-  const clear = useCallback(() => {
-    setMarks({});
-    writeStored({});
-  }, []);
-
-  const counts = useMemo(() => {
-    const tally: ShortlistCounts = { interested: 0, placed: 0, discarded: 0 };
-    for (const state of Object.values(marks)) tally[state] += 1;
-    return tally;
-  }, [marks]);
-
-  return { marks, counts, toggle, clear };
+  const marks = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  // `setMark` is module-level, so the rows' memoisation holds across renders.
+  return { marks, counts: countMarks(marks), toggle: setMark };
 }

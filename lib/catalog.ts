@@ -11,7 +11,7 @@
  * filter pass over 413 rows is string and number comparisons only.
  */
 
-import { facetsForTags, type FacetId } from "@/lib/facets";
+import { facetsForTags, warningTagsFor, type FacetId } from "@/lib/facets";
 
 import catalogFile from "./catalog.json";
 
@@ -56,8 +56,8 @@ export interface CatalogIdea extends CatalogEntry {
   costEurMin: number;
   costEurMax: number;
   facets: FacetId[];
-  /** True when any caveat tag is present — drives the row's badge. */
-  hasWarning: boolean;
+  /** Caveat tags, most specific first. Empty for most entries. */
+  warnings: string[];
   /** name + region + tags + why_rated, lowercased, for substring search. */
   haystack: string;
 }
@@ -120,7 +120,7 @@ function derive(entry: CatalogEntry): CatalogIdea {
     costEurMin: Math.round(costAudMin * AUD_TO_EUR),
     costEurMax: Math.round(costAudMax * AUD_TO_EUR),
     facets,
-    hasWarning: facets.includes("warning"),
+    warnings: warningTagsFor(entry.tags),
     haystack: [entry.name, entry.region, entry.tags.join(" "), entry.why_rated]
       .join(" ")
       .toLowerCase(),
@@ -149,11 +149,20 @@ export function formatEurBand(idea: CatalogIdea): string {
   return `€${idea.costEurMin}–${idea.costEurMax}`;
 }
 
+/** What the row's caveat badge says, or null when there is nothing to flag. */
+export function warningLabel(idea: CatalogIdea): string | null {
+  const first = idea.warnings[0];
+  if (!first) return null;
+  if (first === "warning" || first === "negative-information") return "caveat";
+  return first.replace(/-/g, " ");
+}
+
 /** "2–4 days", "1 day", "half a year" for the Big Lap. */
 export function formatDays(idea: CatalogIdea): string {
   const { days_min: min, days_ideal: ideal } = idea;
   if (ideal === 0 && min === 0) return "no fixed length";
   if (ideal >= 90) return `${Math.round(ideal / 30)} months`;
-  if (min === ideal || min === 0) return ideal === 1 ? "1 day" : `${ideal} days`;
+  if (min === ideal || min === 0)
+    return ideal === 1 ? "1 day" : `${ideal} days`;
   return `${min}–${ideal} days`;
 }

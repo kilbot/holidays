@@ -283,6 +283,22 @@ const FACETS_BY_TAG: ReadonlyMap<string, readonly FacetId[]> = (() => {
   return index;
 })();
 
+/** The two caveat tags that say "there is a problem" without saying what. */
+const GENERIC_WARNINGS = new Set(["warning", "negative-information"]);
+
+/**
+ * The caveat tags an entry carries, specific ones first — the row badge shows
+ * the first, and "wrong season" is worth more than a bare "warning".
+ */
+export function warningTagsFor(tags: readonly string[]): string[] {
+  return FACET_WARNING.tags
+    .filter((tag) => tags.includes(tag))
+    .sort(
+      (a, b) =>
+        Number(GENERIC_WARNINGS.has(a)) - Number(GENERIC_WARNINGS.has(b)),
+    );
+}
+
 /** The facets an entry answers to, in FACETS order. */
 export function facetsForTags(tags: readonly string[]): FacetId[] {
   const hit = new Set<FacetId>();
