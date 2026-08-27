@@ -235,15 +235,20 @@
   opacity: 0.5;
 }
 /* The extra `.mapboxgl-map` is load-bearing: mapbox-gl.css is injected after
-   this stylesheet, so a bare class selector loses the tie on source order. */
+   this stylesheet, so a bare class selector loses the tie on source order.
+
+   The offsets are the docked strip's measured height plus its 16px inset:
+   246px at desktop widths, 317px on a phone where the deadline banner and the
+   date chips each take two lines. An opened week zoom scrolls inside its own
+   box rather than growing past these. */
 .mapboxgl-map .mapboxgl-ctrl-bottom-left,
 .mapboxgl-map .mapboxgl-ctrl-bottom-right {
   z-index: 1;
-  bottom: 152px;
+  bottom: 340px;
 }
 @media (min-width: 1024px) {
   .mapboxgl-map .mapboxgl-ctrl-bottom-left,
   .mapboxgl-map .mapboxgl-ctrl-bottom-right {
-    bottom: 168px;
+    bottom: 272px;
   }
 }
