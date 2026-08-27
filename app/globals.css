@@ -310,3 +310,70 @@
   z-index: 1;
   bottom: calc(var(--sb-strip-h) + 24px);
 }
+
+/* ------------------------------------------------------------------
+   Print.
+
+   The Ledger is not a screen that can also be printed — it *is* the
+   itinerary document, and the couple will want it on paper at the
+   airport, where there is no battery and no signal. So print is a
+   first-class rendering rather than a fallback.
+
+   The palette collapses to black on white, signal colours included: a
+   Warning that printed amber on an office laser is a grey smudge, so
+   on paper the Warnings carry their glyph and their weight instead of
+   their hue, and the Anchor rows carry the pin and a black rule.
+
+   The page's own boxes opt out of the shell's fixed-height frame with
+   `print:` utilities (see `app/(shell)/layout.tsx`); what is left here
+   is the palette, the sheet, and the two break rules that keep a Day
+   from being torn in half.
+   ------------------------------------------------------------------ */
+@media print {
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  :root {
+    --sb-ink: #ffffff;
+    --sb-panel: #ffffff;
+    --sb-panel-2: #ffffff;
+    --sb-panel-glass: #ffffff;
+    --sb-line: #b4b4b4;
+    --sb-text: #000000;
+    --sb-dim: #333333;
+    --sb-faint: #666666;
+    --sb-accent: #000000;
+    --sb-sea: #000000;
+    --sb-good: #000000;
+    --sb-warn: #000000;
+    --sb-over: #000000;
+  }
+
+  html,
+  body {
+    height: auto;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .sb-panel {
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  /* Content-visibility is a scrolling optimisation; off-screen means
+     unprinted, which on paper means missing pages. */
+  .sb-row,
+  .sb-tile {
+    content-visibility: visible;
+  }
+
+  /* A heading that prints as the last line of a sheet has orphaned the
+     block it names. */
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+}

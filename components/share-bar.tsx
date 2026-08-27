@@ -284,7 +284,7 @@ export function ShareBar() {
     // terms, so this clears it rather than covering it.
     <section
       ref={panel}
-      className="pointer-events-auto absolute right-4 bottom-[calc(var(--sb-strip-h)+3.5rem)] z-30 w-[248px] max-w-[calc(100vw-2rem)]"
+      className="pointer-events-auto absolute right-4 bottom-[calc(var(--sb-strip-h)+3.5rem)] z-30 w-[248px] max-w-[calc(100vw-2rem)] print:hidden"
     >
       <div className={cn("sb-panel", open ? "p-3" : "p-0")}>
         <button

@@ -30,7 +30,7 @@ export function ShellStage({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="relative min-h-0 min-w-0 flex-1"
+      className="relative min-h-0 min-w-0 flex-1 print:min-h-0 print:overflow-visible"
       style={onPlan ? undefined : NO_STRIP}
     >
       {children}
