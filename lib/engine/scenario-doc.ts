@@ -15,6 +15,7 @@
  * never a discarded Scenario, never a 400, and never a crash.
  */
 
+import { isLodgingTier } from "@/lib/engine/constants";
 import { EMPTY_INPUT } from "@/lib/engine/plan";
 import type { PlanInput } from "@/lib/engine/types";
 
@@ -127,7 +128,7 @@ export function parseInput(raw: unknown): PlanInput {
       raw.legModeOverrides,
       isString,
     ) as PlanInput["legModeOverrides"],
-    lodgingTiers: record(raw.lodgingTiers, isString) as PlanInput["lodgingTiers"],
+    lodgingTiers: record(raw.lodgingTiers, isLodgingTier),
     carOverrides: record(raw.carOverrides, isBoolean),
     eventOverrides: record(raw.eventOverrides, isEventKnob),
     fxStress: raw.fxStress === true,

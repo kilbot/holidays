@@ -33,7 +33,7 @@
 import {
   BUDGET_CEILING_EUR,
   DAILY_CAP_AUD,
-  MARKETS,
+  homeBaseDayDeltaAud,
 } from "@/lib/engine/constants";
 import type {
   CapsuleSpec,
@@ -314,21 +314,14 @@ function budgetWarnings(input: WarningInput): Warning[] {
 }
 
 /**
- * What one day moved from a paid city to a Home base saves.
+ * What one day moved from a paid city to a Home base saves, in euros.
  *
- * cost-baselines §4 calls this "the site's headline finding". It is quoted at
- * this Plan's own rates rather than the research's A$500 headline, because the
- * research computed it at the mid tier and this model runs at the floor.
+ * Quoted at this Plan's own rates and its own FX, never at cost-baselines §4's
+ * A$500 headline: that was a mid-tier figure, and #64 walked it down to A$185.
+ * The arithmetic lives in `constants.ts`, next to the rates it is about.
  */
 function paidCityDelta(fxRate: number): number {
-  const paid = MARKETS.sydney;
-  const home = MARKETS["home-base-city"];
-  const audDelta =
-    paid.lodging.airbnb.plan +
-    paid.food.plan +
-    paid.local.plan -
-    (home.lodging.airbnb.plan + home.food.plan + home.local.plan);
-  return audDelta * fxRate;
+  return homeBaseDayDeltaAud() * fxRate;
 }
 
 function datesOf(placement: Placement): string[] {

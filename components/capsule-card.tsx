@@ -25,13 +25,13 @@ import {
 import {
   capsuleState,
   capsuleWhere,
+  costLadder,
   deepCapsuleById,
   deepCapsulesMentioning,
   formatCapsuleDays,
   formatDayCount,
   formatEur,
   type Caveat,
-  type CostTier,
   type DeepCapsule,
 } from "@/lib/deep-capsules";
 import {
@@ -197,49 +197,62 @@ function MarkRow({
  * Deep-capsule sections
  * ---------------------------------------------------------------- */
 
+/**
+ * Floor → plan-on → ceiling.
+ *
+ * The rungs come from the Adventure rather than being assumed here, because
+ * they are not the same shape for every one: Rottnest has no cheaper version of
+ * itself, Sydney's cheap rung is a hostel twin and Tasmania's is a tent. The
+ * highlighted row is plan-on, which is the figure the Plan actually charges —
+ * the recalibration on #64 exists so this card and the Ledger stop quoting two
+ * different numbers for the same Adventure.
+ */
 function CostLadder({ capsule }: { capsule: DeepCapsule }) {
-  const rows: { label: string; count: number; tier: CostTier; ideal?: boolean }[] = [
-    { label: "Minimum", count: capsule.days.min, tier: capsule.cost.min },
-    { label: "Ideal", count: capsule.days.ideal, tier: capsule.cost.ideal, ideal: true },
-    { label: "Maximum", count: capsule.days.max, tier: capsule.cost.max },
-  ];
+  const rows = costLadder(capsule.cost);
 
   return (
     <div className="flex flex-col gap-1">
-      {rows.map((row) => (
-        <div
-          key={row.label}
-          className={cn(
-            "flex items-baseline gap-2 rounded-lg px-2 py-1.5",
-            row.ideal
-              ? "bg-[color-mix(in_srgb,var(--sb-accent)_12%,var(--sb-panel-2))]"
-              : "bg-[color-mix(in_srgb,var(--sb-panel-2)_60%,transparent)]",
-          )}
-        >
-          <span
+      {rows.map((row) => {
+        const planOn = row.label === "Plan on";
+        return (
+          <div
+            key={row.label}
             className={cn(
-              "w-[62px] shrink-0 text-[10.5px] font-semibold",
-              row.ideal ? "text-[var(--sb-accent)]" : "text-[var(--sb-dim)]",
+              "flex items-baseline gap-2 rounded-lg px-2 py-1.5",
+              planOn
+                ? "bg-[color-mix(in_srgb,var(--sb-accent)_12%,var(--sb-panel-2))]"
+                : "bg-[color-mix(in_srgb,var(--sb-panel-2)_60%,transparent)]",
             )}
           >
-            {row.label}
-          </span>
-          <span className="sb-num w-[74px] shrink-0 text-[11px] text-[var(--sb-dim)]">
-            {formatDayCount(row.count, capsule.days.unit)}
-          </span>
-          <span className="sb-num flex-1 text-right text-[12.5px] font-medium">
-            {formatEur(row.tier.eur)}
-          </span>
-          <span className="sb-num w-[92px] shrink-0 text-right text-[10px] text-[var(--sb-faint)]">
-            {row.tier.band
-              ? `€${row.tier.band[0].toLocaleString("en-GB")}–${row.tier.band[1].toLocaleString("en-GB")}`
-              : `A$${row.tier.aud.toLocaleString("en-GB")}`}
-          </span>
-        </div>
-      ))}
+            <span
+              className={cn(
+                "w-[74px] shrink-0 text-[10.5px] font-semibold",
+                planOn ? "text-[var(--sb-accent)]" : "text-[var(--sb-dim)]",
+              )}
+            >
+              {row.label}
+            </span>
+            <span className="sb-num w-[70px] shrink-0 text-[11px] text-[var(--sb-dim)]">
+              {formatDayCount(row.days, capsule.days.unit)}
+            </span>
+            <span className="sb-num flex-1 text-right text-[12.5px] font-medium">
+              {formatEur(row.eur)}
+            </span>
+            <span className="sb-num w-[92px] shrink-0 text-right text-[10px] text-[var(--sb-faint)]">
+              {row.band
+                ? `€${row.band[0].toLocaleString("en-GB")}–${row.band[1].toLocaleString("en-GB")}`
+                : `A$${row.aud.toLocaleString("en-GB")}`}
+            </span>
+          </div>
+        );
+      })}
       <p className="mt-1 text-[10px] leading-snug text-[var(--sb-faint)]">
-        Per couple, at the research&rsquo;s own A$1 = €0.61. The plan-on figure
-        first, the honest band second. {capsule.budgetShare}
+        Per couple, at the research&rsquo;s own A$1 = €0.61, and without the
+        flights that reach it. <span className="font-semibold">Plan on</span> is
+        what the Plan charges for these days;{" "}
+        <span className="font-semibold">as published</span> is the mid-tier
+        version the research first wrote up — a ceiling, not a target.{" "}
+        {capsule.budgetShare}
       </p>
     </div>
   );

@@ -30,9 +30,11 @@
  */
 
 import {
+  DEFAULT_LODGING_TIER,
   MARKETS,
   PUBLIC_HOLIDAYS,
   PUBLIC_HOLIDAY_SURCHARGE,
+  lodgingRate,
   peakFor,
   type LodgingTier,
   type Rate,
@@ -188,8 +190,13 @@ export function buildLedger(input: LedgerInput): Day[] {
     lastLocationId = location.returnsTo ?? locationId;
 
     const market = MARKETS[location.market];
+    // The tier is keyed by **Capsule id on an Adventure day and Location id on
+    // a Buffer day** — camping the Byron block and camping the sixteen Byron
+    // Buffer nights are two different decisions, and a Scenario says both.
     const tierKey = capsule ? capsule.id : locationId;
-    const tier: LodgingTier = input.lodgingTiers[tierKey] ?? "airbnb";
+    const asked: LodgingTier =
+      input.lodgingTiers[tierKey] ?? DEFAULT_LODGING_TIER;
+    const { tier, rate: tierRate } = lodgingRate(location.market, asked);
     const peak = peakFor(date, location.market);
     const holiday = PUBLIC_HOLIDAYS.includes(date);
     const surcharge = holiday
@@ -199,7 +206,9 @@ export function buildLedger(input: LedgerInput): Day[] {
     const lines: DayLine[] = [];
 
     if (!location.homeBase) {
-      const lodging = scale(market.lodging[tier], peak.lodging);
+      const lodging = scale(tierRate, peak.lodging);
+      const source =
+        tier === "camp" ? CAMP_SOURCE : "cost-floors-recalibrated.md §2";
       lines.push(
         line(
           `${date}:lodging`,
@@ -209,7 +218,7 @@ export function buildLedger(input: LedgerInput): Day[] {
           fxRate,
           true,
           peak.id === "none"
-            ? `${market.label} ${TIER_LABEL[tier]} rate, cost-baselines §3.1.`
+            ? `${market.label} ${TIER_LABEL[tier]} rate, ${source}.`
             : `${market.label} ${TIER_LABEL[tier]} rate ×${peak.lodging.plan} — ${peak.label}. ${peak.note}`,
         ),
       );
@@ -235,9 +244,15 @@ export function buildLedger(input: LedgerInput): Day[] {
         scale(scale(market.food, peak.food), surcharge),
         fxRate,
         true,
-        holiday
-          ? `Groceries-first basket, cost-baselines §${location.homeBase ? "2.1" : "3.3"}, plus the ${Math.round((PUBLIC_HOLIDAY_SURCHARGE.plan - 1) * 100)}% public-holiday surcharge Australian venues charge on this date.`
-          : `Groceries-first basket, cost-baselines §${location.homeBase ? "2.1" : "3.3"}.`,
+        [
+          `Groceries-first basket, cost-baselines §${location.homeBase ? "2.1" : "3.3"}.`,
+          market.foodNote,
+          holiday
+            ? `Plus the ${Math.round((PUBLIC_HOLIDAY_SURCHARGE.plan - 1) * 100)}% public-holiday surcharge Australian venues charge on this date.`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" "),
       ),
     );
 
@@ -345,9 +360,21 @@ export function buildLedger(input: LedgerInput): Day[] {
 
 const TIER_LABEL: Record<LodgingTier, string> = {
   hostel: "hostel twin",
+  camp: "powered site",
   airbnb: "cheap Airbnb",
   hotel: "hotel",
 };
+
+/**
+ * What a camping night costs, and the dependency it carries.
+ *
+ * The gear caveat is in the line's own note rather than a footnote somewhere
+ * else, because it is the thing that decides whether the rung is available at
+ * all: the WA blocks use the family's gear and the borrowed car, and every
+ * east-coast camping night needs gear flown in or hired.
+ */
+const CAMP_SOURCE =
+  "cost-floors-recalibrated.md §3.1 — a powered caravan-park site for two. Needs gear: WA borrows the family's, and every east-coast night needs it flown in (~€30–60 a Leg in checked bags) or hired. Nothing in a caravan park is quiet at Christmas–January; the tier buys money, not calm";
 
 export { TIER_LABEL };
 

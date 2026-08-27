@@ -8,7 +8,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { AUD_TO_EUR, AUD_TO_EUR_STRESS, MARKETS } from "@/lib/engine/constants";
+import {
+  AUD_TO_EUR,
+  AUD_TO_EUR_STRESS,
+  lodgingRate,
+} from "@/lib/engine/constants";
 import { buildPlan } from "@/lib/engine/plan";
 import { cents } from "@/lib/engine/ledger";
 import { FIXED, FIXTURES, WINDOWED, input } from "@/lib/engine/__tests__/fixtures";
@@ -57,7 +61,7 @@ test("the peak multiplier hits only the nights it covers", () => {
     `NYE lodging (€${nye}) should be more than double an ordinary January night (€${after})`,
   );
 
-  const sydneyAirbnb = MARKETS.sydney.lodging.airbnb.plan;
+  const sydneyAirbnb = lodgingRate("sydney", "airbnb").rate.plan;
   assert.equal(nye, cents(sydneyAirbnb * 2.5 * AUD_TO_EUR));
   // 2 January falls in the school-holiday rule, ×1.2.
   assert.equal(after, cents(sydneyAirbnb * 1.2 * AUD_TO_EUR));
