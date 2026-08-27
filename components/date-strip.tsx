@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { AlarmClock, ChevronDown, TriangleAlert } from "lucide-react";
 
 import { daysUntil, useToday } from "@/lib/countdown";
@@ -461,6 +468,7 @@ export function DateStrip() {
   const { plan, moveRange } = usePlan();
   const [openWeek, setOpenWeek] = useState<string | null>(null);
   const strip = useRef<HTMLElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
 
   const range = { start: plan.startDate, end: plan.endDate };
   // Week ids are positional, so a range change can leave the open one pointing
@@ -488,23 +496,37 @@ export function DateStrip() {
    * stays as the first-paint fallback, and is restored on unmount for the pages
    * that have no strip at all.
    */
-  useEffect(() => {
+  const publish = useCallback(() => {
     const node = strip.current;
     if (!node) return;
-    const publish = () => {
-      document.documentElement.style.setProperty(
-        "--sb-strip-h",
-        `${Math.round(node.getBoundingClientRect().height)}px`,
-      );
-    };
-    publish();
+    document.documentElement.style.setProperty(
+      "--sb-strip-h",
+      `${Math.round(node.getBoundingClientRect().height)}px`,
+    );
+  }, []);
+
+  // After every render, before paint: opening or closing a week is a render of
+  // this component, so this is the path that actually matters and it is
+  // synchronous with the change. A ResizeObserver alone was not enough — the
+  // strip is `position: absolute` with only a bottom edge pinned, and the
+  // observer did not see it grow upwards.
+  useLayoutEffect(publish);
+
+  // And for the resizes no render of ours causes: the window, a font settling,
+  // the trip rail rewrapping. Observed on the panel rather than the positioned
+  // section, because that is an ordinary in-flow box.
+  useEffect(() => {
+    const node = panel.current;
+    if (!node) return;
     const observer = new ResizeObserver(publish);
     observer.observe(node);
+    window.addEventListener("resize", publish);
     return () => {
       observer.disconnect();
+      window.removeEventListener("resize", publish);
       document.documentElement.style.removeProperty("--sb-strip-h");
     };
-  }, []);
+  }, [publish]);
 
   // Escape closes the week, as it does the Capsule card and the globe popups.
   // The close control shrank to a chip in #56, so the keyboard way out matters
@@ -525,16 +547,28 @@ export function DateStrip() {
   );
 
   return (
+    // The strip grows upwards when a week opens, and `--sb-strip-max` is
+    // where it stops: the band above it belongs to the cost HUD, the globe's
+    // controls and the corner pills, and below that the globe keeps the rest.
+    // Past the ceiling the week zoom is the part that gives — it is the one
+    // piece here that already scrolls inside itself.
     <section
       ref={strip}
-      className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20"
+      className="pointer-events-auto absolute right-4 bottom-4 left-4 z-20 flex max-h-[var(--sb-strip-max)]"
     >
-      <div className="sb-panel px-3 py-2.5">
+      <div
+        ref={panel}
+        className="sb-panel flex min-h-0 w-full flex-col px-3 py-2.5"
+      >
         {/* One header line: the dates, the totals, the deadline chip and the
             legend. Before #36 the deadlines had a banner of their own above
             this row; folding them in is most of the height the strip gave
             back. */}
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+        {/* Everything but the week zoom is `shrink-0`: the zoom is the only
+            part of the strip that scrolls inside itself, so it is the only
+            part that may give when the strip hits its ceiling. Without this a
+            short screen sliced the week cells in half instead. */}
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <DateChip
               label="Leaving"
@@ -582,16 +616,18 @@ export function DateStrip() {
           <Legend />
         </div>
 
-        <TripRail
-          startDate={range.start}
-          endDate={range.end}
-          onChange={change}
-        />
+        <div className="shrink-0">
+          <TripRail
+            startDate={range.start}
+            endDate={range.end}
+            onChange={change}
+          />
+        </div>
 
         {warnings.length > 0 && (
           <p
             className={cn(
-              "mb-2 flex items-start gap-1.5 text-[10px] leading-snug",
+              "mb-2 flex shrink-0 items-start gap-1.5 text-[10px] leading-snug",
               warnings.some((warning) => warning.tone === "over")
                 ? "text-[var(--sb-over)]"
                 : "text-[var(--sb-warn)]",
@@ -608,7 +644,7 @@ export function DateStrip() {
             phone, and squeezing them would cost the place names. Above `lg`
             they all fit, and overflow goes back to visible so the weather
             popovers are not clipped by the scroll container. */}
-        <ul className="sb-scroll flex gap-1 overflow-x-auto pb-0.5 lg:overflow-x-visible">
+        <ul className="sb-scroll flex shrink-0 gap-1 overflow-x-auto pb-0.5 lg:overflow-x-visible">
           {plan.weeks.map((week) => (
             <WeekCell
               key={week.id}

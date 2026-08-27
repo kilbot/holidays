@@ -322,10 +322,28 @@
     calc(var(--sb-strip-h) + 6.75rem),
     calc(100% - 3.25rem)
   );
+
+  /* The band at the top of the stage the date strip may never take.
+
+     An opened week grows the strip upwards, and on a 375×812 phone it
+     grew until it had 68% of the screen and the pill line had been
+     pushed onto the cost HUD (#56). This is where it stops. The reserve
+     is what has to fit above it, measured rather than guessed: the cost
+     HUD at rest (85px), the globe's control stack, the corner pill line
+     that sits between them and the strip, Mapbox's own logo and
+     attribution, and the gaps. The globe keeps everything below it —
+     320px of it on that phone, where it had 222px. */
+  --sb-strip-max: calc(100% - 20rem);
 }
 @media (min-width: 1024px) {
   :root {
     --sb-strip-h: 162px;
+    /* More is reserved from `lg` up, not less: on a phone the globe's
+       control stack is tucked into the free top-left corner, but from
+       here it rejoins the right-hand column and has to fit between the
+       cost HUD and the pill line. 26rem is what holds all three with a
+       week open on the shortest laptop the site targets, 1280×800. */
+    --sb-strip-max: calc(100% - 27rem);
   }
 }
 

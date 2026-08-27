@@ -607,8 +607,10 @@ export function WeekZoom({
       aria-label={`${week.label} — day view`}
       // A ceiling rather than a height: most weeks come in well under it, and
       // the ones that do not scroll inside their own box rather than pushing
-      // the globe off the screen.
-      className="sb-scroll-seen mt-2 max-h-[min(34vh,320px)] overflow-y-auto rounded-xl border border-[color-mix(in_srgb,var(--sb-accent)_28%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-panel-2)_45%,transparent)] p-2"
+      // the globe off the screen. `min-h-0` is what lets the strip's own
+      // ceiling squeeze this further on a short screen — it is the flexible
+      // part of the strip, because it is the part that already scrolls.
+      className="sb-scroll-seen mt-2 max-h-[min(34vh,320px)] min-h-0 shrink overflow-y-auto rounded-xl border border-[color-mix(in_srgb,var(--sb-accent)_28%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-panel-2)_45%,transparent)] p-2"
     >
       {/* One line of chrome for the whole panel: what week this is, what it
           costs, and the way out. Before #56 the label and a full-width CLOSE

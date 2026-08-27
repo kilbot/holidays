@@ -40,7 +40,7 @@ function ControlButton({
       aria-label={label}
       title={label}
       className={cn(
-        "flex size-12 cursor-pointer items-center justify-center text-[var(--sb-dim)]",
+        "flex size-11 cursor-pointer items-center justify-center text-[var(--sb-dim)] lg:size-12",
         "transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)]",
         "focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px]",
         "focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none",
@@ -64,11 +64,21 @@ export function GlobeControls({
   onFrameRoute,
 }: GlobeControlsProps) {
   return (
-    // Centred on the globe the traveller can actually see, not on the stage:
-    // the bottom of the stage is the date strip, and half of it again is an
-    // opened week. Riding the strip's live height keeps the stack off the share
-    // pill and off the week panel at every breakpoint (#56).
-    <div className="pointer-events-auto absolute top-[calc(50%-var(--sb-strip-h)/2)] right-3 z-20 flex -translate-y-1/2 flex-col gap-2">
+    <div
+      className={cn(
+        "pointer-events-auto absolute z-20 flex flex-col gap-1.5 lg:gap-2",
+        // On a phone the right-hand column belongs to the cost HUD, which
+        // spans most of the width at the top, so the stack takes the free
+        // top-left corner. From `lg` it rejoins the right-hand column and
+        // rides the share pill: the strip publishes its live height, the pill
+        // clears the strip and Mapbox's chrome, and this clears the pill. One
+        // chain, so an opened week slides the whole column up together
+        // instead of burying it (#56). Not centred on the stage — with a week
+        // open the middle of the stage is the middle of the date strip.
+        "top-4 left-3",
+        "lg:right-3 lg:bottom-[calc(var(--sb-pill-bottom)+3rem)] lg:left-auto lg:top-auto",
+      )}
+    >
       {/* Two panels, not three buttons in one: zooming is continuous and
           framing is a jump, and the gap says so without a caption. */}
       <div className="sb-panel flex flex-col divide-y divide-[var(--sb-line)] overflow-hidden">
