@@ -25,7 +25,7 @@
  * comfort-first. Comfort-first is a ranking, not a blindfold.
  */
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Pin } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 
 import { formatEur, formatEurCompact } from "@/lib/engine";
@@ -729,6 +729,64 @@ function AlternateDays({
 }
 
 /* ------------------------------------------------------------------ */
+/* Pinning                                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Remember this quote, on this day (kilbot/holidays#68).
+ *
+ * A sibling of the disclosure button rather than a child of it — a button
+ * inside a button is invalid HTML and, worse, ambiguous to a keyboard: the two
+ * things this row can do are *open* and *watch*, and they are different actions
+ * with different consequences.
+ *
+ * Visible at rest rather than on hover, faintly. A pin that only appeared under
+ * the pointer would be invisible on a phone and invisible to anyone tabbing,
+ * and the whole feature is a memory aid for someone who has already forgotten
+ * something once.
+ */
+function PinButton({
+  pinned,
+  disabled,
+  label,
+  onToggle,
+}: {
+  pinned: boolean;
+  /** The watchlist is full. The row says which, in the tooltip. */
+  disabled: boolean;
+  /** "BCN → PER on 12 Dec 2026" — what is being watched, for a screen reader. */
+  label: string;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      disabled={disabled && !pinned}
+      aria-pressed={pinned}
+      aria-label={pinned ? `Stop watching ${label}` : `Watch ${label}`}
+      title={
+        pinned
+          ? "Watching this quote. Click to stop."
+          : disabled
+            ? "The watchlist is full — unpin something first."
+            : "Watch this quote: it goes to the top of this page with the price it had today."
+      }
+      className={cn(
+        "mt-2.5 mr-2.5 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border transition-colors motion-reduce:transition-none sm:mt-3 sm:mr-3",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]",
+        pinned
+          ? "border-[color-mix(in_srgb,var(--sb-accent)_45%,transparent)] bg-[color-mix(in_srgb,var(--sb-accent)_14%,transparent)] text-[var(--sb-accent)] hover:bg-[color-mix(in_srgb,var(--sb-accent)_22%,transparent)]"
+          : "border-transparent text-[var(--sb-faint)] hover:border-[var(--sb-line)] hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)]",
+        "disabled:cursor-default disabled:opacity-40 disabled:hover:border-transparent disabled:hover:bg-transparent disabled:hover:text-[var(--sb-faint)]",
+      )}
+    >
+      <Pin className={cn("size-4", pinned && "fill-current")} aria-hidden />
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* The row                                                             */
 /* ------------------------------------------------------------------ */
 
@@ -764,9 +822,34 @@ export interface OptionRowProps {
   datePrices?: ReadonlyMap<string, number>;
   /** Re-anchor the whole search on another day. Absent means the strip is read-only. */
   onPickDate?: (date: string) => void;
+  /**
+   * The watchlist, as three things the row needs to know. Absent means no pin
+   * action at all — which is how the held-back bands and any future read-only
+   * rendering of a row opt out without a flag of their own.
+   */
+  pinned?: boolean;
+  /** True when the watchlist is at its cap, so an unpinned row can say so. */
+  watchlistFull?: boolean;
+  onTogglePin?: () => void;
+  /**
+   * The couple came here from the watchlist and this is the row they meant.
+   * Rendered as a ring rather than a scroll: the page owns the scrolling,
+   * because only it knows whether the row is inside a band that has to open
+   * first.
+   */
+  highlighted?: boolean;
 }
 
 const NO_PRICES: ReadonlyMap<string, number> = new Map();
+
+/**
+ * The DOM id a row answers to, so the watchlist can jump to it.
+ *
+ * Exported rather than composed at both ends by hand: two string templates that
+ * have to agree, in two files, is exactly the pair that drifts — and the
+ * failure mode is a silent one, a button that scrolls nowhere.
+ */
+export const rowElementId = (optionId: string): string => `flight-option-${optionId}`;
 
 export function FlightOptionRow({
   option,
@@ -778,6 +861,10 @@ export function FlightOptionRow({
   date = null,
   datePrices = NO_PRICES,
   onPickDate,
+  pinned = false,
+  watchlistFull = false,
+  onTogglePin,
+  highlighted = false,
 }: OptionRowProps) {
   const excluded = heldBack !== null;
   const overFloor =
@@ -788,19 +875,23 @@ export function FlightOptionRow({
 
   return (
     <li
+      id={rowElementId(option.id)}
       className={cn(
         "sb-row overflow-hidden rounded-xl border",
         excluded
           ? "border-dashed border-[var(--sb-line)] bg-[color-mix(in_srgb,var(--sb-panel)_55%,transparent)]"
           : "border-[var(--sb-line)] bg-[var(--sb-panel)]",
+        highlighted &&
+          "outline-2 -outline-offset-1 outline-[var(--sb-accent)] transition-[outline-color] duration-500 motion-reduce:transition-none",
       )}
     >
+      <div className="flex items-start">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex w-full cursor-pointer items-start gap-3 p-2.5 text-left transition-colors hover:bg-[var(--sb-panel-2)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none sm:p-3"
+        className="flex min-w-0 flex-1 cursor-pointer items-start gap-3 p-2.5 text-left transition-colors hover:bg-[var(--sb-panel-2)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none sm:p-3"
       >
         <ComfortBadge score={option.comfort.score} />
 
@@ -908,6 +999,18 @@ export function FlightOptionRow({
           />
         </span>
       </button>
+
+        {onTogglePin && (
+          <PinButton
+            pinned={pinned}
+            disabled={watchlistFull}
+            label={`${option.origin} to ${option.destination} on ${
+              date ? formatDayYear(date) : "this day"
+            }, ${option.carrier}`}
+            onToggle={onTogglePin}
+          />
+        )}
+      </div>
 
       {open && (
         <div

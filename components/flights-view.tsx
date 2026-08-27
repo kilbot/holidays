@@ -81,10 +81,19 @@ import {
   WEIGHT_EVIDENCE,
 } from "@/lib/flights/comfort";
 import { monthlyResetLabel, type FareQuota } from "@/lib/flights/quota";
+import type { FareSeries } from "@/lib/flights/history";
+import {
+  isPinned,
+  pinIdOf,
+  pinOf,
+  type FlightPin,
+} from "@/lib/flights/watchlist";
 import { formatEur } from "@/lib/engine";
+import { useWatchlist } from "@/lib/engine/scenarios";
 import { formatDayYear } from "@/lib/trip-dates";
 import { FareDateField, type CoverageByDate, type DayCoverage } from "@/components/fare-dates";
-import { FlightOptionRow } from "@/components/flight-option";
+import { FlightOptionRow, rowElementId } from "@/components/flight-option";
+import { FlightWatchlist, seriesKeyOf } from "@/components/flight-watchlist";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
@@ -885,6 +894,36 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
   const [quota, setQuota] = useState<FareQuota | null>(null);
   /** Which route-days already hold a fare. One read per origin, no fare calls. */
   const [coverage, setCoverage] = useState<CoverageReport | null>(null);
+  /**
+   * The stored price line behind each pin, keyed `"BCN-PER:2026-12-12"`.
+   *
+   * Read once per watchlist shape from `/api/fares/history`, which cannot reach
+   * the fare API — pinning twenty flights must not turn a page load into twenty
+   * metered calls (kilbot/holidays#68).
+   */
+  /**
+   * The answer, stamped with the question it answers.
+   *
+   * One piece of state rather than a map plus a loading flag: "still reading"
+   * is exactly "the watchlist has changed since this answer came back", and
+   * deriving it from the stamp keeps every write to this state inside the
+   * fetch's own callback, where a `setState` belongs.
+   */
+  const [watch, setWatch] = useState<{
+    query: string;
+    series: ReadonlyMap<string, FareSeries>;
+  }>(() => ({ query: "", series: new Map() }));
+  /**
+   * The row the couple jumped to from the watchlist.
+   *
+   * A ring on the row, not just a scroll: arriving in the middle of ninety rows
+   * with no idea which one was meant is the failure this exists to prevent. The
+   * counter is what makes jumping to the same pin twice do something the second
+   * time.
+   */
+  const [jump, setJump] = useState<{ optionId: string; seq: number } | null>(null);
+
+  const { pins, pin, unpin, full: watchlistFull } = useWatchlist();
 
   const options = leg === "outbound" ? outbound : returns;
   const date = leg === "outbound" ? outboundDate : returnDate;
@@ -1067,6 +1106,90 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     return () => controller.abort();
   }, [pairs, date, refreshQuota]);
 
+  /* ---------------------------------------------------------------- */
+  /* The watchlist                                                     */
+  /* ---------------------------------------------------------------- */
+
+  /**
+   * One request for the whole watchlist, re-read only when the watchlist
+   * changes.
+   *
+   * Deliberately not keyed on the searched date: a pin is about *its own* day,
+   * and re-reading twenty price lines every time somebody steps the date strip
+   * would be a page that got slower the more the couple used it. The endpoint
+   * cannot spend a fare call, so this is KV reads and an edge cache.
+   */
+  const watchQuery = useMemo(() => pins.map(seriesKeyOf).join(","), [pins]);
+  const watchLoading = watchQuery !== "" && watch.query !== watchQuery;
+
+  useEffect(() => {
+    if (!watchQuery) return;
+
+    const controller = new AbortController();
+    const settle = (series: ReadonlyMap<string, FareSeries>) => {
+      if (!controller.signal.aborted) setWatch({ query: watchQuery, series });
+    };
+
+    void fetch(`/api/fares/history?pin=${watchQuery}`, { signal: controller.signal })
+      .then((response) =>
+        response.ok ? (response.json() as Promise<{ series?: FareSeries[] }>) : null,
+      )
+      .then((body) =>
+        settle(new Map((body?.series ?? []).map((line) => [`${line.route}:${line.date}`, line]))),
+      )
+      // Unreachable store, offline tab, deployment protection. The rows fall
+      // back to "nothing stored", which is what the page can honestly say —
+      // and the query is still stamped, so they stop saying "reading history".
+      .catch(() => settle(new Map()));
+
+    return () => controller.abort();
+  }, [watchQuery]);
+
+  /**
+   * Pin this row as it stands, or unpin it.
+   *
+   * The whole quote is copied — fare, source, total, comfort — because the pin
+   * is a record of what the couple was looking at when they decided it was
+   * worth remembering. Re-deriving any of it later, at a different weight or a
+   * different fare, would answer a different question.
+   */
+  const togglePin = useCallback(
+    (option: SearchOption, price: OptionPrice) => {
+      const id = pinIdOf(leg, option.id, date);
+      if (isPinned(pins, id)) {
+        unpin(id);
+        return;
+      }
+      pin(
+        pinOf({
+          leg,
+          optionId: option.id,
+          from: option.origin,
+          to: option.destination,
+          date,
+          carrier: option.carrier,
+          // The low end of the band: identical to the quote when there is one,
+          // and the research's "from" price when there is not — with
+          // `fareSource` saying which, so the drift knows not to compare them.
+          fareEurPP: price.fareEurPP[0],
+          fareSource: price.fareSource,
+          totalEurCouple: price.totalEurCouple[0],
+          comfort: option.comfort.score,
+          pinnedAt: new Date().toISOString(),
+        }),
+      );
+    },
+    [leg, date, pins, pin, unpin],
+  );
+
+  /** Re-anchor the whole search on a pin's leg and day, and point at its row. */
+  const jumpToPin = useCallback((entry: FlightPin) => {
+    setLeg(entry.leg);
+    if (entry.leg === "outbound") setOutboundDate(entry.date);
+    else setReturnDate(entry.date);
+    setJump((current) => ({ optionId: entry.optionId, seq: (current?.seq ?? 0) + 1 }));
+  }, []);
+
   const priceFor = useCallback(
     (option: SearchOption): OptionPrice => {
       const quote = option.searchable
@@ -1146,6 +1269,38 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
     Number.POSITIVE_INFINITY,
   );
 
+  /**
+   * A pin whose row is in a held-back band opens the band on the way there.
+   *
+   * Watching a Gulf routing or something over the price cap is an entirely
+   * reasonable thing to do — that is what the bands are *for* — and a jump
+   * button that scrolled to a row hidden behind a collapsed disclosure would be
+   * a dead button.
+   *
+   * Adjusted during render rather than in an effect: React's own guidance for
+   * state that follows a changing input, and the pattern `PreviewNotice` uses.
+   * It fires once per jump, so the couple can still close the band afterwards
+   * without the page arguing with them.
+   */
+  const [jumpHandled, setJumpHandled] = useState(0);
+  if (jump && jump.seq !== jumpHandled) {
+    setJumpHandled(jump.seq);
+    const band = viaMiddleEast.some((row) => row.option.id === jump.optionId)
+      ? "middleEast"
+      : overCap.some((row) => row.option.id === jump.optionId)
+        ? "overCap"
+        : null;
+    if (band && !peek[band]) setPeek({ ...peek, [band]: true });
+  }
+
+  /* And the scroll, once that row is actually in the document. */
+  useEffect(() => {
+    if (!jump) return;
+    document
+      .getElementById(rowElementId(jump.optionId))
+      ?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [jump, peek]);
+
   /** Every control change is a new search as far as the bands are concerned. */
   const resetPeek = () => setPeek({ middleEast: false, overCap: false });
 
@@ -1167,6 +1322,14 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
           </p>
           <QuotaMeter quota={quota} />
         </header>
+
+        <FlightWatchlist
+          pins={pins}
+          series={watch.series}
+          loading={watchLoading}
+          onJump={jumpToPin}
+          onUnpin={unpin}
+        />
 
         <div className="mt-5 flex flex-wrap items-start gap-x-6 gap-y-3">
           <Segmented<Leg>
@@ -1260,6 +1423,10 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
               date={date}
               datePrices={pricesFor(row.option)}
               onPickDate={pickDate}
+              pinned={isPinned(pins, pinIdOf(leg, row.option.id, date))}
+              watchlistFull={watchlistFull}
+              onTogglePin={() => togglePin(row.option, row.price)}
+              highlighted={jump?.optionId === row.option.id}
             />
           ))}
           {ranked.length === 0 && (
@@ -1300,6 +1467,10 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 date={date}
                 datePrices={pricesFor(row.option)}
                 onPickDate={pickDate}
+                pinned={isPinned(pins, pinIdOf(leg, row.option.id, date))}
+                watchlistFull={watchlistFull}
+                onTogglePin={() => togglePin(row.option, row.price)}
+                highlighted={jump?.optionId === row.option.id}
               />
             ))}
           </HeldBackBand>
@@ -1334,6 +1505,10 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
                 date={date}
                 datePrices={pricesFor(row.option)}
                 onPickDate={pickDate}
+                pinned={isPinned(pins, pinIdOf(leg, row.option.id, date))}
+                watchlistFull={watchlistFull}
+                onTogglePin={() => togglePin(row.option, row.price)}
+                highlighted={jump?.optionId === row.option.id}
               />
             ))}
           </HeldBackBand>
