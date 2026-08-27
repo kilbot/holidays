@@ -13,11 +13,25 @@
  * came from. #10's progressive disclosure is the law here, not a preference:
  * plan-on on the surface, everything honest one click down.
  *
+ * ## Places, and the journeys between them (#53)
+ *
+ * The page alternates two kinds of row. A **block** is a run of days in one
+ * place, and its subtotal is what the couple spends *there* — living, the car,
+ * the Event spend. A **transit row** is a Leg: the flight or the drive that gets
+ * them to the next block, on its own band between the two, with the fare on it.
+ *
+ * That split is the whole of #53. The engine charges a Leg's fare to the Day it
+ * is travelled — it has to, the Plan's total is the sum of its Days — and that
+ * Day is the first day of the place being arrived in, so a block that simply
+ * summed its Days billed Margaret River for the crossing from Valencia. Getting
+ * somewhere is not being there, and now the page says so.
+ *
  * Three things this page deliberately does **not** do:
  *
- * - **It does not price anything.** Every figure is `day.totalEur` or a sum of
+ * - **It does not price anything.** Every figure is a `Day` line or a sum of
  *   them (`lib/engine/blocks.ts`), so the sections reconcile with the roll-up by
- *   construction rather than by agreement.
+ *   construction rather than by agreement: block subtotals plus transit rows are
+ *   the plan-on figure, to the cent.
  * - **It does not draw the Budget.** The plan-on total and the worst case are in
  *   the header as an orientation, and the link to /budget is the whole of the
  *   money view. Two pages drawing the same burn-down is two pages drifting.
@@ -27,19 +41,31 @@
  */
 
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
-import { ChevronRight, Pin, Plane, TriangleAlert } from "lucide-react";
+import { useMemo, useState, type ComponentType, type ReactNode } from "react";
+import {
+  ArrowRight,
+  Car,
+  ChevronRight,
+  Pin,
+  Plane,
+  Ship,
+  TrainFront,
+  TriangleAlert,
+} from "lucide-react";
 
 import {
   DAILY_CAP_AUD,
   describeLock,
   formatEur,
-  intoBlocks,
+  intoLedger,
   TIER_LABEL,
   type CapsuleSpec,
   type Day,
   type DayLine,
   type LedgerBlock,
+  type LedgerDay,
+  type LedgerTransit,
+  type LegMode,
   type Warning,
   type WarningKind,
 } from "@/lib/engine";
@@ -182,22 +208,27 @@ function whatOf(day: Day, capsule: CapsuleSpec | undefined) {
 }
 
 function DayRow({
-  day,
+  entry,
   capsule,
   capEur,
   warnings,
   open,
   onToggle,
 }: {
-  day: Day;
+  entry: LedgerDay;
   capsule: CapsuleSpec | undefined;
   capEur: number;
   warnings: Warning[];
   open: boolean;
   onToggle: () => void;
 }) {
+  const { day } = entry;
   const { text, of, anchor, transport } = whatOf(day, capsule);
   const overCap = day.livingEur > capEur;
+  // The fare left for the transit row above, so the row shows what the day cost
+  // in this place. Saying so on hover is the difference between a figure that
+  // reconciles and one that looks wrong (#53).
+  const lifted = entry.transitLines.reduce((total, line) => total + line.eur, 0);
 
   return (
     <li
@@ -313,32 +344,42 @@ function DayRow({
               : "text-[var(--sb-text)]",
           )}
           title={
-            overCap
-              ? `Living costs are €${Math.round(day.livingEur)}, over the A$${DAILY_CAP_AUD} / €${Math.round(capEur)} daily cap for a couple. Event spend and Legs sit outside it.`
-              : undefined
+            [
+              overCap
+                ? `Living costs are €${Math.round(day.livingEur)}, over the A$${DAILY_CAP_AUD} / €${Math.round(capEur)} daily cap for a couple. Event spend and Legs sit outside it.`
+                : null,
+              lifted > 0
+                ? `Spent here on the day. The €${Math.round(lifted).toLocaleString("en-GB")} fare travelled today is on the transit row, not in this block.`
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" ") || undefined
           }
         >
-          {formatEur(day.totalEur)}
+          {formatEur(entry.costEur)}
         </span>
       </button>
 
-      {open && <DayLines day={day} capsule={capsule} capEur={capEur} warnings={warnings} />}
+      {open && (
+        <DayLines entry={entry} capsule={capsule} capEur={capEur} warnings={warnings} />
+      )}
     </li>
   );
 }
 
 /** The drill-in: every line, its band, its source, and what is wrong with the Day. */
 function DayLines({
-  day,
+  entry,
   capsule,
   capEur,
   warnings,
 }: {
-  day: Day;
+  entry: LedgerDay;
   capsule: CapsuleSpec | undefined;
   capEur: number;
   warnings: Warning[];
 }) {
+  const { day } = entry;
   // The research's own all-in figure for the block, shown once — on the
   // Capsule's first Day — rather than on all five. It is a cross-check and not
   // an input (#10): it was quoted at mid-tier lodging and this model prices the
@@ -355,8 +396,11 @@ function DayLines({
         </p>
       )}
 
+      {/* Only the lines that stayed on the Day. The Leg fares travelled today
+          are drawn once, on the transit row that carries them, and listing them
+          here as well would put the same €3,800 in the ledger twice. */}
       <dl className="mt-1.5 flex flex-col gap-1.5">
-        {day.lines
+        {entry.lines
           .filter((line) => line.eur !== 0 || line.kind === "lodging")
           .map((line) => (
             <LedgerLine key={line.id} line={line} />
@@ -368,6 +412,13 @@ function DayLines({
         {day.livingEur > capEur ? " — over" : ""}. Event spend and Legs sit
         outside it.
         {day.lodgingTier !== "airbnb" && ` Lodging at ${TIER_LABEL[day.lodgingTier]}.`}
+        {entry.transitLines.map((line) => (
+          <span key={line.id}>
+            {" "}
+            The {line.label} fare, {formatEur(line.eur)}, is on its own transit
+            row — reaching a place is not part of what the place costs.
+          </span>
+        ))}
         {published && (
           <>
             {" "}
@@ -517,7 +568,7 @@ function BlockBand({
 
         <p
           className="sb-num ml-auto text-[12px] font-semibold whitespace-nowrap sm:text-[13.5px]"
-          title={`Band €${Math.round(block.bandEur[0]).toLocaleString("en-GB")}–${Math.round(block.bandEur[1]).toLocaleString("en-GB")} — the sum of this block's Day lines at their low and high.`}
+          title={`What ${block.days.length} day${block.days.length === 1 ? "" : "s"} in ${block.locationName} costs — living, the car and the Event spend. Getting here is the transit row above, not part of this. Band €${Math.round(block.bandEur[0]).toLocaleString("en-GB")}–${Math.round(block.bandEur[1]).toLocaleString("en-GB")}.`}
         >
           {formatEur(block.costEur)}
         </p>
@@ -535,6 +586,118 @@ function BlockBand({
 }
 
 /* ------------------------------------------------------------------ */
+/* One journey between blocks                                          */
+/* ------------------------------------------------------------------ */
+
+const MODE_ICON: Record<LegMode, ComponentType<{ className?: string }>> = {
+  flight: Plane,
+  drive: Car,
+  train: TrainFront,
+  ferry: Ship,
+};
+
+const MODE_LABEL: Record<LegMode, string> = {
+  flight: "Flight",
+  drive: "Drive",
+  train: "Train",
+  ferry: "Ferry",
+};
+
+/**
+ * Where the fare is quoted from, in the two words a row has space for.
+ *
+ * The same claim the Legs popup makes, and for the same reason: a live fare and
+ * a research band are different claims about the same number, and the couple is
+ * about to book on it.
+ */
+const PRICING_LABEL: Record<LedgerTransit["pricing"], string> = {
+  grid: "snapshot",
+  snapshot: "snapshot",
+  band: "estimate",
+  computed: "fuel",
+};
+
+/**
+ * A Leg, between the block it leaves and the block it reaches.
+ *
+ * The #33 prototype had these and the first Ledger lost them, which is how the
+ * crossing from Valencia ended up inside Margaret River. The band is
+ * deliberately unlike a place band — sea-tinted, hairline-ruled top and bottom,
+ * the route in mono — because it is not a section heading: it is a line item
+ * that happens to sit between sections, and it should read as the trip moving
+ * rather than as a new place starting.
+ */
+function TransitRow({ transit }: { transit: LedgerTransit }) {
+  const Mode = MODE_ICON[transit.mode];
+  const free = transit.costEur === 0;
+  const banded = transit.bandEur[0] !== transit.bandEur[1];
+
+  return (
+    <div
+      className={cn(
+        "my-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 border-y px-2 py-1.5 sm:px-3",
+        "border-[color-mix(in_srgb,var(--sb-sea)_28%,var(--sb-line))]",
+        "bg-[color-mix(in_srgb,var(--sb-sea)_11%,transparent)]",
+        "print:break-inside-avoid print:bg-transparent",
+      )}
+    >
+      <Mode
+        aria-hidden
+        className="size-3.5 shrink-0 self-center text-[var(--sb-sea)]"
+      />
+
+      <p className="flex min-w-0 items-baseline gap-1.5 text-[11.5px] leading-snug font-semibold text-[var(--sb-text)] sm:text-[12.5px]">
+        <span className="truncate">{transit.fromName}</span>
+        <ArrowRight
+          aria-hidden
+          className="size-3 shrink-0 self-center text-[var(--sb-faint)]"
+        />
+        <span className="truncate">{transit.toName}</span>
+      </p>
+
+      <p className="sb-num text-[10px] whitespace-nowrap text-[var(--sb-faint)]">
+        {transit.from === transit.to ? "" : `${transit.from}–${transit.to} · `}
+        {formatDay(transit.date)}
+      </p>
+
+      <p className="text-[10.5px] whitespace-nowrap text-[var(--sb-dim)]">
+        {MODE_LABEL[transit.mode]}
+        {transit.carrier && ` · ${transit.carrier}`}
+      </p>
+
+      <Chip
+        tone={transit.hydrated ? "good" : "neutral"}
+        title={transit.note}
+      >
+        {transit.hydrated ? "live fare" : PRICING_LABEL[transit.pricing]}
+      </Chip>
+
+      <p
+        className="sb-num ml-auto text-[12px] font-semibold whitespace-nowrap text-[var(--sb-sea)] sm:text-[13.5px]"
+        title={
+          free
+            ? transit.note
+            : `${transit.note}${banded ? ` Band €${Math.round(transit.bandEur[0]).toLocaleString("en-GB")}–${Math.round(transit.bandEur[1]).toLocaleString("en-GB")}.` : ""}`
+        }
+      >
+        {free ? (
+          <span className="text-[11px] font-medium text-[var(--sb-faint)]">
+            {/* The homeward crossing is the return half of the outbound
+                ticket, so the fare is carried there and this row is honestly
+                zero rather than quietly missing. */}
+            {transit.toLocationId === "origin"
+              ? "on the outbound ticket"
+              : "no fare"}
+          </span>
+        ) : (
+          formatEur(transit.costEur)
+        )}
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* The page                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -543,9 +706,9 @@ export function LedgerView() {
   const [openDates, setOpenDates] = useState<ReadonlySet<string>>(new Set());
   const [allOpen, setAllOpen] = useState(false);
 
-  const blocks = useMemo(
-    () => intoBlocks(plan.days, plan.warnings),
-    [plan.days, plan.warnings],
+  const rows = useMemo(
+    () => intoLedger(plan.days, plan.warnings, plan.legs),
+    [plan.days, plan.warnings, plan.legs],
   );
 
   const byDate = useMemo(() => {
@@ -645,7 +808,9 @@ export function LedgerView() {
               at is exactly the thing a printed sheet has to carry with it. */}
           <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--sb-line)] pt-2">
             <p className="text-[10.5px] text-[var(--sb-faint)]">
-              Plan-on figures, EUR per couple, at A$1 = €{rollUp.fxRate}.
+              Plan-on figures, EUR per couple, at A$1 = €{rollUp.fxRate}. A
+              place band is what its days cost on the ground; getting there is
+              the transit row above it.
               <span className="print:hidden">
                 {" "}
                 Open a day for its lines, bands and sources.
@@ -672,30 +837,43 @@ export function LedgerView() {
           </div>
         </header>
 
-        {blocks.map((block) => (
-          <section key={block.id} aria-label={`${block.locationName}, ${block.label}`}>
-            <BlockBand block={block} capsules={capsules} />
-            <ul>
-              {block.days.map((day) => (
-                <DayRow
-                  key={day.date}
-                  day={day}
-                  capsule={day.capsuleId ? capsules.get(day.capsuleId) : undefined}
-                  capEur={capEur}
-                  warnings={byDate.get(day.date) ?? []}
-                  open={allOpen || openDates.has(day.date)}
-                  onToggle={() => toggle(day.date)}
-                />
-              ))}
-            </ul>
-          </section>
-        ))}
+        {rows.map((row) =>
+          row.kind === "transit" ? (
+            <TransitRow key={row.id} transit={row.transit} />
+          ) : (
+            <section
+              key={row.id}
+              aria-label={`${row.block.locationName}, ${row.block.label}`}
+            >
+              <BlockBand block={row.block} capsules={capsules} />
+              <ul>
+                {row.block.days.map((entry) => (
+                  <DayRow
+                    key={entry.day.date}
+                    entry={entry}
+                    capsule={
+                      entry.day.capsuleId
+                        ? capsules.get(entry.day.capsuleId)
+                        : undefined
+                    }
+                    capEur={capEur}
+                    warnings={byDate.get(entry.day.date) ?? []}
+                    open={allOpen || openDates.has(entry.day.date)}
+                    onToggle={() => toggle(entry.day.date)}
+                  />
+                ))}
+              </ul>
+            </section>
+          ),
+        )}
 
         <p className="mt-6 border-t border-[var(--sb-line)] pt-3 text-[10.5px] leading-snug text-[var(--sb-faint)]">
           Every figure is the sum of its Days — {plan.dayCount} of them, priced
-          one at a time. Bands and sources are on the lines. Australia 2026–27 ·{" "}
-          {scenarios.current.name} · {formatDayYear(plan.startDate)} –{" "}
-          {formatDayYear(plan.endDate)}.
+          one at a time. A place band is what those days cost on the ground; the
+          journeys between them are the transit rows, and the two add up to{" "}
+          {formatEur(rollUp.planOnEur)}. Bands and sources are on the lines.
+          Australia 2026–27 · {scenarios.current.name} ·{" "}
+          {formatDayYear(plan.startDate)} – {formatDayYear(plan.endDate)}.
         </p>
       </div>
     </main>
