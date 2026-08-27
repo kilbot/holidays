@@ -170,7 +170,8 @@ function Row({
  * The Scenarios, side by side.
  *
  * docs/CONTEXT.md: a Scenario is a full alternate calendar for a big fork —
- * "Fireworks NYE" against "Doof NYE", a 12-Feb departure against a 22-Feb one —
+ * "The All-Stops Tour" against a "Doof NYE", a 12-Feb departure against a
+ * 22-Feb one —
  * "compared side by side; exactly one is marked as the current Plan". This is
  * that comparison, and it lives inside the cost panel rather than in a panel of
  * its own because the only thing worth comparing at a glance is the money.

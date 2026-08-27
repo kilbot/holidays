@@ -1,7 +1,7 @@
 /**
  * Topical facets over the Catalog's free-form tags.
  *
- * The 413 entries carry 168 lowercase-kebab tags between them — too many to
+ * The 415 entries carry 168 lowercase-kebab tags between them — too many to
  * put in front of the Travellers, and too specific to sift with ("sandblow",
  * "pearling", "glow-worms"). Each facet below is a named constant listing the
  * tags that feed it, read off the actual vocabulary in `catalog.json` rather
@@ -273,7 +273,7 @@ export const FACETS: readonly Facet[] = [
   FACET_WARNING,
 ];
 
-/** tag → the facets it feeds. Built once; the Catalog derivation hits it 413×. */
+/** tag → the facets it feeds. Built once; the Catalog derivation hits it 415×. */
 const FACETS_BY_TAG: ReadonlyMap<string, readonly FacetId[]> = (() => {
   const index = new Map<string, FacetId[]>();
   for (const facet of FACETS) {

@@ -196,7 +196,7 @@ export function installScenarioStore(
  *
  * It writes to the **current** Scenario, which is what every other knob does:
  * the alternates are alternates, and marking an idea on the Plan while looking
- * at "Fireworks NYE" means putting it on "Fireworks NYE".
+ * at "The All-Stops Tour" means putting it on "The All-Stops Tour".
  *
  * This is what makes membership survive a reload and travel in a Fork. The
  * shortlist's own marks are per-browser by design (`lib/shortlist.ts` says why),

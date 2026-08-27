@@ -3,8 +3,9 @@
  *
  * The regression these pin is #58: *"adding and removing adventures, and the
  * budget doesn't change — locked at some arbitrary number."* The arbitrary
- * number was €24,541 — the reference Scenario with all eight researched
- * Adventures on — and it was arbitrary in the precise sense that no control on
+ * number was €24,541 — the reference Scenario, as it stood then, with every
+ * researched Adventure on — and it was arbitrary in the precise sense that no
+ * control on
  * the site could move it. `usePlan` merged the Scenario's `toggled` list with
  * the shortlist's *placed* marks using a union, and a union cannot subtract.
  *

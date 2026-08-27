@@ -7,7 +7,7 @@ import { CapsulesBrowser } from "@/components/capsules-browser";
 export const metadata: Metadata = {
   title: "Australia 2026–27",
   description:
-    "413 Australian holiday ideas and eight researched Adventures, sifted into a shortlist.",
+    "415 Australian holiday ideas and nine researched Adventures, sifted into a shortlist.",
 };
 
 /**

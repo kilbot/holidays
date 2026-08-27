@@ -43,6 +43,7 @@ export const EMPTY_INPUT: PlanInput = {
   endDate: "2027-02-22",
   toggled: [],
   placementOverrides: {},
+  dayOverrides: {},
   legModeOverrides: {},
   lodgingTiers: {},
   carOverrides: {},
@@ -66,6 +67,7 @@ export function buildPlan(
     endDate: input.endDate,
     capsules: toggled,
     placementOverrides: input.placementOverrides,
+    dayOverrides: input.dayOverrides,
   });
 
   const fxRate = input.fxStress ? AUD_TO_EUR_STRESS : AUD_TO_EUR;

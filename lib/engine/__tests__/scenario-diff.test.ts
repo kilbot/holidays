@@ -100,7 +100,7 @@ test("writing a default explicitly is not a change", () => {
 /* Comfortable, against the reference trip                             */
 /* ------------------------------------------------------------------ */
 
-test("Comfortable is cheaper than Fireworks NYE and keeps every day", () => {
+test("Comfortable is cheaper than the All-Stops Tour and keeps every day", () => {
   const diff = diffScenarios(comfortable, fireworks);
 
   assert.equal(diff.identical, false);
@@ -113,9 +113,20 @@ test("Comfortable is cheaper than Fireworks NYE and keeps every day", () => {
   assert.equal(diff.datesMoved, false);
 });
 
-test("Comfortable adds the Perth city day and drops no Adventure", () => {
+test("Comfortable trades the ceiling's six Catalog blocks for the Perth city day", () => {
   const diff = diffScenarios(comfortable, fireworks);
-  assert.deepEqual(diff.adventuresRemoved, []);
+  // The savings paths carry every researched Adventure and none of the ceiling's
+  // Catalog blocks — the two WA evenings and the four Far North Queensland
+  // ideas. Those are Event spend and a taste directive, and both are what a
+  // savings path cuts.
+  assert.deepEqual(diff.adventuresRemoved, [
+    "atherton-tablelands-waterfall-circuit-millaa-millaa-zillie-ellinjaa",
+    "crater-lakes-lake-eacham-and-lake-barrine",
+    "fremantle-fish-and-chips",
+    "mission-beach-skydive-and-dunk-island",
+    "perth-live-music-night",
+    "yungaburra-curtain-fig-platypus-and-the-monthly-market",
+  ]);
   assert.deepEqual(diff.adventuresAdded, [
     "perth-city-kings-park-cottesloe-and-boola-bardip",
   ]);
@@ -148,17 +159,26 @@ test("Comfortable's tents and drags are counted, not summed into the money", () 
 test("Aggressive is shorter, cheaper, and says so through its dates", () => {
   const diff = diffScenarios(aggressive, fireworks);
   assert.equal(diff.datesMoved, true);
-  assert.equal(diff.days, -14, "ending on 8 February costs a fortnight");
+  // Six days, not the fortnight it used to be: the ceiling now comes home on
+  // 14 February rather than the 22nd, so there is less February left to lose.
+  assert.equal(diff.days, -6, "ending on 8 February costs six days");
   assert.ok(
     diff.eur < diffScenarios(comfortable, fireworks).eur,
     "Aggressive is the cheaper of the two savings paths",
   );
 });
 
-test("Aggressive keeps all eight Adventures — what it drops is February", () => {
+test("Aggressive keeps all ten Adventures — what it drops is February", () => {
   const diff = diffScenarios(aggressive, fireworks);
   assert.deepEqual(diff.adventuresAdded, []);
-  assert.deepEqual(diff.adventuresRemoved, []);
+  assert.deepEqual(diff.adventuresRemoved, [
+    "atherton-tablelands-waterfall-circuit-millaa-millaa-zillie-ellinjaa",
+    "crater-lakes-lake-eacham-and-lake-barrine",
+    "fremantle-fish-and-chips",
+    "mission-beach-skydive-and-dunk-island",
+    "perth-live-music-night",
+    "yungaburra-curtain-fig-platypus-and-the-monthly-market",
+  ]);
   assert.ok(diff.eventsOff.includes("mel-laneway"));
   assert.ok(diff.lodgingChanged.includes("sydney-nye"));
 });

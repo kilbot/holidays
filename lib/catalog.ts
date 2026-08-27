@@ -1,14 +1,14 @@
 /**
- * The Catalog — 413 Capsule ideas, mined in bulk and sifted in the browser.
+ * The Catalog — 415 Capsule ideas, mined in bulk and sifted in the browser.
  *
  * `catalog.json` is the same file the research sweep produced
  * (docs/research/capsule-catalog/catalog.json), copied here so it imports as a
  * module. It ships to the client: it is public research, the sift has to be
- * instant, and 413 rows is not enough data to earn an API round trip.
+ * instant, and 415 rows is not enough data to earn an API round trip.
  *
  * Everything the sift needs per entry is derived once at module load —
  * state prefix, cost bounds in both currencies, facets, search blob — so the
- * filter pass over 413 rows is string and number comparisons only.
+ * filter pass over 415 rows is string and number comparisons only.
  */
 
 import { facetsForTags, warningTagsFor, type FacetId } from "@/lib/facets";

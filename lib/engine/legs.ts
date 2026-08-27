@@ -113,14 +113,31 @@ export function deriveLegs(input: LegInput): LegResult {
 
   const legs: Leg[] = [];
 
+  /**
+   * `transit` is not a place you fly to.
+   *
+   * Since #54 gave the arrival block a `landsAfter` offset, the first Day of
+   * the trip can be a Buffer at the `transit` market — the ledger's own name
+   * for "the trip has started but has not landed", which is exactly what a
+   * night over the Indian Ocean is. Left alone, the sequence below read that as
+   * two relocations: a A$0 *drive* from Valencia to In transit, and then the
+   * €3,800 crossing from In transit to Mundaring. One of those journeys does
+   * not exist and the other starts in the wrong place.
+   *
+   * So the crossing is dated on the day the couple **leaves** and aimed at the
+   * first real Location they reach, and the transit Days in between are not
+   * arrivals at anything.
+   */
+  const landed = days.find((day) => day.locationId !== "transit") ?? days[0];
+
   const first = days[0];
   legs.push(
     buildLeg({
       date: first.date,
       fromLocationId: "origin",
-      toLocationId: first.locationId,
+      toLocationId: landed.locationId,
       from: ORIGIN_AIRPORT,
-      to: locationById(first.locationId).airport,
+      to: locationById(landed.locationId).airport,
       input,
       note: "The outbound crossing. Comfort-first, not cheapest — docs/CONTEXT.md names aircraft type, layover quality and an overnight stopover as the criteria.",
     }),
@@ -130,6 +147,8 @@ export function deriveLegs(input: LegInput): LegResult {
     const previous = days[index - 1];
     const day = days[index];
     if (previous.locationId === day.locationId) continue;
+    // Arriving where the outbound crossing already said it was going.
+    if (previous.locationId === "transit") continue;
 
     legs.push(
       buildLeg({

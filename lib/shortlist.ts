@@ -136,7 +136,7 @@ function subscribe(listener: () => void): () => void {
  * visitor discards a preview. `lib/engine/membership.ts` has the argument.
  *
  * **The comparison is against the effective verdict, not the stored one.** The
- * eight researched Adventures are on the Plan with nothing recorded about them,
+ * nine researched Adventures are on the Plan with nothing recorded about them,
  * so a first press of *Plan* on one of them has to read as "already placed —
  * take it off" and not as "place it", which would be a click that did nothing.
  * That is the gesture the bug report describes.

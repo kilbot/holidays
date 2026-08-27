@@ -167,9 +167,9 @@ export const ANCHORS: Anchor[] = [
   {
     date: "2026-12-25",
     label: "Christmas",
-    place: "Perth",
+    place: "Morawa",
     hard: true,
-    note: "Family Christmas at the Perth home base. Hard anchor.",
+    note: "Christmas Day at the sister's farm in Morawa, four hours north of Perth up the Midlands road. Hard anchor — the day and the place both.",
   },
   {
     date: "2026-12-31",
@@ -244,7 +244,7 @@ export const WINDOW_DEADLINES: WindowDeadline[] = [
     date: "2026-12-26",
     label: "Opera House Forecourt tickets, 10:00 AEDT",
     detail:
-      "6,000 free tickets, max 6 per booking, gone in minutes in prior years — and it is the day of the PER→SYD flight. Whoever is not driving books it from a phone.",
+      "6,000 free tickets, max 6 per booking, gone in minutes in prior years — and it is the day the couple drives the four hours back down from Morawa. Whoever is not driving books it from a phone.",
     source: "docs/research/capsule-sydney-nye.md §11",
     tone: "urgent",
   },

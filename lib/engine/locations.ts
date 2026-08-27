@@ -7,7 +7,7 @@
  * city" and are not the same place).
  *
  * The table is deliberately small and hand-written rather than derived from the
- * 413-row Catalog: these are the places the researched Capsules actually
+ * 415-row Catalog: these are the places the researched Capsules actually
  * happen, and a Catalog idea that names an airport outside this list gets a
  * synthetic Location built from `lib/airports.ts` at the generic `regional`
  * rate — honest about knowing only the airport.
@@ -38,6 +38,40 @@ export const LOCATIONS: readonly Location[] = [
     airport: "PER",
     coords: [115.8613, -31.9523], // Perth CBD, not the airport
     homeBase: true,
+    weather: "perth",
+    regions: ["WA"],
+  },
+  {
+    id: "mundaring",
+    name: "Mundaring Hills",
+    // Home base #3, docs/CONTEXT.md: Paul's dad, free lodging, a borrowed car.
+    // It prices on the Perth card rather than `home-base-regional` because the
+    // block's outings are Perth outings — the Hills are 35 km from Northbridge,
+    // not 350 — and the extra fuel that run costs is exactly what the A$10–30
+    // band on the Perth `local` rate is for. `docs/research/perth-live-music.md`
+    // measures the run: 40–50 min to Northbridge, 55–65 to North Fremantle.
+    market: "home-base-city",
+    airport: "PER",
+    coords: [116.1667, -31.9000], // Mundaring township, in the Perth Hills
+    homeBase: true,
+    weather: "perth",
+    regions: ["WA"],
+  },
+  {
+    id: "morawa",
+    name: "Morawa",
+    // Home base #2, docs/CONTEXT.md: the sister's farm, and since #54 the place
+    // the Christmas hard Anchor actually happens. `home-base-regional` rather
+    // than `home-base-city` because it is 370 km up the Midlands road from
+    // Perth and everything is a drive — the A$30/day fuel line is the wheatbelt
+    // being the wheatbelt, not a rate-card guess.
+    market: "home-base-regional",
+    airport: "PER",
+    coords: [116.0100, -29.2100], // Morawa township, WA wheatbelt
+    homeBase: true,
+    // After Christmas the couple drives back down to Perth; the Buffer days
+    // that follow are Perth days, not four more days on the farm.
+    returnsTo: "perth",
     weather: "perth",
     regions: ["WA"],
   },

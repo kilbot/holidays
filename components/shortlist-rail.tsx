@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
  * The Plan page's shortlist rail — what is left of the Catalog drawer.
  *
  * It used to hold the whole sift: a search box, twelve facet chips, nine
- * region chips, two sliders, five shelves and all 413 ideas, in a 280px column
+ * region chips, two sliders, five shelves and all 415 ideas, in a 280px column
  * beside a globe. #40 moved that to `/capsules`, where it has a page to itself,
  * and the rule that made the move worth making is that the Catalog now exists
  * in exactly one place. Nothing here browses. What is left is the half the Plan
@@ -40,7 +40,7 @@ import { cn } from "@/lib/utils";
  * So: interested and placed entries only. Discarded ideas are not here —
  * discarding is a decision to stop seeing something, and a rail that kept
  * showing them would be a filter, not a shortlist. The counts still say how
- * many there are, because "413 ideas, 6 interested, 41 discarded" is a
+ * many there are, because "415 ideas, 6 interested, 41 discarded" is a
  * progress report on the sift and worth reading at a glance.
  *
  * Both tiers land here. A researched Capsule marked from `/capsules` and a
@@ -81,9 +81,9 @@ function railEntries(marks: ShortlistMap): RailEntry[] {
   const entries: RailEntry[] = [];
 
   // These are `usePlanShortlist`'s reconciled verdicts, so *placed* is exactly
-  // "on the Plan" — including the eight researched Adventures the reference
+  // "on the Plan" — including the nine researched Adventures the reference
   // Scenario starts with and never recorded a verdict for. Listing only marked
-  // ideas left the traveller with no control over the eight that were actually
+  // ideas left the traveller with no control over the ones that were actually
   // costing money (#58).
   for (const [id, state] of Object.entries(marks)) {
     if (state !== "interested" && state !== "placed") continue;
@@ -251,7 +251,7 @@ function ShortlistBody() {
       {/* What this list is filtered to, said out loud.
           The counts alone read as a scoreboard, and a scoreboard does not tell
           a first-time reader that the rail is showing them a *subset* — that
-          the 413 are elsewhere and that the ones they discarded are gone on
+          the 415 are elsewhere and that the ones they discarded are gone on
           purpose. A filter that shapes what is on screen never hides (#56). */}
       <p className="mt-1 text-[10.5px] leading-snug text-[var(--sb-dim)]">
         Showing the{" "}
@@ -272,7 +272,7 @@ function ShortlistBody() {
       </p>
 
       {/* The door back to the Catalog. Prominent on purpose: it is the only
-          way into the 413 from this page now, and a link that quiet would be
+          way into the 415 from this page now, and a link that quiet would be
           a dead end wearing a signpost. */}
       <Link
         href="/adventures"
@@ -359,7 +359,7 @@ export function ShortlistRail() {
         className={cn(
           "pointer-events-auto absolute top-4 left-4 z-20 hidden lg:flex",
           // A shortlist shrink-wraps; the Catalog drawer it replaces ran the
-          // full height because it always had 413 rows to run it with. Six
+          // full height because it always had 415 rows to run it with. Six
           // benched ideas in a column reaching the date strip would be a lot
           // of glass over a map with nothing on it.
           collapsed

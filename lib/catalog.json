@@ -1,6 +1,6 @@
 {
   "generated": "2026-08-27",
-  "entry_count": 413,
+  "entry_count": 415,
   "conflicts_resolved": [
     {
       "id": "rainbow-spirit-2027-dates",
@@ -364,6 +364,60 @@
         "https://fremantlemarkets.com.au/",
         "https://www.visitfremantle.com.au/explore/shopping/markets-and-collectives",
         "https://en.wikipedia.org/wiki/Fremantle_Markets"
+      ]
+    },
+    {
+      "id": "fremantle-fish-and-chips",
+      "name": "Fremantle fish and chips on the harbour",
+      "region": "WA — Perth / Fremantle",
+      "tags": [
+        "food",
+        "seafood",
+        "coast",
+        "waterfront",
+        "cheap",
+        "home-base"
+      ],
+      "days_min": 1,
+      "days_ideal": 1,
+      "rough_cost_couple_aud": "30-70",
+      "cost_confidence": "high",
+      "season_fit_dec_feb": "good",
+      "season_note": "Long summer evenings and the Fremantle Doctor off the water from mid-afternoon — the sea breeze that makes December on the harbour better than December anywhere inland. Busiest 6–8pm on a summer weekend; the queue at Cicerello's moves fast, the one for a table does not. Sits naturally on the same day as the Fremantle Markets, which run Fri–Sun.",
+      "why_rated": "Fishing Boat Harbour is the whole cliché done properly: a paper parcel of fish and chips eaten on the boardwalk with the fishing fleet tied up in front of you. Cicerello's has been there since 1903 and Kailis is next door; the takeaway windows at both are a fraction of the sit-down price for the same fish. This is the cheap end of the Adventure ladder on purpose — a genuinely good Australian evening for the price of a supermarket shop, and the counterweight to the reef days and the festival tickets.",
+      "nearest_airport": "PER",
+      "sources": [
+        "https://www.cicerellos.com.au/",
+        "https://kailisbrosfremantle.com.au/",
+        "https://www.visitfremantle.com.au/explore/eat-drink/fishing-boat-harbour"
+      ]
+    },
+    {
+      "id": "perth-live-music-night",
+      "name": "Perth live music night",
+      "region": "WA — Perth / Northbridge",
+      "tags": [
+        "music",
+        "nightlife",
+        "city",
+        "pub",
+        "home-base"
+      ],
+      "days_min": 1,
+      "days_ideal": 1,
+      "rough_cost_couple_aud": "165-330",
+      "cost_confidence": "high",
+      "season_fit_dec_feb": "good",
+      "season_note": "WEEKDAY-LOCKED to Friday or Saturday — those are the only nights everything is on. December looks empty in the listings and is not: The Bird books ~5 weeks out and Mojo's ~10, so a zero-gig December today is a booking-lead-time artefact, not a closure. RE-CHECK IN THE FIRST WEEK OF NOVEMBER 2026, when The Bird's, Mojo's and the Indian Ocean Hotel's December calendars publish, along with any Spilt Milk (20 Dec, Claremont) sideshows. Cheap alternatives if the Fri/Sat lock is inconvenient: the Indian Ocean Hotel's $5 Sunday Sesh at 5:30pm, or Mojo's free Soul Sunday — both finish early, which is the only version that does not need a late-night drive back up the hill.",
+      "why_rated": "Paul's own two memories are both still alive and still doing what he remembers: The Bird (Northbridge, exposed brick, courtyard, covers of $12–21) is gigging 4–6 nights a week, and Mojo's Bar (North Fremantle, 250 cap, on the Stoned Crow site since the '70s) is now open 7 days. Freo.Social — the old Fly By Night drill hall — is the one room with December already densely booked. The casualties are the OTHER rooms: the Sewing Room died in 2023, Badlands is a promoter-hire shell, and Jack Rabbit Slim's closed in January 2026 and is now a country bar, so any guide still listing those three is stale. The cost band is a transport story, not a ticket story: Mundaring is 35 km up the hill with no train, so a rideshare both ways is A$260–330 while driving with one person sober is A$165–190.",
+      "nearest_airport": "PER",
+      "sources": [
+        "https://github.com/kilbot/holidays/blob/main/docs/research/perth-live-music.md",
+        "https://musick.com.au/venue/the-bird/",
+        "https://www.mojosbar.com.au/",
+        "https://musick.com.au/venue/freo-social/",
+        "https://musick.com.au/venue/indian-ocean-hotel/",
+        "https://xpressmag.com.au/events/"
       ]
     },
     {

@@ -8,10 +8,10 @@
  * toggled: [...new Set([...input.toggled, ...placed])]
  * ```
  *
- * A union can only ever *add*. The reference Scenario ships with all eight
- * researched Adventures in `input.toggled`, and the only control the site gives
+ * A union can only ever *add*. The reference Scenario ships with every
+ * researched Adventure in `input.toggled`, and the only control the site gives
  * for putting an Adventure on the Plan or taking it off is the shortlist's *In
- * the plan* switch — so every one of those eight was pinned on, permanently, and
+ * the plan* switch — so every one of them was pinned on, permanently, and
  * the traveller flipping the switch watched a €24,541 total refuse to move.
  *
  * ## One source of truth: the Scenario
@@ -39,7 +39,7 @@
  * a pin, a pressed button or a filter reads that rather than the raw marks. It
  * settles the two ways the two stores can disagree:
  *
- * - a Capsule on the Plan with no verdict recorded (all eight of them, on a
+ * - a Capsule on the Plan with no verdict recorded (all of them, on a
  *   first visit) reads as *placed*, so pressing *Plan* on it is not a no-op that
  *   looks like a click;
  * - a stale *placed* mark left behind by a discarded preview reads as nothing at

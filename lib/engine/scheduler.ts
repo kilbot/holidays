@@ -30,13 +30,14 @@
  *
  * ## The algorithm, in full
  *
- * 1. **Order the Capsules by how little freedom they have.** Date-locked first,
- *    then window-locked, then weekday-locked, then flexible; longer before
- *    shorter inside a tier; id as the final tiebreak. Placing the immovable
- *    things first is the whole trick — a flexible Capsule that got the reef's
- *    only legal week would push the reef out of its window.
+ * 1. **Order the Capsules by how little freedom they have.** Arrival-locked
+ *    first, then date-locked, then window-locked, then weekday-locked, then
+ *    flexible; longer before shorter inside a tier; id as the final tiebreak.
+ *    Placing the immovable things first is the whole trick — a flexible Capsule
+ *    that got the reef's only legal week would push the reef out of its window.
  * 2. **For each, enumerate candidate start dates** inside the trip range that
- *    its Lock permits.
+ *    its Lock permits and that do not quietly take a hard Anchor's own day —
+ *    Christmas in Perth, New Year's Eve on the harbour (see `anchorsFree`).
  * 3. **Score each candidate** and take the best (see `scoreCandidate`).
  * 4. **Reserve the block plus one trailing Buffer day.** docs/CONTEXT.md:
  *    "capsules are never scheduled edge to edge". If the block only fits
@@ -50,17 +51,26 @@
  */
 
 import type { CapsuleSpec, Lock, Placement } from "@/lib/engine/types";
-import { addDays, daysBetween, weekdayOf } from "@/lib/trip-dates";
+import { ANCHORS, addDays, daysBetween, weekdayOf } from "@/lib/trip-dates";
 
 /** One Buffer day after each block, so nothing is scheduled edge to edge. */
 export const BUFFER_DAYS_AFTER_BLOCK = 1;
 
-/** Lower sorts first: the less freedom a Lock leaves, the earlier it is placed. */
+/**
+ * Lower sorts first: the less freedom a Lock leaves, the earlier it is placed.
+ *
+ * `arrival` leads outright. It has exactly one legal start — the trip's first
+ * day — so it is the least free thing on the calendar, and a window-locked
+ * block that got there first would push the arrival block off the only day it
+ * has. Ahead of `date` for the same reason: a date-lock still has a run of
+ * legal starts, an arrival lock has one.
+ */
 const LOCK_RANK: Record<Lock["kind"], number> = {
-  date: 0,
-  window: 1,
-  weekday: 2,
-  flexible: 3,
+  arrival: 0,
+  date: 1,
+  window: 2,
+  weekday: 3,
+  flexible: 4,
 };
 
 export interface ScheduleInput {
@@ -68,6 +78,8 @@ export interface ScheduleInput {
   endDate: string;
   capsules: readonly CapsuleSpec[];
   placementOverrides: Readonly<Record<string, string>>;
+  /** Capsule id → this Scenario's own block length. `PlanInput.dayOverrides`. */
+  dayOverrides: Readonly<Record<string, number>>;
 }
 
 export interface ScheduleResult {
@@ -76,8 +88,21 @@ export interface ScheduleResult {
   unplaced: string[];
 }
 
-/** Does a Lock permit a block of `days` starting here? */
-export function lockAllows(lock: Lock, startDate: string, days: number): boolean {
+/**
+ * Does a Lock permit a block of `days` starting here?
+ *
+ * `tripStart` is only read by the `arrival` kind, which is the one Lock defined
+ * against the trip rather than the calendar. It is a required argument rather
+ * than an optional one on purpose: a caller that cannot say when the trip
+ * starts cannot answer the question for an arrival-locked block, and defaulting
+ * it would answer wrongly and silently.
+ */
+export function lockAllows(
+  lock: Lock,
+  startDate: string,
+  days: number,
+  tripStart: string,
+): boolean {
   const endDate = addDays(startDate, days - 1);
   switch (lock.kind) {
     case "flexible":
@@ -89,8 +114,50 @@ export function lockAllows(lock: Lock, startDate: string, days: number): boolean
       // Must cover the locked span. NYE on the 30th is not NYE.
       return startDate <= lock.from && endDate >= lock.to;
     case "weekday":
-      return lock.weekdays.includes(weekdayOf(startDate));
+      if (!lock.weekdays.includes(weekdayOf(startDate))) return false;
+      if (lock.from && startDate < lock.from) return false;
+      if (lock.to && endDate > lock.to) return false;
+      return true;
+    case "arrival":
+      // The day the couple lands, and no other. Jet lag does not wait a week,
+      // and it does not start before the plane does either.
+      return startDate === addDays(tripStart, lock.landsAfter);
   }
+}
+
+/**
+ * The hard Anchors' own days, which a proposal may not quietly take.
+ *
+ * docs/CONTEXT.md: an Anchor is *"a fixed or semi-fixed date+place commitment
+ * the itinerary must honour"*, and the two hard ones are Christmas with the
+ * Perth family and New Year's Eve on the harbour. Nothing stopped an unrelated
+ * block landing on them — the Days were free, so any flexible or weekday-locked
+ * block could score them — and #54 walked straight into it: a Northbridge gig
+ * proposed for 25 December, a day on which the couple is at a family lunch and
+ * every band room in Perth is shut.
+ *
+ * So a **proposal** skips a candidate that covers a hard Anchor, unless the
+ * block's own date-Lock is what puts it there — which is how the Sydney block
+ * keeps New Year's Eve, the one thing it exists to cover.
+ *
+ * Two things this deliberately is not. It is not a refusal: the fallback path
+ * below ignores it, so a block with nowhere else to go still lands and still
+ * reports its overlap. And it is not a veto on a drag: `placementOverrides` are
+ * applied before any of this, because a drag is the answer and not a hint.
+ */
+function anchorsFree(lock: Lock, start: string, days: number): boolean {
+  const end = addDays(start, days - 1);
+  for (const anchor of ANCHORS) {
+    if (!anchor.hard) continue;
+    if (anchor.date < start || anchor.date > end) continue;
+    // The block's own dates are the reason it is here. NYE is Sydney's whole
+    // point, and a date-Lock that names the day is the itinerary honouring the
+    // Anchor rather than trampling it.
+    const owned =
+      lock.kind === "date" && lock.from <= anchor.date && lock.to >= anchor.date;
+    if (!owned) return false;
+  }
+  return true;
 }
 
 /** Where a Lock would like to start, when nothing else constrains it. */
@@ -98,12 +165,33 @@ function preferredStart(lock: Lock, startDate: string): string {
   if (lock.kind === "window" || lock.kind === "date") {
     return lock.from > startDate ? lock.from : startDate;
   }
+  if (lock.kind === "weekday" && lock.from && lock.from > startDate) {
+    return lock.from;
+  }
+  if (lock.kind === "arrival") return addDays(startDate, lock.landsAfter);
+  // `flexible` wants the trip's own first day, which `startDate` already is.
   return startDate;
 }
 
 export function schedule(input: ScheduleInput): ScheduleResult {
   const { startDate, endDate } = input;
   const tripDays = daysBetween(startDate, endDate);
+
+  /**
+   * How many days this block gets, in one place so the override, the
+   * Adventure's own floor and the trip's length are reconciled once.
+   *
+   * Order matters. The Scenario's wish is clamped to the Adventure's `minDays`
+   * first — the research's "shortest version still worth doing" is a floor a
+   * Scenario may not undercut, or the site would be pricing a Byron the
+   * document says is not Byron — and then to the trip, because a 9-night
+   * Tasmania in a 6-day trip is a 6-day Tasmania with a Warning, not an
+   * absence.
+   */
+  const lengthOf = (capsule: CapsuleSpec) => {
+    const wanted = input.dayOverrides[capsule.id] ?? capsule.days;
+    return Math.max(1, Math.min(Math.max(wanted, capsule.minDays), tripDays));
+  };
   const taken = new Map<string, string>(); // date → capsule id
   const placements: Placement[] = [];
   const unplaced: string[] = [];
@@ -138,7 +226,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
     if (!start) continue;
     overridden.add(capsule.id);
 
-    const days = Math.min(capsule.days, tripDays);
+    const days = lengthOf(capsule);
     // A drag can land a block off the end of the trip; it gets clamped back so
     // the ledger has Days to hang it on, and keeps its own dates otherwise.
     const latest = addDays(endDate, -(days - 1));
@@ -150,7 +238,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
       endDate: addDays(clamped, days - 1),
       days,
       origin: "override",
-      lockViolated: !lockAllows(capsule.lock, clamped, days),
+      lockViolated: !lockAllows(capsule.lock, clamped, days, startDate),
       overlaps: overlapsAt(clamped, days),
     });
   }
@@ -164,18 +252,16 @@ export function schedule(input: ScheduleInput): ScheduleResult {
       continue;
     }
 
-    // Shrink to the trip before shrinking below the Capsule's own floor: a
-    // 9-night Tasmania in a 6-day trip is a 6-day Tasmania with a Warning, not
-    // an absence.
-    const days = Math.max(1, Math.min(capsule.days, tripDays));
+    const days = lengthOf(capsule);
 
     let best: { start: string; score: number } | null = null;
     const lastStart = tripDays - days;
 
     for (let offset = 0; offset <= lastStart; offset += 1) {
       const start = addDays(startDate, offset);
-      if (!lockAllows(capsule.lock, start, days)) continue;
+      if (!lockAllows(capsule.lock, start, days, startDate)) continue;
       if (!free(start, days)) continue;
+      if (!anchorsFree(capsule.lock, start, days)) continue;
 
       const score = scoreCandidate(start, days, endDate, free);
       // Strictly greater, so the earliest of equally good weeks wins.
@@ -211,7 +297,7 @@ export function schedule(input: ScheduleInput): ScheduleResult {
       endDate: addDays(fallback, days - 1),
       days,
       origin: "proposed",
-      lockViolated: !lockAllows(capsule.lock, fallback, days),
+      lockViolated: !lockAllows(capsule.lock, fallback, days, startDate),
       overlaps: overlapsAt(fallback, days),
     });
   }

@@ -9,7 +9,7 @@
  * ## Why this exists at all
  *
  * `lib/engine/scenario-doc.ts` seeds `INITIAL_STATE` with three Scenarios —
- * "Fireworks NYE" and the two savings paths #65 priced. That seed is what a
+ * "The All-Stops Tour" and the two savings paths #65 priced. That seed is what a
  * browser with no saved Plan gets, and what `scripts/bootstrap-plan.mjs` would
  * write if the canonical Plan were being created today. It is not.
  *

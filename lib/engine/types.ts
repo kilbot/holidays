@@ -64,12 +64,44 @@ export interface Location {
  * names a range it must sit inside (the reef wants 18–31 January, anywhere in
  * there). The Scheduler treats the first as immovable and the second as a
  * corridor to find the cheapest week in.
+ *
+ * `arrival` is the fifth kind and the only **relative** one: it names the
+ * trip's own first day rather than a calendar date. docs/CONTEXT.md's
+ * semi-fixed Anchor — *"the first days after landing are spent with Paul's dad
+ * in Mundaring Hills"* — is a claim about landing, not about 12 December, and
+ * writing it as a window would quietly desynchronise the moment the couple
+ * drags the leaving date. Dragging the rail moves an arrival-locked block with
+ * it; every other Lock stays where the calendar put it.
+ *
+ * `landsAfter` is how many Days of the trip are spent getting there before the
+ * block can start. Valencia to Perth is twenty-odd hours with a Changi
+ * overnight, so a 14 December departure is a 15 December arrival, and the day
+ * in between is a Buffer at the `transit` market — which is what the ledger
+ * already calls a Day the trip has started but not landed on. Zero is legal and
+ * means the block starts on the leaving date itself.
  */
 export type Lock =
   | { kind: "flexible" }
   | { kind: "window"; from: string; to: string; why: string }
-  | { kind: "weekday"; weekdays: readonly number[]; why: string }
-  | { kind: "date"; from: string; to: string; why: string };
+  | {
+      kind: "weekday";
+      weekdays: readonly number[];
+      /**
+       * Optional corridor the weekday rule applies inside.
+       *
+       * A weekday alone is not always the whole constraint. Rottnest wants a
+       * mid-week ferry *and* the couple to be in Western Australia; without the
+       * second half the Scheduler will happily propose a Perth day trip for a
+       * Monday in January when they are in Queensland, which is what #54 found
+       * once the calendar got busy enough to push it there. Absent means the
+       * whole trip, which is what every weekday Lock meant before.
+       */
+      from?: string;
+      to?: string;
+      why: string;
+    }
+  | { kind: "date"; from: string; to: string; why: string }
+  | { kind: "arrival"; landsAfter: number; why: string };
 
 /** An Event spend line a Capsule brings with it. docs/CONTEXT.md, Event spend. */
 export interface CapsuleEvent {
@@ -105,7 +137,7 @@ export interface CapsuleEvent {
  * What the Scheduler needs to know about a Capsule to place it.
  *
  * Deliberately not `DeepCapsule` or `CatalogIdea`: the engine is pure and those
- * types drag in 413 rows of catalog JSON and 1,800 lines of research prose.
+ * types drag in 415 rows of catalog JSON and 1,800 lines of research prose.
  * `lib/engine/capsules.ts` adapts them into this.
  */
 export interface CapsuleSpec {
@@ -369,6 +401,25 @@ export interface PlanInput {
   toggled: readonly string[];
   /** Capsule id → start date. A drag. Beats the Scheduler's proposal. */
   placementOverrides: Readonly<Record<string, string>>;
+  /**
+   * Capsule id → how many days this Scenario gives the block.
+   *
+   * The Adventure's own `days.ideal` is the research's answer to "how long is
+   * this worth"; this is the couple's answer to "how long can we give it". They
+   * are different questions, and #54 was the first time the second one had no
+   * way to be asked: the directive was *way more time in North Queensland than
+   * New South Wales*, and the only honest way to say that is to give Byron its
+   * researched three-night minimum instead of its five-night ideal.
+   *
+   * Clamped to the Adventure's `minDays` and to the trip, so a Scenario can
+   * shorten a block to the shortest version the research says is still worth
+   * doing and no further. Lengthening works too and is not clamped upward — a
+   * couple who wants nine nights in Byron is allowed nine nights in Byron.
+   *
+   * Absent means the researched ideal, which is what every Scenario said before
+   * this field existed.
+   */
+  dayOverrides: Readonly<Record<string, number>>;
   /** Leg id → mode. For when the journey IS the experience. */
   legModeOverrides: Readonly<Record<string, LegMode>>;
   /** Capsule id (or location id, for Buffer stretches) → tier. */

@@ -272,8 +272,9 @@ export function SavingsMenu() {
             </span>
             , against the plan as it stands — they interact, so the column does
             not add up to a total. The two savings Scenarios beside{" "}
-            <span className="italic">Fireworks NYE</span> are the honest
-            cumulative answer.
+            <span className="italic">The All-Stops Tour</span> — the
+            everything version, and the ceiling the other Scenarios cut from —
+            are the honest cumulative answer.
           </p>
 
           <div className="mt-3">

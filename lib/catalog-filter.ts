@@ -8,7 +8,7 @@
  *    shareable, so `?q=reef&f=beach&r=QLD` has to mean the same thing on
  *    someone else's screen. Encode and decode belong next to the shape they
  *    read and write, or they drift.
- * 2. Two tiers are sifted by the same controls. The eight researched Capsules
+ * 2. Two tiers are sifted by the same controls. The nine researched Capsules
  *    are not Catalog entries — different module, different fields — but a
  *    traveller who types "reef" means both. `SiftCandidate` is the small
  *    projection both tiers can answer to, so there is exactly one predicate
@@ -40,7 +40,7 @@ const SHELF_IDS: readonly ShelfId[] = [
 const SEASON_FITS: readonly SeasonFit[] = ["good", "ok", "poor", "no"];
 
 /**
- * Slider stops rather than a linear range: 284 of the 413 are one-day ideas,
+ * Slider stops rather than a linear range: 286 of the 415 are one-day ideas,
  * so a linear 1–90 slider would spend 95% of its travel on eight entries.
  */
 export const DAY_STOPS: readonly number[] = [1, 2, 3, 4, 5, 7, 10, 14, Infinity];

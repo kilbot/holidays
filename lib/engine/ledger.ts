@@ -410,8 +410,19 @@ export function describeLock(
       };
     case "weekday":
       return {
-        chip: "certain days only",
-        sentence: `Only runs on certain days — ${lock.why}`,
+        chip:
+          lock.from && lock.to
+            ? `certain days, ${formatSpan(lock.from, lock.to)}`
+            : "certain days only",
+        sentence: `Only runs on certain days${lock.from && lock.to ? `, and only between ${formatDay(lock.from)} and ${formatDay(lock.to)}` : ""} — ${lock.why}`,
+      };
+    case "arrival":
+      return {
+        chip: "straight off the plane",
+        sentence:
+          lock.landsAfter > 0
+            ? `Starts the day the couple lands, ${lock.landsAfter} day${lock.landsAfter === 1 ? "" : "s"} after leaving — ${lock.why}`
+            : `Starts the day the trip does — ${lock.why}`,
       };
   }
 }

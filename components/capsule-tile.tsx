@@ -23,9 +23,9 @@ import { cn } from "@/lib/utils";
  * than a click away. That is the difference the Capsules page exists to make.
  *
  * Two sizes, and they mean two different things rather than two widths. A
- * `hero` tile is one of the eight researched Capsules: taller cover, the
+ * `hero` tile is one of the nine researched Capsules: taller cover, the
  * research badge, room for three lines of argument. A `grid` tile is one of
- * the 413 shallow ideas. The page never mixes them in one grid, because the
+ * the 415 shallow ideas. The page never mixes them in one grid, because the
  * whole point of the two tiers is that they are not the same kind of thing.
  *
  * Memoised: a keystroke in the search box re-filters 421 entries, and the

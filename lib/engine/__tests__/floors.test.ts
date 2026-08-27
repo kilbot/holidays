@@ -31,6 +31,7 @@ import {
 import { buildPlan } from "@/lib/engine/plan";
 import { DEFAULT_SCENARIO } from "@/lib/engine/scenario-doc";
 import { DEEP_CAPSULES, costLadder } from "@/lib/deep-capsules";
+import { WINDOW_END } from "@/lib/trip-dates";
 
 const PAID: MarketId[] = [
   "sydney",
@@ -141,13 +142,46 @@ test("the home-base lever is derived from the rate card, not written down", () =
 /* The card and the ledger agree                                       */
 /* ------------------------------------------------------------------ */
 
-const plan = buildPlan(DEFAULT_SCENARIO.input, capsuleCatalogue([]));
+/**
+ * The default Scenario, run over a window wide enough for every Lock.
+ *
+ * The card-versus-ledger check below is a claim about the **Adventures**, not
+ * about any one calendar: "the figure on the Margaret River card is the figure
+ * the ledger charges for Margaret River". Since #54 moved the couple's return
+ * in to 14 February, the default Plan no longer reaches Melbourne's 19–21
+ * February festival weekend, so the block lands off its own date-Lock and the
+ * Laneway line correctly drops — and comparing a card that includes Laneway to a
+ * ledger that cannot buy it would be comparing two different questions.
+ *
+ * So this file prices the same toggles against the full trip window. The
+ * shortened return is a decision about the trip, and `savings.test.ts` is where
+ * that decision is asserted.
+ */
+const plan = buildPlan(
+  { ...DEFAULT_SCENARIO.input, endDate: WINDOW_END },
+  capsuleCatalogue(DEFAULT_SCENARIO.input.toggled),
+);
+
+/**
+ * What the top rung of a ladder may be called.
+ *
+ * "As published" is the normal one and means the figure the Adventure's own
+ * research document first wrote up. `mundaring-arrival` has no research
+ * document — it comes from docs/CONTEXT.md's Anchor directive — so it has no
+ * published figure to quote, and its ceiling is the same block taken as a
+ * paying visitor instead. Both are ceilings; only one is a quotation, and the
+ * label is where a reader is told which they are looking at.
+ */
+const CEILING_LABELS = ["As published", "If you paid for it"];
 
 test("every Adventure's ladder reads floor → plan-on → ceiling", () => {
   for (const capsule of DEEP_CAPSULES) {
     const rungs = costLadder(capsule.cost);
     assert.ok(rungs.length >= 2, `${capsule.id} has a ladder`);
-    assert.equal(rungs.at(-1)?.label, "As published", capsule.id);
+    assert.ok(
+      CEILING_LABELS.includes(rungs.at(-1)?.label ?? ""),
+      `${capsule.id}: top rung is "${rungs.at(-1)?.label}"`,
+    );
 
     for (let i = 1; i < rungs.length; i += 1) {
       assert.ok(

@@ -148,7 +148,7 @@ export interface PlanShortlist {
    * Verdicts reconciled against the Plan — `effectiveVerdicts` says how.
    *
    * Read this, never the raw `useShortlist().marks`, anywhere a verdict is
-   * *shown* or *filtered on*. The raw marks know nothing about the eight
+   * *shown* or *filtered on*. The raw marks know nothing about the researched
    * Adventures the reference Scenario starts with, and they keep a stale
    * *placed* long after a discarded preview put the Plan back.
    */
@@ -161,7 +161,7 @@ export interface PlanShortlist {
 /**
  * The sift's view of the shortlist, without building a Plan.
  *
- * `/adventures` renders 413 cards and re-sifts them on every keystroke; running
+ * `/adventures` renders 415 cards and re-sifts them on every keystroke; running
  * the Scheduler and the ledger to find out which pins to draw would be absurd.
  * Membership is one array off the current Scenario.
  */
