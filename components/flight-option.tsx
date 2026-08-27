@@ -13,6 +13,14 @@
  * and where that seat score came from, and each adjustment with the reason it
  * exists.
  *
+ * Since the evidence audit (kilbot/holidays#69) it shows two more things, and
+ * keeps them apart on purpose. The **airline's credentials** — five Skytrax
+ * stars, second in the world, best economy class of 2025 — are what the 55%
+ * airline half is actually made of, and they are awarded *fleet-wide*. The
+ * **sector list** is what this itinerary flies, per leg, with the seat's own
+ * measured inches. Between them sits every component's epistemic label:
+ * measured, rated or judgment, with the audit's sentence behind it.
+ *
  * The price is on the surface for every row, always, even though the sort is
  * comfort-first. Comfort-first is a ranking, not a blindfold.
  */
@@ -21,7 +29,16 @@ import { ChevronDown } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 
 import { formatEur, formatEurCompact } from "@/lib/engine";
-import { comfortBand, rawScoreOf, type ComfortBand } from "@/lib/flights/comfort";
+import {
+  comfortBand,
+  rawScoreOf,
+  SKYTRAX_REFRESH_DATE,
+  sourcesFor,
+  type CarrierCredentials,
+  type ComfortBand,
+  type Evidence,
+  type SectorScore,
+} from "@/lib/flights/comfort";
 import {
   perPersonTotal,
   type Arbitrage,
@@ -195,9 +212,136 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Evidence                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * How much of a number is evidence, said on the number itself.
+ *
+ * Deliberately typographic and not colour-coded. The four signal colours on
+ * this site mean one thing each — sea, good, warn, over — and they are about
+ * *the trip*: a fare, a lock, a budget. Epistemics are not a status, and a
+ * `judgment` chip inked in warning-orange would read as "this row has a
+ * problem" when what it says is "this number is our call". So the three labels
+ * separate on weight and border alone: measured is full-strength ink, rated is
+ * dimmed, judgment is dimmest and dashed, the same dashed edge the page
+ * already uses for "held back, not deleted".
+ *
+ * The title is the audit's own sentence, verbatim — a chip nobody can
+ * interrogate is decoration.
+ */
+const EVIDENCE_STYLE: Record<Evidence["label"], string> = {
+  measured: "border-[var(--sb-line)] bg-[var(--sb-panel-2)] text-[var(--sb-text)]",
+  rated: "border-[var(--sb-line)] text-[var(--sb-dim)]",
+  judgment: "border-dashed border-[var(--sb-line)] text-[var(--sb-faint)]",
+};
+
+function EvidenceChip({ evidence, label }: { evidence: Evidence; label?: string }) {
+  return (
+    <span
+      title={`${evidence.label} — ${evidence.note}`}
+      className={cn(
+        "inline-flex shrink-0 items-center rounded-md border px-1.5 py-[1px] text-[9px] font-semibold tracking-[0.06em] whitespace-nowrap uppercase",
+        EVIDENCE_STYLE[evidence.label],
+      )}
+    >
+      {label ? `${label} ${evidence.label}` : evidence.label}
+    </span>
+  );
+}
+
+/**
+ * What the airline has won, and what that does and does not cover.
+ *
+ * "I didn't know Cathay was number two in the world" (#69) — the airline half
+ * carries 55% of the score and showed as a bare 9.0. These are the reasons.
+ *
+ * The caveat under them is not boilerplate: every one of these honours is
+ * awarded to a carrier **fleet-wide**, across cabins the couple is not flying
+ * in, and none of them says anything about the aeroplane this itinerary puts
+ * them on for thirteen hours. That is what the sector list below is for, and
+ * the two are separated on the page so a wall of accolades cannot be mistaken
+ * for a promise about the seat.
+ */
+function CredentialsLine({ credentials }: { credentials: CarrierCredentials }) {
+  const shown = credentials.honours.slice(0, 3);
+  const rest = credentials.honours.length - shown.length;
+
+  return (
+    <li
+      className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[10.5px] leading-snug"
+      title={
+        credentials.honours.length > 0
+          ? `${credentials.name}: ${credentials.honours.join(" · ")}${
+              credentials.starsAsOf ? ` · Skytrax certification checked ${credentials.starsAsOf}` : ""
+            }`
+          : undefined
+      }
+    >
+      <span className="font-semibold text-[var(--sb-text)]">{credentials.name}</span>
+      <span className="sb-num text-[var(--sb-dim)]">{credentials.airlineScore.toFixed(1)}</span>
+      {credentials.stars !== null && (
+        <span className="text-[var(--sb-text)]">
+          <span aria-hidden>{"★".repeat(credentials.stars)}</span>
+          <span className="sr-only">{credentials.stars} star</span> Skytrax
+        </span>
+      )}
+      {shown.map((honour) => (
+        <span key={honour} className="text-[var(--sb-dim)]">
+          <span aria-hidden className="mr-2 text-[var(--sb-faint)]">
+            ·
+          </span>
+          {honour}
+        </span>
+      ))}
+      {rest > 0 && <span className="text-[var(--sb-faint)]">+{rest} more</span>}
+      <EvidenceChip evidence={credentials.evidence} />
+    </li>
+  );
+}
+
+/** '18" wide · 32" pitch · 3-3-3' — the geometry, when the research measured it. */
+function SeatGeometry({ sector }: { sector: SectorScore }) {
+  const dimensions = sector.seatDimensions;
+  const parts = [
+    dimensions?.widthIn ? `${dimensions.widthIn}" wide` : null,
+    dimensions?.pitchIn ? `${dimensions.pitchIn}" pitch` : null,
+    dimensions?.layout ?? null,
+    sector.cabinAltitudeFt ? `cabin ${sector.cabinAltitudeFt.toLocaleString("en-GB")} ft` : null,
+  ].filter(Boolean);
+
+  if (parts.length === 0) return null;
+
+  return (
+    <span className="flex flex-wrap items-baseline gap-x-1.5 text-[var(--sb-dim)]">
+      <span className="sb-num">{parts.join(" · ")}</span>
+      {sector.seatEvidence.dimensions && (
+        <EvidenceChip evidence={sector.seatEvidence.dimensions} />
+      )}
+    </span>
+  );
+}
+
 function ComfortBreakdown({ option }: { option: SearchOption }) {
   const { comfort } = option;
   const raw = rawScoreOf(comfort);
+
+  /** One line per carrier flown, not per sector: the honours are the airline's. */
+  const carriers = useMemo(() => {
+    const seen = new Map<string, CarrierCredentials>();
+    for (const sector of comfort.sectors) {
+      if (sector.credentials && !seen.has(sector.credentials.carrier)) {
+        seen.set(sector.credentials.carrier, sector.credentials);
+      }
+    }
+    return [...seen.values()];
+  }, [comfort.sectors]);
+
+  const sources = useMemo(
+    () => sourcesFor(["muhm2007", "anjani2021width", "ban2019", "vink2012"]),
+    [],
+  );
 
   return (
     <Section title="How the score is built">
@@ -211,66 +355,125 @@ function ComfortBreakdown({ option }: { option: SearchOption }) {
           weighted across the sectors.
         </p>
       ) : (
-        <p className="sb-num text-[11px] text-[var(--sb-dim)]">
-          0.55 × airline{" "}
-          <span className="font-semibold text-[var(--sb-text)]">
-            {comfort.airlineScore?.toFixed(1)}
-          </span>{" "}
-          + 0.45 × seat{" "}
-          <span className="font-semibold text-[var(--sb-text)]">
-            {comfort.seatScore.toFixed(1)}
+        <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-[var(--sb-dim)]">
+          <span className="sb-num">
+            {comfort.weights.airline.toFixed(2)} × airline{" "}
+            <span className="font-semibold text-[var(--sb-text)]">
+              {comfort.airlineScore?.toFixed(1)}
+            </span>{" "}
+            + {comfort.weights.aircraft.toFixed(2)} × seat{" "}
+            <span className="font-semibold text-[var(--sb-text)]">
+              {comfort.seatScore.toFixed(1)}
+            </span>
+            {comfort.adjustments.length > 0 && raw !== null && (
+              <> — adjustments = {comfort.score?.toFixed(1)} (raw {raw.toFixed(1)})</>
+            )}
           </span>
-          {comfort.adjustments.length > 0 && raw !== null && (
-            <> — adjustments = {comfort.score?.toFixed(1)} (raw {raw.toFixed(1)})</>
-          )}
+          <EvidenceChip evidence={comfort.weights.evidence} label="weight:" />
         </p>
       )}
 
-      <ul className="mt-2 flex flex-col gap-1.5">
+      {carriers.length > 0 && (
+        <>
+          <h4 className="sb-label mt-3 text-[9px]">The airline, fleet-wide</h4>
+          <ul className="mt-1 flex flex-col gap-1">
+            {carriers.map((credentials) => (
+              <CredentialsLine key={credentials.carrier} credentials={credentials} />
+            ))}
+          </ul>
+          <p className="mt-1 max-w-[62ch] text-[10px] leading-snug text-[var(--sb-faint)]">
+            Awarded to the airline across its whole fleet and every cabin it
+            sells — not to this route, and not to this aeroplane. What the
+            couple actually sits in is the next list down.
+          </p>
+        </>
+      )}
+
+      <h4 className="sb-label mt-3 text-[9px]">This itinerary, sector by sector</h4>
+      <ul className="mt-1 flex flex-col gap-1.5">
         {comfort.sectors.map((sector, index) => (
           <li
             key={`${sector.sector.to}-${index}`}
-            className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[10.5px] leading-snug"
+            className="flex flex-col gap-0.5 text-[10.5px] leading-snug"
           >
-            <span className="sb-num w-[52px] shrink-0 text-[var(--sb-faint)]">
-              {sector.sector.hours}h
+            <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className="sb-num w-[52px] shrink-0 text-[var(--sb-faint)]">
+                {sector.sector.hours}h
+              </span>
+              <span className="font-semibold text-[var(--sb-text)]">
+                {sector.carrierName ?? sector.sector.carrier}
+              </span>
+              <span className="text-[var(--sb-dim)]">{sector.sector.aircraft}</span>
+              <span className="sb-num text-[var(--sb-dim)]">
+                seat {sector.seatScore.toFixed(1)}
+              </span>
+              <EvidenceChip evidence={sector.seatEvidence.score} label="score:" />
+              <span className="text-[var(--sb-faint)]">
+                {sector.seatSource === "config"
+                  ? `carrier config · ${sector.seatConfidence ?? "—"} confidence`
+                  : sector.seatSource === "type"
+                    ? "aircraft type only"
+                    : "type unmeasured"}
+              </span>
             </span>
-            <span className="font-semibold text-[var(--sb-text)]">
-              {sector.carrierName ?? sector.sector.carrier}
-            </span>
-            <span className="text-[var(--sb-dim)]">{sector.sector.aircraft}</span>
-            <span className="sb-num text-[var(--sb-dim)]">
-              seat {sector.seatScore.toFixed(1)}
-            </span>
-            <span className="text-[var(--sb-faint)]">
-              {sector.seatSource === "config"
-                ? `carrier config · ${sector.seatConfidence ?? "—"} confidence`
-                : sector.seatSource === "type"
-                  ? "aircraft type only"
-                  : "type unmeasured"}
+            <span className="flex flex-wrap items-baseline gap-x-2 pl-[52px] text-[10px]">
+              <SeatGeometry sector={sector} />
             </span>
           </li>
         ))}
       </ul>
 
       {comfort.adjustments.length > 0 && (
-        <ul className="mt-2 flex flex-col gap-1.5">
-          {comfort.adjustments.map((adjustment) => (
-            <li key={adjustment.name} className="text-[10.5px] leading-snug">
-              <span className="sb-num font-semibold text-[var(--sb-warn)]">
-                {adjustment.points.toFixed(2).replace(/0$/, "")}
-              </span>{" "}
-              <span className="font-semibold text-[var(--sb-text)]">{adjustment.label}</span>
-              <span className="block max-w-[62ch] text-[var(--sb-dim)]">{adjustment.detail}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <h4 className="sb-label mt-3 text-[9px]">Adjustments</h4>
+          <ul className="mt-1 flex flex-col gap-1.5">
+            {comfort.adjustments.map((adjustment) => (
+              <li key={adjustment.name} className="text-[10.5px] leading-snug">
+                <span className="flex flex-wrap items-baseline gap-x-1.5">
+                  <span className="sb-num font-semibold text-[var(--sb-warn)]">
+                    {adjustment.points.toFixed(2).replace(/0$/, "")}
+                  </span>
+                  <span className="font-semibold text-[var(--sb-text)]">{adjustment.label}</span>
+                  <EvidenceChip evidence={adjustment.evidence} />
+                </span>
+                <span className="block max-w-[62ch] text-[var(--sb-dim)]">{adjustment.detail}</span>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
-      <p className="mt-2 max-w-[62ch] text-[10px] leading-snug text-[var(--sb-faint)]">
+      <p className="mt-3 max-w-[62ch] text-[10px] leading-snug text-[var(--sb-faint)]">
         Scored from {option.origin} outwards. A positioning hop is priced in the
         chain, not scored here, so a hub reached by train is judged on the same
-        basis as one reached by Lufthansa. Differences below ~0.3 are noise.
+        basis as one reached by Lufthansa. Differences below ~0.3 are noise.{" "}
+        <span className="text-[var(--sb-dim)]">
+          Skytrax star certifications are current; the Skytrax <em>ranks</em> are
+          the 2025 vote — the 2026 World Airline Awards are announced on{" "}
+          {SKYTRAX_REFRESH_DATE} and this dataset predates them.
+        </span>{" "}
+        Sources:{" "}
+        {sources.map((source, index) => (
+          <span key={source.id}>
+            {index > 0 && "; "}
+            {source.href ? (
+              <a
+                href={source.href}
+                target="_blank"
+                rel="noreferrer"
+                title={source.limitation ? `${source.finding} Limitation: ${source.limitation}` : source.finding}
+                className="underline decoration-dotted underline-offset-2 hover:text-[var(--sb-text)]"
+              >
+                {source.label}
+              </a>
+            ) : (
+              source.label
+            )}
+          </span>
+        ))}
+        . Full audit in{" "}
+        <span className="sb-num">docs/research/comfort-ratings.md</span>, section
+        “Evidence basis”.
       </p>
     </Section>
   );
