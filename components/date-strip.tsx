@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useState } from "react";
 import { AlarmClock, ChevronDown, TriangleAlert } from "lucide-react";
 
+import { daysUntil, useToday } from "@/lib/countdown";
 import { eventsForDays } from "@/lib/events";
 import {
   DAILY_CAP_AUD,
@@ -17,7 +18,6 @@ import {
   PRE_TRIP_DEADLINES,
   WINDOW_END,
   WINDOW_START,
-  daysBetween,
   formatDay,
   formatDayYear,
   monthKey,
@@ -93,22 +93,6 @@ function DateChip({
 }
 
 /**
- * Today, on the client only.
- *
- * A countdown rendered on the server would be baked into the HTML and would be
- * a day wrong for anyone who kept the tab open — and would mismatch hydration
- * across a midnight. The server snapshot is deliberately null, so the banner
- * renders its labels first and the countdown arrives with the client.
- */
-const noSubscription = () => () => {};
-const todayIso = () => new Date().toISOString().slice(0, 10);
-const noToday = () => null;
-
-function useToday(): string | null {
-  return useSyncExternalStore(noSubscription, todayIso, noToday);
-}
-
-/**
  * The deadlines that fall before the window opens, as a countdown chip.
  *
  * They have no position on a rail that starts in December — booking the
@@ -132,7 +116,7 @@ function ClocksTicking() {
     [],
   );
   const next = ranked[0];
-  const away = today && next ? daysBetween(today, next.date) - 1 : null;
+  const away = today && next ? daysUntil(today, next.date) : null;
   const shown = ranked.find((deadline) => deadline.id === shownId);
 
   if (!next) return null;
@@ -177,7 +161,7 @@ function ClocksTicking() {
           <ul className="mt-1.5 flex flex-col gap-1">
             {ranked.map((deadline) => {
               const days = today
-                ? daysBetween(today, deadline.date) - 1
+                ? daysUntil(today, deadline.date)
                 : null;
               return (
                 <li key={deadline.id}>
