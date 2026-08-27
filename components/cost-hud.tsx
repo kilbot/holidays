@@ -10,6 +10,7 @@ import {
   type RollUp,
   type Warning,
 } from "@/lib/engine";
+import type { ScenarioTotal } from "@/lib/engine/scenarios";
 import { usePlan } from "@/lib/engine/use-plan";
 import { cn } from "@/lib/utils";
 
@@ -163,6 +164,83 @@ function Row({
   );
 }
 
+/**
+ * The Scenarios, side by side.
+ *
+ * docs/CONTEXT.md: a Scenario is a full alternate calendar for a big fork —
+ * "Fireworks NYE" against "Doof NYE", a 12-Feb departure against a 22-Feb one —
+ * "compared side by side; exactly one is marked as the current Plan". This is
+ * that comparison, and it lives inside the cost panel rather than in a panel of
+ * its own because the only thing worth comparing at a glance is the money.
+ *
+ * A fork copies the current Scenario's whole input, so it starts identical and
+ * diverges as it is edited. Visitor Forks with their own URLs are #30; this is
+ * the couple's own list.
+ */
+function Scenarios({
+  totals,
+  onSelect,
+  onFork,
+}: {
+  totals: ScenarioTotal[];
+  onSelect: (id: string) => void;
+  onFork: () => void;
+}) {
+  return (
+    <div className="mt-2.5 border-t border-[var(--sb-line)] pt-2">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="sb-label text-[9px]">Scenarios</p>
+        <button
+          type="button"
+          onClick={onFork}
+          title="Copy this Scenario under a new name. The copy starts identical and diverges as you edit it."
+          className="sb-label cursor-pointer text-[9px] text-[var(--sb-accent)] hover:underline"
+        >
+          Fork
+        </button>
+      </div>
+
+      <ul className="mt-1 flex flex-col gap-0.5">
+        {totals.map((total) => (
+          <li key={total.id}>
+            <button
+              type="button"
+              onClick={() => onSelect(total.id)}
+              aria-current={total.current}
+              className={cn(
+                "flex w-full cursor-pointer items-baseline justify-between gap-2 rounded-md px-1 py-0.5 text-left transition-colors hover:bg-[var(--sb-panel-2)] motion-reduce:transition-none",
+                total.current && "bg-[var(--sb-panel-2)]",
+              )}
+            >
+              <span
+                className={cn(
+                  "truncate text-[10.5px] leading-tight",
+                  total.current
+                    ? "font-semibold text-[var(--sb-text)]"
+                    : "text-[var(--sb-dim)]",
+                )}
+              >
+                {total.name}
+                <span className="ml-1 text-[var(--sb-faint)]">
+                  {total.dayCount}d
+                </span>
+              </span>
+              <span className="sb-num shrink-0 text-[10.5px] text-[var(--sb-dim)]">
+                {formatEur(total.totalEur)}
+                {total.warnings > 0 && (
+                  <span className="ml-1 text-[var(--sb-warn)]">
+                    ⚠{total.warnings}
+                  </span>
+                )}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function WarningBadge({ warning }: { warning: Warning }) {
   const over = warning.tone === "over";
   return (
@@ -212,7 +290,7 @@ function WarningBadge({ warning }: { warning: Warning }) {
  */
 export function CostHud() {
   const [open, setOpen] = useState(false);
-  const { plan, scenarios, input, patch } = usePlan();
+  const { plan, scenarios, totals, input, patch } = usePlan();
   const { rollUp, warnings } = plan;
 
   // The badge shows the loudest three. The rest are on the Days they belong to,
@@ -287,6 +365,13 @@ export function CostHud() {
               fxStress={input.fxStress}
               onContingency={(contingency) => patch({ contingency })}
               onFxStress={(fxStress) => patch({ fxStress })}
+            />
+            <Scenarios
+              totals={totals}
+              onSelect={scenarios.select}
+              onFork={() =>
+                scenarios.fork(`Fork ${scenarios.scenarios.length + 1}`)
+              }
             />
             {ranked.slice(0, 3).map((warning) => (
               <WarningBadge key={warning.id} warning={warning} />

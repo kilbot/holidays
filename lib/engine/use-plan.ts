@@ -23,7 +23,12 @@ import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import { capsuleCatalogue } from "@/lib/engine/capsules";
 import { buildPlan } from "@/lib/engine/plan";
-import { useScenarios, type ScenarioApi } from "@/lib/engine/scenarios";
+import {
+  scenarioTotals,
+  useScenarios,
+  type ScenarioApi,
+  type ScenarioTotal,
+} from "@/lib/engine/scenarios";
 import type { LegMode, Plan, PlanInput } from "@/lib/engine/types";
 import { useShortlist } from "@/lib/shortlist";
 import { TRAVELLERS } from "@/lib/engine/constants";
@@ -100,6 +105,8 @@ async function hydrateFare(id: string, from: string, to: string, date: string) {
 export interface PlanApi {
   plan: Plan;
   scenarios: ScenarioApi;
+  /** Every Scenario's headline numbers, computed the same way as this one's. */
+  totals: ScenarioTotal[];
   /** The current Scenario's input, for a knob that wants to read one value. */
   input: PlanInput;
   /** Change one field of the input. Everything downstream re-derives. */
@@ -164,9 +171,23 @@ export function usePlan(): PlanApi {
   const patch = (changes: Partial<PlanInput>) =>
     scenarios.update({ ...input, ...changes });
 
+  // Cheap enough to do eagerly: a Scenario is a saved input and building one
+  // is the same pure pass this hook already runs for the current Plan.
+  const totals = useMemo(
+    () =>
+      scenarioTotals(
+        { scenarios: scenarios.scenarios, currentId: scenarios.currentId },
+        catalogue,
+        placed,
+        fares,
+      ),
+    [scenarios.scenarios, scenarios.currentId, catalogue, placed, fares],
+  );
+
   return {
     plan,
     scenarios,
+    totals,
     input,
     patch,
     moveRange: (end, date) => {

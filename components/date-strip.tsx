@@ -529,11 +529,15 @@ export function DateStrip() {
               </span>{" "}
               buffer
             </span>
+            {/* The same figure the cost panel shows, deliberately: two totals
+                on one screen that disagree is the exact fault the demo strip
+                had. The sum of the Days, plus the contingency row when it is
+                switched on. */}
             <span
-              title="The sum of every Day in the ledger, at the cheapest realistic figure. The band, the worst case and the contingency row are in the cost panel."
+              title="The sum of every Day in the ledger, at the cheapest realistic figure, plus the contingency row. The band and the worst case are in the cost panel."
               className="text-[var(--sb-text)]"
             >
-              €{Math.round(plan.rollUp.planOnEur).toLocaleString("en-GB")}
+              €{Math.round(plan.rollUp.totalEur).toLocaleString("en-GB")}
             </span>
           </p>
 

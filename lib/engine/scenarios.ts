@@ -34,8 +34,8 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-import { EMPTY_INPUT } from "@/lib/engine/plan";
-import type { PlanInput } from "@/lib/engine/types";
+import { EMPTY_INPUT, buildPlan } from "@/lib/engine/plan";
+import type { CapsuleSpec, PlanInput } from "@/lib/engine/types";
 
 const STORAGE_KEY = "southbound.scenarios.v1";
 
@@ -333,6 +333,72 @@ export function useScenarios(): ScenarioApi {
   }, []);
 
   return { ...state, current, update, fork, select, remove, rename };
+}
+
+/* ------------------------------------------------------------------ */
+/* Side by side                                                        */
+/* ------------------------------------------------------------------ */
+
+/** One Scenario's headline numbers, for a comparison row. */
+export interface ScenarioTotal {
+  id: string;
+  name: string;
+  current: boolean;
+  dayCount: number;
+  /** The plan-on figure plus its contingency row — what the HUD shows. */
+  totalEur: number;
+  bandEur: [number, number];
+  worstCaseEur: number;
+  /** Warnings the Scenario carries. A cheaper Plan with three is not cheaper. */
+  warnings: number;
+}
+
+/**
+ * Every Scenario's total, computed the same way.
+ *
+ * This is the "compared side by side" half of docs/CONTEXT.md's Scenario, and
+ * it is three lines because a Plan is a pure function of its input: comparing
+ * two Scenarios is calling `buildPlan` twice. There is no separate comparison
+ * model to keep in step, and no risk of the comparison being computed
+ * differently from the Plan it compares.
+ *
+ * The caller supplies the catalogue so this module stays free of the research
+ * corpus — the same boundary `capsules.ts` exists to hold.
+ */
+export function scenarioTotals(
+  state: ScenarioState,
+  catalogue: readonly CapsuleSpec[],
+  placedCatalogIds: readonly string[] = [],
+  /**
+   * Live fares, keyed by Leg id. Passed through so the current Scenario's row
+   * agrees with the headline figure above it — a comparison whose first row
+   * disagrees with the number it sits under is worse than no comparison. Keys
+   * carry their date, so a Scenario on other dates simply matches none of them.
+   */
+  fareOverrides: Readonly<Record<string, number>> = {},
+): ScenarioTotal[] {
+  return state.scenarios.map((scenario) => {
+    const plan = buildPlan(
+      {
+        ...scenario.input,
+        toggled: [
+          ...new Set([...scenario.input.toggled, ...placedCatalogIds]),
+        ],
+        fareOverrides: { ...scenario.input.fareOverrides, ...fareOverrides },
+      },
+      catalogue,
+    );
+    return {
+      id: scenario.id,
+      name: scenario.name,
+      current: scenario.id === state.currentId,
+      dayCount: plan.dayCount,
+      totalEur: plan.rollUp.totalEur,
+      bandEur: plan.rollUp.bandEur,
+      worstCaseEur: plan.rollUp.worstCaseEur,
+      warnings: plan.warnings.length,
+    };
+  });
 }
 
 /** A slug that is not already taken, so two "Doof NYE" forks can coexist. */
