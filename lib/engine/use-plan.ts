@@ -22,6 +22,7 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import { capsuleCatalogue } from "@/lib/engine/capsules";
+import { planMembership } from "@/lib/engine/membership";
 import { buildPlan } from "@/lib/engine/plan";
 import {
   scenarioTotals,
@@ -131,26 +132,62 @@ export interface PlanApi {
   setLegMode: (legId: string, mode: LegMode) => void;
 }
 
-export function usePlan(): PlanApi {
+/**
+ * Which Capsules are on the Plan, without building one.
+ *
+ * The sift pages need the answer for a pin and a pressed state, and running the
+ * Scheduler and the ledger on every keystroke of a 413-row filter to find out
+ * would be absurd. Membership is two reads and a set.
+ *
+ * It matters that they ask: the reference Scenario ships with eight researched
+ * Adventures already on the Plan and no shortlist verdict recorded for any of
+ * them, so a grid that read `marks` alone drew all eight as untouched — and the
+ * traveller pressing *Plan* on something that was already planned is exactly the
+ * gesture #58 describes as doing nothing.
+ */
+export function usePlanMembership(): ReadonlySet<string> {
   const scenarios = useScenarios();
   const { marks } = useShortlist();
+  const toggled = scenarios.current.input.toggled;
+  return useMemo(
+    () => new Set(planMembership(toggled, marks)),
+    [toggled, marks],
+  );
+}
+
+export function usePlan(): PlanApi {
+  const scenarios = useScenarios();
+  const { marks, toggle: mark } = useShortlist();
   const fares = useSyncExternalStore(subscribeFares, readFares, noFares);
 
   const input = scenarios.current.input;
 
-  // Catalog ideas marked *placed* are Capsules the Scheduler has to find days
-  // for. Ideas marked *interested* sit on the bench and cost nothing —
-  // docs/CONTEXT.md is explicit that the bench occupies no calendar Days.
-  const placed = useMemo(
-    () =>
-      Object.entries(marks)
-        .filter(([, state]) => state === "placed")
-        .map(([id]) => id)
-        .sort(),
-    [marks],
+  // What the Scheduler has to find days for: the Scenario's own list, with the
+  // shortlist's verdicts applied over it. `membership.ts` carries the rule and
+  // the bug it replaced — a union here is what pinned all eight researched
+  // Adventures permanently on (#58).
+  const onPlan = useMemo(
+    () => planMembership(input.toggled, marks),
+    [input.toggled, marks],
   );
 
-  const catalogue = useMemo(() => capsuleCatalogue(placed), [placed]);
+  // Specs for every id any Scenario might reach for, not just this one's: the
+  // comparison rows below price the alternates, and a Scenario whose Capsules
+  // were missing from the catalogue would silently price as a cheaper trip.
+  const catalogueIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const scenario of scenarios.scenarios) {
+      for (const id of planMembership(scenario.input.toggled, marks)) {
+        ids.add(id);
+      }
+    }
+    return [...ids].sort();
+  }, [scenarios.scenarios, marks]);
+
+  const catalogue = useMemo(
+    () => capsuleCatalogue(catalogueIds),
+    [catalogueIds],
+  );
 
   const capsules = useMemo(
     () => new Map(catalogue.map((spec) => [spec.id, spec])),
@@ -160,18 +197,10 @@ export function usePlan(): PlanApi {
   const plan = useMemo(
     () =>
       buildPlan(
-        {
-          ...input,
-          // The Scheduler places every researched Capsule that is toggled on,
-          // plus every Catalog idea marked Plan. The two lists are merged here
-          // rather than in the Scenario so that marking an idea Plan takes
-          // effect in every Scenario at once, which is what the sift means.
-          toggled: [...new Set([...input.toggled, ...placed])],
-          fareOverrides: { ...input.fareOverrides, ...fares },
-        },
+        { ...input, toggled: onPlan, fareOverrides: { ...input.fareOverrides, ...fares } },
         catalogue,
       ),
-    [input, placed, catalogue, fares],
+    [input, onPlan, catalogue, fares],
   );
 
   // Fetch the Legs the grid covers. Runs after render, once per Leg per tab.
@@ -192,10 +221,10 @@ export function usePlan(): PlanApi {
       scenarioTotals(
         { scenarios: scenarios.scenarios, currentId: scenarios.currentId },
         catalogue,
-        placed,
+        marks,
         fares,
       ),
-    [scenarios.scenarios, scenarios.currentId, catalogue, placed, fares],
+    [scenarios.scenarios, scenarios.currentId, catalogue, marks, fares],
   );
 
   return {
@@ -213,12 +242,11 @@ export function usePlan(): PlanApi {
       );
       patch({ startDate: moved.start, endDate: moved.end });
     },
+    // One gesture, one writer. `setMark` records the verdict *and* writes the
+    // Scenario's `toggled` list, so a caller here and a click on a shortlist
+    // row cannot disagree about what is on the Plan.
     toggle: (capsuleId) =>
-      patch({
-        toggled: input.toggled.includes(capsuleId)
-          ? input.toggled.filter((id) => id !== capsuleId)
-          : [...input.toggled, capsuleId],
-      }),
+      mark(capsuleId, onPlan.includes(capsuleId) ? "interested" : "placed"),
     place: (capsuleId, startDate) =>
       patch({
         placementOverrides: { ...input.placementOverrides, [capsuleId]: startDate },

@@ -22,6 +22,7 @@ import {
   formatCapsuleDays,
   formatEur,
 } from "@/lib/deep-capsules";
+import { usePlanMembership } from "@/lib/engine/use-plan";
 import {
   useShortlist,
   type MarkedState,
@@ -80,12 +81,21 @@ interface RailEntry {
  * id that resolves to neither is a mark left behind by an entry that has since
  * been re-cut, and it is dropped rather than rendered as an empty row.
  */
-function railEntries(marks: ShortlistMap): RailEntry[] {
+function railEntries(
+  marks: ShortlistMap,
+  onPlan: ReadonlySet<string>,
+): RailEntry[] {
   const entries: RailEntry[] = [];
 
-  for (const [id, state] of Object.entries(marks)) {
-    if (state !== "interested" && state !== "placed") continue;
-    const placed = state === "placed";
+  // Everything on the Plan, plus everything on the bench. The union is over ids
+  // rather than over verdicts because the reference Scenario puts eight
+  // Adventures on the Plan without recording a verdict for any of them, and a
+  // rail that listed only marked ideas left the traveller with no control over
+  // the eight that were actually costing money (#58).
+  for (const id of new Set([...Object.keys(marks), ...onPlan])) {
+    const state = marks[id];
+    const placed = onPlan.has(id);
+    if (!placed && state !== "interested") continue;
 
     const idea = catalogIdeaById(id);
     if (idea) {
@@ -232,7 +242,11 @@ function ShortlistRow({
 
 function ShortlistBody() {
   const { marks, counts, toggle: mark } = useShortlist();
-  const entries = useMemo(() => railEntries(marks), [marks]);
+  const onPlan = usePlanMembership();
+  const entries = useMemo(
+    () => railEntries(marks, onPlan),
+    [marks, onPlan],
+  );
 
   return (
     <>
@@ -250,7 +264,7 @@ function ShortlistBody() {
           {counts.interested}
         </span>{" "}
         interested ·{" "}
-        <span className="sb-num text-[var(--sb-good)]">{counts.placed}</span> on
+        <span className="sb-num text-[var(--sb-good)]">{onPlan.size}</span> on
         the plan
         {counts.discarded > 0 && (
           <>
@@ -307,7 +321,8 @@ function ShortlistBody() {
 
 export function ShortlistRail() {
   const { counts } = useShortlist();
-  const benched = counts.interested + counts.placed;
+  const onPlan = usePlanMembership();
+  const benched = counts.interested + onPlan.size;
 
   // Server-rendered collapsed, then opened by the effect on a wide viewport:
   // `matchMedia` has no answer during SSR, and collapsed is the safe first

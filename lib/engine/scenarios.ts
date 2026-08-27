@@ -36,6 +36,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 
 import { buildPlan } from "@/lib/engine/plan";
+import { planMembership, type VerdictMap } from "@/lib/engine/membership";
 import {
   DEFAULT_SCENARIO,
   INITIAL_STATE,
@@ -178,6 +179,48 @@ export function installScenarioStore(
   STORE = choose(LOCAL);
 }
 
+/**
+ * Put a Capsule on the current Scenario, or take it off — without a hook.
+ *
+ * The shortlist is the only surface that puts an Adventure on the Plan, and it
+ * lives on `/adventures`, three pages away from anything that renders a Plan.
+ * Calling `usePlan()` there to get at `toggle` would run the Scheduler and the
+ * whole ledger on every keystroke of the sift, for a number nothing on that page
+ * shows. So the write is a plain function over the same store the hook reads,
+ * exactly like `setMark` in `lib/shortlist.ts`.
+ *
+ * It writes to the **current** Scenario, which is what every other knob does:
+ * the alternates are alternates, and marking an idea on the Plan while looking
+ * at "Fireworks NYE" means putting it on "Fireworks NYE".
+ *
+ * This is what makes membership survive a reload and travel in a Fork. The
+ * shortlist's own marks are per-browser by design (`lib/shortlist.ts` says why),
+ * so a placement recorded only there would never reach the couple's other phone.
+ */
+export function setToggled(capsuleId: string, on: boolean): void {
+  const now = store().read();
+  const current =
+    now.scenarios.find((scenario) => scenario.id === now.currentId) ??
+    now.scenarios[0];
+  if (!current) return;
+
+  const already = current.input.toggled.includes(capsuleId);
+  if (already === on) return;
+
+  const toggled = on
+    ? [...current.input.toggled, capsuleId]
+    : current.input.toggled.filter((id) => id !== capsuleId);
+
+  store().write({
+    ...now,
+    scenarios: now.scenarios.map((scenario) =>
+      scenario.id === current.id
+        ? { ...scenario, input: { ...scenario.input, toggled } }
+        : scenario,
+    ),
+  });
+}
+
 export interface ScenarioApi extends ScenarioState {
   current: Scenario;
   /** Replace the current Scenario's input. Every knob change lands here. */
@@ -294,7 +337,12 @@ export interface ScenarioTotal {
 export function scenarioTotals(
   state: ScenarioState,
   catalogue: readonly CapsuleSpec[],
-  placedCatalogIds: readonly string[] = [],
+  /**
+   * The shortlist's verdicts, applied to every Scenario the same way the
+   * current one applies them. A comparison row computed off a different
+   * membership rule from the headline above it is a comparison of nothing.
+   */
+  marks: VerdictMap = {},
   /**
    * Live fares, keyed by Leg id. Passed through so the current Scenario's row
    * agrees with the headline figure above it — a comparison whose first row
@@ -307,9 +355,7 @@ export function scenarioTotals(
     const plan = buildPlan(
       {
         ...scenario.input,
-        toggled: [
-          ...new Set([...scenario.input.toggled, ...placedCatalogIds]),
-        ],
+        toggled: planMembership(scenario.input.toggled, marks),
         fareOverrides: { ...scenario.input.fareOverrides, ...fareOverrides },
       },
       catalogue,

@@ -21,6 +21,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import { setToggled } from "@/lib/engine/scenarios";
+
 export type ShortlistState = "unseen" | "interested" | "discarded" | "placed";
 
 /** The three states worth writing down. */
@@ -122,6 +124,16 @@ function setMark(id: string, state: MarkedState): void {
     cachedRaw = null;
   }
   for (const listener of listeners) listener();
+
+  // Membership follows the verdict, into the Scenario that carries it. The
+  // marks above are this browser's; the Scenario is the couple's Plan and the
+  // thing a Fork copies, so "on the Plan" has to be written there too — see
+  // `lib/engine/membership.ts` for why the two are not merged with a union.
+  //
+  // Ordering matters: the marks are published first so the sift UI repaints
+  // from the verdict it was given, and the Plan rebuild follows on the same
+  // tick from a store React is separately subscribed to.
+  setToggled(id, next[id] === "placed");
 }
 
 export interface ShortlistCounts {
