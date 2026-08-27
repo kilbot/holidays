@@ -175,12 +175,16 @@ function NextUp() {
       of them have a clock running
       {days !== null && days >= 0 && (
         <>
-          {" — the next in "}
-          <span className={cn("sb-num font-semibold", toneFor(days))}>
-            {days === 0 ? "hours" : `${days} days`}
+          {" — the next is "}
+          <span className="font-semibold text-[var(--sb-text)]">
+            {next.name}
           </span>
-          {", "}
-          {next.name.toLowerCase()}
+          {days === 0 ? ", today" : ", in "}
+          {days > 0 && (
+            <span className={cn("sb-num font-semibold", toneFor(days))}>
+              {days} days
+            </span>
+          )}
         </>
       )}
       .

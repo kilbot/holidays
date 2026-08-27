@@ -43,7 +43,7 @@ export type ResourceGroup = (typeof RESOURCE_GROUPS)[number];
 export interface ResourceDeadline {
   /** ISO day, UTC-safe like every other date in the site. */
   date: string;
-  kind: "book by" | "on sale" | "re-check" | "before departure";
+  kind: "book by" | "join by" | "on sale" | "re-check" | "before departure";
 }
 
 export interface Resource {
@@ -180,7 +180,7 @@ export const RESOURCES: readonly Resource[] = [
       "The largest Australian pool by a distance and the clear buy for a couple doing one or two sits — Sydney assignments covering the whole NYE block were already listed four months out.",
     keyFigure: "A$89/yr · 1,000–1,500+ AU listings · no booking fee",
     url: "https://www.housesitters.com.au/",
-    deadline: { date: "2026-09-30", kind: "book by" },
+    deadline: { date: "2026-09-30", kind: "join by" },
     source: "relocation-transport-hacks.md §8.1",
   },
   {
@@ -220,9 +220,9 @@ export const RESOURCES: readonly Resource[] = [
   {
     id: "per-syd-flight",
     group: "Booking",
-    name: "PER→SYD, 26 Dec — book by 1 October",
+    name: "PER→SYD flight, 26 Dec",
     whyOneLine:
-      "The critical Leg, and the one date on this page that cannot slip: Australian domestic fares are bucketed inventory that ratchets up and never comes back down.",
+      "The critical Leg, and the one date here that cannot slip — a 26 Dec relocation will not surface until early December, long after this fare has gone, so buy the flight and treat any relocation as a bonus you would walk away from.",
     keyFigure: "A$400–700 pp early against A$800–1,200 late",
     url: "https://www.google.com/travel/flights",
     deadline: { date: "2026-10-01", kind: "book by" },
@@ -231,7 +231,7 @@ export const RESOURCES: readonly Resource[] = [
   {
     id: "tasmania-car",
     group: "Booking",
-    name: "Tasmania hire car — book by early October",
+    name: "Tasmania hire car",
     whyOneLine:
       "The binding constraint of the entire Tasmania block: the island's fleet is small and it sells out over the Christmas–January holidays, so the failure mode is “there are no cars” rather than “the cars are expensive”.",
     keyFigure: "A$98/day January average, +58% · Hobart quoted at A$171",
@@ -242,7 +242,7 @@ export const RESOURCES: readonly Resource[] = [
   {
     id: "nye-lodging",
     group: "Booking",
-    name: "Sydney NYE lodging block — book early October",
+    name: "Sydney NYE lodging block",
     whyOneLine:
       "Supply-constrained rather than price-constrained, and the harbourside norm is three nights minimum, fully prepaid, fully non-refundable — the largest irreversible exposure in the Plan.",
     keyFigure: "Rates run ×2.5–3.0 across 29 Dec – 1 Jan",
@@ -286,7 +286,7 @@ export const RESOURCES: readonly Resource[] = [
   {
     id: "opera-house-forecourt",
     group: "Booking",
-    name: "Opera House Forecourt tickets — 26 Dec, 10:00 AEDT",
+    name: "Opera House Forecourt tickets, 10:00 AEDT",
     whyOneLine:
       "6,000 free tickets released on the morning of the PER→SYD flight: whoever is not driving to the airport books it from a phone with the page already open, and it is the highest-value ten minutes in the whole trip.",
     keyFigure: "10:00 AEDT = 07:00 AWST · max 6 per booking",
