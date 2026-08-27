@@ -343,4 +343,17 @@ export const COMPACT_CAMERA = {
  */
 export const GLOBE_MAX_FIT_ZOOM = 1.55;
 
-export const MAP_STYLE = "mapbox://styles/mapbox/dark-v11";
+/**
+ * The globe commits to daylight, in both themes.
+ *
+ * `dark-v11` matched the chrome's dark palette and made the actual point of
+ * the page — a continent worth flying 15,000km to look at — a grey smudge.
+ * `outdoors-v12` is the brightest of the classic styles that still carries
+ * real information: green landcover, terrain shading, blue water, and the
+ * national parks and reserves that half the Catalog is about. It is a classic
+ * style rather than Standard, which means `addLayer`, `setFog` and
+ * `queryRenderedFeatures` all behave exactly as the route layers already
+ * expect. The route holds its contrast against it through the `--sb-map-*`
+ * tokens, which do not flip with the theme.
+ */
+export const MAP_STYLE = "mapbox://styles/mapbox/outdoors-v12";

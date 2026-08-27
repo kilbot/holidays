@@ -58,6 +58,10 @@ function prefersReducedMotion(): boolean {
  * Line and marker colours are read from the design tokens at mount rather
  * than hard-coded, so the globe's route stays in step with the palette.
  * Mapbox paint properties want concrete colours, not CSS variables.
+ *
+ * The route reads the `--sb-map-*` tokens rather than the chrome's, because
+ * the map commits to daylight in both themes and the ink has to hold contrast
+ * against green, blue and pale desert rather than against a panel.
  */
 function tokenColor(name: string, fallback: string): string {
   if (typeof window === "undefined") return fallback;
@@ -158,11 +162,12 @@ export function GlobeStage() {
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
 
-    const sea = tokenColor("--sb-sea", "#5fa8c7");
-    const accent = tokenColor("--sb-accent", "#ff6b4a");
-    const good = tokenColor("--sb-good", "#4caf7d");
-    const text = tokenColor("--sb-text", "#e9e4d8");
-    const ink = tokenColor("--sb-ink", "#0e1622");
+    const arc = tokenColor("--sb-map-arc", "#0d4d66");
+    const casing = tokenColor("--sb-map-casing", "#ffffff");
+    const accent = tokenColor("--sb-map-stop", "#d2402a");
+    const good = tokenColor("--sb-map-capsule", "#146c3a");
+    const text = tokenColor("--sb-map-label", "#14232f");
+    const halo = tokenColor("--sb-map-halo", "#ffffff");
 
     const map = new mapboxgl.Map({
       container,
@@ -228,18 +233,20 @@ export function GlobeStage() {
     });
 
     map.on("style.load", () => {
-      // Atmosphere: the globe should read as a planet in space, not a sphere
-      // on a flat backdrop.
+      // Atmosphere: a daylit planet in space, not a sphere on a flat backdrop.
+      // Space stays deep blue rather than black — the globe should look
+      // photographed from orbit on a clear day, which is the register the
+      // bright style is going for.
       map.setFog({
-        color: "rgb(18, 30, 46)",
-        "high-color": "rgb(26, 48, 74)",
+        color: "rgb(198, 222, 244)",
+        "high-color": "rgb(126, 176, 232)",
         // Kept low: Valencia sits ~80° from the camera — near the limb, because
         // Valencia and Melbourne are very nearly antipodal and no globe
         // framing can put both in the middle. A heavier haze would swallow
         // the European end of the route entirely.
-        "horizon-blend": 0.015,
-        "space-color": "rgb(7, 12, 20)",
-        "star-intensity": 0.12,
+        "horizon-blend": 0.02,
+        "space-color": "rgb(16, 30, 56)",
+        "star-intensity": 0.08,
       });
 
       map.addSource(SOURCE_LEGS, { type: "geojson", data: routeLegsGeoJSON() });
@@ -256,18 +263,20 @@ export function GlobeStage() {
         data: interestedGeoJSON([]),
       });
 
-      // Wide, soft casing under the route so arcs stay visible over the
-      // bright Australian landmass.
+      // A solid white casing under the route rather than the old soft glow.
+      // On a terrain style the ground is never one colour — coastline,
+      // relief shading and park green all run under these arcs — and a
+      // cartographic casing is what keeps a thin line legible over all of it.
       map.addLayer({
         id: "legs-glow",
         type: "line",
         source: SOURCE_LEGS,
         layout: { "line-cap": "round", "line-join": "round" },
         paint: {
-          "line-color": sea,
-          "line-width": ["case", ["get", "longHaul"], 9, 6],
-          "line-opacity": 0.18,
-          "line-blur": 6,
+          "line-color": casing,
+          "line-width": ["case", ["get", "longHaul"], 6, 4.5],
+          "line-opacity": 0.75,
+          "line-blur": 0.4,
         },
       });
 
@@ -281,7 +290,7 @@ export function GlobeStage() {
         source: SOURCE_LEGS,
         filter: ["==", ["get", "longHaul"], true],
         layout: { "line-cap": "round", "line-join": "round" },
-        paint: { "line-color": sea, "line-width": 2.2, "line-opacity": 0.95 },
+        paint: { "line-color": arc, "line-width": 2.4, "line-opacity": 1 },
       });
 
       map.addLayer({
@@ -291,9 +300,9 @@ export function GlobeStage() {
         filter: ["==", ["get", "longHaul"], false],
         layout: { "line-cap": "butt", "line-join": "round" },
         paint: {
-          "line-color": sea,
-          "line-width": 1.4,
-          "line-opacity": 0.85,
+          "line-color": arc,
+          "line-width": 1.6,
+          "line-opacity": 0.95,
           "line-dasharray": [2.5, 1.8],
         },
       });
@@ -317,7 +326,7 @@ export function GlobeStage() {
         type: "line",
         source: SOURCE_LEGS,
         layout: { "line-cap": "round", "line-join": "round" },
-        paint: { "line-color": sea, "line-width": 22, "line-opacity": 0 },
+        paint: { "line-color": arc, "line-width": 22, "line-opacity": 0 },
       });
 
       /* ---- Interested Catalog ideas, at their nearest airport ---- */
@@ -340,7 +349,7 @@ export function GlobeStage() {
           "circle-color": accent,
           "circle-opacity": 0.85,
           "circle-stroke-width": 1,
-          "circle-stroke-color": ink,
+          "circle-stroke-color": halo,
         },
       });
       // The count only draws where there is one, so a lone idea is a clean dot.
@@ -358,7 +367,7 @@ export function GlobeStage() {
         },
         paint: {
           "text-color": accent,
-          "text-halo-color": ink,
+          "text-halo-color": halo,
           "text-halo-width": 1.2,
         },
       });
@@ -396,7 +405,7 @@ export function GlobeStage() {
         source: SOURCE_CAPSULES,
         paint: {
           "circle-radius": 4.2,
-          "circle-color": ink,
+          "circle-color": halo,
           "circle-stroke-width": 2,
           "circle-stroke-color": good,
         },
@@ -417,8 +426,8 @@ export function GlobeStage() {
         },
         paint: {
           "text-color": good,
-          "text-halo-color": ink,
-          "text-halo-width": 1.4,
+          "text-halo-color": halo,
+          "text-halo-width": 1.8,
         },
       });
 
@@ -442,11 +451,11 @@ export function GlobeStage() {
           "circle-color": [
             "case",
             ["==", ["get", "kind"], "hub"],
-            sea,
+            arc,
             accent,
           ],
           "circle-stroke-width": 1.5,
-          "circle-stroke-color": ink,
+          "circle-stroke-color": halo,
         },
       });
 
@@ -456,7 +465,7 @@ export function GlobeStage() {
         source: SOURCE_POINTS,
         layout: {
           "text-field": ["get", "code"],
-          "text-font": ["DIN Pro Medium", "Arial Unicode MS Regular"],
+          "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
           "text-size": 11,
           "text-offset": [0, 1.1],
           "text-anchor": "top",
@@ -470,9 +479,8 @@ export function GlobeStage() {
         },
         paint: {
           "text-color": text,
-          "text-halo-color": ink,
-          "text-halo-width": 1.4,
-          "text-opacity": 0.9,
+          "text-halo-color": halo,
+          "text-halo-width": 1.8,
         },
       });
 
@@ -660,13 +668,15 @@ export function GlobeStage() {
       <div ref={containerRef} className="size-full" />
 
       {/* Vignette: darkens the corners the panels sit in, so glass chrome
-          keeps its contrast wherever the globe happens to be bright. */}
+          keeps its contrast wherever the globe happens to be bright. Lighter
+          since the style went to daylight — the point now is to seat the
+          panels, not to dim the continent they are floating over. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 90% at 50% 45%, transparent 40%, rgb(7 12 20 / 0.55) 100%)",
+            "radial-gradient(115% 85% at 50% 45%, transparent 55%, rgb(7 12 20 / 0.42) 100%)",
         }}
       />
 
