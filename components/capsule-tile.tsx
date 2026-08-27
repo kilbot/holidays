@@ -146,17 +146,14 @@ function CapsuleTileImpl({
         TILE_TONE[state],
       )}
     >
-      {/* The cover and the reading matter are one button: anywhere above the
-          verdict bar opens the detail card, which is the same bargain the
-          Catalog rows strike and the reason the bar is a sibling rather than a
-          nested control. */}
-      <button
-        type="button"
-        onClick={() => onOpen(tile)}
-        aria-haspopup="dialog"
-        title={`Open ${tile.name}`}
-        className="flex flex-1 cursor-pointer flex-col text-left outline-none"
-      >
+      {/* Everything above the verdict bar is one target. The control that
+          makes it one is an overlay stretched across the reading matter rather
+          than a button wrapped around it: the card carries an `h3`, and flow
+          content inside a `<button>` is invalid HTML — and a button whose
+          accessible name is the entire card reads terribly out loud. This way
+          the heading is a heading and the target announces itself as "Open
+          Rottnest Island". */}
+      <div className="relative flex flex-1 flex-col">
         <div
           className={cn(
             "relative w-full shrink-0 overflow-hidden",
@@ -251,7 +248,16 @@ function CapsuleTileImpl({
             </p>
           )}
         </div>
-      </button>
+
+        <button
+          type="button"
+          onClick={() => onOpen(tile)}
+          aria-haspopup="dialog"
+          aria-label={`Open ${tile.name}`}
+          title={`Open ${tile.name}`}
+          className="absolute inset-0 cursor-pointer outline-none"
+        />
+      </div>
 
       {/* Pressing the verdict a card already carries clears it back to unseen
           — `aria-pressed` is what says so. */}
