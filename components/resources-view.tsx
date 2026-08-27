@@ -25,6 +25,7 @@ import {
   type Resource,
   type ResourceGroup,
 } from "@/lib/resources";
+import { allPhotos, needsAttribution, type Photo } from "@/lib/region-images";
 import { formatDay } from "@/lib/trip-dates";
 import { cn } from "@/lib/utils";
 
@@ -155,6 +156,88 @@ function Entry({ resource }: { resource: Resource }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Photography credits                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * One photograph's licence, in full.
+ *
+ * The card shows a compressed version of this over the picture — caption,
+ * photographer, licence — and only where the licence demands it. This list is
+ * the complete one: every file on the site, including the CC0 and public-domain
+ * ones nobody is obliged to credit, each linked back to the page it came from
+ * so the claim can be checked rather than believed.
+ */
+function PhotoCredit({ photo }: { photo: Photo }) {
+  return (
+    <li className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 border-b border-[var(--sb-line)] py-2.5 text-[12.5px] leading-snug last:border-b-0">
+      <span className="text-[var(--sb-text)]">{photo.caption}</span>
+      <span className="text-[var(--sb-dim)]">{photo.author}</span>
+      <span className="sb-num text-[11px] text-[var(--sb-faint)]">
+        {photo.licenceUrl ? (
+          <a
+            href={photo.licenceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-[var(--sb-line)] underline-offset-2 hover:text-[var(--sb-text)]"
+          >
+            {photo.licence}
+          </a>
+        ) : (
+          photo.licence
+        )}
+      </span>
+      <a
+        href={photo.source}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="sb-num text-[11px] text-[var(--sb-faint)] underline decoration-[var(--sb-line)] underline-offset-2 hover:text-[var(--sb-text)]"
+      >
+        source
+        <ArrowUpRight
+          aria-hidden
+          className="ml-0.5 inline size-[0.85em] -translate-y-[0.08em]"
+        />
+      </a>
+    </li>
+  );
+}
+
+function PhotographySection() {
+  const photos = allPhotos();
+  const credited = photos.filter(needsAttribution).length;
+
+  return (
+    <section id="photography" className="mt-14 scroll-mt-6">
+      <h2 className="font-display text-[23px] leading-tight font-extrabold tracking-[-0.015em] text-[var(--sb-text)] lg:text-[26px]">
+        Photography
+      </h2>
+      <p className="mt-2.5 max-w-[68ch] text-[13px] leading-[1.7] text-[var(--sb-dim)]">
+        The pictures on the Adventures cards are real photographs of the places
+        themselves, downloaded and served from this site rather than hotlinked,
+        resized to 1200px and kept under 120KB each.{" "}
+        <span className="sb-num font-semibold text-[var(--sb-text)]">
+          {credited}
+        </span>{" "}
+        of the{" "}
+        <span className="sb-num font-semibold text-[var(--sb-text)]">
+          {photos.length}
+        </span>{" "}
+        carry a licence that requires a credit, and those credits also appear on
+        the card itself. The rest are CC0 or public domain and are listed here
+        anyway. Every region the map does not cover keeps its generated cover,
+        which is not a photograph and does not pretend to be one.
+      </p>
+      <ul className="mt-5 border-t border-[var(--sb-line)]">
+        {photos.map((photo) => (
+          <PhotoCredit key={photo.file} photo={photo} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* The page                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -230,6 +313,15 @@ export function ResourcesView() {
               </span>
             </a>
           ))}
+          <a
+            href="#photography"
+            className="rounded-full px-2.5 py-1 text-[11.5px] font-semibold text-[var(--sb-dim)] transition-colors hover:bg-[var(--sb-panel-2)] hover:text-[var(--sb-text)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
+          >
+            Photography
+            <span className="sb-num ml-1.5 text-[10px] text-[var(--sb-faint)]">
+              {allPhotos().length}
+            </span>
+          </a>
         </nav>
 
         {/* ---- The shelves ---- */}
@@ -252,6 +344,8 @@ export function ResourcesView() {
             </ul>
           </section>
         ))}
+
+        <PhotographySection />
 
         <p className="mt-14 border-t border-[var(--sb-line)] pt-4 text-[11px] leading-relaxed text-[var(--sb-faint)]">
           Every link here leaves the site and opens in a new tab. Prices are AUD
