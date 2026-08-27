@@ -49,7 +49,12 @@ export {
 export { LOCATIONS, locationById } from "@/lib/engine/locations";
 
 export { buildPlan, EMPTY_INPUT } from "@/lib/engine/plan";
-export { buildLedger, dayHeadline, TIER_LABEL } from "@/lib/engine/ledger";
+export {
+  buildLedger,
+  dayHeadline,
+  describeLock,
+  TIER_LABEL,
+} from "@/lib/engine/ledger";
 export {
   burnDown,
   type BurnDown,

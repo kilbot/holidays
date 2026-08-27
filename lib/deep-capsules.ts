@@ -355,7 +355,7 @@ const FNQ_WILDLIFE: DeepCapsule = {
   window: "Inside the reef Adventure's 18–31 January window",
   verdict:
     "Cassowaries: January is a good month. Crocodiles: January is the worst month for sighting quality.",
-  why: "The brief's three targets do not live in the same place. Rainforest and wild crocodile are already bought and paid for by the reef Adventure's Daintree buffer day; only the cassowary argues for a separate base, and it argues for one on the wrong side of Cairns. So this is an extension, not a Adventure — and the one night north of the Daintree ferry is what converts it from 'we did a croc cruise' into a dusk and a dawn in cassowary country.",
+  why: "The brief's three targets do not live in the same place. Rainforest and wild crocodile are already bought and paid for by the reef Adventure's Daintree buffer day; only the cassowary argues for a separate base, and it argues for one on the wrong side of Cairns. So this is an extension, not an Adventure — and the one night north of the Daintree ferry is what converts it from 'we did a croc cruise' into a dusk and a dawn in cassowary country.",
   durationNote:
     "The binding constraint is dawn and dusk. Every target here is a crepuscular animal, and every one is unavailable to a couple sleeping in Port Douglas — the ferry is 45 minutes away and Cape Tribulation is 1h45 beyond it. The reef is a mid-morning product; they do not compete for hours, they compete for where you sleep.",
   budgetShare:

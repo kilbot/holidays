@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronUp, Pin, TriangleAlert, Zap } from "lucide-react";
+import { ChevronUp, Lock, Pin, TriangleAlert, Zap } from "lucide-react";
 
 import { eventsForDays, type EventHit, type TripEvent } from "@/lib/events";
 import {
   anchorOn,
+  describeAnchor,
   formatSpan,
   formatWeekdayDay,
   formatWeekdaySpan,
@@ -13,7 +14,9 @@ import {
 } from "@/lib/trip-dates";
 import {
   DAILY_CAP_AUD,
+  describeLock,
   formatEur,
+  type CapsuleSpec,
   type Day,
   type PlanWeek,
 } from "@/lib/engine";
@@ -49,6 +52,7 @@ interface Band {
 interface PlaceBand extends Band {
   key: string;
   locationName: string;
+  capsuleId: string | null;
   capsuleName: string | null;
   buffer: boolean;
 }
@@ -80,6 +84,7 @@ function placeBands(days: Day[]): PlaceBand[] {
       from: index,
       to: index,
       locationName: day.locationName,
+      capsuleId: day.capsuleId,
       capsuleName: day.capsuleName,
       buffer: day.buffer,
     });
@@ -228,10 +233,28 @@ function DayCell({
  * from its neighbours; down here the lines get columns instead, which is both
  * more room and less movement.
  */
-function DayLines({ day, capEur }: { day: Day; capEur: number }) {
+function DayLines({
+  day,
+  capEur,
+  capsules,
+}: {
+  day: Day;
+  capEur: number;
+  capsules: ReadonlyMap<string, CapsuleSpec>;
+}) {
   const lines = day.lines.filter(
     (line) => line.eur !== 0 || line.kind === "lodging",
   );
+  // Every constraint holding this day in place, in plain words. A `title` is a
+  // pointer affordance and half the site is read on a phone, so the tap path
+  // has to say the same thing the hover does.
+  const anchor = anchorOn(day.date);
+  const spec = day.capsuleId ? capsules.get(day.capsuleId) : undefined;
+  const lock = spec ? describeLock(spec.lock) : null;
+  const pinned = [
+    anchor && describeAnchor(anchor),
+    lock && spec && `${spec.name}: ${lock.sentence}`,
+  ].filter(Boolean) as string[];
 
   return (
     <div className="mt-1.5 rounded-md border border-[color-mix(in_srgb,var(--sb-accent)_35%,var(--sb-line))] bg-[color-mix(in_srgb,var(--sb-panel-2)_60%,transparent)] px-2 py-1.5">
@@ -282,6 +305,16 @@ function DayLines({ day, capEur }: { day: Day; capEur: number }) {
         ))}
       </dl>
 
+      {pinned.map((sentence) => (
+        <p
+          key={sentence}
+          className="mt-1 flex gap-1 border-t border-[var(--sb-line)] pt-1 text-[9.5px] leading-snug text-[var(--sb-accent)]"
+        >
+          <Pin className="mt-px size-2.5 shrink-0" aria-hidden />
+          <span>{sentence}</span>
+        </p>
+      ))}
+
       <p className="mt-1 border-t border-[var(--sb-line)] pt-1 text-[9.5px] leading-snug text-[var(--sb-faint)]">
         Living {formatEur(day.livingEur)} of the €{Math.round(capEur)} cap
         {day.livingEur > capEur ? " — over" : ""}. Events and Legs sit outside
@@ -307,12 +340,14 @@ function WeekGrid({
   week,
   hits,
   capEur,
+  capsules,
   openDay,
   onToggleDay,
 }: {
   week: PlanWeek;
   hits: EventHit[];
   capEur: number;
+  capsules: ReadonlyMap<string, CapsuleSpec>;
   openDay: string | null;
   onToggleDay: (date: string) => void;
 }) {
@@ -339,11 +374,23 @@ function WeekGrid({
             // that carry only what changed.
             const sameTown =
               index > 0 && places[index - 1].locationName === place.locationName;
+            // Why this block is *here* and not somewhere cheaper. A padlock
+            // where a Capsule is pinned to dates, and the research's own reason
+            // one hover away — or one tap, in the day drill-in below (#56).
+            const spec = place.capsuleId
+              ? capsules.get(place.capsuleId)
+              : undefined;
+            const lock = spec ? describeLock(spec.lock) : null;
             return (
               <p
                 key={place.key}
                 style={span(place)}
-                title={`${place.locationName}${place.capsuleName ? ` · ${place.capsuleName}` : ""} — ${formatWeekdaySpan(days[place.from].date, days[place.to].date)}`}
+                title={[
+                  `${place.locationName}${place.capsuleName ? ` · ${place.capsuleName}` : ""} — ${formatWeekdaySpan(days[place.from].date, days[place.to].date)}`,
+                  lock?.sentence,
+                ]
+                  .filter(Boolean)
+                  .join("\n\n")}
                 className={cn(
                   "truncate rounded-md px-1.5 py-0.5 text-[11px] leading-tight font-semibold",
                   place.buffer
@@ -370,6 +417,12 @@ function WeekGrid({
                 )}
                 {!place.capsuleName && place.buffer && (
                   <span className="font-normal">{sameTown ? "" : " · "}buffer</span>
+                )}
+                {lock && (
+                  <span className="ml-1 inline-flex items-baseline gap-0.5 font-normal text-[var(--sb-accent)]">
+                    <Lock className="size-2.5 shrink-0 translate-y-[1px]" aria-hidden />
+                    <span className="text-[9.5px]">{lock.chip}</span>
+                  </span>
                 )}
               </p>
             );
@@ -433,7 +486,9 @@ function WeekGrid({
           </p>
         )}
 
-        {day && <DayLines day={day} capEur={capEur} />}
+        {day && (
+          <DayLines day={day} capEur={capEur} capsules={capsules} />
+        )}
       </div>
     </div>
   );
@@ -589,12 +644,15 @@ export function WeekZoom({
   week,
   id,
   capEur,
+  capsules,
   onClose,
 }: {
   week: PlanWeek;
   id: string;
   /** The Daily cap at the Plan's own FX rate. */
   capEur: number;
+  /** The specs the Plan was built from, so a band can say what pins it. */
+  capsules: ReadonlyMap<string, CapsuleSpec>;
   onClose: () => void;
 }) {
   const hits = eventsForDays(eventDaysOf(week));
@@ -641,6 +699,7 @@ export function WeekZoom({
             week={week}
             hits={hits}
             capEur={capEur}
+            capsules={capsules}
             openDay={openDay}
             onToggleDay={(date) =>
               setOpenDay((current) => (current === date ? null : date))

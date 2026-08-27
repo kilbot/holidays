@@ -29,6 +29,7 @@ import {
   formatDayYear,
   monthKey,
   anchorOn,
+  describeAnchor,
   type Anchor,
   type RangeEnd,
 } from "@/lib/trip-dates";
@@ -404,12 +405,12 @@ function WeekCell({
             {/* The anchor mark sits out here rather than after the place name,
                 where a long place ("Margaret River") would truncate the one
                 glyph that says this week is spoken for. */}
+            {/* The mark says a week is spoken for; the hover says by what, how
+                hard, and why — an active constraint never hides (#56). */}
             {anchored && (
               <span
                 className="text-[10px] text-[var(--sb-accent)]"
-                title={anchors
-                  .map((anchor) => `${anchor.label} — ${formatDay(anchor.date)}`)
-                  .join(" · ")}
+                title={anchors.map(describeAnchor).join("\n\n")}
               >
                 ✦
               </span>
@@ -465,7 +466,7 @@ function WeekCell({
  * the sum of the Plan's Days.
  */
 export function DateStrip() {
-  const { plan, moveRange } = usePlan();
+  const { plan, capsules, moveRange } = usePlan();
   const [openWeek, setOpenWeek] = useState<string | null>(null);
   const strip = useRef<HTMLElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -662,6 +663,7 @@ export function DateStrip() {
             week={zoomed}
             id={WEEK_ZOOM_ID}
             capEur={DAILY_CAP_AUD * plan.rollUp.fxRate}
+            capsules={capsules}
             onClose={() => setOpenWeek(null)}
           />
         )}

@@ -191,6 +191,21 @@ export function anchorOn(iso: string): Anchor | undefined {
   return ANCHORS.find((anchor) => anchor.date === iso);
 }
 
+/**
+ * An Anchor, in words a stranger can read.
+ *
+ * A pin on a day says *something* is fixed; it does not say what, or how hard,
+ * or why the rest of the trip is bending around it. Wherever the pin shows, the
+ * sentence has to be one hover or one tap away — an active constraint is the
+ * one thing on this page that may never hide (#56).
+ */
+export function describeAnchor(anchor: Anchor): string {
+  const when = formatDay(anchor.date);
+  return anchor.hard
+    ? `${anchor.label} — fixed to ${when} in ${anchor.place}. It does not move; the trip slides around it. ${anchor.note}`
+    : `${anchor.label} — wants ${when} somewhere good, but no fixed place. ${anchor.note}`;
+}
+
 /* ------------------------------------------------------------------ */
 /* Deadlines                                                           */
 /* ------------------------------------------------------------------ */

@@ -248,19 +248,27 @@ function ShortlistBody() {
         )}
       </div>
 
-      <p className="mt-1 text-[10.5px] leading-tight text-[var(--sb-dim)]">
+      {/* What this list is filtered to, said out loud.
+          The counts alone read as a scoreboard, and a scoreboard does not tell
+          a first-time reader that the rail is showing them a *subset* — that
+          the 413 are elsewhere and that the ones they discarded are gone on
+          purpose. A filter that shapes what is on screen never hides (#56). */}
+      <p className="mt-1 text-[10.5px] leading-snug text-[var(--sb-dim)]">
+        Showing the{" "}
         <span className="sb-num text-[var(--sb-accent)]">
           {counts.interested}
         </span>{" "}
-        interested ·{" "}
-        <span className="sb-num text-[var(--sb-good)]">{counts.placed}</span> on
-        the plan
+        you marked <span className="font-semibold">interested</span> and the{" "}
+        <span className="sb-num text-[var(--sb-good)]">{counts.placed}</span>{" "}
+        <span className="font-semibold">in the plan</span> — not the rest of the{" "}
+        <span className="sb-num">{CATALOG.length}</span>
         {counts.discarded > 0 && (
           <>
-            {" · "}
-            <span className="sb-num">{counts.discarded}</span> discarded
+            , and not the <span className="sb-num">{counts.discarded}</span> you
+            discarded
           </>
         )}
+        .
       </p>
 
       {/* The door back to the Catalog. Prominent on purpose: it is the only
