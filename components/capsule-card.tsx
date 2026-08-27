@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import {
   ArrowUpRight,
   CalendarClock,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { CapsuleArt, CapsuleImageStrip } from "@/components/capsule-art";
+import { CARD_SLIDEOVER_WIDTH_PX } from "@/lib/capsule-camera";
 import {
   SEASON_LABEL,
   SEASON_TOKEN,
@@ -57,9 +58,18 @@ import { cn } from "@/lib/utils";
  * sift is to decide which shallow ideas are worth promoting.
  *
  * Shape: a slide-over on anything wider than a phone, a full-height sheet
- * below that. It is a modal — Escape closes it, the backdrop closes it, and
- * focus lands on the close button — because it covers the drawer it was opened
- * from and there is nothing useful to do behind it.
+ * below that. Escape closes it, and focus lands on the close button.
+ *
+ * Whether it is a *modal* depends on what is behind it, which is the
+ * `overMap` prop. On the Adventures grid it covers the list it was opened
+ * from, there is nothing useful to do behind it, and a dimmed backdrop that
+ * closes on click is exactly right. On the Plan the thing behind it is the
+ * globe, which since #75 flies to the place the card is describing — dimming
+ * that would be covering up the answer. So there the backdrop is dropped at
+ * `sm` and up, the card becomes a non-modal panel beside a live map, and
+ * clicking another marker swaps the card rather than dismissing it. The phone
+ * keeps the sheet and the backdrop either way: 36px of globe above a
+ * full-height sheet is not map worth protecting.
  */
 
 const MARK_BUTTONS: {
@@ -643,7 +653,7 @@ function chromeForIdea(idea: CatalogIdea): CardChrome {
   };
 }
 
-export function CapsuleCardHost() {
+export function CapsuleCardHost({ overMap = false }: { overMap?: boolean }) {
   const focus = useCapsuleFocus();
   const { marks, mark } = usePlanShortlist();
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -682,24 +692,40 @@ export function CapsuleCardHost() {
   const state: ShortlistState = marks[chrome.id] ?? "unseen";
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div
+      className={cn("fixed inset-0 z-50", overMap && "pointer-events-none")}
+      // The width the camera reserves on the right when it flies to this
+      // card's place (see `lib/capsule-camera.ts`). Published as a custom
+      // property rather than written twice, so the panel and the map padding
+      // cannot drift apart.
+      style={
+        { "--sb-card-w": `${CARD_SLIDEOVER_WIDTH_PX}px` } as CSSProperties
+      }
+    >
       <button
         type="button"
         aria-label="Close the adventure"
         onClick={closeCapsule}
-        className="absolute inset-0 cursor-default bg-[rgb(7_12_20/0.55)] backdrop-blur-[3px]"
+        className={cn(
+          "pointer-events-auto absolute inset-0 cursor-default bg-[rgb(7_12_20/0.55)] backdrop-blur-[3px]",
+          // Over the globe the backdrop survives only on the phone, where the
+          // sheet leaves no usable map behind it anyway.
+          overMap && "sm:hidden",
+        )}
       />
 
       <div
         role="dialog"
-        aria-modal="true"
+        // Non-modal over the globe: the map beside it is live, and claiming
+        // otherwise would be a lie to a screen reader as much as to a mouse.
+        aria-modal={overMap ? undefined : true}
         aria-labelledby="capsule-card-title"
         className={cn(
-          "absolute flex flex-col overflow-hidden bg-[var(--sb-panel)] shadow-[0_24px_60px_-16px_rgb(0_0_0/0.7)]",
+          "pointer-events-auto absolute flex flex-col overflow-hidden bg-[var(--sb-panel)] shadow-[0_24px_60px_-16px_rgb(0_0_0/0.7)]",
           // Phone: a sheet off the bottom, with the globe still showing above.
           "inset-x-0 top-9 bottom-0 rounded-t-2xl border-t border-[var(--sb-line)]",
           // Anything wider: a slide-over on the right, clear of the drawer.
-          "sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[440px] sm:rounded-none sm:border-t-0 sm:border-l",
+          "sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[var(--sb-card-w)] sm:rounded-none sm:border-t-0 sm:border-l",
         )}
       >
         {/* ---- Hero ---- */}
