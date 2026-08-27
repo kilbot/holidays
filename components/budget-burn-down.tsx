@@ -98,7 +98,8 @@ export function BurnDownChart({
   const { points } = burn;
   const hover = useNearestIndex(points.length);
 
-  const height = width > 0 && width < NARROW ? 236 : 306;
+  const narrow = width > 0 && width < NARROW;
+  const height = narrow ? 236 : 306;
   const plotWidth = Math.max(0, width - PAD.left - PAD.right);
   const plotHeight = height - PAD.top - PAD.bottom;
 
@@ -136,6 +137,15 @@ export function BurnDownChart({
   const crossingX = crossing ? x(points.findIndex((p) => p.index === crossing.index)) : 0;
   const crossingY = crossing ? y(crossing.eur) : 0;
   const crossingLeft = crossingX > PAD.left + plotWidth * 0.55;
+  // A crossing late in the trip puts this label a few pixels from the endpoint
+  // total on a phone. Both are direct labels and neither may be clipped, so the
+  // narrow version says the same thing in a third of the width — the red dot
+  // sits on a line already labelled "€20k ceiling", which carries the noun.
+  const crossingLabel = crossing
+    ? narrow
+      ? `${crossing.series === "worst" ? "worst " : ""}crosses ~${formatDay(crossing.date)}`
+      : `${crossing.series === "worst" ? "worst case " : ""}crosses ceiling ~${formatDay(crossing.date)}`
+    : "";
 
   return (
     <ChartCard
@@ -308,8 +318,7 @@ export function BurnDownChart({
                   textAnchor={crossingLeft ? "end" : "start"}
                   className="fill-[var(--sb-over)] text-[10px] font-semibold"
                 >
-                  {crossing.series === "plan-on" ? "crosses" : "worst case crosses"}{" "}
-                  ceiling ~{formatDay(crossing.date)}
+                  {crossingLabel}
                 </text>
               </>
             )}
