@@ -178,11 +178,15 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     needsCar: false,
     events: [
       {
+        // The ferry itself is no longer here. It is a Leg — you cannot drive to
+        // Rottnest, and the two hops either side of the island are the boat
+        // (kilbot/holidays#101). What is left on the Day is the gear, which is
+        // what the couple actually buys once they are ashore.
         id: "rotto-ferry",
-        label: "Rottnest ferry, bikes and snorkel gear",
-        aud: aud(243, 243, 400),
+        label: "Bikes and snorkel gear",
+        aud: aud(130, 116, 200),
         dayOffset: 0,
-        source: `${RESEARCH}capsule-wa-southwest.md, itemised at the cost-floors-recalibrated.md §6 floor — SeaLink A$113, bikes A$86, snorkel gear A$44. Ferry pricing is dynamic; the band's top is a late booking.`,
+        source: `${RESEARCH}capsule-wa-southwest.md, itemised at the cost-floors-recalibrated.md §6 floor — bikes A$86 for two (A$38/day plus the A$5 Dec–Jan holiday surcharge each) and snorkel and fins A$44. The band's low is Pedal & Flipper's on-island A$36/day; its top is the Rottnest Express bundle at ~A$60 pp of gear. The A$114 SeaLink crossing is its own Leg, priced on the transit rows either side of the island.`,
       },
     ],
   },

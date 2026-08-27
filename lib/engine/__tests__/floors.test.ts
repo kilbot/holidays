@@ -191,7 +191,13 @@ test("every Adventure's ladder reads floor → plan-on → ceiling", () => {
     }
 
     const planOn = capsule.cost.ideal;
-    assert.equal(planOn.label, "Plan on", capsule.id);
+    // "Plan on", or "Plan on" with a word saying what the figure covers —
+    // Rottnest's is "Plan on, ashore", because the SeaLink crossing is a Leg
+    // and not part of the day the card is pricing (kilbot/holidays#101).
+    assert.ok(
+      planOn.label.startsWith("Plan on"),
+      `${capsule.id}: middle rung is "${planOn.label}"`,
+    );
     assert.equal(planOn.days, capsule.days.ideal, `${capsule.id} plan-on days`);
     assert.ok(
       planOn.eur < capsule.cost.max.eur,

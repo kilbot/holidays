@@ -30,7 +30,8 @@ const plan = buildPlan(
 );
 
 /** The WA leg ends when the couple flies east. */
-const isWestern = (leg: Leg) => leg.mode === "drive" && leg.date <= "2026-12-26";
+const isWestern = (leg: Leg) =>
+  (leg.mode === "drive" || leg.mode === "ferry") && leg.date <= "2026-12-26";
 
 test("the WA leg runs in the order the couple asked for", () => {
   // #95, from the live map: *arrive Perth → Mundaring base, with the Perth and
@@ -112,33 +113,71 @@ test("Boxing Day carries both journeys, and the Ledger files each where it belon
   assert.ok(flight < sydney, "and opens Sydney, which starts the next morning");
 });
 
-test("every relocation inside WA is a drive, and the Morawa run is both ways", () => {
-  const drives = plan.legs.filter(isWestern);
+test("every relocation inside WA is a road or a boat, and the Morawa run is both ways", () => {
+  const surface = plan.legs.filter(isWestern);
   assert.deepEqual(
-    drives.map((leg) => `${leg.fromLocationId}>${leg.toLocationId}`),
+    surface.map((leg) => `${leg.fromLocationId}>${leg.toLocationId}`),
     [
       "mundaring>perth",
       "perth>margaret-river",
       "margaret-river>rottnest",
       "rottnest>morawa",
       // The one the couple said was missing: 370 km back down the Midlands
-      // road on Boxing Day, before the flight east the next morning.
+      // road on Boxing Day, before the red-eye east that same night.
       "morawa>perth",
     ],
   );
 
   // Nobody flies Perth → Margaret River, and every one of these shares the
-  // PER gateway, which is exactly what makes it a drive.
-  for (const leg of drives) {
+  // PER gateway — which is what makes it surface travel rather than a fare.
+  for (const leg of surface) {
     assert.equal(leg.from, "PER");
     assert.equal(leg.to, "PER");
-    assert.equal(leg.modeOverridden, false, "a drive by geography, not by knob");
+    assert.equal(leg.modeOverridden, false, "by geography, not by knob");
   }
+
+  // …and the two that touch the island are the boat, not the road. You cannot
+  // drive to Rottnest, and the Ledger used to price the crossing as €4 of
+  // petrol (kilbot/holidays#101).
+  const modes = new Map(
+    surface.map((leg) => [`${leg.fromLocationId}>${leg.toLocationId}`, leg.mode]),
+  );
+  assert.equal(modes.get("margaret-river>rottnest"), "ferry");
+  assert.equal(modes.get("rottnest>morawa"), "ferry");
+  assert.equal(modes.get("morawa>perth"), "drive");
+});
+
+test("the Rottnest crossing is one SeaLink ticket, charged once", () => {
+  const boats = plan.legs.filter((leg) => leg.mode === "ferry");
+  assert.equal(boats.length, 2, "out on the first ferry, back on the last");
+
+  for (const boat of boats) {
+    assert.equal(boat.carrier, "SeaLink");
+    assert.equal(boat.fareBasis, "return-share", "half a same-day return each");
+    assert.match(boat.note, /Fremantle/);
+    assert.ok(
+      !/A\$0\.16\/km|Fuel only/.test(boat.note),
+      "a boat does not burn petrol by the kilometre",
+    );
+  }
+
+  // A$114 for the couple, same-day return including the island admission fee —
+  // capsule-wa-southwest.md's own cost line. Charged once across both hops.
+  const total = boats.reduce((sum, leg) => sum + leg.eur, 0);
+  assert.equal(Math.round(total * 100) / 100, Math.round(114 * 0.61 * 100) / 100);
+
+  // …and the ferry is no longer *also* an Event line on the island day, which
+  // is what charging it twice would look like.
+  const ashore = plan.days.find((day) => day.capsuleId === "rottnest-island");
+  assert.ok(ashore);
+  const gear = ashore.lines.find((line) => line.id.endsWith(":rotto-ferry"));
+  assert.ok(gear, "the bikes and the snorkel gear are still bought");
+  assert.equal(gear.aud, 130, "bikes A$86 and snorkel A$44, and no boat");
 });
 
 test("a WA drive is priced as fuel and nothing else", () => {
   const morawaRun = plan.legs.find(
-    (leg) => leg.id === "PER>PER@2026-12-26",
+    (leg) => leg.id === "PER>PER@2026-12-26" && leg.mode === "drive",
   );
   assert.ok(morawaRun, "the drive home from Christmas");
   assert.equal(morawaRun.pricing, "computed");
@@ -162,7 +201,7 @@ test("a WA drive is priced as fuel and nothing else", () => {
   );
 });
 
-test("each WA drive is a transit row in the Ledger", () => {
+test("each WA journey is a transit row in the Ledger", () => {
   const rows = intoLedger(plan.days, plan.warnings, plan.legs);
   const transits = new Map(
     rows
@@ -173,7 +212,7 @@ test("each WA drive is a transit row in the Ledger", () => {
   for (const leg of plan.legs.filter(isWestern)) {
     const transit = transits.get(leg.id);
     assert.ok(transit, `${leg.id} has a row of its own`);
-    assert.equal(transit.mode, "drive");
+    assert.equal(transit.mode, leg.mode, "drawn as what it is, road or water");
     // The row shows places, not the airport code all five of them share.
     assert.notEqual(transit.fromName, transit.toName);
     assert.equal(transit.costEur, leg.eur, "the row is the charged line");

@@ -158,7 +158,6 @@ const LONGHAUL_RETURN_BAND: readonly [number, number] = [1_500, 2_300];
  */
 const OUTBOUND_SHARE = 0.625;
 
-
 /**
  * Routes the research says are flown overnight, and the sentence that says why.
  *
@@ -210,6 +209,7 @@ const AUSTRALIAN = new Set<string>(
     (code) => !EUROPEAN.includes(code) && !STOPOVER_AIRPORTS.includes(code),
   ),
 );
+
 /* ------------------------------------------------------------------ */
 /* The two crossings, as the couple has booked them                    */
 /* ------------------------------------------------------------------ */
@@ -646,13 +646,23 @@ function buildLeg(args: BuildLegArgs): Leg {
   const override = input.legModeOverrides[id];
   // Two places reached through the same airport are a drive, not a flight:
   // nobody flies Perth → Margaret River, and pricing it as a fare would invent
-  // several hundred euro out of a three-hour highway run.
+  // several hundred euro out of a three-hour highway run. An island is neither.
   const mode: LegMode =
-    override ?? args.mode ?? (from === to ? "drive" : "flight");
+    override ??
+    args.mode ??
+    (isIsland(args.fromLocationId) || isIsland(args.toLocationId)
+      ? "ferry"
+      : from === to
+        ? "drive"
+        : "flight");
 
   const priced =
     args.quoted ??
-    (mode === "drive" ? priceDrive(args) : priceFlight({ ...args, id }));
+    (mode === "drive"
+      ? priceDrive(args)
+      : mode === "ferry"
+        ? priceFerry(args)
+        : priceFlight({ ...args, id }));
 
   const live = input.fareOverrides[id];
   const hydrated = typeof live === "number" && Number.isFinite(live);
@@ -824,6 +834,66 @@ function priceFlight(args: BuildLegArgs & { id: string }): Priced {
   };
 }
 
+/**
+ * Places you cannot drive to, however much the airport codes agree.
+ *
+ * Rottnest shares Perth's gateway with Margaret River and Morawa, and
+ * `from === to` therefore read every hop on or off it as a road journey: the
+ * Ledger showed *"Rottnest Island → Perth, Drive, fuel, €4"*, which is a
+ * sentence about a road that is nine nautical miles of Indian Ocean
+ * (kilbot/holidays#101). An island is a ferry whatever its gateway says.
+ */
+const ISLANDS = new Set<string>(["rottnest"]);
+
+const isIsland = (locationId: string) => ISLANDS.has(locationId);
+
+/**
+ * What the crossing to Rottnest costs, AUD for the couple.
+ *
+ * `docs/research/capsule-wa-southwest.md` picks SeaLink out of Fremantle —
+ * *"cheapest fare, shortest crossing"* — at **A$56–57 per adult, same-day
+ * return, admission included**, and its own cost table carries the couple's
+ * line: *"Ferry ex-Fremantle, SeaLink same-day return incl. admission ×2 @
+ * A$57 = 114"*, band A$100–260 (Rottnest Express A$171, ex-Perth A$259).
+ *
+ * The Rottnest Island Authority landing fee is inside that figure: SeaLink
+ * quotes fares inclusive, which is part of why it is the pick.
+ */
+const ROTTNEST_FERRY_AUD: readonly [number, number, number] = [114, 100, 260];
+
+/**
+ * One ticket, two crossings, so each carries half.
+ *
+ * The same provenance rule as the ocean crossings, applied to a A$114 boat: a
+ * same-day return buys the sailing out *and* the sailing back, and charging it
+ * whole to the hop that reaches the island would double the ferry the moment
+ * the hop off it was priced too.
+ */
+const FERRY_CROSSINGS = 2;
+
+/**
+ * The ferry, priced as the ticket rather than as petrol.
+ *
+ * No fuel line: the drive to Fremantle is made in the family's car, which is
+ * already a daily line, and the island is car-free. What this Leg costs is the
+ * boat — a bookable, sells-out-early item the research says to buy *"weeks
+ * ahead, mid-week, on the earliest sailing"*.
+ */
+function priceFerry(args: BuildLegArgs): Priced {
+  const [plan, low, high] = ROTTNEST_FERRY_AUD;
+  const share = (value: number) => cents((value / FERRY_CROSSINGS) * AUD_TO_EUR);
+
+  return {
+    eur: share(plan),
+    bandEur: [share(low), share(high)],
+    pricing: "snapshot",
+    onGrid: false,
+    // Half of a same-day return, which is what a ticket to an island is.
+    fareBasis: "return-share",
+    carrier: "SeaLink",
+    note: `${args.note} SeaLink out of Fremantle, ~25 minutes: A$${plan} for the couple, same-day return with the island admission fee inside it (capsule-wa-southwest.md). One ticket buys both crossings, so this half of the day carries half of it. No fuel — the island is car-free and the run to the terminal is in the family's car. Book weeks ahead; summer sailings sell out.`,
+  };
+}
 
 /**
  * A drive, priced as fuel only.
