@@ -184,7 +184,14 @@ export function remoteScenarioStore(
         setStatus("synced");
         return false;
       }
-      local.write({ scenarios: plan.scenarios, currentId: plan.currentId });
+      local.write({
+        scenarios: plan.scenarios,
+        currentId: plan.currentId,
+        // The watchlist is part of the canonical Plan, so it hydrates with it:
+        // this is what puts a fare pinned on one traveller's phone in front of
+        // the other one.
+        pins: plan.pins,
+      });
       setStatus("synced", plan.updatedAt);
       return true;
     } catch {

@@ -243,6 +243,10 @@ export function adoptFork(
 
   return {
     state: {
+      // 4. **It adopts a calendar, not a watchlist.** A Fork stores a
+      //    `PlanInput` and nothing else, so there are no pins on it to copy —
+      //    and the couple's own stay exactly as they were.
+      ...state,
       scenarios: [...state.scenarios, scenario],
       currentId: state.currentId,
     },

@@ -45,6 +45,12 @@ import {
   type ScenarioState,
 } from "@/lib/engine/scenario-doc";
 import type { CapsuleSpec, PlanInput } from "@/lib/engine/types";
+import {
+  addPin,
+  MAX_PINS,
+  removePin,
+  type FlightPin,
+} from "@/lib/flights/watchlist";
 
 const STORAGE_KEY = "southbound.scenarios.v1";
 
@@ -246,6 +252,63 @@ export function isToggled(capsuleId: string): boolean {
   return Boolean(current?.input.toggled.includes(capsuleId));
 }
 
+/* ------------------------------------------------------------------ */
+/* The watchlist                                                       */
+/* ------------------------------------------------------------------ */
+
+export interface WatchlistApi {
+  pins: readonly FlightPin[];
+  /** Add a pin. Returns false when the cap refused it, so the UI can say so. */
+  pin: (pin: FlightPin) => boolean;
+  unpin: (id: string) => void;
+  /** No room left. The pin button on every row reads this. */
+  full: boolean;
+}
+
+/**
+ * The Flights page's watchlist, over the same store the Scenarios use.
+ *
+ * It lives in this file rather than under `lib/flights/` for one reason: this
+ * is where the Plan document's client store is, and `lib/flights/` may not
+ * import `lib/engine/` — the dependency runs the other way (`legs.ts` reads the
+ * route grid) and a cycle between the two would take the engine's `node --test`
+ * suite down with it. `setToggled` above is here for the same reason.
+ *
+ * Every write goes through `store().write`, which is what makes a pin behave
+ * like every other edit on this site: it lands locally and instantly, it is
+ * debounced to the server when this tab holds the edit key, and in view mode it
+ * becomes part of the #62 preview — real, immediate, unsaved, and loudly
+ * labelled as such by `PreviewNotice`.
+ */
+export function useWatchlist(): WatchlistApi {
+  const state = useSyncExternalStore(
+    subscribeToStore,
+    readStore,
+    getServerSnapshot,
+  );
+
+  const pin = useCallback((entry: FlightPin) => {
+    const now = store().read();
+    const { pins, full } = addPin(now.pins, entry);
+    if (full) return false;
+    store().write({ ...now, pins });
+    return true;
+  }, []);
+
+  const unpin = useCallback((id: string) => {
+    const now = store().read();
+    if (!now.pins.some((entry) => entry.id === id)) return;
+    store().write({ ...now, pins: removePin(now.pins, id) });
+  }, []);
+
+  return {
+    pins: state.pins,
+    pin,
+    unpin,
+    full: state.pins.length >= MAX_PINS,
+  };
+}
+
 export interface ScenarioApi extends ScenarioState {
   current: Scenario;
   /** Replace the current Scenario's input. Every knob change lands here. */
@@ -293,6 +356,7 @@ export function useScenarios(): ScenarioApi {
       now.scenarios[0];
     const id = nextScenarioId(name, now.scenarios);
     store().write({
+      ...now,
       scenarios: [
         ...now.scenarios,
         {
@@ -318,6 +382,7 @@ export function useScenarios(): ScenarioApi {
     // into the middle would repaint every Scenario after it — and "Aggressive
     // is the sea-blue one" has to stay true across somebody else's duplicate.
     store().write({
+      ...now,
       scenarios: [
         ...now.scenarios,
         {
@@ -355,6 +420,9 @@ export function useScenarios(): ScenarioApi {
     if (now.scenarios.length <= 1) return;
     const scenarios = now.scenarios.filter((scenario) => scenario.id !== id);
     store().write({
+      // The watchlist rides through: deleting a Scenario is deleting a
+      // calendar, and the fares the couple is watching are not on it.
+      ...now,
       scenarios,
       currentId: now.currentId === id ? scenarios[0].id : now.currentId,
     });
@@ -403,7 +471,11 @@ export interface ScenarioTotal {
  * corpus — the same boundary `capsules.ts` exists to hold.
  */
 export function scenarioTotals(
-  state: ScenarioState,
+  // The Scenarios and which one is current, and deliberately not the whole
+  // document: costing a list of calendars has nothing to do with the watchlist,
+  // and a caller that had to invent an empty `pins` to ask for a total would be
+  // a caller the type was lying to.
+  state: Pick<ScenarioState, "scenarios" | "currentId">,
   catalogue: readonly CapsuleSpec[],
   /**
    * Live fares, keyed by Leg id. Passed through so the current Scenario's row
