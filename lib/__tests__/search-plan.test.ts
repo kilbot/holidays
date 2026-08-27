@@ -14,11 +14,24 @@ import { describe, it } from "node:test";
 import {
   arbitrageVsBarcelona,
   barcelonaReference,
+  cheapestFloor,
+  DEFAULT_RULES,
+  groupByDefaultRules,
+  heldBackBy,
+  LONGHAUL_CAP_EUR_PP,
+  overCap,
+  perPersonTotal,
   priceOption,
   quoteMatches,
   type LiveQuote,
 } from "@/lib/flights/pricing";
-import { blockHours, outboundOptions, returnOptions } from "@/lib/flights/search-plan";
+import {
+  blockHours,
+  excludedByDefault,
+  outboundOptions,
+  returnOptions,
+  type SearchOption,
+} from "@/lib/flights/search-plan";
 
 const outbound = outboundOptions();
 const returns = returnOptions();
@@ -245,5 +258,104 @@ describe("the €150 rule", () => {
     assert.ok(vienna);
     assert.equal(vienna.clears, true);
     assert.ok(vienna.deltaEurPP >= 150);
+  });
+});
+
+describe("the two default rules", () => {
+  const priced = (options: readonly SearchOption[]) =>
+    options.map((option) => ({ option, price: priceOption(option, null) }));
+  const outboundPriced = priced(outbound);
+  const returnPriced = priced(returns);
+
+  it("marks every Gulf itinerary and no other", () => {
+    const gulf = [...outbound, ...returns].filter((option) => excludedByDefault(option));
+    const carriers = [...new Set(gulf.map((option) => option.carrier))].sort();
+    assert.deepEqual(carriers, ["Emirates", "Etihad", "Qatar Airways"]);
+    assert.ok(gulf.every((option) => option.middleEastTransit.length > 0));
+  });
+
+  it("leaves Istanbul alone — the via, and the hub", () => {
+    // Turkish's SYD/MEL–SIN–IST–VLC is the only itinerary ending at Valencia's
+    // own airport; excluding it would cost the trip its best return.
+    const turkish = returns.filter((option) => option.carrier === "Turkish Airlines");
+    assert.ok(turkish.length > 0);
+    assert.ok(turkish.every((option) => !excludedByDefault(option)));
+    // And departing Istanbul is only excluded when the routing itself is Gulf.
+    const istanbul = outbound.filter((option) => option.origin === "IST");
+    assert.deepEqual(
+      istanbul.filter((option) => excludedByDefault(option)).map((option) => option.carrier),
+      ["Qatar Airways"],
+    );
+  });
+
+  it("ranks nothing that breaks either rule", () => {
+    const { ranked } = groupByDefaultRules(outboundPriced, DEFAULT_RULES);
+    assert.ok(ranked.length > 0);
+    for (const row of ranked) {
+      assert.equal(row.option.middleEastTransit.length, 0, row.option.id);
+      assert.ok(perPersonTotal(row.price)[0] <= LONGHAUL_CAP_EUR_PP, row.option.id);
+    }
+  });
+
+  it("files a row that breaks both rules under the routing one, once", () => {
+    const { ranked, viaMiddleEast, overCap } = groupByDefaultRules(outboundPriced, DEFAULT_RULES);
+    assert.equal(ranked.length + viaMiddleEast.length + overCap.length, outboundPriced.length);
+    // Qatar ex-Madrid is €1,158 pp on the research band: Gulf and over the cap.
+    const madrid = viaMiddleEast.find((row) => row.option.id === "out-MAD-QR");
+    assert.ok(madrid);
+    assert.ok(overCap.every((row) => row.option.middleEastTransit.length === 0));
+    const held = heldBackBy(madrid.option, madrid.price, DEFAULT_RULES);
+    assert.deepEqual(held, { middleEast: ["DOH"], overCap: true, capEurPP: 1_000 });
+  });
+
+  it("measures the cap on the whole chain, per person, at the cheap end", () => {
+    // Vienna on Scoot is €730 pp all in — fare, the Austrian feed, the hotel.
+    const vienna = outboundPriced.find((row) => row.option.id === "out-VIE-TR");
+    assert.ok(vienna);
+    assert.equal(Math.round(perPersonTotal(vienna.price)[0]), 730);
+    assert.equal(overCap(vienna.price, 1_000), false);
+    assert.equal(overCap(vienna.price, 700), true);
+  });
+
+  it("gives both rules back when they are switched off", () => {
+    const open = groupByDefaultRules(outboundPriced, { maxEurPP: 3_000, avoidMiddleEast: false });
+    assert.equal(open.viaMiddleEast.length, 0);
+    assert.equal(open.overCap.length, 0);
+    assert.equal(open.ranked.length, outboundPriced.length);
+  });
+
+  it("keeps Canberra's only return, which is Qatar's, out of the default ranking", () => {
+    // Worth pinning: the rule does not merely reorder this search, it empties
+    // one of its four origins. The row is still on the page, in the band.
+    const canberra = returnPriced.filter((row) => row.option.origin === "CBR");
+    assert.equal(canberra.length, 1);
+    const { ranked, viaMiddleEast } = groupByDefaultRules(returnPriced, DEFAULT_RULES);
+    assert.ok(ranked.every((row) => row.option.origin !== "CBR"));
+    assert.ok(viaMiddleEast.some((row) => row.option.origin === "CBR"));
+  });
+
+  it("measures the floor against everything, rules included", () => {
+    const floor = cheapestFloor(returnPriced);
+    assert.ok(floor);
+    // China Southern SYD–CAN–MAD: the cheapest thing in the return search, and
+    // the ruler the rest of the page quotes its distance from.
+    assert.equal(floor.option.carrier, "China Southern");
+    const cheapest = Math.min(...returnPriced.map((row) => perPersonTotal(row.price)[0]));
+    assert.equal(perPersonTotal(floor.price)[0], cheapest);
+  });
+
+  it("does not let a Gulf fare become the Barcelona yardstick", () => {
+    // Qatar and Emirates are Barcelona's two cheapest carriers. Measuring
+    // every other hub against a routing the trip will not book would call them
+    // all expensive by comparison with something that is not on offer.
+    const reference = barcelonaReference(outboundPriced);
+    const gulfAtBarcelona = outboundPriced.filter(
+      (row) => row.option.origin === "BCN" && excludedByDefault(row.option),
+    );
+    assert.ok(gulfAtBarcelona.length > 0);
+    for (const row of gulfAtBarcelona) {
+      assert.equal(reference.byCarrier[row.option.carrier], undefined);
+      assert.ok(reference.cheapest !== null && reference.cheapest > row.price.fareEurPP[0]);
+    }
   });
 });

@@ -86,11 +86,36 @@ const METAL_PENALTY = adjustmentPoints("metalUncertainty");
 const SECTOR_PENALTY = adjustmentPoints("extraSector");
 
 /**
- * The three airports the Gulf adjustment names. It is a reliability judgement
- * about December 2026 airspace, not a comfort one, which is why it is a flat
- * subtraction rather than a lower seat score.
+ * The airports the Gulf adjustment names, read out of the adjustment itself.
+ *
+ * `appliesTo` is prose — "Any Dec 2026 - Jan 2027 itinerary transiting DOH, DXB
+ * or AUH" — but the only all-caps triples in it are the airport codes, so the
+ * set can be lifted from the research rather than typed out beside it. That
+ * matters more than it looks: the same three airports now carry two different
+ * consequences — this −1.0, and the Flights page's default exclusion
+ * (docs/CONTEXT.md, "No Middle East transits") — and a hand-copied list is
+ * exactly how those two would come to disagree about what the Gulf is.
+ *
+ * Istanbul is deliberately not among them and must not be added: the rule is
+ * about Gulf airspace in the December window, and IST is an ordinary via-point
+ * with an ordinary via-routing label (kilbot/holidays#60).
+ *
+ * `lib/__tests__/comfort.test.ts` pins the three the file resolves to, so a
+ * reworded justification cannot quietly empty the set.
  */
-const GULF_HUBS: readonly string[] = ["DOH", "DXB", "AUH"];
+export const MIDDLE_EAST_TRANSIT_HUBS: readonly string[] = [
+  ...new Set(
+    (
+      RATINGS.formula.adjustments.find((adjustment) => adjustment.name === "gulfHubReliability")
+        ?.appliesTo ?? ""
+    ).match(/\b[A-Z]{3}\b/g) ?? [],
+  ),
+];
+
+/** Which of the excluded hubs an itinerary actually touches, in order flown. */
+export function middleEastTransitsOf(stops: readonly string[]): string[] {
+  return stops.filter((stop) => MIDDLE_EAST_TRANSIT_HUBS.includes(stop));
+}
 
 /* ------------------------------------------------------------------ */
 /* Inputs                                                              */
@@ -261,7 +286,7 @@ export function scoreItinerary(sectors: readonly Sector[]): ComfortScore {
 
   const adjustments: Adjustment[] = [];
 
-  const gulf = sectors.find((sector) => GULF_HUBS.includes(sector.to));
+  const gulf = sectors.find((sector) => MIDDLE_EAST_TRANSIT_HUBS.includes(sector.to));
   if (gulf) {
     adjustments.push({
       name: "gulfHubReliability",

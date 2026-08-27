@@ -18,7 +18,12 @@
  * (docs/CONTEXT.md). Fare bands arrive per person and are doubled once, here.
  */
 
-import type { Band, PositioningOption, SearchOption } from "@/lib/flights/search-plan";
+import {
+  excludedByDefault,
+  type Band,
+  type PositioningOption,
+  type SearchOption,
+} from "@/lib/flights/search-plan";
 import type { FareTrend } from "@/lib/flights/history";
 
 /** How many travellers. Matches the API's `ADULTS` and the Ledger's couple. */
@@ -53,6 +58,8 @@ export interface OptionPrice {
   totalEurCouple: Band;
   lines: readonly PriceLine[];
   trend: FareTrend | null;
+  /** Door to door, when a live quote said so. Never inferred. */
+  durationMin: number | null;
 }
 
 const double = (band: Band): Band => [band[0] * TRAVELLERS, band[1] * TRAVELLERS];
@@ -171,7 +178,170 @@ export function priceOption(
     totalEurCouple: total,
     lines,
     trend: matched?.trend ?? null,
+    durationMin: matched?.durationMin ?? null,
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* The two default rules                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The most the couple will pay per person to cross to Australia: €1,000.
+ *
+ * A hard limit from the user (2026-08-27), not a target and not a preference
+ * the comfort score is allowed to outvote — the sibling of "no Middle East
+ * transits", and applied the same way: a row over it is held out of the default
+ * ranking rather than deleted, because an expensive routing can still be the
+ * interesting one and the site never refuses (docs/CONTEXT.md).
+ *
+ * It is where the page's price slider *starts*, not a value baked into the
+ * ranking. A number that silently decided what the list looked like would read
+ * as the world being that shape; a slider sitting at €1,000 reads as a choice,
+ * and can be moved to see what the choice cost.
+ *
+ * Three things it is careful about:
+ *
+ * - **Per person, and per *journey*.** The cap is measured against the whole
+ *   chain — the long-haul, the positioning hop into the hub, its hold bags,
+ *   the night before, the ride home from the arrival airport and the UK's APD
+ *   — halved. A €900 fare reached by a €300 positioning move is not under a
+ *   €1,000 cap, and pretending otherwise is exactly the arithmetic this module
+ *   exists to stop.
+ * - **Long-haul only.** It is a rule about the crossing, so it lives here,
+ *   next to the fare bands, and never reaches the Australian domestic Legs the
+ *   Plan prices through `lib/leg-fare.ts`.
+ * - **Judged on the cheap end of the band.** A research band is a range, not a
+ *   quote; a row banded €908–1,355 pp can be bought at €1,000 and belongs in
+ *   the ranking. So the test is whether the *cheapest* honest total clears the
+ *   cap, and a live quote — which is a single number, not a band — settles it
+ *   properly the moment one lands.
+ */
+export const LONGHAUL_CAP_EUR_PP = 1_000;
+
+/**
+ * How far the page's price slider travels.
+ *
+ * €400 is under the cheapest thing in the research and €3,000 is over the
+ * dearest, so both ends of the slider are places where the setting stops
+ * mattering — which is what makes it legible: the couple can see the rule
+ * switch itself off in either direction rather than wondering whether the
+ * track ran out before the answer did.
+ */
+export const LONGHAUL_CAP_RANGE_EUR_PP = { min: 400, max: 3_000, step: 50 } as const;
+
+/**
+ * The two rules the default view applies, as settings rather than as facts.
+ *
+ * Both are the couple's own, and a constraint the visitor cannot see is a
+ * constraint they will misread as the world being that shape. So each one is a
+ * labelled control with these as its starting position, the summary above the
+ * results says both out loud in a sentence, and the rows either rule holds back
+ * stay on the page behind a count. `LONGHAUL_CAP_EUR_PP` is where the slider
+ * starts, not a ceiling on where it can go.
+ */
+export interface DefaultRules {
+  /** The slider's value: the most one person may pay for the whole journey. */
+  maxEurPP: number;
+  /** The toggle: whether Gulf routings are held out of the ranking. */
+  avoidMiddleEast: boolean;
+}
+
+export const DEFAULT_RULES: DefaultRules = {
+  maxEurPP: LONGHAUL_CAP_EUR_PP,
+  avoidMiddleEast: true,
+};
+
+/** Everything this option costs, halved: the unit the cap is written in. */
+export function perPersonTotal(price: OptionPrice): Band {
+  return [price.totalEurCouple[0] / TRAVELLERS, price.totalEurCouple[1] / TRAVELLERS];
+}
+
+/** Whether even the cheap end of the journey is over the price setting. */
+export function overCap(price: OptionPrice, maxEurPP: number): boolean {
+  return perPersonTotal(price)[0] > maxEurPP;
+}
+
+/** Why a row is not in the default ranking. `null` means it is. */
+export interface HeldBack {
+  /** The Gulf hubs it transits — `docs/CONTEXT.md`, "No Middle East transits". */
+  middleEast: readonly string[];
+  /** True when the cheapest per-person total is over the price setting. */
+  overCap: boolean;
+  /** The setting it was measured against, so the row can name the number. */
+  capEurPP: number;
+}
+
+export function heldBackBy(
+  option: SearchOption,
+  price: OptionPrice,
+  rules: DefaultRules,
+): HeldBack | null {
+  const middleEast = rules.avoidMiddleEast ? option.middleEastTransit : [];
+  const over = overCap(price, rules.maxEurPP);
+  if (middleEast.length === 0 && !over) return null;
+  return { middleEast, overCap: over, capEurPP: rules.maxEurPP };
+}
+
+/**
+ * Split a priced search three ways: what the rules rank, and one group per
+ * reason they do not.
+ *
+ * A row can break both rules, and the Gulf ones frequently do. It is filed
+ * under the Middle East — the rule that is about where the aeroplane goes
+ * rather than what it costs, and the one the couple asked for first — and
+ * carries both reasons on its face, so nothing is listed twice and nothing
+ * loses half of its explanation.
+ */
+export function groupByDefaultRules<T extends { option: SearchOption; price: OptionPrice }>(
+  rows: readonly T[],
+  rules: DefaultRules,
+): { ranked: T[]; viaMiddleEast: T[]; overCap: T[] } {
+  const ranked: T[] = [];
+  const viaMiddleEast: T[] = [];
+  const dear: T[] = [];
+
+  for (const row of rows) {
+    const held = heldBackBy(row.option, row.price, rules);
+    if (!held) ranked.push(row);
+    else if (held.middleEast.length > 0) viaMiddleEast.push(row);
+    else dear.push(row);
+  }
+
+  return { ranked, viaMiddleEast, overCap: dear };
+}
+
+/* ------------------------------------------------------------------ */
+/* The floor                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The cheapest thing in the search, whatever it is.
+ *
+ * Not a recommendation and not a row anyone is expected to book — a *ruler*.
+ * The user's own framing: "that's the cheapest it can possibly be, then we see
+ * how close we can get". So it ignores every rule the page has, including the
+ * comfort sort, the Middle East exclusion and the price cap, because a floor
+ * that already agreed with the filters would measure nothing. It is routinely a
+ * Gulf or a Guangzhou routing with a forty-hour elapsed time, and the reference
+ * that quotes it says so in the same breath.
+ *
+ * Measured in the same unit as the cap — the whole journey, per person, at the
+ * cheap end of its band — so that every other row's distance from it is the
+ * price of the comfort, the protection and the hours it buys instead.
+ *
+ * Derived from the rows already priced, so it never costs a fare call.
+ */
+export function cheapestFloor<T extends { price: OptionPrice }>(
+  rows: readonly T[],
+): T | null {
+  let floor: T | null = null;
+  for (const row of rows) {
+    const eurPP = perPersonTotal(row.price)[0];
+    if (eurPP <= 0) continue;
+    if (!floor || eurPP < perPersonTotal(floor.price)[0]) floor = row;
+  }
+  return floor;
 }
 
 /* ------------------------------------------------------------------ */
@@ -203,6 +373,13 @@ const midpoint = (band: Band): number => (band[0] + band[1]) / 2;
  * against a Barcelona 777 measures the carrier, not the origin market. Where
  * the carrier does not fly to Barcelona at all (Thai, Malaysia, Scoot) the
  * cheapest Barcelona fare is the honest yardstick instead.
+ *
+ * That fallback is why the reference has to know about the Middle East rule.
+ * Barcelona's two cheapest carriers are Qatar and Emirates, both excluded
+ * (docs/CONTEXT.md), and a yardstick made of a fare the trip will not book
+ * would tell every other hub it was expensive by comparison with a routing
+ * that is not on offer. The bar is the cheapest Barcelona fare the couple
+ * would actually take.
  */
 export interface BarcelonaReference {
   byCarrier: Readonly<Record<string, number>>;
@@ -248,6 +425,7 @@ export function barcelonaReference(
 
   for (const entry of priced) {
     if (entry.option.origin !== "BCN") continue;
+    if (excludedByDefault(entry.option)) continue;
     const fare = midpoint(entry.price.fareEurPP);
     if (fare <= 0) continue;
     all.push(fare);
