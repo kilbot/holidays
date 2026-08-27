@@ -168,6 +168,93 @@
 }
 
 /* ------------------------------------------------------------------
+   Chart ink (#42).
+
+   The signal tokens above (sea / good / warn / over) say what a *state*
+   is. A chart needs something else: hues that say which *series* a mark
+   belongs to, and they are a different job with a different test. The
+   dataviz method's six checks are computable, so these were computed —
+   `scripts/validate_palette.js` from the dataviz skill, run per mode
+   against the real panel surfaces (#ffffff light, #16202e dark), not
+   eyeballed. The values below are the site's own hues snapped to the
+   nearest step that passes; the PR for #42 carries the verdicts.
+
+   Two consequences worth knowing before editing any hex here:
+
+   - **Dark is not a flip.** The dark band the checks enforce (OKLCH L
+     0.48–0.67) sits *below* the site's dark signal tokens, so the dark
+     series steps hold each token's hue and chroma and drop lightness
+     into the band. `--sb-warn` at #e3b34a is L 0.79 and would fail;
+     `--sb-chart-living` is the same hue at L 0.67.
+   - **Order is load-bearing.** The category bars are validated on
+     *adjacent* pairs in the order living → flights → events →
+     contingency. Ochre beside coral collapses under deuteranopia
+     (ΔE 1.0), which is why sea sits between them. Reordering the bars
+     without re-running the validator breaks the chart for a reader who
+     cannot separate the pair.
+
+   The Scenario slots are a second, separate palette: a Scenario's
+   colour is its *identity*, fixed by its position in the saved list and
+   never by its rank in a sorted chart, so filtering or re-sorting never
+   repaints it. Three slots are validated on **all** pairs (a dot row
+   puts any two rows side by side); a fourth Scenario and beyond take
+   the neutral, which is the documented fold rather than a generated
+   ninth hue. Each slot carries a `-dim` step — the same hue at a
+   recessive lightness — for the burn-down's worst-case line, validated
+   as a two-step ordinal ramp so the pair reads as one measure at two
+   confidence levels rather than as two unrelated series.
+   ------------------------------------------------------------------ */
+:root {
+  --sb-chart-living: #a87a16;
+  --sb-chart-flights: #1e80a8;
+  --sb-chart-events: #d84328;
+  --sb-chart-contingency: #7047c8;
+
+  --sb-series-1: #1e80a8;
+  --sb-series-1-dim: #8ca2ae;
+  --sb-series-2: #d84328;
+  --sb-series-2-dim: #b09893;
+  --sb-series-3: #7047c8;
+  --sb-series-3-dim: #a19baf;
+  --sb-series-n: #4a545f;
+  --sb-series-n-dim: #9dabb6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sb-chart-living: #ba8b10;
+    --sb-chart-flights: #30a1cb;
+    --sb-chart-events: #f05d3d;
+    --sb-chart-contingency: #8f68cb;
+
+    --sb-series-1: #30a1cb;
+    --sb-series-1-dim: #576d77;
+    --sb-series-2: #f05d3d;
+    --sb-series-2-dim: #79635e;
+    --sb-series-3: #8f68cb;
+    --sb-series-3-dim: #6b6578;
+    --sb-series-n: #93a0ad;
+    --sb-series-n-dim: #5c6b79;
+  }
+}
+
+.dark {
+  --sb-chart-living: #ba8b10;
+  --sb-chart-flights: #30a1cb;
+  --sb-chart-events: #f05d3d;
+  --sb-chart-contingency: #8f68cb;
+
+  --sb-series-1: #30a1cb;
+  --sb-series-1-dim: #576d77;
+  --sb-series-2: #f05d3d;
+  --sb-series-2-dim: #79635e;
+  --sb-series-3: #8f68cb;
+  --sb-series-3-dim: #6b6578;
+  --sb-series-n: #93a0ad;
+  --sb-series-n-dim: #5c6b79;
+}
+
+/* ------------------------------------------------------------------
    Map ink.
 
    The chrome is theme-aware; the map is not. A globe is a picture of
@@ -348,6 +435,23 @@
     --sb-good: #000000;
     --sb-warn: #000000;
     --sb-over: #000000;
+
+    /* On paper the series hues are gone, so the charts fall back to the
+       channel that survives an office laser: the direct labels and the
+       table view each chart ships. What is left is a two-step grey so a
+       plan-on line is still distinguishable from its worst case. */
+    --sb-chart-living: #000000;
+    --sb-chart-flights: #000000;
+    --sb-chart-events: #000000;
+    --sb-chart-contingency: #000000;
+    --sb-series-1: #000000;
+    --sb-series-1-dim: #8a8a8a;
+    --sb-series-2: #000000;
+    --sb-series-2-dim: #8a8a8a;
+    --sb-series-3: #000000;
+    --sb-series-3-dim: #8a8a8a;
+    --sb-series-n: #000000;
+    --sb-series-n-dim: #8a8a8a;
   }
 
   html,
