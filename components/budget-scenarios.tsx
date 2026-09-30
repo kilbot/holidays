@@ -25,6 +25,7 @@
 
 import { useId, useState } from "react";
 
+import { planTitle } from "@/lib/engine/curated-plans";
 import { formatEur, BUDGET_CEILING_EUR } from "@/lib/engine";
 import type { ScenarioTotal } from "@/lib/engine/scenarios";
 import {
@@ -102,7 +103,7 @@ export function ScenarioCompare({
             height={height}
             viewBox={`0 0 ${width} ${height}`}
             role="img"
-            aria-label={`Scenario comparison: ${totals.map((total) => `${total.name} ${formatEur(total.totalEur)}`).join(", ")}.`}
+            aria-label={`Scenario comparison: ${totals.map((total) => `${planTitle(total.letter, total.name)} ${formatEur(total.totalEur)}`).join(", ")}.`}
             aria-describedby={tableId}
           >
             {ticks.map((tick) => (
@@ -153,9 +154,9 @@ export function ScenarioCompare({
                         : "fill-[var(--sb-dim)]",
                     )}
                   >
-                    {total.name.length > (narrow ? 11 : 16)
-                      ? `${total.name.slice(0, narrow ? 10 : 15)}…`
-                      : total.name}
+                    {/* The letter alone: it is the Plan's name, and the
+                        legend underneath carries the subtitle in full. */}
+                    {`Plan ${total.letter}`}
                   </text>
 
                   {/* The tail: plan-on out to the worst case. */}
@@ -266,7 +267,7 @@ export function ScenarioCompare({
                 className="inline-block size-2 rounded-full"
                 style={{ background: scenarioInk(index).ink }}
               />
-              {total.name}
+              {planTitle(total.letter, total.name)}
             </button>
           </li>
         ))}
@@ -278,7 +279,9 @@ export function ScenarioCompare({
         caption="Every Scenario's plan-on total, honest band and worst case, in EUR per couple."
         columns={["Scenario", "Days", "Plan-on", "Worst case", "Warnings"]}
         rows={totals.map((total) => [
-          total.current ? `${total.name} (current Plan)` : total.name,
+          total.current
+            ? `${planTitle(total.letter, total.name)} (current Plan)`
+            : planTitle(total.letter, total.name),
           `${total.dayCount}`,
           formatEur(total.totalEur),
           formatEur(total.worstCaseEur),

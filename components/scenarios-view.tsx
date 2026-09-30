@@ -35,19 +35,24 @@
  * ## Edit mode, view mode
  *
  * Per ADR 0001 and #58: every figure is readable by anyone holding the view
- * link, and the mutating verbs — set current, rename, duplicate, delete,
- * create — appear only for the tab holding the edit link. A visitor is not
- * given a disabled toolbar to guess at; they get the site's one real
- * invitation, *make your own version*, which is the Fork panel the share pill
- * already owns.
+ * link, and the mutating verbs — set current, rename, delete — appear only for
+ * the tab holding the edit link.
+ *
+ * ## Curated, not created (2026-09-30)
+ *
+ * There is no "new scenario" here, no duplicate, and no fork or adopt: the
+ * Travellers give Claude their preferences and it adds the next lettered Plan
+ * (`lib/engine/curated-plans.ts`), seeded into the store and, when the brief
+ * came written, with its write-up at `/scenarios/<slug>`. Where the create
+ * button was, one quiet line says so.
  */
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
+  ArrowRight,
   Check,
   ChevronDown,
-  Copy,
   GitFork,
   Pencil,
   TriangleAlert,
@@ -57,6 +62,7 @@ import {
 
 import { daysUntil, useToday } from "@/lib/countdown";
 import { formatEur, locationById, TIER_LABEL } from "@/lib/engine";
+import { curatedPlan, planLetter, planTitle } from "@/lib/engine/curated-plans";
 import { lastEditedAt, type Scenario } from "@/lib/engine/scenario-doc";
 import {
   diffChangeCount,
@@ -67,10 +73,8 @@ import {
 } from "@/lib/engine/scenario-diff";
 import type { ScenarioTotal } from "@/lib/engine/scenarios";
 import { usePlan } from "@/lib/engine/use-plan";
-import { openSharePanel } from "@/lib/share-panel";
-import { FORK_QUERY_PARAM } from "@/lib/store/canonical-plan";
 import { MAX_FORK_NAME_LENGTH } from "@/lib/store/plans";
-import { useSharing, type SharingApi } from "@/lib/store/sharing";
+import { useSharing } from "@/lib/store/sharing";
 import { formatDay, formatDayYear } from "@/lib/trip-dates";
 import { scenarioInk } from "@/components/budget-chart";
 import { cn } from "@/lib/utils";
@@ -332,7 +336,6 @@ interface RowProps {
   deletable: boolean;
   onSelect: () => void;
   onRename: (name: string) => void;
-  onDuplicate: () => void;
   onDelete: () => void;
   renaming: boolean;
   onRenamingChange: (on: boolean) => void;
@@ -349,7 +352,6 @@ function ScenarioRow({
   deletable,
   onSelect,
   onRename,
-  onDuplicate,
   onDelete,
   renaming,
   onRenamingChange,
@@ -359,6 +361,7 @@ function ScenarioRow({
   const [draft, setDraft] = useState(scenario.name);
   const { ink } = scenarioInk(index);
   const changes = diffChangeCount(diff);
+  const writeup = curatedPlan(scenario.id)?.writeup;
 
   return (
     <li
@@ -403,7 +406,7 @@ function ScenarioRow({
                       }
                     }}
                     maxLength={MAX_FORK_NAME_LENGTH}
-                    aria-label={`Rename ${scenario.name}`}
+                    aria-label={`Rename Plan ${total.letter}`}
                     // Wide enough for the names this site actually produces —
                     // "Comfortable — A$10k off (copy)" is 30 characters — so
                     // renaming is not done through a four-word window.
@@ -430,6 +433,8 @@ function ScenarioRow({
                 </form>
               ) : (
                 <h2 className="font-display text-[19px] leading-tight font-bold tracking-[-0.01em] text-[var(--sb-text)] lg:text-[21px]">
+                  <span style={{ color: ink }}>Plan {total.letter}</span>
+                  <span className="text-[var(--sb-faint)]"> · </span>
                   {scenario.name}
                 </h2>
               )}
@@ -478,6 +483,15 @@ function ScenarioRow({
                 </>
               )}
             </p>
+            {writeup && (
+              <Link
+                href={`/scenarios/${writeup.slug}`}
+                className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--sb-accent)] underline-offset-[3px] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]"
+              >
+                Read {writeup.by}&rsquo;s plan, week by week
+                <ArrowRight aria-hidden className="size-3.5" />
+              </Link>
+            )}
           </div>
 
           <div className="text-right">
@@ -591,12 +605,6 @@ function ScenarioRow({
                 <Pencil className="size-3.5" /> Rename
               </Action>
             )}
-            <Action
-              onClick={onDuplicate}
-              title="A copy, saved beside this one. The Plan does not change."
-            >
-              <Copy className="size-3.5" /> Duplicate
-            </Action>
 
             {/* No Delete on the last Scenario — the store refuses it anyway
                 ("exactly one is marked as the current Plan", and zero is not
@@ -623,166 +631,6 @@ function ScenarioRow({
         )}
       </div>
     </li>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Forks                                                               */
-/* ------------------------------------------------------------------ */
-
-/**
- * The Forks section, and the honest sentence it has to carry.
- *
- * A Fork is written under `fork:<id>` with a random id, handed back exactly
- * once, and **nothing enumerates the key space** — `lib/store/plans.ts` says so
- * in as many words, and it is a consequence of ADR 0001's no-accounts bargain
- * rather than a gap to be filled in later. So this section does not pretend to
- * be a list of forks. It shows the two kinds this browser can actually know
- * about — the ones already adopted into the Plan, and the one this tab was
- * opened on — and says plainly why there may be others it cannot see.
- *
- * An adopted Scenario keeps the Fork's id (`adoptedFrom`), so its original link
- * *is* reconstructable, which is the one useful thing to do with that stamp
- * beyond making adopt idempotent.
- */
-function Forks({
-  adopted,
-  sharing,
-  canEdit,
-  onCopyLocally,
-}: {
-  adopted: { scenario: Scenario; total: ScenarioTotal }[];
-  sharing: SharingApi;
-  canEdit: boolean;
-  onCopyLocally: (name: string) => void;
-}) {
-  const visiting = sharing.visiting;
-  const alreadyAdopted =
-    visiting !== null &&
-    adopted.some((row) => row.scenario.adoptedFrom === visiting.forkId);
-  const [working, setWorking] = useState(false);
-  const [done, setDone] = useState<string | null>(null);
-
-  return (
-    <section className="mt-12">
-      <h2 className="font-display text-[23px] leading-tight font-extrabold tracking-[-0.015em] text-[var(--sb-text)] lg:text-[26px]">
-        Visitor forks
-      </h2>
-      <p className="mt-2.5 max-w-[68ch] text-[13px] leading-[1.7] text-[var(--sb-dim)]">
-        Anyone holding the view link can rearrange the trip and keep the result
-        under a link of their own. Those forks never touch the Plan — the couple
-        <em> adopt</em> one to put it on the shelf above.
-      </p>
-      <p className="mt-2 max-w-[68ch] text-[12px] leading-[1.7] text-[var(--sb-faint)]">
-        There is no complete list of them, and there cannot be: a fork&rsquo;s id
-        is handed to its author once and nothing on the server enumerates them.
-        That is the cost of having no accounts. What is shown here is what this
-        browser can honestly know — the forks already adopted, and the one this
-        tab was opened on.
-      </p>
-
-      <ul className="mt-5 flex flex-col gap-2">
-        {adopted.map(({ scenario, total }) => (
-          <li
-            key={scenario.id}
-            className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-xl border border-[var(--sb-line)] bg-[var(--sb-panel)] px-4 py-3"
-          >
-            <div className="min-w-0">
-              <p className="text-[14px] font-semibold text-[var(--sb-text)]">
-                {scenario.name}
-              </p>
-              <p className="mt-0.5 text-[11.5px] text-[var(--sb-dim)]">
-                Adopted <Edited iso={scenario.createdAt} /> · on the shelf as a
-                Scenario
-              </p>
-            </div>
-            <div className="flex items-baseline gap-3">
-              <span className="sb-num text-[14px] font-semibold text-[var(--sb-dim)]">
-                {formatEur(total.totalEur)}
-              </span>
-              {/* A full navigation on purpose: the fork parameter is read once,
-                  when the sharing hook mounts, and the hook lives in the shell
-                  — a soft navigation would change the URL and nothing else. */}
-              <a
-                href={`/?${FORK_QUERY_PARAM}=${scenario.adoptedFrom}`}
-                className="text-[11.5px] font-semibold text-[var(--sb-accent)] underline decoration-dotted underline-offset-[3px]"
-              >
-                Open the original
-              </a>
-            </div>
-          </li>
-        ))}
-
-        {visiting && !alreadyAdopted && (
-          <li className="rounded-xl border border-[color-mix(in_srgb,var(--sb-accent)_35%,var(--sb-line))] bg-[var(--sb-panel)] px-4 py-3">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <div className="min-w-0">
-                <p className="text-[14px] font-semibold text-[var(--sb-text)]">
-                  {visiting.name}
-                </p>
-                <p className="mt-0.5 text-[11.5px] text-[var(--sb-dim)]">
-                  You are looking at this fork now
-                  {visiting.createdAt && (
-                    <>
-                      {" · made "}
-                      <Edited iso={visiting.createdAt} />
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-            {visiting.authorNote && (
-              <p className="mt-2 max-w-[62ch] text-[12.5px] leading-snug text-[var(--sb-text)] italic">
-                &ldquo;{visiting.authorNote}&rdquo;
-              </p>
-            )}
-            {done ? (
-              <p className="mt-2 text-[12px] font-semibold text-[var(--sb-good)]">
-                {done}
-              </p>
-            ) : (
-              <div className="mt-2.5">
-                <Action
-                  onClick={() => {
-                    setWorking(true);
-                    if (canEdit && sharing.mode === "edit") {
-                      void sharing.adopt(visiting.forkId).then((ok) => {
-                        setWorking(false);
-                        setDone(
-                          ok
-                            ? "Adopted — it is a Scenario above now."
-                            : "That did not save. The store may be unreachable.",
-                        );
-                      });
-                    } else {
-                      // No server write in view mode, so this is the local copy
-                      // the engine has always had — this browser, nowhere else.
-                      onCopyLocally(visiting.name);
-                      setWorking(false);
-                      setDone("Copied into this browser only.");
-                    }
-                  }}
-                >
-                  <GitFork className="size-3.5" />
-                  {working
-                    ? "Working…"
-                    : sharing.mode === "edit"
-                      ? "Adopt into Scenarios"
-                      : "Copy into this browser"}
-                </Action>
-              </div>
-            )}
-          </li>
-        )}
-
-        {adopted.length === 0 && !visiting && (
-          <li className="rounded-xl border border-dashed border-[var(--sb-line)] px-4 py-5 text-[12.5px] text-[var(--sb-faint)]">
-            None yet. A fork appears here once it has been adopted, or while you
-            are viewing one by its link.
-          </li>
-        )}
-      </ul>
-    </section>
   );
 }
 
@@ -826,10 +674,6 @@ export function ScenariosView() {
     return { scenario, index, total };
   });
 
-  const adopted = rows
-    .filter((row) => row.scenario.adoptedFrom && row.total)
-    .map((row) => ({ scenario: row.scenario, total: row.total as ScenarioTotal }));
-
   const cheapest = [...totals].sort((a, b) => a.totalEur - b.totalEur)[0];
 
   return (
@@ -843,11 +687,12 @@ export function ScenariosView() {
           </h1>
           <p className="mt-3.5 max-w-[68ch] text-[14px] leading-[1.7] text-[var(--sb-dim)] lg:text-[15px]">
             A Scenario is a whole alternate calendar — its own dates, its own
-            Adventures, its own Legs and its own total. Several are saved at
-            once and exactly one is the Plan; everything else on the site — the
-            globe, the Ledger, the Budget — shows whichever one that is. Each
-            row below says what it costs and, derived from the trip itself
-            rather than written down, what it would cost you to switch.
+            Adventures, its own Legs and its own total — and each one is a
+            lettered Plan. Exactly one is the current Plan; everything else on
+            the site — the globe, the Ledger, the Budget — shows whichever one
+            that is. Each row below says what it costs and, derived from the
+            trip itself rather than written down, what it would cost you to
+            switch.
           </p>
 
           {currentTotal && cheapest && (
@@ -855,9 +700,12 @@ export function ScenariosView() {
               <span className="sb-num font-semibold text-[var(--sb-text)]">
                 {scenarios.scenarios.length}
               </span>{" "}
-              saved. The Plan is{" "}
+              saved. The current Plan is{" "}
               <span className="font-semibold text-[var(--sb-text)]">
-                {current.name}
+                {planTitle(
+                  planLetter(current.id, scenarios.scenarios),
+                  current.name,
+                )}
               </span>{" "}
               at{" "}
               <span className="sb-num font-semibold text-[var(--sb-text)]">
@@ -867,7 +715,7 @@ export function ScenariosView() {
                 <>
                   {"; the cheapest is "}
                   <span className="font-semibold text-[var(--sb-text)]">
-                    {cheapest.name}
+                    {planTitle(cheapest.letter, cheapest.name)}
                   </span>{" "}
                   at{" "}
                   <span className="sb-num font-semibold text-[var(--sb-text)]">
@@ -892,18 +740,10 @@ export function ScenariosView() {
             <p className="mt-1.5 max-w-[62ch] text-[12.5px] leading-snug text-[var(--sb-dim)]">
               You are on the view link, so the couple&rsquo;s shelf is
               read-only here — switching, renaming and deleting belong to the
-              edit link. What you can do is take the trip away and rearrange it:
-              every change you make anywhere on the site is real and immediate
-              in this browser, and <em>Make your own version</em> saves it under
-              a link of your own.
+              edit link. You can still rearrange the trip anywhere on the site:
+              every change is real and immediate in this browser, and none of it
+              is saved.
             </p>
-            <button
-              type="button"
-              onClick={openSharePanel}
-              className="mt-2.5 inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-[var(--sb-accent)] px-3 text-[12px] font-semibold text-[var(--primary-foreground)] transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
-            >
-              <GitFork className="size-3.5" /> Make your own version
-            </button>
           </div>
         )}
 
@@ -949,10 +789,6 @@ export function ScenariosView() {
                 deletable={scenarios.scenarios.length > 1}
                 onSelect={() => scenarios.select(scenario.id)}
                 onRename={(name) => scenarios.rename(scenario.id, name)}
-                onDuplicate={() => {
-                  const id = scenarios.duplicate(scenario.id);
-                  if (id) setRenaming(id);
-                }}
                 onDelete={() => scenarios.remove(scenario.id)}
                 renaming={renaming === scenario.id}
                 onRenamingChange={(on) =>
@@ -963,39 +799,12 @@ export function ScenariosView() {
           )}
         </ul>
 
-        {canEdit && (
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                // A new Scenario starts as a copy of the Plan, which is the
-                // only starting position that is not a blank calendar — and
-                // `fork` switches to it, because starting a variant means
-                // working on it.
-                const id = scenarios.fork("New scenario");
-                setRenaming(id);
-              }}
-              className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--sb-line)] bg-[var(--sb-panel)] px-3 text-[12px] font-semibold text-[var(--sb-text)] transition-colors hover:bg-[var(--sb-panel-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
-            >
-              <GitFork className="size-3.5" /> New scenario from the Plan
-            </button>
-            <p className="text-[11.5px] text-[var(--sb-faint)]">
-              It starts identical to{" "}
-              <span className="font-semibold text-[var(--sb-dim)]">
-                {current.name}
-              </span>{" "}
-              and becomes the Plan, so the next thing you change is a change to
-              the copy.
-            </p>
-          </div>
-        )}
-
-        <Forks
-          adopted={adopted}
-          sharing={sharing}
-          canEdit={canEdit}
-          onCopyLocally={(name) => scenarios.fork(name)}
-        />
+        {/* Where "New scenario from the Plan" was. The Plans are curated
+            now, so the way to another one is a conversation, not a button. */}
+        <p className="mt-4 text-[12px] text-[var(--sb-faint)]">
+          Want another option? Tell Claude your preferences and it adds the next
+          plan.
+        </p>
 
         <p className="mt-12 border-t border-[var(--sb-line)] pt-4 text-[11px] leading-relaxed text-[var(--sb-faint)]">
           Every total is the sum of that Scenario&rsquo;s Days, EUR per couple,

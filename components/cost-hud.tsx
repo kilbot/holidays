@@ -11,6 +11,7 @@ import {
   type RollUp,
   type Warning,
 } from "@/lib/engine";
+import { planLetter, planTitle } from "@/lib/engine/curated-plans";
 import type { ScenarioTotal } from "@/lib/engine/scenarios";
 import { usePlan } from "@/lib/engine/use-plan";
 import { useSharing } from "@/lib/store/sharing";
@@ -176,18 +177,16 @@ function Row({
  * that comparison, and it lives inside the cost panel rather than in a panel of
  * its own because the only thing worth comparing at a glance is the money.
  *
- * A fork copies the current Scenario's whole input, so it starts identical and
- * diverges as it is edited. Visitor Forks with their own URLs are #30; this is
- * the couple's own list.
+ * Each row is a lettered Plan. There is no fork button here any more: the Plans
+ * are curated (2026-09-30), and the next one comes from telling Claude what the
+ * Travellers want, not from copying this one.
  */
 function Scenarios({
   totals,
   onSelect,
-  onFork,
 }: {
   totals: ScenarioTotal[];
   onSelect: (id: string) => void;
-  onFork: () => void;
 }) {
   return (
     <div className="mt-2.5 border-t border-[var(--sb-line)] pt-2">
@@ -200,14 +199,6 @@ function Scenarios({
         >
           Scenarios <span aria-hidden>→</span>
         </Link>
-        <button
-          type="button"
-          onClick={onFork}
-          title="Copy this Scenario under a new name. The copy starts identical and diverges as you edit it."
-          className="sb-label cursor-pointer text-[9px] text-[var(--sb-accent)] hover:underline"
-        >
-          Fork
-        </button>
       </div>
 
       <ul className="mt-1 flex flex-col gap-0.5">
@@ -230,7 +221,7 @@ function Scenarios({
                     : "text-[var(--sb-dim)]",
                 )}
               >
-                {total.name}
+                {planTitle(total.letter, total.name)}
                 <span className="ml-1 text-[var(--sb-faint)]">
                   {total.dayCount}d
                 </span>
@@ -391,10 +382,15 @@ export function CostHud() {
               inside a button is invalid, and the two do different things. */}
           <Link
             href="/scenarios"
-            title="All the saved Scenarios — compare, switch, fork"
+            title="All the Plans — compare, switch"
             className="mt-px flex max-w-[55%] shrink-0 items-center gap-0.5 rounded-full border border-[var(--sb-line)] py-[3px] pr-1 pl-2 text-[10px] font-medium text-[var(--sb-accent)] transition-colors hover:bg-[var(--sb-panel-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)] motion-reduce:transition-none"
           >
-            <span className="truncate">{scenarios.current.name}</span>
+            <span className="truncate">
+              {planTitle(
+                planLetter(scenarios.current.id, scenarios.scenarios),
+                scenarios.current.name,
+              )}
+            </span>
             <ChevronRight aria-hidden className="size-3 shrink-0" />
           </Link>
         </div>
@@ -412,13 +408,7 @@ export function CostHud() {
               onContingency={(contingency) => patch({ contingency })}
               onFxStress={(fxStress) => patch({ fxStress })}
             />
-            <Scenarios
-              totals={totals}
-              onSelect={scenarios.select}
-              onFork={() =>
-                scenarios.fork(`Fork ${scenarios.scenarios.length + 1}`)
-              }
-            />
+            <Scenarios totals={totals} onSelect={scenarios.select} />
             {ranked.slice(0, 3).map((warning) => (
               <WarningBadge key={warning.id} warning={warning} />
             ))}

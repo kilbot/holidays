@@ -79,6 +79,7 @@ import {
   type Warning,
   type WarningKind,
 } from "@/lib/engine";
+import { planLetter, planTitle } from "@/lib/engine/curated-plans";
 import { usePlan } from "@/lib/engine/use-plan";
 import {
   anchorOn,
@@ -784,9 +785,11 @@ export function LedgerView() {
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <p className="sb-label">Australia 2026–27</p>
             <p className="text-[11px] text-[var(--sb-faint)]">
-              Scenario{" "}
               <span className="font-semibold text-[var(--sb-dim)]">
-                {scenarios.current.name}
+                {planTitle(
+                  planLetter(scenarios.current.id, scenarios.scenarios),
+                  scenarios.current.name,
+                )}
               </span>
             </p>
           </div>
@@ -960,7 +963,11 @@ export function LedgerView() {
             </>
           )}{" "}
           Bands and sources are on the lines. Australia 2026–27 ·{" "}
-          {scenarios.current.name} · {formatDayYear(plan.startDate)} –{" "}
+          {planTitle(
+            planLetter(scenarios.current.id, scenarios.scenarios),
+            scenarios.current.name,
+          )}{" "}
+          · {formatDayYear(plan.startDate)} –{" "}
           {formatDayYear(plan.endDate)}.
         </p>
       </div>

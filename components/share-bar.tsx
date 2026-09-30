@@ -13,23 +13,20 @@
  * everything else is one click behind it. Nothing is hidden and nothing shouts:
  * the same bargain the cost HUD strikes with its plan-on figure.
  *
- * The labels are deliberately plain. "Viewing — fork to play" is what is
- * actually true, and it is more useful than a disabled-looking UI that leaves
- * the visitor guessing why their clicks do not stick. What they *can* do — take
- * the whole thing away and rearrange it — is the accent-coloured button, because
- * per ADR 0001 that is the site's one real invitation to a friend.
+ * The labels are deliberately plain: "Viewing" is what is actually true. A
+ * visitor can still rearrange the trip as a preview in their own browser; what
+ * they can no longer do is save it as a Fork, because the Plans are curated
+ * (2026-09-30) — the next one comes from telling Claude, not from this pill.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Copy, GitFork, Link2, Pencil, Undo2, X } from "lucide-react";
+import { Check, Copy, Link2, Pencil, Undo2, X } from "lucide-react";
 
-import { usePlan } from "@/lib/engine/use-plan";
 import {
   closeSharePanel,
   toggleSharePanel,
   useSharePanelOpen,
 } from "@/lib/share-panel";
-import { MAX_FORK_NAME_LENGTH } from "@/lib/store/plans";
 import { useSharing, type SharingApi } from "@/lib/store/sharing";
 import { cn } from "@/lib/utils";
 
@@ -92,7 +89,7 @@ function restingLabel(sharing: SharingApi): string {
   if (sharing.previewing) return "Previewing — not saved";
   if (sharing.visiting) return sharing.visiting.name;
   if (sharing.mode === "local") return "This browser only";
-  if (sharing.mode === "view") return "Viewing — fork to play";
+  if (sharing.mode === "view") return "Viewing";
   if (sharing.status === "offline") return "Editing · offline";
   if (sharing.status === "rejected") return "Editing · not saving";
   if (sharing.status === "saving") return "Editing · saving";
@@ -110,97 +107,6 @@ function toneFor(sharing: SharingApi): string | null {
   }
   if (sharing.status === "saving") return "var(--sb-faint)";
   return "var(--sb-good)";
-}
-
-/* ------------------------------------------------------------------ */
-/* Fork                                                                */
-/* ------------------------------------------------------------------ */
-
-/**
- * The visitor's one write.
- *
- * A name and nothing else is required — docs/CONTEXT.md's Fork is *"named,
- * saved, with its own URL"*, and asking a friend to fill in a form before they
- * are allowed to have an opinion is how you get no opinions. The note is there
- * because people want to say *why*, and a fork with no argument attached is
- * harder for the couple to weigh.
- *
- * The URL comes back once and is never recoverable. The copy says so.
- */
-function ForkPanel({ sharing }: { sharing: SharingApi }) {
-  const { input, scenarios } = usePlan();
-  const [name, setName] = useState(`${scenarios.current.name} — my version`);
-  const [note, setNote] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [url, setUrl] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
-
-  if (url) {
-    return (
-      <div className="mt-2 border-t border-[var(--sb-line)] pt-2">
-        <p className="text-[10.5px] leading-snug text-[var(--sb-dim)]">
-          Saved. This link is the only way back to it — nothing lists forks, so
-          keep it somewhere.
-        </p>
-        <CopyRow label="Your version" url={url} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-2 border-t border-[var(--sb-line)] pt-2">
-      <p className="sb-label text-[9px]">Make your own version</p>
-      <p className="mt-1 text-[10.5px] leading-snug text-[var(--sb-dim)]">
-        Saves the trip exactly as you have it now — every change you have made
-        while previewing, on its own link. The couple&rsquo;s plan is untouched.
-      </p>
-
-      <input
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        maxLength={MAX_FORK_NAME_LENGTH}
-        aria-label="Name your version"
-        placeholder="Name it"
-        className="mt-1.5 w-full rounded-md border border-[var(--sb-line)] bg-[var(--sb-panel-2)] px-2 py-1.5 text-[11px] text-[var(--sb-text)] outline-none focus-visible:border-[var(--sb-accent)]"
-      />
-      <textarea
-        value={note}
-        onChange={(event) => setNote(event.target.value)}
-        maxLength={280}
-        rows={2}
-        aria-label="Why this version (optional)"
-        placeholder="Why? (optional)"
-        className="sb-scroll mt-1 w-full resize-none rounded-md border border-[var(--sb-line)] bg-[var(--sb-panel-2)] px-2 py-1.5 text-[11px] text-[var(--sb-text)] outline-none focus-visible:border-[var(--sb-accent)]"
-      />
-
-      <button
-        type="button"
-        disabled={saving || name.trim().length === 0}
-        onClick={() => {
-          setSaving(true);
-          setFailed(false);
-          void sharing
-            .saveFork(name, input, note.trim() || undefined)
-            .then((saved) => {
-              if (saved) setUrl(saved);
-              else setFailed(true);
-              setSaving(false);
-            });
-        }}
-        className="mt-2 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md bg-[var(--sb-accent)] px-2 py-1.5 text-[11px] font-semibold text-[var(--primary-foreground)] transition-opacity hover:opacity-90 disabled:cursor-default disabled:opacity-50 motion-reduce:transition-none"
-      >
-        <GitFork className="size-3.5" />
-        {saving ? "Saving…" : "Save my version"}
-      </button>
-
-      {failed && (
-        <p className="mt-1.5 text-[10px] leading-snug text-[var(--sb-warn)]">
-          That did not save — the store may be unreachable. Your changes are
-          still here in this browser.
-        </p>
-      )}
-    </div>
-  );
 }
 
 /**
@@ -256,17 +162,14 @@ function DiscardRow({ sharing }: { sharing: SharingApi }) {
 }
 
 /**
- * What to do about a Fork you are looking at.
+ * A Fork you are looking at.
  *
- * Two different verbs for the two modes, and the difference is exactly ADR
- * 0001's: a visitor can take a copy into their own browser, and only the couple
- * can put it on the Plan's shelf. Neither one lets a Fork change the itinerary.
+ * Forks are no longer made or adopted on the site (2026-09-30: the Plans are
+ * curated), but a link somebody saved before that still opens, and the note
+ * its author left is still worth reading.
  */
 function VisitingPanel({ sharing }: { sharing: SharingApi }) {
-  const { scenarios } = usePlan();
   const visiting = sharing.visiting;
-  const [done, setDone] = useState<string | null>(null);
-  const [working, setWorking] = useState(false);
   if (!visiting) return null;
 
   return (
@@ -276,38 +179,6 @@ function VisitingPanel({ sharing }: { sharing: SharingApi }) {
         <p className="mt-1 text-[10.5px] leading-snug text-[var(--sb-text)] italic">
           &ldquo;{visiting.authorNote}&rdquo;
         </p>
-      )}
-
-      {done ? (
-        <p className="mt-1.5 text-[10.5px] leading-snug text-[var(--sb-good)]">
-          {done}
-        </p>
-      ) : (
-        <button
-          type="button"
-          disabled={working}
-          onClick={() => {
-            setWorking(true);
-            if (sharing.mode === "edit") {
-              void sharing.adopt(visiting.forkId).then((ok) => {
-                setWorking(false);
-                setDone(ok ? "Adopted — it is in your Scenarios now." : null);
-              });
-            } else {
-              // View mode has no server write, so this is the local fork the
-              // engine has always had: a copy in this browser, nowhere else.
-              scenarios.fork(visiting.name);
-              setWorking(false);
-              setDone("Copied into this browser.");
-            }
-          }}
-          className="mt-1.5 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border border-[var(--sb-line)] px-2 py-1.5 text-[11px] font-semibold text-[var(--sb-text)] transition-colors hover:bg-[var(--sb-panel-2)] disabled:opacity-50 motion-reduce:transition-none"
-        >
-          <GitFork className="size-3.5" />
-          {sharing.mode === "edit"
-            ? "Adopt into Scenarios"
-            : "Copy into this browser"}
-        </button>
       )}
     </div>
   );
@@ -411,9 +282,6 @@ export function ShareBar() {
             {sharing.previewing && <DiscardRow sharing={sharing} />}
 
             {sharing.visiting && <VisitingPanel sharing={sharing} />}
-            {sharing.mode === "view" && !sharing.visiting && (
-              <ForkPanel sharing={sharing} />
-            )}
           </>
         )}
       </div>

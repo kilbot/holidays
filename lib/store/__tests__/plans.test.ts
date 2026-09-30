@@ -1,10 +1,10 @@
 /**
- * The document layer: create, fork, adopt.
+ * The document layer: create a Plan, read a Fork, and what a Plan write may do.
  *
  * The rules being pinned here are the ADR's, not the store's — *"Forks can
- * never modify the canonical Plan; the couple can adopt (copy) a fork into
- * their Scenario list"* — plus the two invariants docs/CONTEXT.md states about
- * Scenarios: exactly one is current, and a Scenario is a saved `PlanInput`.
+ * never modify the canonical Plan"* — plus the two invariants docs/CONTEXT.md
+ * states about Scenarios: exactly one is current, and a Scenario is a saved
+ * `PlanInput`; and, since 2026-09-30, that a Plan write never adds one.
  */
 
 import assert from "node:assert/strict";
@@ -12,24 +12,21 @@ import test from "node:test";
 
 import { EMPTY_INPUT } from "@/lib/engine/plan";
 import {
+  ADELINE_SCENARIO,
   DEFAULT_SCENARIO,
   INITIAL_STATE,
   lastEditedAt,
   type ScenarioState,
 } from "@/lib/engine/scenario-doc";
 import { fakeKv } from "@/lib/store/__tests__/fake-kv";
-import { reserveDailyPerIp } from "@/lib/store/guards";
 import {
-  DAILY_FORK_CAP_PER_IP,
   FORK_TTL_SECONDS,
-  adoptFork,
-  createFork,
   createPlan,
-  markForkAdopted,
   readFork,
   readPlan,
   readPlanMeta,
   toPlanDoc,
+  withoutNewScenarios,
   writePlan,
   type ForkDoc,
 } from "@/lib/store/plans";
@@ -146,91 +143,34 @@ test("writePlan stamps updatedAt", async () => {
 /* Forks                                                               */
 /* ------------------------------------------------------------------ */
 
-test("a fork stores its input, its name and where it came from", async () => {
-  const kv = fakeKv();
-  const { forkId, fork } = await createFork(kv, {
-    name: "  Doof NYE  ",
-    planInput: { ...EMPTY_INPUT, toggled: ["byron-nimbin"] },
-    authorNote: "hear me out",
-    forkedFrom: "PLAN",
-  });
+/**
+ * Forks are no longer made or adopted on the site (2026-09-30: Scenarios are
+ * curated), but the ones already saved still open from their links, so reading
+ * one — and its lifetime — is still pinned here.
+ */
+const storeFork = async (kv: ReturnType<typeof fakeKv>, over: Partial<ForkDoc> = {}) => {
+  await kv.setJson("fork:FORK1", forkDoc(over));
+  await kv.setTtl("fork:FORK1", 3 * 24 * 60 * 60);
+  return "FORK1";
+};
 
-  assert.equal(fork.name, "Doof NYE", "trimmed");
-  assert.equal(fork.forkedFrom, "PLAN");
+test("a stored fork reads back with its input, its name and its note", async () => {
+  const kv = fakeKv();
+  const forkId = await storeFork(kv, { authorNote: "hear me out" });
   const stored = await readFork(kv, forkId);
+  assert.equal(stored?.name, "Doof NYE");
   assert.deepEqual(stored?.planInput.toggled, ["byron-nimbin"]);
   assert.equal(stored?.authorNote, "hear me out");
-});
-
-test("a fork never lands in the plan's key space", async () => {
-  const kv = fakeKv();
-  await createFork(kv, {
-    name: "Doof NYE",
-    planInput: EMPTY_INPUT,
-    forkedFrom: "PLAN",
-  });
-  // ADR 0001's "Forks can never modify the canonical Plan", as a fact about
-  // which keys this code path can address.
-  assert.ok(kv.writes.every((key) => key.startsWith("fork:")));
-});
-
-test("an unnamed fork gets a name rather than an empty label", async () => {
-  const kv = fakeKv();
-  const { fork } = await createFork(kv, {
-    name: "   ",
-    planInput: EMPTY_INPUT,
-    forkedFrom: "PLAN",
-  });
-  assert.equal(fork.name, "Untitled fork");
-});
-
-test("long names and notes are cut to length", async () => {
-  const kv = fakeKv();
-  const { fork } = await createFork(kv, {
-    name: "x".repeat(500),
-    planInput: EMPTY_INPUT,
-    authorNote: "y".repeat(5000),
-    forkedFrom: "PLAN",
-  });
-  assert.equal(fork.name.length, 60);
-  assert.equal(fork.authorNote?.length, 280);
 });
 
 test("a missing fork reads as absent", async () => {
   assert.equal(await readFork(fakeKv(), "nope"), null);
 });
 
-/* ------------------------------------------------------------------ */
-/* How long a Fork lives (#90)                                         */
-/* ------------------------------------------------------------------ */
-
-/**
- * Nothing ever deleted a Fork, and anyone may write one, so `fork:<id>` was a
- * key space that only grew. The lifetime is a measure of *neglect* rather than
- * of age: 90 days from the last visit, and none at all once the couple has
- * adopted it.
- */
-test("a new fork is written with a lifetime, not left immortal", async () => {
-  const kv = fakeKv();
-  const { forkId } = await createFork(kv, {
-    name: "Doof NYE",
-    planInput: EMPTY_INPUT,
-    forkedFrom: "PLAN",
-  });
-  assert.equal(kv.ttls.get(`fork:${forkId}`), FORK_TTL_SECONDS);
-});
-
 test("reading a fork pushes its expiry back out", async () => {
   const kv = fakeKv();
-  const { forkId } = await createFork(kv, {
-    name: "Doof NYE",
-    planInput: EMPTY_INPUT,
-    forkedFrom: "PLAN",
-  });
-
-  // Something else shortened it — three days left, as a stand-in for 87 days
-  // of nobody looking.
-  await kv.setTtl(`fork:${forkId}`, 3 * 24 * 60 * 60);
+  // Three days left, as a stand-in for 87 days of nobody looking.
+  const forkId = await storeFork(kv);
   await readFork(kv, forkId);
   assert.equal(
     kv.ttls.get(`fork:${forkId}`),
@@ -239,150 +179,64 @@ test("reading a fork pushes its expiry back out", async () => {
   );
 });
 
-test("an adopted fork has no expiry, and reading it does not give it one", async () => {
+test("an adopted fork is never given an expiry by reading it", async () => {
   const kv = fakeKv();
-  const { forkId, fork } = await createFork(kv, {
-    name: "Doof NYE",
-    planInput: EMPTY_INPUT,
-    forkedFrom: "PLAN",
-  });
-
-  await markForkAdopted(kv, forkId, fork, new Date("2026-09-02T00:00:00.000Z"));
-  assert.equal(kv.ttls.has(`fork:${forkId}`), false);
-
-  const read = await readFork(kv, forkId);
+  await kv.setJson("fork:FORK2", forkDoc({ adoptedAt: "2026-09-02T00:00:00.000Z" }));
+  const read = await readFork(kv, "FORK2");
   assert.equal(read?.adoptedAt, "2026-09-02T00:00:00.000Z");
   assert.equal(
-    kv.ttls.has(`fork:${forkId}`),
+    kv.ttls.has("fork:FORK2"),
     false,
     "the Plan points at this permanently — a countdown would be a dead link",
   );
 });
 
-test("marking an already-adopted fork does not restamp when it happened", async () => {
-  const kv = fakeKv();
-  const { forkId, fork } = await createFork(kv, {
-    name: "Doof NYE",
-    planInput: EMPTY_INPUT,
-    forkedFrom: "PLAN",
-  });
-
-  await markForkAdopted(kv, forkId, fork, new Date("2026-09-02T00:00:00.000Z"));
-  const first = await readFork(kv, forkId);
-  assert.ok(first);
-  await markForkAdopted(kv, forkId, first, new Date("2026-10-10T00:00:00.000Z"));
-
-  assert.equal((await readFork(kv, forkId))?.adoptedAt, "2026-09-02T00:00:00.000Z");
-});
-
-test("one address may create ten forks a day, and then not an eleventh", async () => {
-  const kv = fakeKv();
-  const request = new Request("https://example.test/api/plan/PLAN/fork", {
-    method: "POST",
-    headers: { "x-forwarded-for": "1.2.3.4" },
-  });
-
-  for (let i = 0; i < DAILY_FORK_CAP_PER_IP; i += 1) {
-    assert.equal(
-      await reserveDailyPerIp(kv, request, "fork", DAILY_FORK_CAP_PER_IP),
-      true,
-      `fork ${i + 1}`,
-    );
-  }
-  assert.equal(
-    await reserveDailyPerIp(kv, request, "fork", DAILY_FORK_CAP_PER_IP),
-    false,
-  );
-
-  // The per-minute write throttle stops accidents; it does not stop patience,
-  // because 20 a minute is 28,800 forks a day. This is the one that does.
-  const somebodyElse = new Request("https://example.test/api/plan/PLAN/fork", {
-    method: "POST",
-    headers: { "x-forwarded-for": "5.6.7.8" },
-  });
-  assert.equal(
-    await reserveDailyPerIp(kv, somebodyElse, "fork", DAILY_FORK_CAP_PER_IP),
-    true,
-  );
-});
-
-test("fork and fare allowances are separate budgets", async () => {
-  const kv = fakeKv();
-  const request = new Request("https://example.test/", {
-    headers: { "x-forwarded-for": "1.2.3.4" },
-  });
-
-  await reserveDailyPerIp(kv, request, "fork", 1);
-  assert.equal(await reserveDailyPerIp(kv, request, "fork", 1), false);
-  // Spending every fork must not cost this visitor their fare calls.
-  assert.equal(await reserveDailyPerIp(kv, request, "fare", 1), true);
-});
-
 /* ------------------------------------------------------------------ */
-/* Adopt                                                               */
+/* No new Scenarios over the wire                                      */
 /* ------------------------------------------------------------------ */
 
-const state = (): ScenarioState => ({
-  scenarios: [DEFAULT_SCENARIO],
+const stored = (): ScenarioState => ({
+  scenarios: [DEFAULT_SCENARIO, ADELINE_SCENARIO],
   currentId: DEFAULT_SCENARIO.id,
   pins: [],
 });
 
-test("adopt appends the fork's input as a new Scenario", () => {
-  const result = adoptFork(state(), "FORK1", forkDoc());
-  assert.equal(result.state.scenarios.length, 2);
-  const adopted = result.state.scenarios[1];
-  assert.equal(adopted.name, "Doof NYE");
-  assert.equal(adopted.adoptedFrom, "FORK1");
-  assert.deepEqual(adopted.input.toggled, ["byron-nimbin"]);
-  assert.equal(result.alreadyAdopted, false);
-});
-
-test("adopt does not swap the current Plan out from under the couple", () => {
-  const result = adoptFork(state(), "FORK1", forkDoc());
-  assert.equal(result.state.currentId, DEFAULT_SCENARIO.id);
-});
-
-test("adopt leaves the existing Scenarios untouched", () => {
-  const before = state();
-  const result = adoptFork(before, "FORK1", forkDoc());
-  assert.deepEqual(result.state.scenarios[0], DEFAULT_SCENARIO);
-  assert.equal(before.scenarios.length, 1, "the input state is not mutated");
-});
-
-test("adopting the same fork twice adopts it once", () => {
-  const first = adoptFork(state(), "FORK1", forkDoc());
-  const second = adoptFork(first.state, "FORK1", forkDoc({ name: "Renamed" }));
-  assert.equal(second.state.scenarios.length, 2);
-  assert.equal(second.alreadyAdopted, true);
-  assert.equal(second.scenarioId, first.scenarioId);
-  assert.equal(second.state, first.state, "no new document to write");
-});
-
-test("two different forks with the same name both land", () => {
-  const first = adoptFork(state(), "FORK1", forkDoc());
-  const second = adoptFork(first.state, "FORK2", forkDoc());
-  assert.equal(second.state.scenarios.length, 3);
-  assert.notEqual(second.scenarioId, first.scenarioId);
-  assert.equal(second.state.scenarios[1].id, "doof-nye");
-  assert.equal(second.state.scenarios[2].id, "doof-nye-2");
-});
-
-test("adopt takes the fork's input as it stood, and changes nothing about it", () => {
-  const fork = forkDoc();
-  const result = adoptFork(state(), "FORK1", fork);
-  assert.deepEqual(result.state.scenarios[1].input, fork.planInput);
-  // The Plan holds a copy of the input — never a reference to the Fork document,
-  // which is what makes ADR 0001's "forks can never modify the canonical Plan"
-  // survive the author editing their Fork afterwards.
-  assert.deepEqual(fork, forkDoc(), "adopting did not touch the fork");
-  assert.ok(
-    !JSON.stringify(result.state.scenarios[1]).includes("forkedFrom"),
-    "the Scenario carries a stamp, not the Fork document",
+test("a Plan write cannot add a Scenario the store does not hold", () => {
+  const incoming: ScenarioState = {
+    ...stored(),
+    scenarios: [
+      ...stored().scenarios,
+      { ...DEFAULT_SCENARIO, id: "new-scenario", name: "New scenario" },
+    ],
+    currentId: "new-scenario",
+  };
+  const kept = withoutNewScenarios(incoming, stored());
+  assert.deepEqual(
+    kept.scenarios.map((scenario) => scenario.id),
+    [DEFAULT_SCENARIO.id, ADELINE_SCENARIO.id],
   );
+  assert.equal(kept.currentId, DEFAULT_SCENARIO.id, "never current by the back door");
 });
 
-test("an unnamed fork adopts under a usable name", () => {
-  const result = adoptFork(state(), "FORK1", forkDoc({ name: "   " }));
-  assert.equal(result.state.scenarios[1].name, "Adopted fork");
+test("a Plan write may still edit, switch and delete the Scenarios it holds", () => {
+  const renamed = { ...ADELINE_SCENARIO, name: "Renamed" };
+  const incoming: ScenarioState = {
+    scenarios: [renamed],
+    currentId: renamed.id,
+    pins: [],
+  };
+  const kept = withoutNewScenarios(incoming, stored());
+  assert.deepEqual(kept.scenarios, [renamed]);
+  assert.equal(kept.currentId, renamed.id);
+});
+
+test("a write holding only unknown Scenarios keeps the stored ones", () => {
+  const incoming: ScenarioState = {
+    scenarios: [{ ...DEFAULT_SCENARIO, id: "stranger" }],
+    currentId: "stranger",
+    pins: [],
+  };
+  const kept = withoutNewScenarios(incoming, stored());
+  assert.deepEqual(kept.scenarios, stored().scenarios);
+  assert.equal(kept.currentId, DEFAULT_SCENARIO.id);
 });

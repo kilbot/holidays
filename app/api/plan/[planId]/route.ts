@@ -24,6 +24,7 @@ import { getKv } from "@/lib/store/kv";
 import {
   readPlan,
   readPlanMeta,
+  withoutNewScenarios,
   writePlan,
   writePlanIfCurrent,
 } from "@/lib/store/plans";
@@ -85,7 +86,11 @@ export async function PUT(
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
 
-  const state = parseScenarioState(body.value);
+  const stored = await readPlan(kv, planId);
+  if (!stored) return errorResponse("No such plan", 404);
+  // Scenarios are curated, not created on the site: a write may change, switch
+  // or delete the Scenarios the Plan holds, and never add one.
+  const state = withoutNewScenarios(parseScenarioState(body.value), stored);
   const base = basePlanVersion(request);
 
   // No claimed version is not a stale claim — it is a caller with no document

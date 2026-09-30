@@ -23,14 +23,12 @@
  * which is what keeps `npm run dev` working on a fresh clone with no store.
  */
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { installScenarioStore } from "@/lib/engine/scenarios";
-import type { PlanInput } from "@/lib/engine/types";
 import {
   CANONICAL_PLAN_ID,
   FORK_QUERY_PARAM,
-  forkShareUrl,
 } from "@/lib/store/canonical-plan";
 import {
   captureEditKey,
@@ -38,12 +36,10 @@ import {
   stripEditKeyFromUrl,
   subscribeEditKey,
 } from "@/lib/store/edit-key";
-import { EDIT_KEY_HEADER } from "@/lib/store/guards";
 import {
   discardPreview,
   readSyncStatus,
   readSyncStatusOnServer,
-  refreshPlanFromServer,
   remoteScenarioStore,
   subscribeSyncStatus,
   type SyncStatus,
@@ -124,14 +120,6 @@ export interface SharingApi {
    * the preview warning stands.
    */
   discardPreview: () => Promise<boolean>;
-  /** Save the current Scenario as a Fork and get its shareable URL. */
-  saveFork: (
-    name: string,
-    input: PlanInput,
-    authorNote?: string,
-  ) => Promise<string | null>;
-  /** Copy the visited Fork into the Plan. Edit mode only. */
-  adopt: (forkId: string) => Promise<boolean>;
 }
 
 export function useSharing(): SharingApi {
@@ -202,48 +190,6 @@ export function useSharing(): SharingApi {
     };
   }, []);
 
-  const saveFork = useCallback(
-    async (name: string, input: PlanInput, authorNote?: string) => {
-      if (!CANONICAL_PLAN_ID) return null;
-      try {
-        const response = await fetch(`/api/plan/${CANONICAL_PLAN_ID}/fork`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ name, planInput: input, authorNote }),
-        });
-        if (!response.ok) return null;
-        const body = (await response.json()) as { forkId?: string };
-        if (!body.forkId) return null;
-        return forkShareUrl(window.location.origin, body.forkId);
-      } catch {
-        return null;
-      }
-    },
-    [],
-  );
-
-  const adopt = useCallback(async (forkId: string) => {
-    const key = readEditKey();
-    if (!CANONICAL_PLAN_ID || !key) return false;
-    try {
-      const response = await fetch(`/api/plan/${CANONICAL_PLAN_ID}/adopt`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          [EDIT_KEY_HEADER]: key,
-        },
-        body: JSON.stringify({ forkId }),
-      });
-      if (!response.ok) return false;
-      // The Plan now holds a Scenario this tab has never seen. Re-read rather
-      // than guess at what the route did.
-      await refreshPlanFromServer();
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
   const mode: ShareMode = !CANONICAL_PLAN_ID
     ? "local"
     : editing
@@ -258,7 +204,5 @@ export function useSharing(): SharingApi {
     visiting,
     previewing: sync.status === "preview",
     discardPreview,
-    saveFork,
-    adopt,
   };
 }
