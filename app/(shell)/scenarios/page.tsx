@@ -5,7 +5,7 @@ import { ScenariosView } from "@/components/scenarios-view";
 export const metadata: Metadata = {
   title: "Australia 2026–27",
   description:
-    "Every saved alternate trip on one shelf: what each costs, how long it runs, when it was last worked on, and — derived from the trip itself — exactly what switching to it would change. Plus the visitor forks the couple have adopted.",
+    "Every lettered Plan on one shelf: what each costs, how long it runs, when it was last worked on, and — derived from the trip itself — exactly what switching to it would change.",
 };
 
 /**

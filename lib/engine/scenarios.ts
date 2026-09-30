@@ -35,11 +35,11 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
+import { planLetter } from "@/lib/engine/curated-plans";
 import { buildPlan } from "@/lib/engine/plan";
 import {
   DEFAULT_SCENARIO,
   INITIAL_STATE,
-  nextScenarioId,
   parseScenarioState,
   type Scenario,
   type ScenarioState,
@@ -313,17 +313,6 @@ export interface ScenarioApi extends ScenarioState {
   current: Scenario;
   /** Replace the current Scenario's input. Every knob change lands here. */
   update: (input: PlanInput) => void;
-  /** Save a copy of the **current** Scenario under a new name and switch to it. */
-  fork: (name: string, input?: PlanInput) => string;
-  /**
-   * Copy any Scenario, named or not, **without** switching to it.
-   *
-   * `fork` is the globe's verb — take what I am looking at and start a variant
-   * of it — and it switches because that is what "start a variant" means. This
-   * is the list's verb: duplicating the third row from a page showing all of
-   * them should not silently change which trip the rest of the site is costing.
-   */
-  duplicate: (id: string, name?: string) => string | null;
   select: (id: string) => void;
   rename: (id: string, name: string) => void;
   remove: (id: string) => void;
@@ -347,54 +336,6 @@ export function useScenarios(): ScenarioApi {
         scenario.id === now.currentId ? touch({ ...scenario, input }) : scenario,
       ),
     });
-  }, []);
-
-  const fork = useCallback((name: string, input?: PlanInput) => {
-    const now = store().read();
-    const source =
-      now.scenarios.find((scenario) => scenario.id === now.currentId) ??
-      now.scenarios[0];
-    const id = nextScenarioId(name, now.scenarios);
-    store().write({
-      ...now,
-      scenarios: [
-        ...now.scenarios,
-        {
-          id,
-          name,
-          createdAt: new Date().toISOString(),
-          input: input ?? source.input,
-        },
-      ],
-      currentId: id,
-    });
-    return id;
-  }, []);
-
-  const duplicate = useCallback((id: string, name?: string) => {
-    const now = store().read();
-    const source = now.scenarios.find((scenario) => scenario.id === id);
-    if (!source) return null;
-    const copyName = name ?? `${source.name} (copy)`;
-    const copyId = nextScenarioId(copyName, now.scenarios);
-    // Appended, never inserted beside its original. A Scenario's colour is its
-    // position in this list (`budget-chart.ts`, `scenarioInk`), so splicing one
-    // into the middle would repaint every Scenario after it — and "Aggressive
-    // is the sea-blue one" has to stay true across somebody else's duplicate.
-    store().write({
-      ...now,
-      scenarios: [
-        ...now.scenarios,
-        {
-          id: copyId,
-          name: copyName,
-          createdAt: new Date().toISOString(),
-          input: source.input,
-        },
-      ],
-      currentId: now.currentId,
-    });
-    return copyId;
   }, []);
 
   const select = useCallback((id: string) => {
@@ -432,8 +373,6 @@ export function useScenarios(): ScenarioApi {
     ...state,
     current,
     update,
-    fork,
-    duplicate,
     select,
     remove,
     rename,
@@ -448,6 +387,8 @@ export function useScenarios(): ScenarioApi {
 export interface ScenarioTotal {
   id: string;
   name: string;
+  /** "D" — the Plan letter, from `curated-plans.ts`. */
+  letter: string;
   current: boolean;
   dayCount: number;
   /** The plan-on figure plus its contingency row — what the HUD shows. */
@@ -496,6 +437,7 @@ export function scenarioTotals(
     return {
       id: scenario.id,
       name: scenario.name,
+      letter: planLetter(scenario.id, state.scenarios),
       current: scenario.id === state.currentId,
       dayCount: plan.dayCount,
       totalEur: plan.rollUp.totalEur,

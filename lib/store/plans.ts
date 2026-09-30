@@ -31,11 +31,9 @@
 
 import {
   isRecord,
-  nextScenarioId,
   parseInput,
   toPlanDoc,
   type PlanDoc,
-  type Scenario,
   type ScenarioState,
 } from "@/lib/engine/scenario-doc";
 import type { PlanInput } from "@/lib/engine/types";
@@ -87,10 +85,8 @@ const planKey = (planId: string) => `plan:${planId}`;
 const planMetaKey = (planId: string) => `plan:${planId}:meta`;
 const forkKey = (forkId: string) => `fork:${forkId}`;
 
-/** Longest a Fork name may be. Long enough to be descriptive, short enough to sit in the HUD. */
+/** Longest a Scenario name may be. Long enough to be descriptive, short enough to sit in the HUD. */
 export const MAX_FORK_NAME_LENGTH = 60;
-/** Longest an author note may be. A sentence or two, not an essay. */
-export const MAX_AUTHOR_NOTE_LENGTH = 280;
 
 /**
  * How long an unadopted Fork lives after its last visit.
@@ -105,17 +101,6 @@ export const MAX_AUTHOR_NOTE_LENGTH = 280;
  * An adopted Fork has no expiry at all — see `ForkDoc.adoptedAt`.
  */
 export const FORK_TTL_SECONDS = 90 * 24 * 60 * 60;
-
-/**
- * How many Forks one IP may create in a day.
- *
- * The write throttle already stops a script at 20 requests a minute, which is
- * the right shape for accidents and the wrong one for patience: 20 a minute is
- * 28,800 Forks a day. Ten is far above what a friend playing with the
- * itinerary does — they save a version, not a hundred — and far below what
- * makes the key space somebody's storage.
- */
-export const DAILY_FORK_CAP_PER_IP = 10;
 
 /* ------------------------------------------------------------------ */
 /* Reading and writing the canonical Plan                              */
@@ -263,120 +248,36 @@ export async function readFork(
   return fork;
 }
 
-/**
- * Take the expiry off a Fork the couple has adopted, and record when.
- *
- * Called after the adopt has landed in the Plan, not before: a Fork marked
- * adopted by a write that then failed would be a Fork that outlives its reason
- * to exist. The other order — persist first, adopt second — leaks; this one, at
- * worst, expires a Fork whose Scenario is already safely copied into the Plan.
- */
-export async function markForkAdopted(
-  kv: KvClient,
-  forkId: string,
-  fork: ForkDoc,
-  now: Date = new Date(),
-): Promise<void> {
-  if (fork.adoptedAt) return;
-  await kv.setJson(forkKey(forkId), {
-    ...fork,
-    adoptedAt: now.toISOString(),
-  } satisfies ForkDoc);
-}
-
-/**
- * Save a Fork. Anyone may; that is the point.
- *
- * The id comes back exactly once, in this response — it is not derivable from
- * the name, it is not listed anywhere, and nothing enumerates the key space. A
- * visitor who loses the URL has lost the Fork, which is the honest cost of
- * having no accounts.
- */
-export async function createFork(
-  kv: KvClient,
-  input: {
-    name: string;
-    planInput: PlanInput;
-    authorNote?: string;
-    forkedFrom: string;
-  },
-  now: Date = new Date(),
-): Promise<{ forkId: string; fork: ForkDoc }> {
-  const forkId = newId();
-  const fork: ForkDoc = {
-    name: trimTo(input.name, MAX_FORK_NAME_LENGTH) || "Untitled fork",
-    planInput: input.planInput,
-    ...(input.authorNote
-      ? { authorNote: trimTo(input.authorNote, MAX_AUTHOR_NOTE_LENGTH) }
-      : {}),
-    createdAt: now.toISOString(),
-    forkedFrom: input.forkedFrom,
-  };
-  // Written with its lifetime rather than given one afterwards: a two-call
-  // version leaves an immortal Fork behind whenever the second call fails,
-  // which is the leak this is here to close.
-  await kv.setJsonWithTtl(forkKey(forkId), fork, FORK_TTL_SECONDS);
-  return { forkId, fork };
-}
-
-function trimTo(value: string, limit: number): string {
-  return value.trim().slice(0, limit);
-}
-
 /* ------------------------------------------------------------------ */
-/* Adopt                                                               */
+/* No new Scenarios over the wire                                      */
 /* ------------------------------------------------------------------ */
 
 /**
- * Copy a Fork into the Plan's Scenario list. Pure — the route does the I/O.
+ * The Plan write with any Scenario the stored document does not already hold
+ * taken out.
  *
- * Three decisions worth stating, because each is a thing the obvious
- * implementation gets wrong:
- *
- * 1. **The current Scenario does not change.** Adopting a friend's Fork should
- *    put it on the shelf next to the couple's own Scenarios, not swap the Plan
- *    out from under them. docs/CONTEXT.md's *"exactly one is marked as the
- *    current Plan"* still holds; it is simply still the one that was.
- * 2. **Adopting twice adopts once.** The `adoptedFrom` stamp makes this
- *    idempotent, so a double-clicked button, a retried request or a second
- *    person hitting Adopt on the same link all produce one Scenario.
- * 3. **It copies, it does not link.** The adopted Scenario holds its own copy of
- *    the `PlanInput`. The Fork's author can keep editing their Fork afterwards
- *    and nothing they do reaches the Plan — the ADR's *"Forks can never modify
- *    the canonical Plan"*, made structural.
+ * Scenarios are curated, not created on the site (2026-09-30): the next Plan
+ * arrives as a seeded Scenario through `scripts/seed-scenarios.mjs`, which
+ * writes the store directly. So the one route that writes a Plan may change a
+ * Scenario, reorder the list or delete one, and may not add one — the site's
+ * create buttons are gone, and this is what makes that structural rather than a
+ * matter of which buttons happen to be drawn. Pure; the route does the I/O.
  */
-export function adoptFork(
-  state: ScenarioState,
-  forkId: string,
-  fork: ForkDoc,
-  now: Date = new Date(),
-): { state: ScenarioState; scenarioId: string; alreadyAdopted: boolean } {
-  const existing = state.scenarios.find(
-    (scenario) => scenario.adoptedFrom === forkId,
+export function withoutNewScenarios(
+  incoming: ScenarioState,
+  stored: Pick<ScenarioState, "scenarios" | "currentId">,
+): ScenarioState {
+  const known = new Set(stored.scenarios.map((scenario) => scenario.id));
+  const scenarios = incoming.scenarios.filter((scenario) =>
+    known.has(scenario.id),
   );
-  if (existing) {
-    return { state, scenarioId: existing.id, alreadyAdopted: true };
+  if (scenarios.length === 0) {
+    return { ...incoming, scenarios: stored.scenarios, currentId: stored.currentId };
   }
-
-  const id = nextScenarioId(fork.name, state.scenarios);
-  const scenario: Scenario = {
-    id,
-    name: trimTo(fork.name, MAX_FORK_NAME_LENGTH) || "Adopted fork",
-    createdAt: now.toISOString(),
-    input: fork.planInput,
-    adoptedFrom: forkId,
-  };
-
-  return {
-    state: {
-      // 4. **It adopts a calendar, not a watchlist.** A Fork stores a
-      //    `PlanInput` and nothing else, so there are no pins on it to copy —
-      //    and the couple's own stay exactly as they were.
-      ...state,
-      scenarios: [...state.scenarios, scenario],
-      currentId: state.currentId,
-    },
-    scenarioId: id,
-    alreadyAdopted: false,
-  };
+  const currentId = scenarios.some(
+    (scenario) => scenario.id === incoming.currentId,
+  )
+    ? incoming.currentId
+    : scenarios[0].id;
+  return { ...incoming, scenarios, currentId };
 }

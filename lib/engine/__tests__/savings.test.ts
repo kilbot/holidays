@@ -394,10 +394,10 @@ test("Aggressive camps everywhere the research offers a tent, and nowhere else",
 /* Seeding                                                             */
 /* ------------------------------------------------------------------ */
 
-test("a fresh browser gets all three Scenarios, with the reference trip current", () => {
+test("a fresh browser gets all four Scenarios, with the reference trip current", () => {
   assert.deepEqual(
     INITIAL_STATE.scenarios.map((scenario) => scenario.id),
-    ["fireworks-nye", "comfortable-10k", "aggressive-15k"],
+    ["fireworks-nye", "comfortable-10k", "aggressive-15k", "adeline-west-to-east"],
   );
   assert.equal(INITIAL_STATE.currentId, DEFAULT_SCENARIO.id);
 });

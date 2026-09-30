@@ -217,9 +217,10 @@ test("edit mode: the other traveller's phone gets the pin on hydrate", async () 
   server.restore();
 });
 
-test("edit mode: forking a Scenario carries the watchlist across", async () => {
+test("edit mode: renaming a Scenario carries the watchlist across", async () => {
   // A Scenario is a calendar and the watchlist is not on it. The write paths
-  // that build a state by hand are where this quietly goes wrong.
+  // that build a state by hand are where this quietly goes wrong. (It used to
+  // fork a new Scenario; since 2026-09-30 the site never adds one.)
   const server = fakeServer({ ...withPin(empty()), updatedAt: "2026-08-27T12:00:00.000Z" });
   const local = fakeLocal(empty());
 
@@ -232,11 +233,11 @@ test("edit mode: forking a Scenario carries the watchlist across", async () => {
   const now = local.current();
   store.write({
     ...now,
-    scenarios: [...now.scenarios, { ...DEFAULT_SCENARIO, id: "doof-nye", name: "Doof NYE" }],
-    currentId: "doof-nye",
+    scenarios: now.scenarios.map((scenario) => ({ ...scenario, name: "Doof NYE" })),
   });
   await delay(AFTER_DEBOUNCE);
 
+  assert.equal(server.doc.scenarios[0].name, "Doof NYE");
   assert.deepEqual(server.doc.pins, [PIN]);
   server.restore();
 });

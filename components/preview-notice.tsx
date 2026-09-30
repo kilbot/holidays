@@ -5,7 +5,7 @@
  *
  * #58: *"the user played for minutes without realizing"* — they were on the view
  * link, they rearranged Adventures, and the only thing on screen that knew was a
- * 11px pill in the far corner reading *Viewing — fork to play*. Which is true,
+ * 11px pill in the far corner reading *Viewing*. Which is true,
  * and which nobody reads, because it says the same thing before you touch
  * anything as after.
  *
@@ -16,9 +16,10 @@
  * it the quiet signals take over: the share pill's label turns to *Previewing —
  * not saved* with a warn dot, and the cost HUD's total wears a *preview* tag.
  *
- * Three things to do about it, which is the whole point of preferring a preview
- * to a disabled UI (issue #58, option a): keep playing, keep the result under a
- * link of your own, or put the couple's Plan back.
+ * Two things to do about it, which is the point of preferring a preview to a
+ * disabled UI (issue #58, option a): keep playing, or put the couple's Plan
+ * back. Saving the result as a Fork went with in-site Scenario creation
+ * (2026-09-30); the next Plan comes from telling Claude.
  *
  * Nothing here is persisted. A reload discards the preview anyway — the server
  * copy wins on hydrate — so a dismissal that outlived the preview it described
@@ -26,9 +27,8 @@
  */
 
 import { useState } from "react";
-import { GitFork, TriangleAlert, Undo2, X } from "lucide-react";
+import { TriangleAlert, Undo2, X } from "lucide-react";
 
-import { openSharePanel } from "@/lib/share-panel";
 import { useSharing } from "@/lib/store/sharing";
 
 export function PreviewNotice() {
@@ -65,20 +65,10 @@ export function PreviewNotice() {
             <p className="mt-1 text-[11px] leading-snug text-[var(--sb-dim)]">
               You are on the view link, so the trip is recomputing here and
               nowhere else. The couple&rsquo;s plan is untouched, and reloading
-              this page puts it back. Save your own version to keep what you have
-              done.
+              this page puts it back.
             </p>
 
             <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-              <button
-                type="button"
-                onClick={openSharePanel}
-                className="flex min-h-8 cursor-pointer items-center gap-1.5 rounded-md bg-[var(--sb-accent)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--primary-foreground)] transition-opacity hover:opacity-90 motion-reduce:transition-none"
-              >
-                <GitFork className="size-3.5" />
-                Save my version
-              </button>
-
               <button
                 type="button"
                 disabled={discarding}

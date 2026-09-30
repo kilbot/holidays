@@ -449,17 +449,85 @@ export const AGGRESSIVE_SCENARIO: Scenario = {
 };
 
 /**
+ * "Adeline's pick — west to east": Plan D, the first Scenario added from a
+ * Traveller's written brief rather than built on the site
+ * (`content/plans/plan-d-adeline-west-to-east.md`, Adeline's words, unedited).
+ *
+ * The plan is written in weeks, and this is the engine's reading of those
+ * weeks from a 16 December landing, so the Ledger, the Budget and the globe can
+ * cost it beside Plans A–C. The write-up is the plan; this input is how the
+ * site prices it, and where the two disagree the write-up wins.
+ *
+ * - **Week 1, Margaret River**: the researched Adventure, seven days.
+ * - **Week 2, Perth for Christmas**: the Perth-city Catalog idea held for the
+ *   week. Christmas in Perth rather than at the Morawa farm is Adeline's call, and
+ *   the anchor Warning that raises is the site informing, not objecting.
+ * - **Week 3, Sydney**: the NYE Adventure pinned to the 30th, the flight day
+ *   the write-up names, for seven days.
+ * - **Weeks 4–5, the Huon Valley**: the Cygnet/Huonville Catalog idea for
+ *   fourteen days.
+ * - **Weeks 6–7, the Tasmania road trip**: the researched south-to-north arc
+ *   for fourteen days. The weeks put it in late January, earlier than the arc's
+ *   own February window, and the lock Warning says so.
+ * - **Weeks 8–9, the Northern Rivers**: Byron + Nimbin for ten days, the week
+ *   in Brunswick Heads or Mullumbimby plus the Yamba nights, which the engine
+ *   has no separate Location for. Home on the 14th, the same window as A and B.
+ *
+ * No Buffer days, because the written weeks have none; the jam-packed Warnings are the
+ * engine saying so, not a correction.
+ */
+export const ADELINE_SCENARIO: Scenario = {
+  id: "adeline-west-to-east",
+  name: "Adeline's pick — west to east",
+  createdAt: "2026-09-30T00:00:00.000Z",
+  input: {
+    ...EMPTY_INPUT,
+    startDate: LEAVING_DATE,
+    endDate: RETURN_DATE,
+    toggled: [
+      "margaret-river",
+      PERTH_CITY_DAYS,
+      "sydney-nye",
+      "huon-valley-cygnet-huonville-cider-and-orchards",
+      "tasmania-arc",
+      "byron-nimbin",
+    ],
+    dayOverrides: {
+      "margaret-river": 7,
+      [PERTH_CITY_DAYS]: 7,
+      "sydney-nye": 7,
+      "huon-valley-cygnet-huonville-cider-and-orchards": 14,
+      "tasmania-arc": 14,
+      "byron-nimbin": 10,
+    },
+    placementOverrides: {
+      "margaret-river": "2026-12-16",
+      [PERTH_CITY_DAYS]: "2026-12-23",
+      "sydney-nye": "2026-12-30",
+      "huon-valley-cygnet-huonville-cider-and-orchards": "2027-01-06",
+      "tasmania-arc": "2027-01-20",
+      "byron-nimbin": "2027-02-03",
+    },
+  },
+};
+
+/**
  * What a browser with no saved Plan starts with, and what the canonical Plan
- * document is seeded with: the reference trip, and the two savings paths #65
- * priced, so the couple can flip between them and feel the difference rather
- * than read about it.
+ * document is seeded with: the reference trip, the two savings paths #65
+ * priced, and Adeline's west-to-east plan, so the couple can flip between them
+ * and feel the difference rather than read about it.
  *
  * "The All-Stops Tour" is the current one — the everything version, and the
- * ceiling the other two cut from. They are alternatives sitting beside it, which is what docs/CONTEXT.md means by a Scenario — *"exactly one
+ * ceiling the savings paths cut from. The others are alternatives sitting beside it, which is what docs/CONTEXT.md means by a Scenario — *"exactly one
  * is marked as the current Plan"*.
  */
 export const INITIAL_STATE: ScenarioState = {
-  scenarios: [DEFAULT_SCENARIO, COMFORTABLE_SCENARIO, AGGRESSIVE_SCENARIO],
+  scenarios: [
+    DEFAULT_SCENARIO,
+    COMFORTABLE_SCENARIO,
+    AGGRESSIVE_SCENARIO,
+    ADELINE_SCENARIO,
+  ],
   currentId: DEFAULT_SCENARIO.id,
   // Nothing is watched until somebody watches something. Seeding a pin would be
   // the site pretending to have found a fare it never fetched.

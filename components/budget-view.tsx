@@ -33,6 +33,7 @@ import {
   formatEur,
   type Warning,
 } from "@/lib/engine";
+import { planLetter, planTitle } from "@/lib/engine/curated-plans";
 import { usePlan } from "@/lib/engine/use-plan";
 import { useSharing } from "@/lib/store/sharing";
 import { formatDayYear } from "@/lib/trip-dates";
@@ -326,9 +327,11 @@ export function BudgetView() {
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <p className="sb-label">The budget</p>
             <p className="text-[11px] text-[var(--sb-faint)]">
-              Scenario{" "}
               <span className="font-semibold text-[var(--sb-dim)]">
-                {scenarios.current.name}
+                {planTitle(
+                  planLetter(scenarios.current.id, scenarios.scenarios),
+                  scenarios.current.name,
+                )}
               </span>
             </p>
           </div>
@@ -418,7 +421,10 @@ export function BudgetView() {
             fxRate={rollUp.fxRate}
             ink={ink}
             dimInk={dim}
-            scenarioName={scenarios.current.name}
+            scenarioName={planTitle(
+              planLetter(scenarios.current.id, scenarios.scenarios),
+              scenarios.current.name,
+            )}
           />
         </div>
 

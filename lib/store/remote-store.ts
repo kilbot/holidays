@@ -42,8 +42,8 @@
  * A tab holding only the view link may not touch the canonical Plan — that is
  * ADR 0001, and it is not negotiable. But "may not save" is not "may not act":
  * the write still lands in localStorage, everything downstream recomputes, and
- * the visitor gets a working **preview** of their own version, which is the
- * "fork to play" invitation actually functioning.
+ * the visitor gets a working **preview** of their own version, kept in this
+ * browser until reload.
  *
  * What was missing was the second half. The push used to be skipped in silence,
  * so the pill went on saying whatever it last said and nothing anywhere told the
