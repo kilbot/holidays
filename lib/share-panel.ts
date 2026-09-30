@@ -3,11 +3,10 @@
 /**
  * Whether the share pill is open — as a store, because two things now open it.
  *
- * The pill opens itself when it is clicked, and that was the whole story until
- * #58 gave the preview notice a *Save my version* button. The notice sits at the
- * top of the stage and the pill is pinned to the bottom-right corner of it; they
- * are siblings under `ShellStage` with a page between them, so the notice asks
- * through a module-level store for exactly the reason `capsule-focus.ts` does.
+ * #58 gave the preview notice a *Save my version* button that opened the pill
+ * from the other end of the stage, which is why this is a module-level store
+ * rather than the pill's own state. That button went with Forks (2026-09-30);
+ * the pill is the only opener now, and the store stays because it works.
  *
  * Not persisted, and deliberately so: an open panel is a moment, not a decision.
  */
@@ -25,11 +24,6 @@ function set(next: boolean) {
   if (open === next) return;
   open = next;
   emit();
-}
-
-/** Open the pill, with the Fork form in it. The preview notice's one verb. */
-export function openSharePanel(): void {
-  set(true);
 }
 
 export function closeSharePanel(): void {

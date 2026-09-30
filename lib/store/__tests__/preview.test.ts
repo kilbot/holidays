@@ -345,10 +345,9 @@ test("view mode: a discard that cannot reach the store leaves the preview standi
   server.restore();
 });
 
-test("view mode: a Fork carries the previewed input, not the shared one", async () => {
-  // Not a store test so much as the promise the notice makes. `saveFork` is
-  // handed `usePlan().input`, which reads through this store — so whatever the
-  // preview did is what a Fork saves.
+test("view mode: the tab reads the previewed input, not the shared one", async () => {
+  // Everything on the page reads `usePlan().input` through this store, so
+  // whatever the preview did is what the visitor sees costed.
   const local = fakeLocal({
     scenarios: [DEFAULT_SCENARIO],
     currentId: DEFAULT_SCENARIO.id,
@@ -368,9 +367,9 @@ test("view mode: a Fork carries the previewed input, not the shared one", async 
   await delay(10);
   store.write(withoutTasmania());
 
-  const forked = store.read().scenarios[0].input;
-  assert.ok(!forked.toggled.includes("tasmania-arc"));
-  assert.notDeepEqual(forked, EMPTY_INPUT);
+  const previewed = store.read().scenarios[0].input;
+  assert.ok(!previewed.toggled.includes("tasmania-arc"));
+  assert.notDeepEqual(previewed, EMPTY_INPUT);
 
   server.restore();
 });
