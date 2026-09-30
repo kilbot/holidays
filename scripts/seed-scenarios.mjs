@@ -8,8 +8,11 @@
  *
  * ## Why this exists at all
  *
- * `lib/engine/scenario-doc.ts` seeds `INITIAL_STATE` with three Scenarios —
- * "The All-Stops Tour" and the two savings paths #65 priced. That seed is what a
+ * `lib/engine/scenario-doc.ts` seeds `INITIAL_STATE` with the lettered Plans —
+ * "The All-Stops Tour", the two savings paths #65 priced, and Adeline's
+ * west-to-east pick (2026-09-30). Since Scenarios are curated rather than
+ * created on the site, this script is how each new Plan reaches the live
+ * document. That seed is what a
  * browser with no saved Plan gets, and what `scripts/bootstrap-plan.mjs` would
  * write if the canonical Plan were being created today. It is not.
  *
@@ -86,6 +89,10 @@ if (!write) {
 
 const next = await writePlan(kv, CANONICAL_PLAN_ID, {
   scenarios: [...live.scenarios, ...missing],
+  // The watchlist rides through untouched. `writePlan` stores exactly what it
+  // is given, and a document written without `pins` reads back with none —
+  // on both phones, after their next hydrate.
+  pins: live.pins,
   // Untouched on purpose: whichever Scenario the couple was looking at stays
   // the current Plan. A seeding script does not get to change what the site
   // opens on.

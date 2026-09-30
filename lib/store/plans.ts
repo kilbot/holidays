@@ -102,7 +102,6 @@ export const MAX_FORK_NAME_LENGTH = 60;
  */
 export const FORK_TTL_SECONDS = 90 * 24 * 60 * 60;
 
-
 /* ------------------------------------------------------------------ */
 /* Reading and writing the canonical Plan                              */
 /* ------------------------------------------------------------------ */
