@@ -12,14 +12,25 @@ import { PlanWriteup } from "@/components/plan-writeup";
  * Static: this page makes no fare calls.
  */
 
-export const metadata: Metadata = {
-  title: "Flights – December — Australia 2026–27",
-  description: "Flight options to Perth for December 2026, and what to weigh between them.",
-};
+const CONTENT = path.join(process.cwd(), "content", "pages", "flights-december.md");
+
+/**
+ * The link preview is the page's own words — its first heading and the
+ * first paragraph — so editing the markdown is the whole of a content change.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const lines = (await readFile(CONTENT, "utf8")).split("\n").map((line) => line.trim());
+  const heading = lines.find((line) => line.startsWith("# "))?.slice(2);
+  const paragraph = lines.find((line) => line !== "" && !/^[#>|*\-\d]/.test(line));
+  return {
+    title: `${heading ?? "Flights – December"} — Australia 2026–27`,
+    description: paragraph,
+  };
+}
 
 export default async function FlightsDecember() {
   const markdown = await readFile(
-    path.join(process.cwd(), "content", "pages", "flights-december.md"),
+    CONTENT,
     "utf8",
   );
 

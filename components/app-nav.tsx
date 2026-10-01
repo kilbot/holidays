@@ -165,8 +165,13 @@ type NavItem = {
     | "/scenarios"
     | "/resources";
   label: string;
-  /** A shorter name for the phone's tab bar, where a column is ~47px wide. */
-  tabLabel?: string;
+  /**
+   * Rail only. The phone's bar is one row of equal columns, and an eighth
+   * leaves ~47px each: at 375px "Scenarios" and "Adventures" overlap and
+   * "Resources" runs off the edge. A rail-only page is reached on a phone
+   * from a link on its parent page instead.
+   */
+  railOnly?: true;
   /** Said to a screen reader, and to anyone who hovers long enough. */
   hint: string;
   Icon: ComponentType<IconProps>;
@@ -195,7 +200,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   {
     href: "/flights-december",
     label: "Flights – December",
-    tabLabel: "December",
+    railOnly: true,
     hint: "December fares to Perth, written up",
     Icon: FlightsDecemberIcon,
   },
@@ -301,7 +306,7 @@ export function AppTabBar() {
       aria-label="Sections"
       className="relative z-40 flex shrink-0 border-t border-[var(--sb-line)] bg-[var(--sb-panel)] pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >
-      {NAV_ITEMS.map(({ href, label, tabLabel, hint, Icon }) => {
+      {NAV_ITEMS.filter((item) => !item.railOnly).map(({ href, label, hint, Icon }) => {
         const current = isCurrent(pathname, href);
         return (
           <Link
@@ -328,7 +333,7 @@ export function AppTabBar() {
                 so the narrowest phones still set it on one line rather than
                 truncating a destination's name. */}
             <span className="text-[10px] leading-none font-semibold tracking-[0.02em] max-[400px]:tracking-normal">
-              {tabLabel ?? label}
+              {label}
             </span>
           </Link>
         );
