@@ -68,9 +68,15 @@ const components: Components = {
   ),
 };
 
-export function PlanWriteup({ markdown }: { markdown: string }) {
+export function PlanWriteup({
+  markdown,
+  className,
+}: {
+  markdown: string;
+  className?: string;
+}) {
   return (
-    <article className="mt-8 border-t border-[var(--sb-line)] pb-4">
+    <article className={className ?? "mt-8 border-t border-[var(--sb-line)] pb-4"}>
       <Markdown remarkPlugins={[remarkGfm]} components={components}>
         {markdown}
       </Markdown>

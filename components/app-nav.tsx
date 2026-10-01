@@ -182,7 +182,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   {
     href: "/scenarios",
     label: "Scenarios",
-    hint: "Saved alternate trips — compare and switch",
+    hint: "Numbered trips — when each applies, what it costs",
     Icon: ScenariosIcon,
   },
   {

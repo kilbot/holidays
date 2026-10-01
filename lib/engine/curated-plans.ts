@@ -1,21 +1,11 @@
 /**
- * The Scenarios as lettered Plans — Plan A, Plan B, … — and where each one's
- * write-up lives, if it has one.
- *
- * Scenarios are curated, not created on the site (2026-09-30): the Travellers
- * give Claude their preferences and it adds the next Plan, as a seeded Scenario
- * in `scenario-doc.ts` plus, when the brief is written, a markdown write-up in
- * `content/plans/`. So the letter is a fact about the Scenario, fixed here by
- * id, rather than its position in the list — deleting Plan B must not quietly
- * turn Plan C into a second Plan B.
- *
- * The Scenario's own `name` stays what it was and becomes the subtitle: "Plan A
- * · The All-Stops Tour".
+ * Numbered Scenarios and their curated write-ups, fixed by Scenario id.
  */
 
 export interface CuratedPlan {
-  /** The Scenario id this Plan is. */
+  /** The Scenario id this plan is. */
   id: string;
+  /** Holds the Scenario's number as a string, renumbered 2026-10-01. */
   letter: string;
   /** The written plan, when there is one. */
   writeup?: {
@@ -24,34 +14,32 @@ export interface CuratedPlan {
     /** File name in `content/plans/`, exactly as the Traveller wrote it. */
     file: string;
     /** Whose words the write-up is. */
-    by: string;
+    by?: string;
   };
 }
 
 export const CURATED_PLANS: readonly CuratedPlan[] = [
-  { id: "fireworks-nye", letter: "A" },
-  { id: "comfortable-10k", letter: "B" },
-  { id: "aggressive-15k", letter: "C" },
   {
     id: "adeline-west-to-east",
-    letter: "D",
+    letter: "1",
     writeup: {
-      slug: "plan-d",
+      slug: "adeline-west-to-east",
       file: "plan-d-adeline-west-to-east.md",
       by: "Adeline",
     },
   },
+  { id: "fireworks-nye", letter: "2", writeup: { slug: "all-stops", file: "all-stops.md" } },
+  { id: "comfortable-10k", letter: "3", writeup: { slug: "comfortable", file: "comfortable.md" } },
+  { id: "aggressive-15k", letter: "4", writeup: { slug: "aggressive", file: "aggressive.md" } },
 ];
 
 const BY_ID = new Map(CURATED_PLANS.map((plan) => [plan.id, plan]));
 
 /**
- * The letter a Scenario shows under.
+ * The number a Scenario shows under.
  *
- * A Scenario from before the letters (a copy made in some browser, a fork the
- * couple adopted) has none of its own, so it takes the next letter after the
- * curated ones by its position among the uncurated — never one of the curated
- * letters, so no two rows ever share one.
+ * An uncurated Scenario takes the next number after the curated ones by its
+ * position among the uncurated.
  */
 export function planLetter(
   id: string,
@@ -64,12 +52,12 @@ export function planLetter(
     0,
     uncurated.findIndex((scenario) => scenario.id === id),
   );
-  return String.fromCharCode(65 + CURATED_PLANS.length + offset);
+  return String(CURATED_PLANS.length + offset + 1);
 }
 
-/** "Plan D · Adeline's pick — west to east". */
+/** "Scenario 1 · Adeline's pick — west to east". */
 export function planTitle(letter: string, name: string): string {
-  return `Plan ${letter} · ${name}`;
+  return `Scenario ${letter} · ${name}`;
 }
 
 export function curatedPlan(id: string): CuratedPlan | undefined {
