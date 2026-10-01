@@ -42,39 +42,22 @@ test("the default Scenario places every Adventure it is given", () => {
 });
 
 /**
- * The second thing the reference trip knowingly gets wrong, and keeps.
- *
- * The couple's pinned crossing is Madrid → Hong Kong → Perth, which takes two
- * days rather than one (#107). The WA leg between landing and Boxing Day is
- * therefore ten days long and the sequence the couple asked for wants eleven:
- * the arrival block's two-day minimum, the Fremantle evening, the Northbridge
- * Friday, Margaret River's three nights, a mid-week Rottnest ferry and the
- * three-day Christmas run. There is no arrangement of those that fits, and the
- * Scheduler does not refuse — it places the Fremantle evening on the arrival
- * block's second day and reports the overlap.
- *
- * That is the honest outcome and it costs nothing: both blocks are Home-base
- * days at the same rates, and the couple sleeps at Paul's dad's either way. The
- * jet-lag block is the thing that gets squeezed, the Warning says so, and a
- * reader can drag it back and see what it displaces.
+ * Leaving 12 Dec and landing 15 Dec gives the eleven-day WA sequence room for
+ * the full arrival minimum, both Perth evenings and Christmas without overlap.
  */
-test("the extra day in the air comes out of the jet-lag block, out loud", () => {
+test("the booked crossing leaves the arrival block its full two days", () => {
   const overlapping = plan.placements.filter(
     (placement) => placement.overlaps.length > 0,
   );
   assert.deepEqual(
     overlapping.map((placement) => placement.capsuleId),
-    ["fremantle-fish-and-chips"],
-    "one squeezed block, and only one",
+    [],
+    "the WA sequence fits without squeezing a block",
   );
-  assert.deepEqual(overlapping[0].overlaps, ["mundaring-arrival"]);
+  assert.deepEqual(plan.placements.find((p) => p.capsuleId === "mundaring-arrival")?.overlaps, []);
   assert.ok(
-    plan.warnings.some(
-      (warning) =>
-        warning.kind === "overlap" &&
-        warning.capsuleId === "fremantle-fish-and-chips",
-    ),
-    "and the Plan says so",
+    !plan.warnings.some((warning) => warning.kind === "overlap"),
+    "and the Plan reports no overlaps",
   );
 });
 
@@ -196,14 +179,13 @@ test("the two hard Anchors are honoured out of the box", () => {
 test("the arrival block leads the calendar, and nothing else can", () => {
   const first = plan.placements[0];
   assert.equal(first.capsuleId, "mundaring-arrival");
-  // The day the couple *lands*, which is two days after they leave: the pinned
-  // Cathay routing is a train to Madrid, the 22:30 to Hong Kong, a connection,
-  // and a dawn arrival in Perth about twenty-five hours later (#107).
-  assert.equal(first.startDate, addDays(plan.startDate, 2));
-  assert.equal(plan.days[0].locationId, "transit", "a night over Asia");
-  assert.equal(plan.days[1].locationId, "transit", "and the day that follows it");
-  assert.equal(plan.days[2].locationId, "mundaring");
-  assert.equal(plan.days[2].homeBase, true, "free lodging, borrowed car");
+  // Train 12 Dec, CX372 13 Dec, Hong Kong night 14 Dec, Perth 22:55 15 Dec.
+  assert.equal(first.startDate, addDays(plan.startDate, 3));
+  assert.equal(plan.days[0].locationId, "transit", "a Madrid night");
+  assert.equal(plan.days[1].locationId, "transit", "CX372 to Hong Kong");
+  assert.equal(plan.days[2].locationId, "transit", "a Hong Kong night");
+  assert.equal(plan.days[3].locationId, "mundaring");
+  assert.equal(plan.days[3].homeBase, true, "free lodging, borrowed car");
 });
 
 test("the outbound crossing starts the day they leave and ends where they land", () => {
@@ -229,9 +211,9 @@ test("the outbound crossing starts the day they leave and ends where they land",
     "`transit` is a state, not a destination",
   );
 
-  // And a connection is dated on the day it *leaves*: Hong Kong is left on the
-  // evening of day two and Perth is reached at dawn on day three.
-  assert.equal(third.date, addDays(plan.startDate, 1));
+  // Each flight is dated on departure: CX372 on day 1, CX171 on day 3.
+  assert.equal(second.date, addDays(plan.startDate, 1));
+  assert.equal(third.date, addDays(plan.startDate, 3));
 });
 
 test("the Perth music night is on a Friday or a Saturday", () => {

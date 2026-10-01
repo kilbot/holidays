@@ -31,6 +31,8 @@
 
 import {
   DEFAULT_LODGING_TIER,
+  INBOUND_LANDS_AFTER,
+  LANDING_LOCATION_ID,
   MARKETS,
   PUBLIC_HOLIDAYS,
   PUBLIC_HOLIDAY_SURCHARGE,
@@ -157,8 +159,8 @@ export function eventOffset(
  * model must show that rather than rewarding jam-packing).
  *
  * A Buffer day inherits the Location of the block before it, because that is
- * where the couple physically is. Buffer days before anything is placed sit at
- * `transit` — the trip has started but has not landed.
+ * where the couple physically is. Before anything is placed, Buffer days sit
+ * at `transit` until INBOUND_LANDS_AFTER, then at LANDING_LOCATION_ID.
  */
 export function buildLedger(input: LedgerInput): Day[] {
   const { startDate, endDate, placements, capsules, fxRate } = input;
@@ -183,7 +185,9 @@ export function buildLedger(input: LedgerInput): Day[] {
     const held = owner.get(date);
     const capsule = held ? capsules.get(held.placement.capsuleId) : undefined;
 
-    const locationId = capsule ? capsule.locationId : lastLocationId;
+    const locationId = capsule ? capsule.locationId
+      : lastLocationId === "transit" && index >= INBOUND_LANDS_AFTER
+        ? LANDING_LOCATION_ID : lastLocationId;
     const location = locationById(locationId);
     // A Buffer day after a day trip is spent back at the base — `returnsTo` is
     // where the last ferry goes.
