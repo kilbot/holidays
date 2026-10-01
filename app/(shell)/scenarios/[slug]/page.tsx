@@ -16,7 +16,7 @@ import {
 import { INITIAL_STATE } from "@/lib/engine/scenario-doc";
 
 /**
- * A lettered Plan's write-up, as the Traveller who asked for it wrote it.
+ * A numbered Scenario's write-up, as the Traveller who asked for it wrote it.
  *
  * Scenarios are curated, not created on the site (2026-09-30), and a Plan that
  * came from a written brief keeps the brief: the markdown in `content/plans/`
@@ -53,7 +53,9 @@ export async function generateMetadata({
   if (!plan) return {};
   return {
     title: `${planTitle(plan.letter, seededName(plan.id))} — Australia 2026–27`,
-    description: `${plan.writeup?.by}'s plan, week by week, as written.`,
+    description: plan.writeup?.by
+      ? `${plan.writeup.by}'s plan, week by week, as written.`
+      : `${planTitle(plan.letter, seededName(plan.id))}: dates, adventures and the site's figures.`,
   };
 }
 
@@ -78,16 +80,18 @@ export default async function PlanPage({
           href="/scenarios"
           className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--sb-dim)] hover:text-[var(--sb-text)]"
         >
-          <ArrowLeft aria-hidden className="size-3.5" /> All the Plans
+          <ArrowLeft aria-hidden className="size-3.5" /> All scenarios
         </Link>
 
         <p className="sb-label mt-5">
-          Plan {plan.letter} · {seededName(plan.id)}
+          Scenario {plan.letter} · {seededName(plan.id)}
         </p>
-        <p className="mt-1.5 text-[12.5px] text-[var(--sb-faint)]">
-          Written by {plan.writeup.by}. Everything below the line is{" "}
-          {plan.writeup.by}&rsquo;s plan, word for word.
-        </p>
+        {plan.writeup.by && (
+          <p className="mt-1.5 text-[12.5px] text-[var(--sb-faint)]">
+            Written by {plan.writeup.by}. Everything below the line is{" "}
+            {plan.writeup.by}&rsquo;s plan, word for word.
+          </p>
+        )}
 
         <PlanFigures scenarioId={plan.id} by={plan.writeup.by} />
 

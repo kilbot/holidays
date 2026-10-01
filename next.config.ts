@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         destination: "/adventures",
         permanent: true,
       },
+      {
+        source: "/scenarios/plan-d",
+        destination: "/scenarios/adeline-west-to-east",
+        permanent: true,
+      },
     ];
   },
 };

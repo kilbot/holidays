@@ -19,7 +19,7 @@ export function PlanFigures({
   by,
 }: {
   scenarioId: string;
-  by: string;
+  by?: string;
 }) {
   const { scenarios, totals } = usePlan();
   const scenario = scenarios.scenarios.find((entry) => entry.id === scenarioId);
@@ -47,26 +47,26 @@ export function PlanFigures({
                   {total.warnings === 1 ? "warning" : "warnings"}
                 </>
               )}
-              {total.current && " · the current Plan"}
+              {total.current && " · the current scenario"}
             </span>
           </p>
           <p className="mt-2 max-w-[64ch] text-[11.5px] leading-snug text-[var(--sb-faint)]">
             The engine&rsquo;s reading of these weeks, priced at the site&rsquo;s
             own rates with its contingency on, so it can sit beside the other
-            Plans on the{" "}
+            scenarios on the{" "}
             <Link
               href="/scenarios"
               className="underline decoration-dotted underline-offset-[3px] hover:text-[var(--sb-dim)]"
             >
               Scenarios
             </Link>{" "}
-            page. {by}&rsquo;s own budget is in the write-up below.
+            page. {by && <>{by}&rsquo;s own budget is in the write-up below.</>}
           </p>
         </>
       ) : (
         <p className="mt-2 text-[12px] text-[var(--sb-dim)]">
-          This Plan is not on the shelf this browser holds yet, so there is no
-          total to show. {by}&rsquo;s plan below stands on its own.
+          This scenario is not in the list this browser holds yet, so there is no
+          total to show. {by && <>{by}&rsquo;s plan below stands on its own.</>}
         </p>
       )}
     </section>

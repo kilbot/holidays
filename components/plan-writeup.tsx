@@ -33,6 +33,18 @@ const components: Components = {
   strong: ({ children }) => (
     <strong className="font-semibold text-[var(--sb-text)]">{children}</strong>
   ),
+  a: ({ href, children }) => {
+    const external = Boolean(href && /^https?:\/\//.test(href));
+    return (
+      <a
+        href={href}
+        className="font-semibold text-[var(--sb-text)] underline decoration-[var(--sb-accent)] decoration-1 underline-offset-[3px] hover:text-[var(--sb-accent)]"
+        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >
+        {children}
+      </a>
+    );
+  },
   ul: ({ children }) => (
     <ul className="mt-3 flex max-w-[68ch] list-disc flex-col gap-1.5 pl-5 text-[14px] leading-[1.6] text-[var(--sb-dim)] marker:text-[var(--sb-faint)] lg:text-[15px]">
       {children}
@@ -68,9 +80,15 @@ const components: Components = {
   ),
 };
 
-export function PlanWriteup({ markdown }: { markdown: string }) {
+export function PlanWriteup({
+  markdown,
+  className,
+}: {
+  markdown: string;
+  className?: string;
+}) {
   return (
-    <article className="mt-8 border-t border-[var(--sb-line)] pb-4">
+    <article className={className ?? "mt-8 border-t border-[var(--sb-line)] pb-4"}>
       <Markdown remarkPlugins={[remarkGfm]} components={components}>
         {markdown}
       </Markdown>

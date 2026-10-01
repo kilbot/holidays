@@ -1,21 +1,31 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
 import type { Metadata } from "next";
 
-import { ScenariosView } from "@/components/scenarios-view";
+import { MarkdownCards } from "@/components/markdown-cards";
 
 export const metadata: Metadata = {
-  title: "Australia 2026–27",
+  title: "Scenarios — Australia 2026–27",
   description:
-    "Every lettered Plan on one shelf: what each costs, how long it runs, when it was last worked on, and — derived from the trip itself — exactly what switching to it would change.",
+    "Every scenario for the trip, numbered: when it applies, its dates, and what it costs for two.",
 };
 
 /**
- * The Scenarios page (#59).
- *
- * A thin route, like /ledger and /budget. The view reads the Plan through
- * `usePlan` and the share mode through `useSharing`, both of which read
- * module-level stores, so it is a client tree; it takes no search params, so
- * the shell prerenders and only the figures hydrate.
+ * `content/pages/scenarios.md` rendered as one card per `## ` section.
+ * Switching the current scenario stays in the cost HUD.
  */
-export default function Scenarios() {
-  return <ScenariosView />;
+export default async function Scenarios() {
+  const markdown = await readFile(
+    path.join(process.cwd(), "content", "pages", "scenarios.md"),
+    "utf8",
+  );
+
+  return (
+    <main className="sb-scroll h-full w-full overflow-y-auto">
+      <div className="mx-auto max-w-[880px] px-5 pt-8 pb-24 sm:px-8 lg:pt-10">
+        <MarkdownCards markdown={markdown} level={2} />
+      </div>
+    </main>
+  );
 }
