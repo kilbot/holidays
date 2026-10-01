@@ -2,6 +2,14 @@
 
 *Two adults, economy, one way. Google Flights fares seen 1 Oct 2026, totals for two. Prices move daily.*
 
+## Booked
+
+- **Train:** Sat 12 Dec, Valencia → Madrid Atocha, AVE 15:09 → 17:17 (€40.70 for two).
+- **Flight 1:** Sun 13 Dec, Cathay Pacific CX372 Madrid 11:20 → Hong Kong 06:50 Mon 14 Dec.
+- **Night in Hong Kong:** Mon 14 → Tue 15 Dec.
+- **Flight 2:** Tue 15 Dec, Cathay Pacific CX171 Hong Kong 15:20 → Perth 22:55 (Economy Light, 1 × 23 kg bag each, €1,762.24 for two).
+- **Still to book:** Madrid hotel Sat 12 Dec, Hong Kong hotel Mon 14 Dec, seats, travel insurance, return flights (east-coast one-ways, ~mid Feb).
+
 ## The options
 
 | Option | Leave | Stop | Land in Perth | For two (each) | vs cheapest |
@@ -79,7 +87,7 @@
 - Cheapest fare per day, any airline: 12 Dec €1,455 · 13 Dec €1,448 · 14 Dec €1,676 · 15 Dec €1,639 · 16 Dec €1,952 · 17–19 Dec €2,300–2,900 · 20–22 Dec €1,952 (two stops, 40 h) · 23 Dec €1,923 (lands Christmas Eve).
 - Under €1,700 ends on **15 Dec**. Leaving later costs more, not less.
 
-## Verdict
+## Verdict (before booking)
 
 - **Budget pick: China Southern, Sat 12 Dec with the night in Guangzhou, €1,455 for two.** Same jet-lag shape as Cathay, lands Mon 14 Dec 21:35, most punctual airline of the three; you give up food, screens, English-speaking crew and Hong Kong.
 - **Comfort pick: Cathay, Sun 13 Dec with the day and night in Hong Kong, €1,763.** #3 airline in the world vs #31 for €308 more; lands Tue 15 Dec 22:55.
