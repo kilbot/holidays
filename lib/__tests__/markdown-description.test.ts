@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { plainDescription } from "@/lib/markdown-description";
+import { firstParagraph, plainDescription } from "@/lib/markdown-description";
 
 for (const [name, markdown, expected] of [
   ["bold", "**bold** and __bold__", "bold and bold"],
@@ -39,14 +39,26 @@ test("cleans Markdown and whitespace before applying the length limit", () => {
   assert.equal(plainDescription(" **[one](url)**  `two` ", 7), "one two");
 });
 
-test("makes the flights-december first paragraph a plain, capped description", () => {
+test("firstParagraph skips headings, lists, quotes, tables and thematic breaks", () => {
+  assert.equal(firstParagraph("# H\n\n- a\n* b\n+ c\n1. d\n2) e\n> q\n| t |\n---\n***"), undefined);
+});
+
+test("firstParagraph includes italic and bold prose", () => {
+  assert.equal(firstParagraph("# H\n\n*Italic intro.*\n\nLater."), "*Italic intro.*");
+  assert.equal(firstParagraph("- item\n**Bold** lead."), "**Bold** lead.");
+});
+
+test("firstParagraph trims prose", () => {
+  assert.equal(firstParagraph("  \n  Plain.  "), "Plain.");
+});
+
+test("makes the flights-december first paragraph a plain description", () => {
   const markdown = readFileSync("content/pages/flights-december.md", "utf8");
-  const lines = markdown.split("\n").map((line) => line.trim());
-  const paragraph = lines.find((line) => line !== "" && !/^[#>|*\-\d]/.test(line));
-  assert.ok(paragraph);
+  const paragraph = firstParagraph(markdown);
+  assert.ok(typeof paragraph === "string" && paragraph.length > 0);
 
   const description = plainDescription(paragraph);
+  assert.ok(description.length > 0);
   assert.doesNotMatch(description, /[*_\[`]/);
   assert.ok(description.length <= 160);
-  assert.ok(description.endsWith("…"));
 });

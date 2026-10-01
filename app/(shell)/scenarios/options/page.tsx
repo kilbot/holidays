@@ -29,7 +29,7 @@ export default async function Options() {
           <ArrowLeft aria-hidden className="size-3.5" /> All scenarios
         </Link>
 
-        <MarkdownCards markdown={markdown} level={3} />
+        <MarkdownCards markdown={markdown} level={3} jumpList />
       </div>
     </main>
   );
