@@ -46,7 +46,7 @@
 - **How long:** 4–5 h walking, plus a car shuttle or an out-and-back.
 - **Dec–Feb:** the park agency advises against the hot months for long walks; start at dawn and check the fire danger rating.
 - **Fits the route:** Margaret River base, 16–22 Dec.
-- **Cost for two:** free; no park fee listed for the track.
+- **Cost for two:** no park fee found on the DBCA track page.
 - **Book ahead:** no booking.
 - **Caveat:** total fire ban days can close sections. Check DBCA park alerts that morning.
 - **Sources:** [DBCA Explore Parks, Cape to Cape Track](https://exploreparks.dbca.wa.gov.au/trail/cape-cape-track) · [We Are Explorers, Cape to Cape](https://weareexplorers.co/cape-to-cape-track-western-australia/)
@@ -58,7 +58,7 @@
 - **How long:** 1–1.5 h; breakfast there.
 - **Dec–Feb:** Saturdays only. In the base week that is Sat 19 Dec.
 - **Fits the route:** Margaret River base, 16–22 Dec.
-- **Cost for two:** free entry; breakfast and produce as you go.
+- **Cost for two:** not found; breakfast and produce as you go.
 - **Book ahead:** no booking.
 - **Caveat:** busy; go early. Hours are from a listing page, as the market's own site didn't load.
 - **Sources:** [margaretriver.com, farmers market](https://www.margaretriver.com/things-to-do/eat-drink/local-produce-markets/margaret-river-farmers-market/)
@@ -166,7 +166,7 @@
 - **What exactly:** Echo Point for the Three Sisters, then the Prince Henry Cliff Walk: 7 km one way, 3–4 h, Katoomba Cascades to Gordon Falls, ending in Leura village. Shorter sections join from Cliff Drive.
 - **How long:** a full day, about 4 h of it on the train.
 - **Dec–Feb:** the parks service closes tracks for fire danger and bad weather.
-- **Fits the route:** the Sydney week, any weekday 2–5 Jan.
+- **Fits the route:** the Sydney week, a weekday: Mon 4 or Tue 5 Jan.
 - **Cost for two:** train about A$27–38 return for two (€16–23); walking is free.
 - **Book ahead:** no booking; trains about hourly.
 - **Caveat:** a total fire ban can close tracks. Check NSW National Parks alerts the evening before.
@@ -195,7 +195,7 @@
   - Willie Smith's Apple Shed, Grove: artisan market every Saturday 10:00–15:00.
   - Pagan Cider.
 - **How long:** the two-week working base.
-- **Dec–Feb:** Hobart January mean max 22 °C, min 12 °C. Cygnet Market dates: 3 and 17 Jan.
+- **Dec–Feb:** Hobart January mean max 22 °C, min 12 °C. Cygnet Market in the base weeks: Sun 17 Jan (3 Jan is before you arrive).
 - **Fits the route:** 6–19 Jan.
 - **Cost for two:** Airbnbs from about A$70 to A$236 a night (€43–144).
 - **Book ahead:** book the Airbnb 2–3 months ahead; January is peak.
@@ -306,7 +306,7 @@
 - **How long:** 1.5–2.5 h each.
 - **Dec–Feb:** about 27.5 °C mean max; about 165 mm of rain in Jan and 193 mm in Feb at Cape Byron.
 - **Fits the route:** Northern Rivers, 3–12 Feb: Mullum on Fri 5 and Fri 12 Feb; Brunswick Sat 6 Feb and Byron Sun 7 Feb on one weekend. Bangalow (24 Jan, 28 Feb) misses.
-- **Cost for two:** free entry.
+- **Cost for two:** entry fee not found; budget for food on the day.
 - **Book ahead:** no booking.
 - **Caveat:** sources disagree on Bangalow's and Brunswick's hours. Check the week before.
 - **Sources:** [Visit NSW, Bangalow Market](https://www.visitnsw.com/destinations/north-coast/byron-bay-area/bangalow/events/bangalow-market) · [Australian Traveller, Byron Bay markets](https://www.australiantraveller.com/nsw/north-coast/byron-bay/byron-bay-markets/)
@@ -354,7 +354,7 @@
 - **How long:** half a day plus the drive.
 - **Dec–Feb:** pick a dry day; the parks service closes tracks in bad weather.
 - **Fits the route:** Northern Rivers, 3–12 Feb, a dry midweek day.
-- **Cost for two:** free.
+- **Cost for two:** park fee not found.
 - **Book ahead:** no booking.
 - **Caveat:** Wollumbin (Mount Warning) summit is closed with no reopening date, out of respect for the Bundjalung custodians. Don't plan on it.
 - **Sources:** [NSW National Parks, Minyon Falls walking track](https://www.nationalparks.nsw.gov.au/things-to-do/walking-tracks/minyon-falls-walking-track) · [NSW National Parks, Wollumbin National Park](https://www.nationalparks.nsw.gov.au/visit-a-park/parks/wollumbin-national-park)

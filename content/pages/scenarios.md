@@ -1,7 +1,7 @@
 # Scenarios
 
 - **Every scenario starts here:** land in Perth on Tue 15 Dec 2026 at 22:55 (Cathay CX171, booked).
-- **Every scenario ends here:** a flight home from the east coast around mid-February 2027 (not booked yet).
+- **Every scenario ends here:** a flight home from the east coast, mid-February 2027 (8 Feb in Scenario 4; not booked yet).
 - **Costs:** EUR for two, from the site's engine (contingency on, 1 Oct 2026). Each full scenario page shows the live figure.
 - **Options not yet in a scenario:** [Adeline's adventures, researched →](/scenarios/options)
 
@@ -21,7 +21,7 @@
 | ~mid Feb | Fly home from Brisbane | Not booked |
 
 - **Cost for two:** €17,157 on the engine (63 days). Adeline's own estimate: €12,500–15,000 including flights.
-- **Watch:** Christmas Day at the sister's farm in Morawa (4 h north of Perth) is not in this plan's Christmas week yet. No direct Hobart → Ballina flight: it connects via Sydney or Melbourne.
+- **Watch:** Christmas Day at the sister's farm in Morawa (4 h north of Perth) is not in this plan's Christmas week yet. No direct Hobart → Ballina flight: it connects via Sydney or Melbourne. The engine prices Hobart → Gold Coast and home from Gold Coast instead.
 - [Full scenario: Adeline's plan, week by week →](/scenarios/adeline-west-to-east)
 
 ## 2 · The All-Stops Tour
