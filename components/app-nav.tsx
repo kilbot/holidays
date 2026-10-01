@@ -92,6 +92,17 @@ function FlightsIcon(props: IconProps) {
   );
 }
 
+/** Flights – December — a calendar page: the month's fares, written up. */
+function FlightsDecemberIcon(props: IconProps) {
+  return (
+    <Glyph {...props}>
+      <rect x="4" y="5" width="16" height="15" rx="2.5" />
+      <path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3" />
+      <path d="M8 13.5h3M8 16.5h6" />
+    </Glyph>
+  );
+}
+
 /** Ledger — a page of priced day lines, long, long, short. */
 function LedgerIcon(props: IconProps) {
   return (
@@ -148,11 +159,19 @@ type NavItem = {
     | "/"
     | "/adventures"
     | "/flights"
+    | "/flights-december"
     | "/ledger"
     | "/budget"
     | "/scenarios"
     | "/resources";
   label: string;
+  /**
+   * Rail only. The phone's bar is one row of equal columns, and an eighth
+   * leaves ~47px each: at 375px "Scenarios" and "Adventures" overlap and
+   * "Resources" runs off the edge. A rail-only page is reached on a phone
+   * from a link on its parent page instead.
+   */
+  railOnly?: true;
   /** Said to a screen reader, and to anyone who hovers long enough. */
   hint: string;
   Icon: ComponentType<IconProps>;
@@ -178,6 +197,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
     hint: "Multi-origin search, comfort-first",
     Icon: FlightsIcon,
   },
+  {
+    href: "/flights-december",
+    label: "Flights – December",
+    railOnly: true,
+    hint: "December fares to Perth, written up",
+    Icon: FlightsDecemberIcon,
+  },
   { href: "/ledger", label: "Ledger", hint: "Day-by-day costs", Icon: LedgerIcon },
   { href: "/budget", label: "Budget", hint: "Spend against the ceiling", Icon: BudgetIcon },
   {
@@ -190,10 +216,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
 
 /**
  * `/` is only current when it is exactly `/` — every other section owns its
- * subtree, so a future `/adventures/rottnest` still lights Adventures.
+ * subtree, so `/adventures/rottnest` lights Adventures, but
+ * `/flights-december` must not light Flights.
  */
 function isCurrent(pathname: string, href: NavItem["href"]): boolean {
-  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+  return href === "/"
+    ? pathname === "/"
+    : pathname === href || pathname.startsWith(`${href}/`);
 }
 
 /* ------------------------------------------------------------------ */
@@ -277,7 +306,7 @@ export function AppTabBar() {
       aria-label="Sections"
       className="relative z-40 flex shrink-0 border-t border-[var(--sb-line)] bg-[var(--sb-panel)] pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
     >
-      {NAV_ITEMS.map(({ href, label, hint, Icon }) => {
+      {NAV_ITEMS.filter((item) => !item.railOnly).map(({ href, label, hint, Icon }) => {
         const current = isCurrent(pathname, href);
         return (
           <Link
