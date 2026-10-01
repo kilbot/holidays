@@ -46,6 +46,7 @@
  */
 
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import type { CoverageReport } from "@/lib/flights/coverage";
@@ -1426,6 +1427,14 @@ export function FlightsView({ outbound, returns }: FlightsViewProps) {
             by the comfort score rather than the price, and add the train, the
             hold bags, the night before and the taxes back on before anything is
             compared.
+          </p>
+          <p className="mt-2 text-[12px] sm:text-[13px]">
+            <Link
+              href="/flights-december"
+              className="font-semibold text-[var(--sb-accent)] underline-offset-2 hover:underline"
+            >
+              December flights to Perth — options and considerations →
+            </Link>
           </p>
           <QuotaMeter quota={quota} />
         </header>
