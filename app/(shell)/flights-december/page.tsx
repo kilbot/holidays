@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { PlanWriteup } from "@/components/plan-writeup";
+import { plainDescription } from "@/lib/markdown-description";
 
 /**
  * The markdown in `content/pages/flights-december.md`, rendered as written.
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const paragraph = lines.find((line) => line !== "" && !/^[#>|*\-\d]/.test(line));
   return {
     title: `${heading ?? "Flights – December"} — Australia 2026–27`,
-    description: paragraph,
+    description: paragraph ? plainDescription(paragraph) : undefined,
   };
 }
 
