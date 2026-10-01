@@ -1,3 +1,13 @@
+/** The first prose line of a Markdown document, trimmed; undefined if none. */
+export function firstParagraph(markdown: string): string | undefined {
+  return markdown.split("\n").map((line) => line.trim()).find((line) =>
+    line !== "" &&
+    !/^[#>|]/.test(line) &&
+    !/^(?:[-*+] |\d+[.)] )/.test(line) &&
+    !/^(?:-{3,}|\*{3,}|_{3,})$/.test(line),
+  );
+}
+
 export function plainDescription(markdown: string, max = 160): string {
   const text = markdown
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")

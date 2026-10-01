@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { PlanWriteup } from "@/components/plan-writeup";
-import { plainDescription } from "@/lib/markdown-description";
+import { firstParagraph, plainDescription } from "@/lib/markdown-description";
 
 /**
  * The markdown in `content/pages/flights-december.md`, rendered as written.
@@ -20,9 +20,10 @@ const CONTENT = path.join(process.cwd(), "content", "pages", "flights-december.m
  * first paragraph — so editing the markdown is the whole of a content change.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const lines = (await readFile(CONTENT, "utf8")).split("\n").map((line) => line.trim());
+  const markdown = await readFile(CONTENT, "utf8");
+  const lines = markdown.split("\n").map((line) => line.trim());
   const heading = lines.find((line) => line.startsWith("# "))?.slice(2);
-  const paragraph = lines.find((line) => line !== "" && !/^[#>|*\-\d]/.test(line));
+  const paragraph = firstParagraph(markdown);
   return {
     title: `${heading ?? "Flights – December"} — Australia 2026–27`,
     description: paragraph ? plainDescription(paragraph) : undefined,
