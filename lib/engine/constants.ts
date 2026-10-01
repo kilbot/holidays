@@ -48,6 +48,14 @@ export const CONTINGENCY_RATE = 0.1;
 /** How many people the per-couple figures cover. */
 export const TRAVELLERS = 2;
 
+/**
+ * Days getting to Australia: train 12 Dec, CX372 13 Dec, night in HKG 14 Dec,
+ * CX171 lands PER 22:55 15 Dec. The couple first sleeps there on day 3.
+ */
+export const INBOUND_LANDS_AFTER = 3;
+/** Where the outbound crossing lands. */
+export const LANDING_LOCATION_ID = "perth";
+
 /* ------------------------------------------------------------------ */
 /* Markets                                                             */
 /* ------------------------------------------------------------------ */

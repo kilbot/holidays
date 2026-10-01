@@ -186,14 +186,9 @@ const BYRON_AT_ITS_MINIMUM: Readonly<Record<string, number>> = {
  *   the day the Sydney block still opens on. Boxing Day carries the 370 km
  *   drive *and* the fare, which is one travelling day where there were two.
  *
- * **It no longer quite fits, and the Plan says so.** The couple's pinned
- * crossing is Madrid → Hong Kong → Perth and takes two days rather than one, so
- * the leg above is eleven days of sequence in ten days of calendar. The
- * Scheduler does not refuse: it puts the Fremantle evening on the arrival
- * block's second day and raises an overlap Warning. Nothing is lost — both are
- * Home-base days at the same rates and the couple sleeps at Paul's dad's either
- * way — but the jet-lag block is a day shorter than its own minimum asks for,
- * and that is on the page rather than quietly absorbed.
+ * The booked crossing takes three days: leave 12 Dec, land 15 Dec. That gives
+ * the eleven-day WA sequence eleven days before Boxing Day, including the
+ * arrival block's full two-day minimum before the Fremantle evening.
  */
 const WA_SEQUENCE_LENGTHS: Readonly<Record<string, number>> = {
   "mundaring-arrival": 2,
@@ -223,17 +218,13 @@ const WA_SEQUENCE_LENGTHS: Readonly<Record<string, number>> = {
 const RETURN_DATE = "2027-02-14";
 
 /**
- * When the couple leaves Valencia: **14 December 2026**.
+ * When the couple leaves Valencia: **12 December 2026**, as booked.
  *
- * Moved out from the 12th on the live Plan and brought back here so a re-seed
- * keeps it. It is seed data and nothing else — the `arrival` Lock is defined
- * against the trip rather than the calendar precisely so that moving this date
- * moves the Mundaring block with it, and every other Lock is a real claim about
- * the world that stays where the world put it. The user is watching a 12
- * December Cathay fare; if it comes back level, this one line moves back and
- * the WA sequence reflows on its own.
+ * The 14 Dec watch is over: the live Plan leaves on the 12th, with CX372
+ * departing Madrid on the 13th. A re-seed keeps that booked departure; the
+ * trip-relative arrival Lock moves Mundaring with it.
  */
-const LEAVING_DATE = "2026-12-14";
+const LEAVING_DATE = "2026-12-12";
 
 /**
  * "The All-Stops Tour" — the reference trip: **the everything version, the

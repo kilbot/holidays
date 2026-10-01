@@ -51,6 +51,7 @@
 import {
   AUD_TO_EUR,
   DEFAULT_LODGING_TIER,
+  INBOUND_LANDS_AFTER,
   MARKETS,
   lodgingRate,
   type Rate,
@@ -86,15 +87,10 @@ const SCHEDULING: Readonly<Record<string, Scheduling>> = {
     locationId: "mundaring",
     lock: {
       kind: "arrival",
-      // The couple's own booking, not a research default: train Valencia →
-      // Madrid, then Cathay Pacific MAD → HKG → PER on one ticket. The Madrid
-      // departure is the 22:30 (`flight-hubs.md`: "the only long-haul in the
-      // grid a same-day 1h56 train can safely feed"), Hong Kong is a
-      // same-ticket connection rather than a stopover, and about 25 hours later
-      // they land in Perth at dawn **two** days after leaving. No hotel night
-      // at either end of it — the two Days in between price at the transit
-      // market, which is the honest cost of being in the air.
-      landsAfter: 2,
+      // Booked: AVE to Madrid 12 Dec and a Madrid night; CX372 13 Dec to
+      // Hong Kong 14 Dec and a Hong Kong night; CX171 lands Perth 22:55
+      // on 15 Dec. The days before landing still price at the transit market.
+      landsAfter: INBOUND_LANDS_AFTER,
       why: "docs/CONTEXT.md's semi-fixed Anchor: the first days after landing are spent with Paul's dad in Mundaring Hills — jet-lag recovery and Perth acclimatisation, before anything with a ticket on it starts.",
     },
     // Home base #3. The car is Dad's, so the block hires nothing.

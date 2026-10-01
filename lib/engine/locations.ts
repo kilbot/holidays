@@ -29,11 +29,8 @@ export const ORIGIN_AIRPORT = "VLC";
  * nothing recognises comes back named "HKG". A connection the couple spends
  * five hours in is still a place they go, and the map should say Hong Kong.
  *
- * No Day is ever spent at one. `landsAfter` puts the couple in Perth the
- * morning after the second sector leaves, and the research's own routing has
- * no hotel night at either hub — so these carry the `transit` regime, which is
- * the ledger's name for "the trip has started and has not landed", and price
- * nothing because nothing is placed here.
+ * The booking has a Madrid night and a Hong Kong night. The ledger prices
+ * both at the `transit` regime for now; no Day is assigned to either hub.
  *
  * The coordinates are the terminals, and that is exact rather than
  * approximate: unlike Port Douglas, a connection genuinely *is* its airport.

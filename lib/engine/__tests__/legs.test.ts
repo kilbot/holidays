@@ -63,10 +63,10 @@ test("the journey home carries a share of the return figure, and says that it do
   // The outbound is no longer a share of anything: the couple has pinned it,
   // and a quote you hold outranks a band somebody modelled (#107). €872 per
   // person one-way, for two, split across the two Cathay sectors by their
-  // block hours — this one is the 13-hour leg out of Madrid.
+  // block hours — this one is the 12h30 leg out of Madrid.
   assert.equal(out.fareBasis, "one-way");
   assert.equal(out.pricing, "pinned");
-  assert.equal(out.eur, cents(872 * TRAVELLERS * (13 / (13 + 7 + 40 / 60))));
+  assert.equal(out.eur, cents(872 * TRAVELLERS * (12.5 / (12.5 + 7 + 35 / 60))));
   assert.ok(
     out.eur > home.eur,
     "December out is the peak; February home is the cheapest month",

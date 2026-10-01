@@ -97,6 +97,7 @@ import {
   AUD_TO_EUR,
   DRIVE_KM_PER_DAY,
   FUEL_AUD_PER_KM,
+  INBOUND_LANDS_AFTER,
   ROAD_DISTANCE_FACTOR,
   TRAVELLERS,
 } from "@/lib/engine/constants";
@@ -250,19 +251,11 @@ interface Crossing {
 /**
  * **Valencia → Madrid → Hong Kong → Perth.** The couple's own booking.
  *
- * `docs/research/longhaul-comfort.md` §"The Value-Comfort Line" is this exact
- * routing: *"Train Valencia → Madrid (1h56, ~25 trains/day)… MAD → HKG daily
- * from 25 October 2026. HKG → PER twice daily, 7h40… A350 on both sectors."*
- * `flight-hubs.md` adds the reason Madrid is the hub rather than Barcelona:
- * one of Cathay's two rotations departs **MAD 22:30**, *"the only long-haul in
- * the grid a same-day 1h56 train can safely feed"*, so there is no hotel night
- * on the European side.
- *
- * Departure days: the train and the 22:30 flight both go on day 0; Hong Kong is
- * reached late on day 1 and left the same evening, so the second flight departs
- * on day 1 and lands in Perth at dawn on day 2. That is the `landsAfter: 2` on
- * `mundaring-arrival`, and it is why the two Days in between are Buffer days at
- * the transit market rather than a hotel anywhere.
+ * `content/pages/flights-december.md`, "Booked": AVE 15:09→17:17 12 Dec
+ * (day 0), then a Madrid night. CX372 leaves MAD 11:20 13 Dec (day 1),
+ * reaches HKG 06:50 14 Dec (day 2), then a Hong Kong night. CX171 leaves
+ * HKG 15:20 and lands PER 22:55 15 Dec (day 3). The ledger prices the days
+ * before landing at the transit regime for now.
  */
 const INBOUND: Crossing = {
   journey: { from: "MAD", to: "PER" },
@@ -271,32 +264,26 @@ const INBOUND: Crossing = {
       locationId: "madrid",
       mode: "train",
       hours: null,
-      // flight-hubs.md, the positioning table: "Madrid by train, same day
-      // (feeding the 22:30 Cathay) — €16–110 train, no hotel", for the couple.
+      // Retain the research's €16–110 train estimate for the couple.
       ownEur: [16, 16, 110],
       departsOn: 0,
-      note: "The feeder. 1h56 and ~25 trains a day, and it is the reason the hub is Madrid: it is the only long-haul in the grid a same-day train can safely feed, so there is no hotel night in Europe. Not on the airline ticket — flight-hubs.md is explicit that a train feed is unprotected, and Iberia on the same oneworld PNR is the €90–240 upgrade that buys the protection.",
+      note: "Booked AVE Valencia → Madrid, 15:09→17:17 12 Dec, then a Madrid night. The train feed is unprotected and not on the airline ticket — flight-hubs.md.",
     },
     {
       locationId: "hong-kong",
       mode: "flight",
-      // ~13h. The published pair is MAD 22:30 and HKG–PER at 7h40, and the
-      // couple's own ~25h door-to-door leaves about four hours at Chek Lap Kok.
-      hours: 13,
+      hours: 12.5,
       ownEur: null,
-      departsOn: 0,
-      note: "Cathay Pacific, MAD 22:30, A350 — daily from 25 October 2026, longhaul-comfort.md §5.",
+      departsOn: 1,
+      note: "Booked Cathay Pacific CX372, MAD 11:20 13 Dec → HKG 06:50 14 Dec, 12h30, then a Hong Kong night.",
     },
     {
       locationId: null,
       mode: "flight",
-      // CX171 is the A350-900 at 7h40; the couple is on the later rotation of
-      // the two dailies, which is what makes Hong Kong a connection and not a
-      // night. longhaul-comfort.md §4.
-      hours: 7 + 40 / 60,
+      hours: 7 + 35 / 60,
       ownEur: null,
-      departsOn: 1,
-      note: "Cathay Pacific HKG→PER, A350-900, 7h40 — a same-ticket connection rather than a stopover, landing in Perth at dawn. No hotel night at either end of the crossing.",
+      departsOn: INBOUND_LANDS_AFTER,
+      note: "Booked Cathay Pacific CX171, HKG 15:20 → PER 22:55 15 Dec, 7h35, after the Hong Kong night.",
     },
   ],
 };
@@ -377,7 +364,7 @@ const PINNED_FARES: Readonly<Record<string, PinnedFare>> = {
   "MAD-PER": {
     priceEur: 872,
     carrier: "Cathay Pacific",
-    quotedFor: "14 Dec 2026",
+    quotedFor: "13 Dec 2026",
   },
 };
 

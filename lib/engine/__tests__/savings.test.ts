@@ -116,16 +116,17 @@ const AUDIT_EUR = { comfortable: 17_914, aggressive: 15_530 };
  */
 const FARE_REBASIS_EUR = 951;
 
-test("Aggressive still lands within €150 of the audit's €15,530, less the fare re-basis", () => {
+test("Aggressive stays within €150 of the audit after fare and calendar adjustments", () => {
   // The one waterfall the re-plan left standing, and it is not luck: Aggressive
   // was always the shortest, flattest version — every eligible block camped,
   // a hostel twin on the harbour, no cruises — so moving the *shape* of the
-  // trip moved it least. The one adjustment is the crossings, above.
-  const expected = AUDIT_EUR.aggressive - FARE_REBASIS_EUR;
+  // trip moved it least. The booked calendar adds a transit day (€48.80) and
+  // a Margaret River Buffer day (€115.90), plus 10% contingency: €181.17.
+  const expected = AUDIT_EUR.aggressive - FARE_REBASIS_EUR + 181.17;
   const drift = Math.abs(aggressive.rollUp.totalEur - expected);
   assert.ok(
     drift <= TOLERANCE_EUR,
-    `engine says €${Math.round(aggressive.rollUp.totalEur)}, audit says €${AUDIT_EUR.aggressive} less €${FARE_REBASIS_EUR} = €${expected} — €${Math.round(drift)} apart`,
+    `engine says €${Math.round(aggressive.rollUp.totalEur)}, audit says €${AUDIT_EUR.aggressive} less €${FARE_REBASIS_EUR} plus €181.17 = €${expected} — €${Math.round(drift)} apart`,
   );
 });
 
@@ -146,27 +147,22 @@ test("Comfortable has left the audit behind, and the re-plan is why", () => {
 });
 
 /**
- * The arrival block is a rounding, whichever way it falls.
- *
- * It does not add days, it displaces them, so its effect on a total is whatever
- * the re-plan around it comes to — a rise when it pushes Margaret River into
- * more paid nights, a fall when it takes them out. Both have been true during
- * #54. The assertion worth keeping is the magnitude: this is noise on a €19,000
- * trip and not a lever, and a golden number here would only have to be re-typed
- * every time the rate card or the calendar moves.
+ * With the booked calendar, omitting arrival buys Perth Buffer nights before
+ * the first block. The default also reflows WA; the savings paths share a delta.
  */
-test("the arrival block is a re-plan, not a lever", () => {
-  for (const [name, scenario, priced_] of [
-    ["default", DEFAULT_SCENARIO, base],
-    ["comfortable", COMFORTABLE_SCENARIO, comfortable],
-    ["aggressive", AGGRESSIVE_SCENARIO, aggressive],
+test("the arrival block's cost reflects Perth Buffers and the WA re-plan", () => {
+  for (const [name, scenario, priced_, expected] of [
+    ["default", DEFAULT_SCENARIO, base, 275.22],
+    ["comfortable", COMFORTABLE_SCENARIO, comfortable, 74.47],
+    ["aggressive", AGGRESSIVE_SCENARIO, aggressive, 74.47],
   ] as const) {
     const delta = Math.abs(
       priced_.rollUp.totalEur - withoutArrival(scenario).rollUp.totalEur,
     );
-    assert.ok(
-      delta < 250,
-      `${name}: €${Math.round(delta)} is too big to call a re-plan`,
+    assert.equal(
+      Math.round(delta * 100),
+      Math.round(expected * 100),
+      `${name}: expected €${expected}, got €${delta}`,
     );
   }
 });
@@ -337,10 +333,8 @@ test("Comfortable re-homes the post-NYE gap without teleporting", () => {
   }, 0);
 
   // …and a Day the ceiling double-books is a Day its placements claim twice.
-  // The reference trip's pinned crossing takes two days rather than one (#107),
-  // which leaves the WA sequence one day short and puts the Fremantle evening
-  // on top of the arrival block. The ledger prices that Day once, so it is one
-  // fewer claimed Day than the placements add up to.
+  // Leaving 12 Dec and landing 15 Dec now fits the full WA sequence without
+  // overlaps; a future double-booking would still count only once in the ledger.
   const doubleBooked =
     base.placements.reduce((total, placement) => total + placement.days, 0) -
     base.days.filter((day) => !day.buffer).length;
@@ -418,10 +412,8 @@ test("the seeded state survives a round trip through the parser", () => {
 });
 
 test("the default Scenario's shape is untouched by the recalibration", () => {
-  // #64 re-prices the reference trip; it does not re-plan it. Same dates, same
-  // Adventures, no overrides of any kind — only the rate card moved. The count
-  // is nine since #54 added the Mundaring arrival block to every seed.
-  assert.equal(DEFAULT_SCENARIO.input.startDate, "2026-12-14");
+  // The booked 12 Dec departure keeps the same Adventures and rate choices.
+  assert.equal(DEFAULT_SCENARIO.input.startDate, "2026-12-12");
   assert.equal(DEFAULT_SCENARIO.input.endDate, "2027-02-14");
   // Ten researched Adventures, the two WA evenings and the four Far North
   // Queensland ideas #54 put on the bench.
